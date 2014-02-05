@@ -1,5 +1,5 @@
 /*****************************************************************************
-* this should be first go for the FR framework. marc dunser, 2014            *
+* this should be a first go at the FR framework. marc dunser, 2014            *
 *****************************************************************************/
 
 #include "include/Fakerates.hh"

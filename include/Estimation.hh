@@ -1,5 +1,5 @@
-#ifndef FAKERATES_HH
-#define FAKERATES_HH
+#ifndef ESTIMATION_HH
+#define ESTIMATION_HH
 
 #include "TMath.h"
 
