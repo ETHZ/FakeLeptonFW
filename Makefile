@@ -6,12 +6,14 @@ ROOTLIBS   = $(shell root-config --libs)
 ROOTGLIBS  = $(shell root-config --glibs)
 
 LIBS       = $(ROOTLIBS)
-INCLUDES   = -I. $(ROOTCFLAGS) 
+INCLUDES   = -I. $(ROOTCFLAGS)
 
 CXX        = g++
 CXXFLAGS   = $(ROOTCFLAGS) $(INCLUDES)
+## -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2 -std=c++0x
 
-SRCSA      = src/TreeClass.C src/Fakerates.cc
+##SRCSA      = src/TreeClass.C src/Fakerates.cc
+SRCSA      = src/FWBaseClass.C src/Fakerates.cc
 OBJSA      = $(patsubst %.C,%.o,$(SRCSA:.cc=.o))
 
 includes = $(wildcard include/*.h)
@@ -26,15 +28,11 @@ OBJSC      = $(patsubst %.C,%.o,$(SRCSC:.cc=.o))
 .PHONY : clean purge all depend
 
 
-##DEPENDENCIES_OUTPUT = .depend
-
 # Rules ====================================
 all: Fakerates Estimation Closure
 
 Fakerates: exe/Fakerates.C $(OBJSA)
 	$(CXX) $(INCLUDES) $(LIBS) -ldl -o $@ $^
-
-%.o: %.C ${includes}
 
 Estimation: exe/Estimation.C $(OBJSB)
 	$(CXX) $(INCLUDES) $(LIBS) -ldl -o $@ $^
@@ -48,7 +46,6 @@ depend: .depend
 	rm -f ./.depend
 	$(foreach SRC,$^,$(CXX) -I. -I$(shell root-config --incdir) -MG -MM -MT $(patsubst %.C,%.o,$(SRC:.cc=.o)) $(SRC) >> ./.depend;)
 
-#$(CXX) $(CXXFLAGS) -MM -MT $(patsubst %.o,%.cc,$^) >> ./.depend;
 
 clean:
 	find src -name '*.o' -exec $(RM) -v {} ';' 

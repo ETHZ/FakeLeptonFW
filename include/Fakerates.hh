@@ -30,10 +30,10 @@
 #include <map>
 #include <time.h> // access to date/time
 
-#include "TreeClass.h"
+#include "include/FWBaseClass.h"
 #include "Utilities.hh"
 
-class Fakerates: public TreeClass{
+class Fakerates: public FWBaseClass{
 
 public:
 	Fakerates();
