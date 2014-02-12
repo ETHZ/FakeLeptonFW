@@ -31,13 +31,14 @@ void Fakerates::init(bool verbose){
 
 
 void Fakerates::doStuff(){
-	loop("/shome/mdunser/framework/release/fakeminitree.root");
+	Sample * sample();
+	loop();
 
 }
-void Fakerates::loop(const char * filestring){
+void Fakerates::loop(){
 
 
-	TFile * file_ = TFile::Open(filestring);
+	TFile * file_ = TFile::Open(fInputFile);
 	TTree * tree_ = (TTree *) file_->Get("Analysis"); // tree name has to be named "Analysis"
 	tree_->ResetBranchAddresses();
 	Init(tree_);
@@ -48,14 +49,56 @@ void Fakerates::loop(const char * filestring){
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events;jentry++) {
 		tree_->GetEntry(jentry);
-		// if(Event % 100 == 0) cout << "Event: " << Event << endl;
-		if(ElPt->size() > 0) {
-			cout << "more than one electron present" << endl;
-			cout << " pt of first electron: " << ElPt->at(0) << endl;
-			cout << " pt of first electron: " << (*ElPt)[0] << endl;
-		}
 		ntot++;
+
+		// fillRatios();
+		fillIsoPlots();
 	}
 	cout << "i just looped on " << ntot << " events." << endl;
 	delete file_, tree_;
 }
+
+bool Fakerates::isCalibrationRegionMuEvent(int &mu){
+	int nloose(0), nveto_add(0);
+	for(int i=0; MuPt->size(); ++i){
+		if(MuIsLoose->at(i)){
+			nloose++;
+			mu = i;
+		}
+		if(!MuIsLoose->at(i) && MuIsVeto->at(i)){
+			nveto_add++;
+		}
+	}
+	// require exactly one loose muon and no additional veto muons
+	if(nloose    != 1) return false;
+	if(nveto_add != 0) return false;
+
+	// upper cuts on MT and MET
+	if(pfMET > 30.)              return false;
+	if(MuMT->at(mu) > 30.) return false;
+
+	int nawayjets(0);
+	for(int i=0; JetPt->size(); ++i){
+		if(JetPt->at(i) < 40.) continue;
+		if(Util::DeltaPhi(JetPhi->at(i), MuPhi->at(mu)) < 2.0 ) continue;
+		nawawyjets++;
+	}
+	if(nawayjets != 1) return false;
+	return true;
+}
+
+bool Fakerates::isCalibrationRegionElEvent(){
+	return false;	
+}
+
+void Fakerates::fillIsoPlots(){
+	int mu(-1);
+	if(isCalibrationRegionMuEvent(mu)){
+		muIsoPlot->Fill(MuPFIso->at(mu));
+	}
+	int el(-1);
+	if(isCalibrationRegionElEvent(el)){
+		elIsoPlot->Fill(ElPFIso->at(el));
+	}
+}
+

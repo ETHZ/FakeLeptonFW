@@ -25,14 +25,20 @@ int main(int argc, char* argv[]) {
 	TString inputfile  = "";
 	TString outputdir  = "";
 	int verbose(0);
+	bool isdata(true);
+	TString name = "";
+	float xsec(1.);
 
 	// Parse options
 	char ch;
-	while ((ch = getopt(argc, argv, "i:v:h?")) != -1 ) {
+	while ((ch = getopt(argc, argv, "i:o:v:x:sn:h?")) != -1 ) {
 		switch (ch) {
-			case 'i': inputfile  = TString(optarg);  break;
-			case 'o': outputdir  = TString(optarg);  break;
-			case 'v': verbose    = atoi(optarg);     break;
+			case 'i': inputfile  = TString(optarg)       ;  break;
+			case 'o': outputdir  = TString(optarg)       ;  break;
+			case 'v': verbose    = atoi(optarg)          ;  break;
+			case 's': isdata     = false                 ;  break;
+			case 'n': name       = TString(optarg)       ;  break;
+			case 'x': xsec       = ::atof( ((std::string) optarg).c_str());  break;
 			case '?':
 			case 'h': usage(0); break;
 			default:
@@ -46,15 +52,23 @@ int main(int argc, char* argv[]) {
 		usage(-1);
 	}
 
-	if(verbose > 0) cout << "------------------------------------" << endl;
-	if(verbose > 0) cout << " Verbose level is:  " << verbose << endl;
-	if(verbose > 0) cout << " Inputfile is:      " << inputfile << endl;
-	if(verbose > 0) cout << " Outputdir is:      " << outputdir << endl;
+	cout << "------------------------------------" << endl;
+	cout << " verbose level is:  " << verbose << endl;
+	cout << " inputfile is:      " << inputfile << endl;
+	cout << " outputdir is:      " << outputdir << endl;
+	cout << " running on " << (isdata?"data":"mc") << endl;
+	cout << " xsec: " << xsec << endl;
+	cout << " sample name " << name << endl;
 
 	Fakerates *frA = new Fakerates();
 	frA->setVerbose(verbose);
+	frA->setData(isdata);
+	frA->setXS(xsec);
+	frA->setInputFile(inputfile);
+	frA->setOutputDir(outputdir);
 	frA->doStuff();
 	delete frA;
+	cout << "...done" << endl;
 	return 0;
 }
 

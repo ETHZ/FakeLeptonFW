@@ -451,18 +451,6 @@ namespace Util {
 	}
 
 	//__________________________________________________________________________
-	inline std::string removeFunnyChar(const std::string& input){
-		const std::string excluded = " ()[]/\\~;:{}*&$<>`!@#%^+|\'\",?";
-		std::string answer(input);
-		std::string::size_type pos = answer.find_first_of(excluded);
-		while (pos != std::string::npos) {
-			answer.erase(pos, 1);
-			pos = answer.find_first_of(excluded);
-		}    
-		return answer;
-	}
-
-	//__________________________________________________________________________
 	inline double IntegralAndError(TH1 *hist, int bin1, int bin2, double &err){
 		// not implemented before ROOT v2.26
 		double_t integral = 0;
