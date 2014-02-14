@@ -14,14 +14,16 @@ Fakerates::Fakerates(){
 }
 
 //____________________________________________________________________________
-Fakerates::~Fakerates(){}
+Fakerates::~Fakerates(){
+	// TFile * fOutputFile = new TFile(fOutputFilename);
+	// if(fOutputFile != NULL && fOutputFile->IsOpen()) fOutputFile->Close();
+}
 
 //____________________________________________________________________________
 void Fakerates::init(bool verbose){
 	cout << "------------------------------------" << endl;
 	cout << "Initializing Fakerates Class ... " << endl;
 	cout << "------------------------------------" << endl;
-	fOutputSubDir = "";
 	Util::SetStyle();
 }
 
@@ -31,12 +33,15 @@ void Fakerates::init(bool verbose){
 
 
 void Fakerates::doStuff(){
-	Sample * sample();
+	//Sample * sample();
+	fOutputFilename = fOutputDir + "/" + fName + "_ratios.root";
 	loop();
 
 }
 void Fakerates::loop(){
 
+	TFile *pFile = new TFile(fOutputFilename, "RECREATE");
+	bookHistos();
 
 	TFile * file_ = TFile::Open(fInputFile);
 	TTree * tree_ = (TTree *) file_->Get("Analysis"); // tree name has to be named "Analysis"
@@ -48,25 +53,37 @@ void Fakerates::loop(){
 
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events;jentry++) {
+		if(jentry > 150000) break; // foo
 		tree_->GetEntry(jentry);
 		ntot++;
 
 		// fillRatios();
 		fillIsoPlots();
 	}
+	// end loop on the events
+
 	cout << "i just looped on " << ntot << " events." << endl;
 	delete file_, tree_;
+
+
+	writeHistos(pFile);
+
+	// pFile->Write();
+	pFile->Close();
+
 }
 
+
 bool Fakerates::isCalibrationRegionMuEvent(int &mu){
+	if(MuPt->size() < 1) return false;
 	int nloose(0), nveto_add(0);
-	for(int i=0; MuPt->size(); ++i){
+	for(int i=0; i < MuPt->size(); ++i){
 		if(MuIsLoose->at(i)){
 			nloose++;
 			mu = i;
 		}
-		if(!MuIsLoose->at(i) && MuIsVeto->at(i)){
-			nveto_add++;
+		else{
+			if(MuIsVeto->at(i)) nveto_add++;
 		}
 	}
 	// require exactly one loose muon and no additional veto muons
@@ -74,31 +91,113 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	if(nveto_add != 0) return false;
 
 	// upper cuts on MT and MET
-	if(pfMET > 30.)              return false;
+	if(pfMET > 30.)        return false;
 	if(MuMT->at(mu) > 30.) return false;
 
 	int nawayjets(0);
-	for(int i=0; JetPt->size(); ++i){
-		if(JetPt->at(i) < 40.) continue;
-		if(Util::DeltaPhi(JetPhi->at(i), MuPhi->at(mu)) < 2.0 ) continue;
-		nawawyjets++;
+	int ngoodjets(0);
+	if(JetPt->size() < 1) return false;
+	for(int jet=0; jet < JetPt->size(); ++jet){
+		if(!isGoodJet(jet, 40.)) continue;
+		if(Util::DeltaPhi(JetPhi->at(jet), MuPhi->at(mu)) < 2.0 ) continue;
+		nawayjets++;
 	}
 	if(nawayjets != 1) return false;
 	return true;
 }
 
-bool Fakerates::isCalibrationRegionElEvent(){
+bool Fakerates::isGoodJet(int j, float pt){
+	if(JetPt->at(j) < pt) return false;
+	if(fabs(JetEta->at(j)) > 2.5) return false;
+	if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
+	
+	float minDR = 0.4;
+
+	// Remove jets close to all tight leptons
+	for(int imu = 0; imu < MuPt->size(); ++imu){
+	    if(!MuIsTight->at(imu)) continue;
+	    if(Util::GetDeltaR(MuEta->at(imu), JetEta->at(j), MuPhi->at(imu), JetPhi->at(j)) > minDR ) continue;
+	    return false;
+	}
+	for(int iel = 0; iel < ElPt->size(); ++iel){
+	    if(!ElIsTight->at(iel)) continue;
+	    if(Util::GetDeltaR(ElEta->at(iel), JetEta->at(j), ElPhi->at(iel), JetPhi->at(j)) > minDR ) continue;
+	    return false;
+	}
+	return true;
+
+
+}
+
+bool Fakerates::isCalibrationRegionElEvent(int &el){
 	return false;	
 }
 
 void Fakerates::fillIsoPlots(){
 	int mu(-1);
 	if(isCalibrationRegionMuEvent(mu)){
-		muIsoPlot->Fill(MuPFIso->at(mu));
+		h_muIsoPlot->Fill(MuPFIso->at(mu));
+		h_muFLoose ->Fill(MuPt->at(mu), MuEta->at(mu));
+		if(MuIsTight->at(mu) && MuPFIso->at(mu) < 0.1) {
+			h_muFTight ->Fill(MuPt->at(mu), MuEta->at(mu));
+		}
 	}
 	int el(-1);
 	if(isCalibrationRegionElEvent(el)){
-		elIsoPlot->Fill(ElPFIso->at(el));
+		h_elIsoPlot->Fill(ElPFIso->at(el));
 	}
 }
 
+void Fakerates::bookHistos(){
+
+	// the ratio histograms, those are just divided versions of the following
+	h_elFRatio = new TH2F("h_elFRatio", "elFRatio", 4, 10, 40, 2, 0., 2.5);
+	h_muFRatio = new TH2F("h_muFRatio", "muFRatio", 4, 10, 40, 2, 0., 2.5);
+	h_elPRatio = new TH2F("h_elPRatio", "elPRatio", 4, 10, 40, 2, 0., 2.5);
+	h_muPRatio = new TH2F("h_muPRatio", "muPRatio", 4, 10, 40, 2, 0., 2.5);
+	
+	// passing histograms for electrons and muons, f and p rate
+	h_elFTight = new TH2F("h_elFTight", "elFTight", 4, 10, 40, 2, 0., 2.5);
+	h_muFTight = new TH2F("h_muFTight", "muFTight", 4, 10, 40, 2, 0., 2.5);
+	h_elPTight = new TH2F("h_elPTight", "elPTight", 4, 10, 40, 2, 0., 2.5);
+	h_muPTight = new TH2F("h_muPTight", "muPTight", 4, 10, 40, 2, 0., 2.5);
+
+	// failing histograms for electrons and muons, f and p rate
+	h_elFLoose = new TH2F("h_elFLoose", "elFLoose", 4, 10, 40, 2, 0., 2.5);
+	h_muFLoose = new TH2F("h_muFLoose", "muFLoose", 4, 10, 40, 2, 0., 2.5);
+	h_elPLoose = new TH2F("h_elPLoose", "elPLoose", 4, 10, 40, 2, 0., 2.5);
+	h_muPLoose = new TH2F("h_muPLoose", "muPLoose", 4, 10, 40, 2, 0., 2.5);
+
+	h_muIsoPlot = new TH1F("h_muIsoPlot", "muIsoPlot", 100, 0., 1.);
+	h_elIsoPlot = new TH1F("h_elIsoPlot", "elIsoPlot", 100, 0., 1.);
+
+}
+void Fakerates::writeHistos(TFile* pFile){
+	pFile->cd(); 
+	TDirectory* sdir = Util::FindOrCreate(fName, pFile);
+	sdir->cd();
+
+
+	// the ratio histograms, those are just divided versions of the following
+	h_elFRatio ->Write(fName+h_elFRatio->GetName(), TObject::kWriteDelete);
+	h_muFRatio ->Write(fName+h_muFRatio->GetName(), TObject::kWriteDelete);
+	h_elPRatio ->Write(fName+h_elPRatio->GetName(), TObject::kWriteDelete);
+	h_muPRatio ->Write(fName+h_muPRatio->GetName(), TObject::kWriteDelete);
+	
+	// tight histograms for electrons and muons, f and p rate
+	h_elFTight ->Write(fName+h_elFTight->GetName(), TObject::kWriteDelete);
+	h_muFTight ->Write(fName+h_muFTight->GetName(), TObject::kWriteDelete);
+	h_elPTight ->Write(fName+h_elPTight->GetName(), TObject::kWriteDelete);
+	h_muPTight ->Write(fName+h_muPTight->GetName(), TObject::kWriteDelete);
+
+	// loose histograms for electrons and muons, f and p rate
+	h_elFLoose ->Write(fName+h_elFLoose->GetName(), TObject::kWriteDelete);
+	h_muFLoose ->Write(fName+h_muFLoose->GetName(), TObject::kWriteDelete);
+	h_elPLoose ->Write(fName+h_elPLoose->GetName(), TObject::kWriteDelete);
+	h_muPLoose ->Write(fName+h_muPLoose->GetName(), TObject::kWriteDelete);
+
+	h_muIsoPlot ->Write(fName+h_muIsoPlot->GetName(), TObject::kWriteDelete);
+
+	h_elIsoPlot ->Write(fName+h_elIsoPlot->GetName(), TObject::kWriteDelete);
+
+}

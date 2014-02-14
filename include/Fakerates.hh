@@ -50,18 +50,20 @@ public:
 		return;
 	};
 
-	TString fOutputSubDir;
-	inline virtual void setVerbose(int v){ fVerbose = v;};
-	inline virtual void setData(bool d){ fIsData = d;};
-	inline virtual void setInputFile(TString f){ fInputFile = f;};
-	inline virtual void setOutputDir(TString d){ fOutputDir = d;};
-	inline virtual void setXS(float x){ if(!fIsData) fXSec = x; else fXSec = -1.;};
+	inline virtual void setVerbose   (int     v) {fVerbose   = v;};
+	inline virtual void setData      (bool    d) {fIsData    = d;};
+	inline virtual void setInputFile (TString f) {fInputFile = f;};
+	inline virtual void setOutputDir (TString d) {fOutputDir = d;};
+	inline virtual void setName      (TString n) {fName      = n;};
+	inline virtual void setXS        (float   x) {if (!fIsData) fXSec = x; else fXSec = -1.;};
 
 	int  fVerbose;
 	bool fIsData;
 	float fXSec;
 	TString fInputFile;
 	TString fOutputDir;
+	TString fOutputFilename;
+	TString fName;
 	
 
 // FUNCTIONS
@@ -71,30 +73,39 @@ public:
 	//void fillRatios();
 	void fillIsoPlots();
 
-	bool isCalibrationRegionMuEvent();
-	bool isCalibrationRegionElEvent();
+	bool isCalibrationRegionMuEvent(int&);
+	bool isCalibrationRegionElEvent(int&);
+
+	bool isGoodJet(int, float);
+
+	std::vector<float>::const_iterator fITFloat;
+	std::vector<bool >::const_iterator fITBool;
+	std::vector< int >::const_iterator fITInt;
 
 	// ===================================
 	// the ratio histograms, those are just divided versions of the following
-	TH2F * elFRatio;
-	TH2F * muFRatio;
-	TH2F * elPRatio;
-	TH2F * muPRatio;
+	TH2F * h_elFRatio;
+	TH2F * h_muFRatio;
+	TH2F * h_elPRatio;
+	TH2F * h_muPRatio;
 	
 	// passing histograms for electrons and muons, f and p rate
-	TH2F * elFPass;
-	TH2F * muFPass;
-	TH2F * elPPass;
-	TH2F * muPPass;
+	TH2F * h_elFTight;
+	TH2F * h_muFTight;
+	TH2F * h_elPTight;
+	TH2F * h_muPTight;
 
 	// failing histograms for electrons and muons, f and p rate
-	TH2F * elFFail;
-	TH2F * muFFail;
-	TH2F * elPFail;
-	TH2F * muPFail;
+	TH2F * h_elFLoose;
+	TH2F * h_muFLoose;
+	TH2F * h_elPLoose;
+	TH2F * h_muPLoose;
 
-	TH1F * muIsoPlot;
-	TH1F * elIsoPlot;
+	TH1F * h_muIsoPlot;
+	TH1F * h_elIsoPlot;
+
+	void bookHistos();
+	void writeHistos(TFile *);
 
 	// ===================================
 

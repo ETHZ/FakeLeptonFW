@@ -8,9 +8,9 @@ ROOTGLIBS  = $(shell root-config --glibs)
 LIBS       = $(ROOTLIBS)
 INCLUDES   = -I. $(ROOTCFLAGS)
 
-CXX        = g++
+CXX        = g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2
 CXXFLAGS   = $(ROOTCFLAGS) $(INCLUDES)
-## -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2 -std=c++0x
+
 
 ##SRCSA      = src/TreeClass.C src/Fakerates.cc
 SRCSA      = src/FWBaseClass.C src/Fakerates.cc
@@ -42,9 +42,12 @@ Closure: exe/Closure.C $(OBJSC)
 
 depend: .depend
 
-.depend: $(SRCSA) $(SRCSB) $(SRCSC)
+## old .depend: $(SRCSA) $(SRCSB) $(SRCSC)
+## old 	rm -f ./.depend
+## old 	$(foreach SRC,$(SRCA),$(SRCB),$(SRCC),$(CXX) -I. -I$(shell root-config --incdir) -MG -MM -MT $(patsubst %.C,%.o,$(SRC:.cc=.o)) $(SRC) >> ./.depend;)
+depend: 
 	rm -f ./.depend
-	$(foreach SRC,$^,$(CXX) -I. -I$(shell root-config --incdir) -MG -MM -MT $(patsubst %.C,%.o,$(SRC:.cc=.o)) $(SRC) >> ./.depend;)
+	$(foreach SRC,$(SRCSA) $(SRCSB) $(SRCSC),$(CXX) -I. -I$(shell root-config --incdir) -MG -MM -MT $(patsubst %.C,%.o,$(SRC:.cc=.o)) $(SRC) >> ./.depend;)
 
 
 clean:

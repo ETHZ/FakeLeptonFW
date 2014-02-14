@@ -66,8 +66,9 @@ int main(int argc, char* argv[]) {
 	frA->setXS(xsec);
 	frA->setInputFile(inputfile);
 	frA->setOutputDir(outputdir);
+	frA->setName(name);
 	frA->doStuff();
-	delete frA;
+	// delete frA;
 	cout << "...done" << endl;
 	return 0;
 }
