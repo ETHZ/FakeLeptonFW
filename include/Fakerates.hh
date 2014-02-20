@@ -74,6 +74,8 @@ public:
 	void fillIsoPlots();
 
 	void synchOutput();
+	
+	bool passesUpperMETMT(int, int);
 
 	bool isCalibrationRegionMuEvent(int&);
 	bool isCalibrationRegionElEvent(int&);
@@ -106,6 +108,9 @@ public:
 
 	TH1F * h_muIsoPlot;
 	TH1F * h_elIsoPlot;
+
+	TH1F * h_muD0Plot;
+	TH1F * h_elD0Plot;
 
 	void bookHistos();
 	void writeHistos(TFile *);

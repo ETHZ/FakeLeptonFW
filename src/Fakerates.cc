@@ -58,7 +58,7 @@ void Fakerates::loop(){
 		ntot++;
 
 		// fillRatios();
-		// fillIsoPlots();
+		fillIsoPlots();
 
 		synchOutput();
 	}
@@ -101,8 +101,7 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	// if(nveto_add != 0) return false; // don't require this for the synching
 
 	// upper cuts on MT and MET
-	if(pfMET > 20.)        return false;
-	if(MuMT->at(loosemu_inds[0]) > 20.) return false;
+	if(!passesUpperMETMT(0, loosemu_inds[0]) ) return false;
 
 	int nawayjets(0);
 	int jetind(-1);
@@ -120,8 +119,26 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 
 	float dphi =  Util::DeltaPhi(JetPhi->at(awayjet_inds[0]), MuPhi->at(loosemu_inds[0]));
 	
- 	cout << Form("%i\t%i\t%10i\t%.2f\t%.2f\t%i\t%.2f\t%.2f",Run, Lumi, Event, MuPt->at(loosemu_inds[0]), JetRawPt->at(awayjet_inds[0]), (int) MuIsTight->at(loosemu_inds[0]), dphi, JetCSVBTag->at(awayjet_inds[0])) << endl;
+ 	// cout << Form("%i\t%i\t%10i\t%.2f\t%.2f\t%i\t%.2f\t%.2f",Run, Lumi, Event, MuPt->at(loosemu_inds[0]), JetRawPt->at(awayjet_inds[0]), (int) MuIsTight->at(loosemu_inds[0]), dphi, JetCSVBTag->at(awayjet_inds[0])) << endl;
 	return true;
+}
+
+bool Fakerates::passesUpperMETMT(int type, int index){
+	float value_mt  = 20.;
+	float value_met = 20.;
+	if(pfMET > value_met)              return false;
+	if(type == 0){
+		if(MuMT->at(index) > value_mt) return false;
+	}
+	else if(type == 1){
+		if(ElMT->at(index) > value_mt) return false;
+	}
+	else{
+		cout << "ERROR in passesUpperMETMT! you're not calling it right..." << endl;
+		exit(0);
+	}
+	return true;
+
 }
 
 bool Fakerates::isGoodSynchJet(int j, float pt){
@@ -177,11 +194,13 @@ void Fakerates::fillIsoPlots(){
 	int mu(-1);
 	if(isCalibrationRegionMuEvent(mu)){
 		h_muIsoPlot->Fill(MuPFIso->at(mu));
+		h_muD0Plot ->Fill(MuD0->at(mu));
 		h_muFLoose ->Fill(MuPt->at(mu), MuEta->at(mu));
-		if(MuIsTight->at(mu) && MuPFIso->at(mu) < 0.1) {
+		if(MuIsTight->at(mu)) {
 			h_muFTight ->Fill(MuPt->at(mu), MuEta->at(mu));
 		}
 	}
+	h_muFRatio->Divide(h_muFTight, h_muFLoose);
 	int el(-1);
 	if(isCalibrationRegionElEvent(el)){
 		h_elIsoPlot->Fill(ElPFIso->at(el));
@@ -190,26 +209,35 @@ void Fakerates::fillIsoPlots(){
 
 void Fakerates::bookHistos(){
 
+	float binseta[] = {0., 2.5};
+	float binspt[]  = {10., 15., 20., 25., 40};
+
+	int n_binseta  = sizeof(binseta)/sizeof(float)-1;
+	int n_binspt   = sizeof(binspt )/sizeof(float)-1;
+
 	// the ratio histograms, those are just divided versions of the following
-	h_elFRatio = new TH2F("h_elFRatio", "elFRatio", 4, 10, 40, 2, 0., 2.5);
-	h_muFRatio = new TH2F("h_muFRatio", "muFRatio", 4, 10, 40, 2, 0., 2.5);
-	h_elPRatio = new TH2F("h_elPRatio", "elPRatio", 4, 10, 40, 2, 0., 2.5);
-	h_muPRatio = new TH2F("h_muPRatio", "muPRatio", 4, 10, 40, 2, 0., 2.5);
+	h_elFRatio = new TH2F("h_elFRatio", "elFRatio", n_binspt, binspt, n_binseta, binseta); h_elFRatio->Sumw2(); 
+	h_muFRatio = new TH2F("h_muFRatio", "muFRatio", n_binspt, binspt, n_binseta, binseta); h_muFRatio->Sumw2(); 
+	h_elPRatio = new TH2F("h_elPRatio", "elPRatio", n_binspt, binspt, n_binseta, binseta); h_elPRatio->Sumw2(); 
+	h_muPRatio = new TH2F("h_muPRatio", "muPRatio", n_binspt, binspt, n_binseta, binseta); h_muPRatio->Sumw2(); 
 	
 	// passing histograms for electrons and muons, f and p rate
-	h_elFTight = new TH2F("h_elFTight", "elFTight", 4, 10, 40, 2, 0., 2.5);
-	h_muFTight = new TH2F("h_muFTight", "muFTight", 4, 10, 40, 2, 0., 2.5);
-	h_elPTight = new TH2F("h_elPTight", "elPTight", 4, 10, 40, 2, 0., 2.5);
-	h_muPTight = new TH2F("h_muPTight", "muPTight", 4, 10, 40, 2, 0., 2.5);
+	h_elFTight = new TH2F("h_elFTight", "elFTight", n_binspt, binspt, n_binseta, binseta); h_elFTight->Sumw2(); 
+	h_muFTight = new TH2F("h_muFTight", "muFTight", n_binspt, binspt, n_binseta, binseta); h_muFTight->Sumw2(); 
+	h_elPTight = new TH2F("h_elPTight", "elPTight", n_binspt, binspt, n_binseta, binseta); h_elPTight->Sumw2(); 
+	h_muPTight = new TH2F("h_muPTight", "muPTight", n_binspt, binspt, n_binseta, binseta); h_muPTight->Sumw2(); 
 
 	// failing histograms for electrons and muons, f and p rate
-	h_elFLoose = new TH2F("h_elFLoose", "elFLoose", 4, 10, 40, 2, 0., 2.5);
-	h_muFLoose = new TH2F("h_muFLoose", "muFLoose", 4, 10, 40, 2, 0., 2.5);
-	h_elPLoose = new TH2F("h_elPLoose", "elPLoose", 4, 10, 40, 2, 0., 2.5);
-	h_muPLoose = new TH2F("h_muPLoose", "muPLoose", 4, 10, 40, 2, 0., 2.5);
+	h_elFLoose = new TH2F("h_elFLoose", "elFLoose", n_binspt, binspt, n_binseta, binseta); h_elFLoose->Sumw2(); 
+	h_muFLoose = new TH2F("h_muFLoose", "muFLoose", n_binspt, binspt, n_binseta, binseta); h_muFLoose->Sumw2(); 
+	h_elPLoose = new TH2F("h_elPLoose", "elPLoose", n_binspt, binspt, n_binseta, binseta); h_elPLoose->Sumw2(); 
+	h_muPLoose = new TH2F("h_muPLoose", "muPLoose", n_binspt, binspt, n_binseta, binseta); h_muPLoose->Sumw2(); 
 
-	h_muIsoPlot = new TH1F("h_muIsoPlot", "muIsoPlot", 100, 0., 1.);
-	h_elIsoPlot = new TH1F("h_elIsoPlot", "elIsoPlot", 100, 0., 1.);
+	h_muIsoPlot = new TH1F("h_muIsoPlot", "muIsoPlot", 100, 0., 1.); h_muIsoPlot->Sumw2(); 
+	h_elIsoPlot = new TH1F("h_elIsoPlot", "elIsoPlot", 100, 0., 1.); h_elIsoPlot->Sumw2(); 
+
+	h_muD0Plot = new TH1F("h_muD0Plot", "muD0Plot", 20, 0., 0.2); h_muD0Plot->Sumw2(); 
+	h_elD0Plot = new TH1F("h_elD0Plot", "elD0Plot", 20, 0., 0.2); h_elD0Plot->Sumw2(); 
 
 }
 void Fakerates::writeHistos(TFile* pFile){
@@ -237,7 +265,9 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_muPLoose ->Write(fName+h_muPLoose->GetName(), TObject::kWriteDelete);
 
 	h_muIsoPlot ->Write(fName+h_muIsoPlot->GetName(), TObject::kWriteDelete);
+	h_muD0Plot  ->Write(fName+h_muD0Plot->GetName() , TObject::kWriteDelete);
 
 	h_elIsoPlot ->Write(fName+h_elIsoPlot->GetName(), TObject::kWriteDelete);
+	h_elD0Plot  ->Write(fName+h_elD0Plot->GetName() , TObject::kWriteDelete);
 
 }
