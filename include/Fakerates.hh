@@ -117,6 +117,11 @@ public:
 
 	// ===================================
 
+	int fCutflow_afterLepSel;
+	int fCutflow_afterJetSel;
+	int fCutflow_afterMETCut;
+	int fCutflow_afterMTCut ;
+	
 
 // SAMPLE CLASS
 	class Sample{

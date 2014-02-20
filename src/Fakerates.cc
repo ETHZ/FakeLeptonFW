@@ -24,6 +24,10 @@ void Fakerates::init(bool verbose){
 	cout << "------------------------------------" << endl;
 	cout << "Initializing Fakerates Class ... " << endl;
 	cout << "------------------------------------" << endl;
+	fCutflow_afterLepSel = 0;
+	fCutflow_afterJetSel = 0;
+	fCutflow_afterMETCut = 0;
+	fCutflow_afterMTCut  = 0;
 	Util::SetStyle();
 }
 
@@ -60,9 +64,13 @@ void Fakerates::loop(){
 		// fillRatios();
 		fillIsoPlots();
 
-		synchOutput();
 	}
 	// end loop on the events
+
+	cout << "mu: nevents passing lepton selection: " << fCutflow_afterLepSel << endl;
+	cout << "mu: nevents passing jet    selection: " << fCutflow_afterJetSel << endl;
+	cout << "mu: nevents passing MET    selection: " << fCutflow_afterMETCut << endl;
+	cout << "mu: nevents passing MT     selection: " << fCutflow_afterMTCut  << endl;
 
 	cout << "i just looped on " << ntot << " events." << endl;
 	delete file_, tree_;
@@ -98,10 +106,8 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	}
 	// require exactly one loose muon and no additional veto muons
 	if(nloose    != 1) return false;
+	fCutflow_afterLepSel++;
 	// if(nveto_add != 0) return false; // don't require this for the synching
-
-	// upper cuts on MT and MET
-	if(!passesUpperMETMT(0, loosemu_inds[0]) ) return false;
 
 	int nawayjets(0);
 	int jetind(-1);
@@ -115,7 +121,10 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 		awayjet_inds.push_back(jet);
 	}
 	if(awayjet_inds.size() < 1) return false;
-	// cout << awayjet_inds.size() << endl;
+	fCutflow_afterJetSel++;
+
+	// upper cuts on MT and MET
+	if(!passesUpperMETMT(0, loosemu_inds[0]) ) return false;
 
 	float dphi =  Util::DeltaPhi(JetPhi->at(awayjet_inds[0]), MuPhi->at(loosemu_inds[0]));
 	
@@ -127,6 +136,7 @@ bool Fakerates::passesUpperMETMT(int type, int index){
 	float value_mt  = 20.;
 	float value_met = 20.;
 	if(pfMET > value_met)              return false;
+	fCutflow_afterMETCut++;
 	if(type == 0){
 		if(MuMT->at(index) > value_mt) return false;
 	}
@@ -137,6 +147,7 @@ bool Fakerates::passesUpperMETMT(int type, int index){
 		cout << "ERROR in passesUpperMETMT! you're not calling it right..." << endl;
 		exit(0);
 	}
+	fCutflow_afterMTCut++;
 	return true;
 
 }
