@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Feb 12 10:37:51 2014 by ROOT version 5.34/14
+// Wed Feb 19 19:20:03 2014 by ROOT version 5.34/14
 // from TTree Analysis/AnalysisTree
-// found on file: release/fakeminitree.root
+// found on file: fakeminitree.root
 //////////////////////////////////////////////////////////
 
 #ifndef FWBaseClass_h
@@ -19,7 +19,6 @@
 
 class FWBaseClass {
 public :
-   //using namespace std;
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
@@ -63,6 +62,14 @@ public :
    std::vector<float>   *MuPFIso;
    std::vector<float>   *MuD0;
    std::vector<float>   *MuMT;
+   std::vector<bool>    *MuIsGlobal;
+   std::vector<bool>    *MuIsPF;
+   std::vector<float>   *MuChi2;
+   std::vector<int>     *MuChamberHits;
+   std::vector<int>     *MuMatchedStations;
+   std::vector<float>   *MuDz;
+   std::vector<int>     *MuPixelHits;
+   std::vector<int>     *MuNLayers;
    std::vector<bool>    *MuIsVeto;
    std::vector<bool>    *MuIsLoose;
    std::vector<bool>    *MuIsTight;
@@ -79,6 +86,7 @@ public :
    Float_t         pfMET;
    Float_t         pfMETPhi;
    std::vector<float>   *JetPt;
+   std::vector<float>   *JetRawPt;
    std::vector<float>   *JetEta;
    std::vector<float>   *JetPhi;
    std::vector<float>   *JetEnergy;
@@ -126,6 +134,14 @@ public :
    TBranch        *b_MuPFIso;   //!
    TBranch        *b_MuD0;   //!
    TBranch        *b_MuMT;   //!
+   TBranch        *b_MuIsGlobal;   //!
+   TBranch        *b_MuIsPF;   //!
+   TBranch        *b_MuChi2;   //!
+   TBranch        *b_MuChamberHits;   //!
+   TBranch        *b_MuMatchedStations;   //!
+   TBranch        *b_MuDz;   //!
+   TBranch        *b_MuPixelHits;   //!
+   TBranch        *b_MuNLayers;   //!
    TBranch        *b_MuIsVeto;   //!
    TBranch        *b_MuIsLoose;   //!
    TBranch        *b_MuIsTight;   //!
@@ -142,6 +158,7 @@ public :
    TBranch        *b_pfMET;   //!
    TBranch        *b_pfMETPhi;   //!
    TBranch        *b_JetPt;   //!
+   TBranch        *b_JetRawPt;   //!
    TBranch        *b_JetEta;   //!
    TBranch        *b_JetPhi;   //!
    TBranch        *b_JetEnergy;   //!
@@ -168,9 +185,9 @@ FWBaseClass::FWBaseClass(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("release/fakeminitree.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("fakeminitree.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("release/fakeminitree.root");
+         f = new TFile("fakeminitree.root");
       }
       f->GetObject("Analysis",tree);
 
@@ -221,6 +238,14 @@ void FWBaseClass::Init(TTree *tree)
    MuPFIso = 0;
    MuD0 = 0;
    MuMT = 0;
+   MuIsGlobal = 0;
+   MuIsPF = 0;
+   MuChi2 = 0;
+   MuChamberHits = 0;
+   MuMatchedStations = 0;
+   MuDz = 0;
+   MuPixelHits = 0;
+   MuNLayers = 0;
    MuIsVeto = 0;
    MuIsLoose = 0;
    MuIsTight = 0;
@@ -235,6 +260,7 @@ void FWBaseClass::Init(TTree *tree)
    ElIsLoose = 0;
    ElIsTight = 0;
    JetPt = 0;
+   JetRawPt = 0;
    JetEta = 0;
    JetPhi = 0;
    JetEnergy = 0;
@@ -286,6 +312,14 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuPFIso", &MuPFIso, &b_MuPFIso);
    fChain->SetBranchAddress("MuD0", &MuD0, &b_MuD0);
    fChain->SetBranchAddress("MuMT", &MuMT, &b_MuMT);
+   fChain->SetBranchAddress("MuIsGlobal", &MuIsGlobal, &b_MuIsGlobal);
+   fChain->SetBranchAddress("MuIsPF", &MuIsPF, &b_MuIsPF);
+   fChain->SetBranchAddress("MuChi2", &MuChi2, &b_MuChi2);
+   fChain->SetBranchAddress("MuChamberHits", &MuChamberHits, &b_MuChamberHits);
+   fChain->SetBranchAddress("MuMatchedStations", &MuMatchedStations, &b_MuMatchedStations);
+   fChain->SetBranchAddress("MuDz", &MuDz, &b_MuDz);
+   fChain->SetBranchAddress("MuPixelHits", &MuPixelHits, &b_MuPixelHits);
+   fChain->SetBranchAddress("MuNLayers", &MuNLayers, &b_MuNLayers);
    fChain->SetBranchAddress("MuIsVeto", &MuIsVeto, &b_MuIsVeto);
    fChain->SetBranchAddress("MuIsLoose", &MuIsLoose, &b_MuIsLoose);
    fChain->SetBranchAddress("MuIsTight", &MuIsTight, &b_MuIsTight);
@@ -302,6 +336,7 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("pfMET", &pfMET, &b_pfMET);
    fChain->SetBranchAddress("pfMETPhi", &pfMETPhi, &b_pfMETPhi);
    fChain->SetBranchAddress("JetPt", &JetPt, &b_JetPt);
+   fChain->SetBranchAddress("JetRawPt", &JetRawPt, &b_JetRawPt);
    fChain->SetBranchAddress("JetEta", &JetEta, &b_JetEta);
    fChain->SetBranchAddress("JetPhi", &JetPhi, &b_JetPhi);
    fChain->SetBranchAddress("JetEnergy", &JetEnergy, &b_JetEnergy);

@@ -58,7 +58,9 @@ void Fakerates::loop(){
 		ntot++;
 
 		// fillRatios();
-		fillIsoPlots();
+		// fillIsoPlots();
+
+		synchOutput();
 	}
 	// end loop on the events
 
@@ -73,14 +75,22 @@ void Fakerates::loop(){
 
 }
 
+void Fakerates::synchOutput(){
+	int mu = -1;
+	bool a = isCalibrationRegionMuEvent(mu);
+
+}
+
 
 bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	if(MuPt->size() < 1) return false;
 	int nloose(0), nveto_add(0);
+	std::vector<int> loosemu_inds;
 	for(int i=0; i < MuPt->size(); ++i){
 		if(MuIsLoose->at(i)){
 			nloose++;
 			mu = i;
+			loosemu_inds.push_back(i);
 		}
 		else{
 			if(MuIsVeto->at(i)) nveto_add++;
@@ -88,24 +98,54 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	}
 	// require exactly one loose muon and no additional veto muons
 	if(nloose    != 1) return false;
-	if(nveto_add != 0) return false;
+	// if(nveto_add != 0) return false; // don't require this for the synching
 
 	// upper cuts on MT and MET
-	if(pfMET > 30.)        return false;
-	if(MuMT->at(mu) > 30.) return false;
+	if(pfMET > 20.)        return false;
+	if(MuMT->at(loosemu_inds[0]) > 20.) return false;
 
 	int nawayjets(0);
-	int ngoodjets(0);
+	int jetind(-1);
+	std::vector<int> awayjet_inds;
 	if(JetPt->size() < 1) return false;
 	for(int jet=0; jet < JetPt->size(); ++jet){
-		if(!isGoodJet(jet, 40.)) continue;
-		if(Util::DeltaPhi(JetPhi->at(jet), MuPhi->at(mu)) < 2.0 ) continue;
+		// if(!isGoodJet(jet, 40.)) continue;
+		if(!isGoodSynchJet(jet, 40.)) continue;
+		if(Util::DeltaPhi(JetPhi->at(jet), MuPhi->at(mu)) < 1.0 ) continue;
 		nawayjets++;
+		awayjet_inds.push_back(jet);
 	}
-	if(nawayjets != 1) return false;
+	if(awayjet_inds.size() < 1) return false;
+	// cout << awayjet_inds.size() << endl;
+
+	float dphi =  Util::DeltaPhi(JetPhi->at(awayjet_inds[0]), MuPhi->at(loosemu_inds[0]));
+	
+ 	cout << Form("%i\t%i\t%10i\t%.2f\t%.2f\t%i\t%.2f\t%.2f",Run, Lumi, Event, MuPt->at(loosemu_inds[0]), JetRawPt->at(awayjet_inds[0]), (int) MuIsTight->at(loosemu_inds[0]), dphi, JetCSVBTag->at(awayjet_inds[0])) << endl;
 	return true;
 }
 
+bool Fakerates::isGoodSynchJet(int j, float pt){
+	if(JetRawPt->at(j) < pt) return false;
+	if(fabs(JetEta->at(j)) > 2.5) return false;
+	// if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
+	
+	// no cleaning float minDR = 0.4;
+
+	// no cleaning // Remove jets close to all tight leptons
+	// no cleaning for(int imu = 0; imu < MuPt->size(); ++imu){
+	// no cleaning     if(!MuIsTight->at(imu)) continue;
+	// no cleaning     if(Util::GetDeltaR(MuEta->at(imu), JetEta->at(j), MuPhi->at(imu), JetPhi->at(j)) > minDR ) continue;
+	// no cleaning     return false;
+	// no cleaning }
+	// no cleaning for(int iel = 0; iel < ElPt->size(); ++iel){
+	// no cleaning     if(!ElIsTight->at(iel)) continue;
+	// no cleaning     if(Util::GetDeltaR(ElEta->at(iel), JetEta->at(j), ElPhi->at(iel), JetPhi->at(j)) > minDR ) continue;
+	// no cleaning     return false;
+	// no cleaning }
+	return true;
+
+
+}
 bool Fakerates::isGoodJet(int j, float pt){
 	if(JetPt->at(j) < pt) return false;
 	if(fabs(JetEta->at(j)) > 2.5) return false;

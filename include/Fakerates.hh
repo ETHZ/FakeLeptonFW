@@ -73,10 +73,13 @@ public:
 	//void fillRatios();
 	void fillIsoPlots();
 
+	void synchOutput();
+
 	bool isCalibrationRegionMuEvent(int&);
 	bool isCalibrationRegionElEvent(int&);
 
 	bool isGoodJet(int, float);
+	bool isGoodSynchJet(int, float);
 
 	std::vector<float>::const_iterator fITFloat;
 	std::vector<bool >::const_iterator fITBool;
