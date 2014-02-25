@@ -57,15 +57,15 @@ void Fakerates::loop(){
     TH1F * EventCount = (TH1F*) file_->Get("EventCount");
     double Ngen = EventCount->GetEntries();
     float Lum = 19500.0;
-    fEventweight = fXSec * Lum / Ngen;
-
+    
+    fEventweight = fXSec * Lum / (fMaxSize>0?fMaxSize:Ngen);
     cout << "eventweight is " << fEventweight << endl;
 
 	int ntot = 0;
 
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events;jentry++) {
-		// if(jentry > 150000) break; // foo
+		if(jentry > (fMaxSize>0?fMaxSize:Ngen)) break; // foo
 		tree_->GetEntry(jentry);
 		ntot++;
 
@@ -231,7 +231,7 @@ void Fakerates::fillIsoPlots(){
 
 void Fakerates::bookHistos(){
 
-	float binseta[] = {0., 2.5};
+	float binseta[] = {0., 1.4, 2.5};
 	float binspt[]  = {10., 15., 20., 25., 40};
 
 	int n_binseta  = sizeof(binseta)/sizeof(float)-1;

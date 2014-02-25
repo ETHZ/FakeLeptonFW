@@ -28,10 +28,11 @@ int main(int argc, char* argv[]) {
 	bool isdata(true);
 	TString name = "";
 	float xsec(1.);
+    int maxsize(0);
 
 	// Parse options
 	char ch;
-	while ((ch = getopt(argc, argv, "i:o:v:x:sn:h?")) != -1 ) {
+	while ((ch = getopt(argc, argv, "i:o:v:x:m:sn:h?")) != -1 ) {
 		switch (ch) {
 			case 'i': inputfile  = TString(optarg)       ;  break;
 			case 'o': outputdir  = TString(optarg)       ;  break;
@@ -39,6 +40,7 @@ int main(int argc, char* argv[]) {
 			case 's': isdata     = false                 ;  break;
 			case 'n': name       = TString(optarg)       ;  break;
 			case 'x': xsec       = ::atof( ((std::string) optarg).c_str());  break;
+            case 'm': maxsize    = atoi(optarg)          ;  break;
 			case '?':
 			case 'h': usage(0); break;
 			default:
@@ -58,6 +60,7 @@ int main(int argc, char* argv[]) {
 	cout << " outputdir is:      " << outputdir << endl;
 	cout << " running on " << (isdata?"data":"mc") << endl;
 	cout << " xsec: " << xsec << endl;
+    cout << " sample max size " << maxsize << endl;
 	cout << " sample name " << name << endl;
 
 	Fakerates *frA = new Fakerates();
@@ -66,6 +69,7 @@ int main(int argc, char* argv[]) {
 	frA->setXS(xsec);
 	frA->setInputFile(inputfile);
 	frA->setOutputDir(outputdir);
+    frA->setMaxSize(maxsize);
 	frA->setName(name);
 	frA->doStuff();
 	// delete frA;
