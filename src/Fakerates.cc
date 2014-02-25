@@ -95,6 +95,8 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	int nloose(0), nveto_add(0);
 	std::vector<int> loosemu_inds;
 	for(int i=0; i < MuPt->size(); ++i){
+// if(Event == 78968781 || Event == 284453637 || Event == 73284272 || Event == 73898425) 
+// 	cout << Form("%i\t%.2f\t%.2f\t%.2f",Event, MuPt->at(i), MuEta->at(i), MuPhi->at(i)) << endl;
 		if(MuIsLoose->at(i)){
 			nloose++;
 			mu = i;
@@ -106,6 +108,7 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	}
 	// require exactly one loose muon and no additional veto muons
 	if(nloose    != 1) return false;
+// cout << Form("%d\t%d\t%d\t%.2f",Run, Lumi, Event, MuPt->at(mu)) << endl;
 	fCutflow_afterLepSel++;
 	// if(nveto_add != 0) return false; // don't require this for the synching
 
@@ -114,21 +117,26 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	std::vector<int> awayjet_inds;
 	if(JetPt->size() < 1) return false;
 	for(int jet=0; jet < JetPt->size(); ++jet){
+//if(Event == 78968781 || Event == 284453637 || Event == 73284272 || Event == 73898425) 
+//	cout << Form("Jet%i\t%.2f\t%.2f\t%.2f\t%.2f",jet, JetRawPt->at(jet), JetEta->at(jet), JetPhi->at(jet), Util::GetDeltaR(JetEta->at(jet), MuEta->at(mu), JetPhi->at(jet), MuPhi->at(mu))) << endl;
 		// if(!isGoodJet(jet, 40.)) continue;
 		if(!isGoodSynchJet(jet, 40.)) continue;
-		if(Util::DeltaPhi(JetPhi->at(jet), MuPhi->at(mu)) < 1.0 ) continue;
+		// if(Util::DeltaPhi(JetPhi->at(jet), MuPhi->at(mu)) < 1.0 ) continue;
+		if(Util::GetDeltaR(JetEta->at(jet), MuEta->at(mu), JetPhi->at(jet), MuPhi->at(mu)) < 1.0 ) continue;
 		nawayjets++;
 		awayjet_inds.push_back(jet);
 	}
 	if(awayjet_inds.size() < 1) return false;
 	fCutflow_afterJetSel++;
+	int jetIndex = awayjet_inds[0];
+	if(awayjet_inds.size() > 1 && JetRawPt->at(awayjet_inds[1]) > JetRawPt->at(awayjet_inds[0]) ) jetIndex = awayjet_inds[1];
 
 	// upper cuts on MT and MET
 	if(!passesUpperMETMT(0, loosemu_inds[0]) ) return false;
 
 	float dphi =  Util::DeltaPhi(JetPhi->at(awayjet_inds[0]), MuPhi->at(loosemu_inds[0]));
 	
- 	// cout << Form("%i\t%i\t%10i\t%.2f\t%.2f\t%i\t%.2f\t%.2f",Run, Lumi, Event, MuPt->at(loosemu_inds[0]), JetRawPt->at(awayjet_inds[0]), (int) MuIsTight->at(loosemu_inds[0]), dphi, JetCSVBTag->at(awayjet_inds[0])) << endl;
+ 	// cout << Form("%i\t%i\t%10i\t%.2f\t%.2f\t%i\t%.2f\t%.2f\t%.2f\t%.2f",Run, Lumi, Event, MuPt->at(loosemu_inds[0]), JetRawPt->at(jetIndex), (int) MuIsTight->at(loosemu_inds[0]), dphi, JetCSVBTag->at(jetIndex), pfMET, MuMT->at(loosemu_inds[0]) ) << endl;
 	return true;
 }
 
