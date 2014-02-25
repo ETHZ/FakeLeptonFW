@@ -54,7 +54,8 @@ public:
 	inline virtual void setData      (bool    d) {fIsData    = d;};
 	inline virtual void setInputFile (TString f) {fInputFile = f;};
 	inline virtual void setOutputDir (TString d) {fOutputDir = d;};
-	inline virtual void setName      (TString n) {fName      = n;};
+	inline virtual void setMaxSize   (int     m) {fMaxSize   = m;};
+    inline virtual void setName      (TString n) {fName      = n;};
 	inline virtual void setXS        (float   x) {if (!fIsData) fXSec = x; else fXSec = -1.;};
 
 	int  fVerbose;
@@ -63,6 +64,7 @@ public:
 	TString fInputFile;
 	TString fOutputDir;
 	TString fOutputFilename;
+    int fMaxSize;
 	TString fName;
 	
 
