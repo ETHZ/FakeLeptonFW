@@ -136,7 +136,7 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 
 	float dphi =  Util::DeltaPhi(JetPhi->at(awayjet_inds[0]), MuPhi->at(loosemu_inds[0]));
 	
- 	// cout << Form("%i\t%i\t%10i\t%.2f\t%.2f\t%i\t%.2f\t%.2f\t%.2f\t%.2f",Run, Lumi, Event, MuPt->at(loosemu_inds[0]), JetRawPt->at(jetIndex), (int) MuIsTight->at(loosemu_inds[0]), dphi, JetCSVBTag->at(jetIndex), pfMET, MuMT->at(loosemu_inds[0]) ) << endl;
+ 	// cout << Form("%i\t%i\t%10i\t%.2f\t%.2f\t%i\t%.2f\t%.2f\t%.2f\t%.2f",Run, Lumi, Event, MuPt->at(loosemu_inds[0]), JetRawPt->at(jetIndex), (int) MuIsTight->at(loosemu_inds[0]), dphi, JetCSVBTag->at(jetIndex), pfMET, MuMT->at(loosemu_inds[0]) ) << endl; aaa
 	return true;
 }
 
