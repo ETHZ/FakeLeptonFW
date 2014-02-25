@@ -66,7 +66,7 @@ public:
 	TString fName;
 	
 
-// FUNCTIONS
+    // FUNCTIONS
 	void doStuff(); // this one gets called by the executable
 	void loop();
 
@@ -117,13 +117,14 @@ public:
 
 	// ===================================
 
-	int fCutflow_afterLepSel;
+	float fEventweight;
+    int fCutflow_afterLepSel;
 	int fCutflow_afterJetSel;
 	int fCutflow_afterMETCut;
 	int fCutflow_afterMTCut ;
 	
 
-// SAMPLE CLASS
+    // SAMPLE CLASS
 	class Sample{
 		public:
 			// Sample(){};

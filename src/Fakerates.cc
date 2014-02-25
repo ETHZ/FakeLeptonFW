@@ -24,7 +24,8 @@ void Fakerates::init(bool verbose){
 	cout << "------------------------------------" << endl;
 	cout << "Initializing Fakerates Class ... " << endl;
 	cout << "------------------------------------" << endl;
-	fCutflow_afterLepSel = 0;
+	fEventweight = 0.0;
+    fCutflow_afterLepSel = 0;
 	fCutflow_afterJetSel = 0;
 	fCutflow_afterMETCut = 0;
 	fCutflow_afterMTCut  = 0;
@@ -52,6 +53,13 @@ void Fakerates::loop(){
 	tree_->ResetBranchAddresses();
 	Init(tree_);
 	Long64_t tot_events = tree_->GetEntriesFast();
+
+    TH1F * EventCount = (TH1F*) file_->Get("EventCount");
+    double Ngen = EventCount->GetEntries();
+    float Lum = 19500.0;
+    fEventweight = fXSec * Lum / Ngen;
+
+    cout << "eventweight is " << fEventweight << endl;
 
 	int ntot = 0;
 
@@ -95,8 +103,6 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	int nloose(0), nveto_add(0);
 	std::vector<int> loosemu_inds;
 	for(int i=0; i < MuPt->size(); ++i){
-// if(Event == 78968781 || Event == 284453637 || Event == 73284272 || Event == 73898425) 
-// 	cout << Form("%i\t%.2f\t%.2f\t%.2f",Event, MuPt->at(i), MuEta->at(i), MuPhi->at(i)) << endl;
 		if(MuIsLoose->at(i)){
 			nloose++;
 			mu = i;
@@ -108,7 +114,6 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	}
 	// require exactly one loose muon and no additional veto muons
 	if(nloose    != 1) return false;
-// cout << Form("%d\t%d\t%d\t%.2f",Run, Lumi, Event, MuPt->at(mu)) << endl;
 	fCutflow_afterLepSel++;
 	// if(nveto_add != 0) return false; // don't require this for the synching
 
@@ -117,8 +122,6 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu){
 	std::vector<int> awayjet_inds;
 	if(JetPt->size() < 1) return false;
 	for(int jet=0; jet < JetPt->size(); ++jet){
-//if(Event == 78968781 || Event == 284453637 || Event == 73284272 || Event == 73898425) 
-//	cout << Form("Jet%i\t%.2f\t%.2f\t%.2f\t%.2f",jet, JetRawPt->at(jet), JetEta->at(jet), JetPhi->at(jet), Util::GetDeltaR(JetEta->at(jet), MuEta->at(mu), JetPhi->at(jet), MuPhi->at(mu))) << endl;
 		// if(!isGoodJet(jet, 40.)) continue;
 		if(!isGoodSynchJet(jet, 40.)) continue;
 		// if(Util::DeltaPhi(JetPhi->at(jet), MuPhi->at(mu)) < 1.0 ) continue;
@@ -212,17 +215,17 @@ bool Fakerates::isCalibrationRegionElEvent(int &el){
 void Fakerates::fillIsoPlots(){
 	int mu(-1);
 	if(isCalibrationRegionMuEvent(mu)){
-		h_muIsoPlot->Fill(MuPFIso->at(mu));
-		h_muD0Plot ->Fill(MuD0->at(mu));
-		h_muFLoose ->Fill(MuPt->at(mu), MuEta->at(mu));
+		h_muIsoPlot->Fill(MuPFIso->at(mu), fEventweight);
+		h_muD0Plot ->Fill(MuD0->at(mu), fEventweight);
+		h_muFLoose ->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
 		if(MuIsTight->at(mu)) {
-			h_muFTight ->Fill(MuPt->at(mu), MuEta->at(mu));
+			h_muFTight ->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
 		}
 	}
 	h_muFRatio->Divide(h_muFTight, h_muFLoose);
 	int el(-1);
 	if(isCalibrationRegionElEvent(el)){
-		h_elIsoPlot->Fill(ElPFIso->at(el));
+		h_elIsoPlot->Fill(ElPFIso->at(el), fEventweight);
 	}
 }
 

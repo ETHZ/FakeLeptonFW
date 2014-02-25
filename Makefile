@@ -18,10 +18,10 @@ OBJSA      = $(patsubst %.C,%.o,$(SRCSA:.cc=.o))
 
 includes = $(wildcard include/*.h)
 
-SRCSB      = src/TreeClass.C src/Estimation.cc
+SRCSB      = src/FWBaseClass.C src/Estimation.cc
 OBJSB      = $(patsubst %.C,%.o,$(SRCSB:.cc=.o))
 
-SRCSC      = src/TreeClass.C src/Closure.cc
+SRCSC      = src/FWBaseClass.C src/Closure.cc
 OBJSC      = $(patsubst %.C,%.o,$(SRCSC:.cc=.o))
 
 .SUFFIXES: .cc,.C,.hh,.h
