@@ -78,12 +78,19 @@ public:
 	void synchOutput();
 	
 	bool passesUpperMETMT(int, int);
+    bool passesMETCut(float, int);
+    bool passesMTCut(int, int);
 
-	bool isCalibrationRegionMuEvent(int&);
+	bool isCalibrationRegionMuEvent(int&, int&);
 	bool isCalibrationRegionElEvent(int&);
 
 	bool isGoodJet(int, float);
 	bool isGoodSynchJet(int, float);
+
+    float getAwayJet(int, int);
+    float getClosestJet(int, int);
+    float getHT();
+    int getNJets(int);
 
 	std::vector<float>::const_iterator fITFloat;
 	std::vector<bool >::const_iterator fITBool;
@@ -114,7 +121,42 @@ public:
 	TH1F * h_muD0Plot;
 	TH1F * h_elD0Plot;
 
+    TH1F * h_Loose_muAwayJetDR;
+    TH1F * h_Loose_muAwayJetPt;
+    TH1F * h_Loose_muClosJetDR;
+    TH1F * h_Loose_muClosJetPt;
+    TH1F * h_Loose_muHT;
+    TH1F * h_Loose_muLepEta;
+    TH1F * h_Loose_muLepIso;
+    TH1F * h_Loose_muLepPt;
+    TH1F * h_Loose_muMET;
+    TH1F * h_Loose_muMETnoMTCut;
+    TH1F * h_Loose_muMT;
+    TH1F * h_Loose_muMTMET30;
+    TH1F * h_Loose_muMaxJPt;
+    TH1F * h_Loose_muNBJets;
+    TH1F * h_Loose_muNJets;
+    TH1F * h_Loose_muNVertices;
+
+    TH1F * h_Tight_muAwayJetDR;
+    TH1F * h_Tight_muAwayJetPt;
+    TH1F * h_Tight_muClosJetDR;
+    TH1F * h_Tight_muClosJetPt;
+    TH1F * h_Tight_muHT;
+    TH1F * h_Tight_muLepEta;
+    TH1F * h_Tight_muLepIso;
+    TH1F * h_Tight_muLepPt;
+    TH1F * h_Tight_muMET;
+    TH1F * h_Tight_muMETnoMTCut;
+    TH1F * h_Tight_muMT;
+    TH1F * h_Tight_muMTMET30;
+    TH1F * h_Tight_muMaxJPt;
+    TH1F * h_Tight_muNBJets;
+    TH1F * h_Tight_muNJets;
+    TH1F * h_Tight_muNVertices;   
+
 	void bookHistos();
+    void setHistoStyle();
 	void writeHistos(TFile *);
 
 	// ===================================
