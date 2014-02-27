@@ -24,7 +24,7 @@ void Fakerates::init(bool verbose){
 	cout << "------------------------------------" << endl;
 	cout << "Initializing Fakerates Class ... " << endl;
 	cout << "------------------------------------" << endl;
-	fEventweight = 0.0;
+	fEventweight = 1.0;
     fCutflow_afterLepSel = 0;
 	fCutflow_afterJetSel = 0;
 	fCutflow_afterMETCut = 0;
@@ -68,7 +68,7 @@ void Fakerates::loop(){
     // calculate the eventweight
     TH1F * EventCount = (TH1F*) file_->Get("EventCount");
     double Ngen = EventCount->GetEntries();
-    fEventweight = fXSec * Lum / (fMaxSize>0?fMaxSize:Ngen);
+    if(!fIsData) fEventweight = fXSec * Lum / (fMaxSize>0?fMaxSize:Ngen);
     cout << "eventweight is " << fEventweight << endl;
 
 	// loop on events in the tree
@@ -90,7 +90,6 @@ void Fakerates::loop(){
 	delete file_, tree_;
 
     // write histograms in output file
-    setHistoStyle();
 	writeHistos(pFile);
 	pFile->Close();
 }
@@ -115,6 +114,10 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu, int &jet){
     int nawayjets(0);
 	int jetind(-1);
 	std::vector<int> awayjet_inds;
+
+
+    // Event fails HLT muon trigger (if data)
+    if(fIsData && !HLT_MU17) return false;
 
     // muon Pt is not reasonable then return false
 	if(MuPt->size() < 1) return false;
@@ -368,10 +371,6 @@ void Fakerates::fillIsoPlots(){
 	if(isCalibrationRegionMuEvent(mu, jet)){
 
         if(passesUpperMETMT(0,mu)) {
-
-		    h_muIsoPlot         ->Fill(MuPFIso->at(mu), fEventweight);
-	  	    h_muD0Plot          ->Fill(MuD0->at(mu), fEventweight);
-		    h_muFLoose          ->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
  
             h_Loose_muAwayJetDR ->Fill(getAwayJet(1,mu), fEventweight);
             h_Loose_muAwayJetPt ->Fill(getAwayJet(0,mu), fEventweight);
@@ -379,7 +378,7 @@ void Fakerates::fillIsoPlots(){
             h_Loose_muClosJetPt ->Fill(getClosestJet(0,mu), fEventweight);
 
             h_Loose_muHT        ->Fill(getHT(), fEventweight);
-            h_Loose_muLepEta    ->Fill(MuEta->at(mu), fEventweight);
+            h_Loose_muLepEta    ->Fill(fabs(MuEta->at(mu)), fEventweight);
             h_Loose_muLepIso    ->Fill(MuPFIso->at(mu), fEventweight);
             h_Loose_muLepPt     ->Fill(MuPt->at(mu), fEventweight);
 
@@ -387,29 +386,29 @@ void Fakerates::fillIsoPlots(){
             h_Loose_muNBJets    ->Fill(getNJets(1), fEventweight);
             h_Loose_muNJets     ->Fill(getNJets(), fEventweight);
             h_Loose_muNVertices ->Fill(NVrtx, fEventweight);
+
+            h_Loose_muD0        ->Fill(MuD0->at(mu), fEventweight);
+            h_Loose_muF         ->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
         }
 
 	    if(passesMTCut(0, mu)) h_Loose_muMET->Fill(pfMET, fEventweight);
         h_Loose_muMETnoMTCut->Fill(pfMET, fEventweight);
         if(passesMETCut()) h_Loose_muMT->Fill(MuMT->at(mu), fEventweight);
-        if(passesMETCut(30,1)) h_Loose_muMTMET30->Fill(MuMT->at(mu), fEventweight);
+        if(passesMETCut(20,1)) h_Loose_muMTMET30->Fill(MuMT->at(mu), fEventweight);
 
 
         // tight muons
 		if(MuIsTight->at(mu)) {
 
-
             if(passesUpperMETMT(0,mu)) {
-
-			    h_muFTight ->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
-
+  
                 h_Tight_muAwayJetDR ->Fill(getAwayJet(1,mu), fEventweight);
                 h_Tight_muAwayJetPt ->Fill(getAwayJet(0,mu), fEventweight);
                 h_Tight_muClosJetDR ->Fill(getClosestJet(1,mu), fEventweight);
                 h_Tight_muClosJetPt ->Fill(getClosestJet(0,mu), fEventweight);
 
                 h_Tight_muHT        ->Fill(getHT(), fEventweight);
-                h_Tight_muLepEta    ->Fill(MuEta->at(mu), fEventweight);
+                h_Tight_muLepEta    ->Fill(fabs(MuEta->at(mu)), fEventweight);
                 h_Tight_muLepIso    ->Fill(MuPFIso->at(mu), fEventweight);
                 h_Tight_muLepPt     ->Fill(MuPt->at(mu), fEventweight);
 		
@@ -417,12 +416,15 @@ void Fakerates::fillIsoPlots(){
                 h_Tight_muNBJets    ->Fill(getNJets(1), fEventweight);
                 h_Tight_muNJets     ->Fill(getNJets(), fEventweight);
                 h_Tight_muNVertices ->Fill(NVrtx, fEventweight);
+
+                h_Tight_muD0        ->Fill(MuD0->at(mu), fEventweight);
+                h_Tight_muF         ->Fill(MuPt->at(mu), fEventweight);
             }
 
             if(passesMTCut(0, mu)) h_Tight_muMET->Fill(pfMET, fEventweight);
             h_Tight_muMETnoMTCut->Fill(pfMET, fEventweight);
             if(passesMETCut()) h_Tight_muMT->Fill(MuMT->at(mu), fEventweight);
-            if(passesMETCut(30,1)) h_Tight_muMTMET30->Fill(MuMT->at(mu), fEventweight);
+            if(passesMETCut(20,1)) h_Tight_muMTMET30->Fill(MuMT->at(mu), fEventweight);
 
         }
 	}
@@ -430,10 +432,10 @@ void Fakerates::fillIsoPlots(){
 
 
     // electrons
-	int el(-1);
-	if(isCalibrationRegionElEvent(el)) {
-		h_elIsoPlot->Fill(ElPFIso->at(el), fEventweight);
-	}
+	//int el(-1);
+	//if(isCalibrationRegionElEvent(el)) {
+	//	h_elIsoPlot->Fill(ElPFIso->at(el), fEventweight);
+	//}
 }
 
 
@@ -468,12 +470,6 @@ void Fakerates::bookHistos(){
 	h_elPLoose = new TH2F("h_elPLoose", "elPLoose", n_binspt, binspt, n_binseta, binseta); h_elPLoose->Sumw2(); 
 	h_muPLoose = new TH2F("h_muPLoose", "muPLoose", n_binspt, binspt, n_binseta, binseta); h_muPLoose->Sumw2(); 
 
-	h_muIsoPlot = new TH1F("h_muIsoPlot", "muIsoPlot", 100, 0., 1.); h_muIsoPlot->Sumw2(); 
-	h_elIsoPlot = new TH1F("h_elIsoPlot", "elIsoPlot", 100, 0., 1.); h_elIsoPlot->Sumw2(); 
-
-	h_muD0Plot = new TH1F("h_muD0Plot", "muD0Plot", 20, 0., 0.2); h_muD0Plot->Sumw2(); 
-	h_elD0Plot = new TH1F("h_elD0Plot", "elD0Plot", 20, 0., 0.2); h_elD0Plot->Sumw2(); 
-
     h_Loose_muAwayJetDR = new TH1F("h_Loose_muAwayJetDR", "Loose_muAwayJetDR", 30, 0, 6); h_Loose_muAwayJetDR->Sumw2();
     h_Loose_muAwayJetPt = new TH1F("h_Loose_muAwayJetPt", "Loose_muAwayJetPt", 13, 20, 150); h_Loose_muAwayJetPt->Sumw2();
     h_Loose_muClosJetDR = new TH1F("h_Loose_muClosJetDR", "Loose_muClosJetDR", 30, 0, 6); h_Loose_muClosJetDR->Sumw2();
@@ -482,7 +478,7 @@ void Fakerates::bookHistos(){
     h_Loose_muHT = new TH1F("h_Loose_muHT", "Loose_muHT", 10, 50, 500); h_Loose_muHT->Sumw2();
     h_Loose_muLepEta = new TH1F("h_Loose_muLepEta", "Loose_muLepEta", 12, 0, 2.4); h_Loose_muLepEta->Sumw2();
     h_Loose_muLepIso = new TH1F("h_Loose_muLepIso", "Loose_muLepIso", 20, 0, 1); h_Loose_muLepIso->Sumw2();
-    h_Loose_muLepPt = new TH1F("h_Loose_muLepPt", "Loose_muLepPt", 70, 10, 80); h_Loose_muLepPt->Sumw2();
+    h_Loose_muLepPt = new TH1F("h_Loose_muLepPt", "Loose_muLepPt", 20, 10, 50); h_Loose_muLepPt->Sumw2();
 
     h_Loose_muMET = new TH1F("h_Loose_muMET", "Loose_muMET", 20, 0, 100); h_Loose_muMET->Sumw2();
     h_Loose_muMETnoMTCut = new TH1F("h_Loose_muMETnoMTCut", "Loose_muMETnoMTCut", 20, 0, 100); h_Loose_muMETnoMTCut->Sumw2();
@@ -492,7 +488,10 @@ void Fakerates::bookHistos(){
     h_Loose_muMaxJPt = new TH1F("h_Loose_muMaxJPt", "Loose_muMaxJPt", 13, 20, 150); h_Loose_muMaxJPt->Sumw2();
     h_Loose_muNBJets = new TH1F("h_Loose_muNBJets", "Loose_muNBJets", 3, 0, 3); h_Loose_muNBJets->Sumw2();
     h_Loose_muNJets = new TH1F("h_Loose_muNJets", "Loose_muNJets", 5, 1, 6); h_Loose_muNJets->Sumw2();
-    h_Loose_muNVertices = new TH1F("h_Loose_muNVertices", "Loose_muNVertices", 5, 5, 25); h_Loose_muNVertices->Sumw2();
+    h_Loose_muNVertices = new TH1F("h_Loose_muNVertices", "Loose_muNVertices", 7, 5, 40); h_Loose_muNVertices->Sumw2();
+
+    h_Loose_muD0 = new TH1F("h_Loose_muD0", "Loose_muD0", 20, 0., 0.2); h_Loose_muD0->Sumw2();
+    h_Loose_muF = new TH2F("h_Loose_muF", "Loose_muF", n_binspt, binspt, n_binseta, binseta); h_Loose_muF->Sumw2(); 
 
     h_Tight_muAwayJetDR = new TH1F("h_Tight_muAwayJetDR", "Tight_muAwayJetDR", 30, 0, 6); h_Tight_muAwayJetDR->Sumw2();
     h_Tight_muAwayJetPt = new TH1F("h_Tight_muAwayJetPt", "Tight_muAwayJetPt", 13, 20, 150); h_Tight_muAwayJetPt->Sumw2();
@@ -502,7 +501,7 @@ void Fakerates::bookHistos(){
     h_Tight_muHT = new TH1F("h_Tight_muHT", "Tight_muHT", 10, 50, 500); h_Tight_muHT->Sumw2();
     h_Tight_muLepEta = new TH1F("h_Tight_muLepEta", "Tight_muLepEta", 12, 0, 2.4); h_Tight_muLepEta->Sumw2();
     h_Tight_muLepIso = new TH1F("h_Tight_muLepIso", "Tight_muLepIso", 20, 0, 1); h_Tight_muLepIso->Sumw2();
-    h_Tight_muLepPt = new TH1F("h_Tight_muLepPt", "Tight_muLepPt", 70, 10, 80); h_Tight_muLepPt->Sumw2();
+    h_Tight_muLepPt = new TH1F("h_Tight_muLepPt", "Tight_muLepPt", 20, 10, 50); h_Tight_muLepPt->Sumw2();
 
     h_Tight_muMET = new TH1F("h_Tight_muMET", "Tight_muMET", 20, 0, 100); h_Tight_muMET->Sumw2();
     h_Tight_muMETnoMTCut = new TH1F("h_Tight_muMETnoMTCut", "Tight_muMETnoMTCut", 20, 0, 100); h_Tight_muMETnoMTCut->Sumw2();
@@ -512,107 +511,11 @@ void Fakerates::bookHistos(){
     h_Tight_muMaxJPt = new TH1F("h_Tight_muMaxJPt", "Tight_muMaxJPt", 13, 20, 150); h_Tight_muMaxJPt->Sumw2();
     h_Tight_muNBJets = new TH1F("h_Tight_muNBJets", "Tight_muNBJets", 3, 0, 3); h_Tight_muNBJets->Sumw2();
     h_Tight_muNJets = new TH1F("h_Tight_muNJets", "Tight_muNJets", 5, 1, 6); h_Tight_muNJets->Sumw2();
-    h_Tight_muNVertices = new TH1F("h_Tight_muNVertices", "Tight_muNVertices", 5, 5, 25); h_Tight_muNVertices->Sumw2();
-}
+    h_Tight_muNVertices = new TH1F("h_Tight_muNVertices", "Tight_muNVertices", 7, 5, 40); h_Tight_muNVertices->Sumw2();
 
+    h_Tight_muD0 = new TH1F("h_Tight_muD0", "Tight_muD0", 20, 0., 0.2); h_Tight_muD0->Sumw2();
+    h_Tight_muF = new TH2F("h_Tight_muF", "Tight_muF", n_binspt, binspt, n_binseta, binseta); h_Tight_muF->Sumw2(); 
 
-void Fakerates::setHistoStyle() {
-
-    h_Loose_muAwayJetDR->GetXaxis()->SetTitle("DR (Away Jet)");
-    h_Loose_muAwayJetDR->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muAwayJetPt->GetXaxis()->SetTitle("p_T (Away Jet) (GeV)");
-    h_Loose_muAwayJetPt->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muClosJetDR->GetXaxis()->SetTitle("DR (Closest Jet)");
-    h_Loose_muClosJetDR->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muClosJetPt->GetXaxis()->SetTitle("p_T (Closest Jet) (GeV)");
-    h_Loose_muClosJetPt->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muHT->GetXaxis()->SetTitle("H_T (GeV)");
-    h_Loose_muHT->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muLepEta->GetXaxis()->SetTitle("#eta");
-    h_Loose_muLepEta->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muLepIso->GetXaxis()->SetTitle("Lepton PF Iso");
-    h_Loose_muLepIso->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muLepPt->GetXaxis()->SetTitle("p_T (GeV)");
-    h_Loose_muLepPt->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muMET->GetXaxis()->SetTitle("E_T^{miss} (GeV)");
-    h_Loose_muMET->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muMETnoMTCut->GetXaxis()->SetTitle("E_T^{miss} (GeV)");
-    h_Loose_muMETnoMTCut->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muMT->GetXaxis()->SetTitle("m_T (GeV)");
-    h_Loose_muMT->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muMTMET30->GetXaxis()->SetTitle("m_T (GeV)");
-    h_Loose_muMTMET30->GetYaxis()->SetTitle("N_{Loose}");
- 
-    h_Loose_muMaxJPt->GetXaxis()->SetTitle("p_T (Hardest Jet) (GeV)");
-    h_Loose_muMaxJPt->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muNBJets->GetXaxis()->SetTitle("N_{BJets}");
-    h_Loose_muNBJets->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muNJets->GetXaxis()->SetTitle("N_{Jets}");
-    h_Loose_muNJets->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Loose_muNVertices->GetXaxis()->SetTitle("N_{Vertices}");
-    h_Loose_muNVertices->GetYaxis()->SetTitle("N_{Loose}");       
-
-    h_Tight_muAwayJetDR->GetXaxis()->SetTitle("DR (Away Jet)");
-    h_Tight_muAwayJetDR->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muAwayJetPt->GetXaxis()->SetTitle("p_T (Away Jet) (GeV)");
-    h_Tight_muAwayJetPt->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muClosJetDR->GetXaxis()->SetTitle("DR (Closest Jet)");
-    h_Tight_muClosJetDR->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muClosJetPt->GetXaxis()->SetTitle("p_T (Closest Jet) (GeV)");
-    h_Tight_muClosJetPt->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muHT->GetXaxis()->SetTitle("H_T (GeV)");
-    h_Tight_muHT->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muLepEta->GetXaxis()->SetTitle("#eta");
-    h_Tight_muLepEta->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muLepIso->GetXaxis()->SetTitle("Lepton PF Iso");
-    h_Tight_muLepIso->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muLepPt->GetXaxis()->SetTitle("p_T (GeV)");
-    h_Tight_muLepPt->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muMET->GetXaxis()->SetTitle("E_T^{miss} (GeV)");
-    h_Tight_muMET->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muMETnoMTCut->GetXaxis()->SetTitle("E_T^{miss} (GeV)");
-    h_Tight_muMETnoMTCut->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muMT->GetXaxis()->SetTitle("m_T (GeV)");
-    h_Tight_muMT->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muMTMET30->GetXaxis()->SetTitle("m_T (GeV)");
-    h_Tight_muMTMET30->GetYaxis()->SetTitle("N_{Tight}");
- 
-    h_Tight_muMaxJPt->GetXaxis()->SetTitle("p_T (Hardest Jet) (GeV)");
-    h_Tight_muMaxJPt->GetYaxis()->SetTitle("N_{Tight}");
-
-    h_Tight_muNBJets->GetXaxis()->SetTitle("N_{BJets}");
-    h_Tight_muNBJets->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Tight_muNJets->GetXaxis()->SetTitle("N_{Jets}");
-    h_Tight_muNJets->GetYaxis()->SetTitle("N_{Loose}");
-
-    h_Tight_muNVertices->GetXaxis()->SetTitle("N_{Vertices}");
-    h_Tight_muNVertices->GetYaxis()->SetTitle("N_{Loose}");       
 }
 
 
@@ -645,12 +548,6 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_muFLoose ->Write(fName+h_muFLoose->GetName(), TObject::kWriteDelete);
 	h_elPLoose ->Write(fName+h_elPLoose->GetName(), TObject::kWriteDelete);
 	h_muPLoose ->Write(fName+h_muPLoose->GetName(), TObject::kWriteDelete);
-
-	h_muIsoPlot ->Write(fName+h_muIsoPlot->GetName(), TObject::kWriteDelete);
-	h_muD0Plot  ->Write(fName+h_muD0Plot->GetName() , TObject::kWriteDelete);
-
-	h_elIsoPlot ->Write(fName+h_elIsoPlot->GetName(), TObject::kWriteDelete);
-	h_elD0Plot  ->Write(fName+h_elD0Plot->GetName() , TObject::kWriteDelete);
  
     h_Loose_muAwayJetDR ->Write(fName+h_Loose_muAwayJetDR->GetName(), TObject::kWriteDelete);
     h_Loose_muAwayJetPt ->Write(fName+h_Loose_muAwayJetPt->GetName(), TObject::kWriteDelete);
@@ -672,6 +569,9 @@ void Fakerates::writeHistos(TFile* pFile){
     h_Loose_muNJets     ->Write(fName+h_Loose_muNJets->GetName(),     TObject::kWriteDelete);
     h_Loose_muNVertices ->Write(fName+h_Loose_muNVertices->GetName(), TObject::kWriteDelete);
 
+    h_Loose_muD0        ->Write(fName+h_Loose_muD0->GetName(),        TObject::kWriteDelete);
+    h_Loose_muF         ->Write(fName+h_Loose_muF->GetName(),         TObject::kWriteDelete);
+
     h_Tight_muAwayJetDR ->Write(fName+h_Tight_muAwayJetDR->GetName(), TObject::kWriteDelete);
     h_Tight_muAwayJetPt ->Write(fName+h_Tight_muAwayJetPt->GetName(), TObject::kWriteDelete);
     h_Tight_muClosJetDR ->Write(fName+h_Tight_muClosJetDR->GetName(), TObject::kWriteDelete);
@@ -691,6 +591,9 @@ void Fakerates::writeHistos(TFile* pFile){
     h_Tight_muNBJets    ->Write(fName+h_Tight_muNBJets->GetName(),    TObject::kWriteDelete);
     h_Tight_muNJets     ->Write(fName+h_Tight_muNJets->GetName(),     TObject::kWriteDelete);
     h_Tight_muNVertices ->Write(fName+h_Tight_muNVertices->GetName(), TObject::kWriteDelete);
+
+    h_Tight_muD0        ->Write(fName+h_Tight_muD0->GetName(),        TObject::kWriteDelete);
+    h_Tight_muF         ->Write(fName+h_Tight_muF->GetName(),         TObject::kWriteDelete);
 
 }
 

@@ -13,13 +13,33 @@ import ROOT
 # DEFINE VARIABLES
 
 inputdir = "../outputDir/"
-
 outputdir = "../outputDir/"
 
+
+# DEFINE FILES
+
 files = []
+isdata = []
+
 files.append("qcdMuEnriched")
 files.append("wjets")
 files.append("dyjets")
+files.append("data")
+
+isdata.append(0)
+isdata.append(0)
+isdata.append(0)
+isdata.append(1)
+
+# ATTENTION!
+# Note that this is not very nice and wants to be changed!
+# Later in the code, the number of mc samples is hard-coded 
+# (looping over the first 3 files in the list) albeit it would
+# be way better if the code could discriminate between data sample
+# and mc sample, using the right ones in the right places
+
+
+# DEFINE HISTOGRAMS AND AXIS LABELS
 
 histos = []
 labelx = []
@@ -137,8 +157,6 @@ labely.append("N_{Tight}")
 labely.append("N_{Tight}")
 
 
-
-
 # LOAD FILES AND HISTOGRAMS
 
 f = [ROOT.TFile(inputdir + element + "_ratios.root") for element in files]
@@ -153,13 +171,14 @@ for i in range(len(histos)):
     h[0][i].SetFillColor(ROOT.kBlue)
     h[1][i].SetFillColor(ROOT.kRed)
     h[2][i].SetFillColor(ROOT.kGreen)
+    h[3][i].SetLineColor(ROOT.kBlack)
 
 
 # ADD HISTOGRAMS TO STACK
 
 s = [ROOT.THStack(histos[j] + "_stack", histos[j] + "_stack") for j in range(len(histos))]
 
-for i in range(len(t)):
+for i in range(3):
     for j,m in enumerate(s): 
         m.Add(h[i][j])
 
@@ -174,6 +193,8 @@ for i,m in enumerate(s):
     m.Draw("hist")
     m.GetXaxis().SetTitle(labelx[i])
     m.GetYaxis().SetTitle(labely[i])
+
+    h[3][i].Draw("P E1 SAME")
 
     l[i] = ROOT.TLegend(0.7, 0.7, 0.9, 0.9)
     l[i].AddEntry(h[0][i], files[0], "F")

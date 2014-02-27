@@ -115,12 +115,6 @@ public:
 	TH2F * h_elPLoose;
 	TH2F * h_muPLoose;
 
-	TH1F * h_muIsoPlot;
-	TH1F * h_elIsoPlot;
-
-	TH1F * h_muD0Plot;
-	TH1F * h_elD0Plot;
-
     TH1F * h_Loose_muAwayJetDR;
     TH1F * h_Loose_muAwayJetPt;
     TH1F * h_Loose_muClosJetDR;
@@ -137,6 +131,8 @@ public:
     TH1F * h_Loose_muNBJets;
     TH1F * h_Loose_muNJets;
     TH1F * h_Loose_muNVertices;
+    TH1F * h_Loose_muD0;
+    TH2F * h_Loose_muF;
 
     TH1F * h_Tight_muAwayJetDR;
     TH1F * h_Tight_muAwayJetPt;
@@ -154,9 +150,10 @@ public:
     TH1F * h_Tight_muNBJets;
     TH1F * h_Tight_muNJets;
     TH1F * h_Tight_muNVertices;   
+    TH1F * h_Tight_muD0;
+    TH2F * h_Tight_muF;
 
 	void bookHistos();
-    void setHistoStyle();
 	void writeHistos(TFile *);
 
 	// ===================================
