@@ -51,9 +51,11 @@ for hist in data.hists:
 	for mc in mc_samples:
 		mc.hists[i].SetFillColor(mc.color())
 		stack.Add(mc.hists[i])
-	stack.Draw('hist norm')
+	stack.Draw('hist')
 	stack.GetXaxis().SetTitle(helper.getXTitle(hist))
-	hist.Draw('p e1 normsame')
+	hist.Draw('p e1 same')
 	leg.Draw()
 	canv.SaveAs(helper.getSaveName(hist)+'.pdf')
 	canv.SaveAs(helper.getSaveName(hist)+'.png')
+
+
