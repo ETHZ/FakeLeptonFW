@@ -55,7 +55,10 @@ for hist in data.hists:
 	stack.GetXaxis().SetTitle(helper.getXTitle(hist))
 	hist.Draw('p e1 same')
 	leg.Draw()
-	canv.SaveAs(helper.getSaveName(hist)+'.pdf')
-	canv.SaveAs(helper.getSaveName(hist)+'.png')
+	prepend = ''
+	if '_Loose_' in hist.GetName(): prepend = 'Loose_'
+	if '_Tight_' in hist.GetName(): prepend = 'Tight_'
+	canv.SaveAs(prepend+helper.getSaveName(hist)+'.pdf')
+	canv.SaveAs(prepend+helper.getSaveName(hist)+'.png')
 
 
