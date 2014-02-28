@@ -35,7 +35,7 @@ mc_samples.append(dyjets)
 canv = helper.makeCanvas(900, 675)
 canv.cd()
 
-leg = helper.makeLegend(0.60, 0.55, 0.85, 0.85)
+leg = helper.makeLegend(0.70, 0.65, 0.95, 0.90)
 
 leg.AddEntry(data  .hists[0], 'Data'    , 'pe')
 leg.AddEntry(wjets .hists[0], 'W+Jets'  , 'f' )
@@ -48,11 +48,15 @@ for hist in data.hists:
 	i = data.hists.index(hist)
 	if not hist.GetName() in plotHists: continue
 	stack = ROOT.THStack()
+	stackint = 0.
 	for mc in mc_samples:
-		mc.hists[i].SetFillColor(mc.color())
+		stackint += mc.hists[i].Integral()
 		stack.Add(mc.hists[i])
+	yscale = max(stack.GetMaximum(), hist.GetMaximum())
 	stack.Draw('hist')
+	stack.SetMaximum(1.2*yscale)
 	stack.GetXaxis().SetTitle(helper.getXTitle(hist))
+	hist.Scale(stackint/hist.Integral())
 	hist.Draw('p e1 same')
 	leg.Draw()
 	prepend = ''
