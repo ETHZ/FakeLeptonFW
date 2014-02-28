@@ -56,7 +56,7 @@ for hist in data.hists:
 	stack.Draw('hist')
 	stack.SetMaximum(1.2*yscale)
 	stack.GetXaxis().SetTitle(helper.getXTitle(hist))
-	hist.Scale(stackint/hist.Integral())
+	## hist.Scale(stackint/hist.Integral())
 	hist.Draw('p e1 same')
 	leg.Draw()
 	prepend = ''
