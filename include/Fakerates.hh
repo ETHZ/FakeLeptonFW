@@ -61,6 +61,7 @@ public:
 	int  fVerbose;
 	bool fIsData;
 	float fXSec;
+	float fLumi;
 	TString fInputFile;
 	TString fOutputDir;
 	TString fOutputFilename;

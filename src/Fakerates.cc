@@ -30,6 +30,8 @@ void Fakerates::init(bool verbose){
 	fCutflow_afterMETCut = 0;
 	fCutflow_afterMTCut  = 0;
 	Util::SetStyle();
+
+	float fLumi = 24.9;
 }
 
 // -------------------------------------------------------------
@@ -51,7 +53,6 @@ void Fakerates::loop(){
 	*/
 
 
-	float Lum = 24.9;
 	int ntot = 0;
 
 	// open output file and define histograms
@@ -68,7 +69,7 @@ void Fakerates::loop(){
     // calculate the eventweight
     TH1F * EventCount = (TH1F*) file_->Get("EventCount");
     double Ngen = EventCount->GetEntries();
-    if(!fIsData) fEventweight = fXSec * Lum / (fMaxSize>0?fMaxSize:Ngen);
+    if(!fIsData) fEventweight = fXSec * fLumi / (fMaxSize>0?fMaxSize:Ngen);
 	else fEventweight = 1.;
     cout << "eventweight is " << fEventweight << endl;
 
