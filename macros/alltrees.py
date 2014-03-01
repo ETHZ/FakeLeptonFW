@@ -9,6 +9,7 @@
 
 import ROOT
 
+# ROOT.gROOT.SetBatch(1)
 
 # DEFINE VARIABLES
 
@@ -162,12 +163,22 @@ labely.append("N_{Tight}")
 f = [ROOT.TFile(inputdir + element + "_ratios.root") for element in files]
 t = [element.Get(files[j]) for j, element in enumerate(f)]
 
+
 c = ROOT.TCanvas("c0", "C0")
 l = [{} for i in range(len(histos))]
 
+
+print 'f', f
+print 't', t
+print 'l', l
+
+print 'enumerate t:', enumerate(t)
 h = [[element1.Get(files[j] + element2) for element2 in histos] for j, element1 in enumerate(t)]
 
+print 'h', h
 for i in range(len(histos)):
+    print 'h05', h[0][5]
+    if i < 4: continue
     h[0][i].SetFillColor(ROOT.kBlue)
     h[1][i].SetFillColor(ROOT.kRed)
     h[2][i].SetFillColor(ROOT.kGreen)
@@ -180,6 +191,7 @@ s = [ROOT.THStack(histos[j] + "_stack", histos[j] + "_stack") for j in range(len
 
 for i in range(3):
     for j,m in enumerate(s): 
+        if j < 4: continue
         m.Add(h[i][j])
 
 
@@ -189,6 +201,7 @@ new = ROOT.TFile(outputdir + "alltrees.root", "RECREATE")
 new.cd()
 
 for i,m in enumerate(s):
+    if i < 4: continue
 
     m.Draw("hist")
     m.GetXaxis().SetTitle(labelx[i])

@@ -75,8 +75,6 @@ public:
 	//void fillRatios();
 	void fillIsoPlots();
 
-	void synchOutput();
-	
 	bool passesUpperMETMT(int, int);
     bool passesMETCut(float, int);
     bool passesMTCut(int, int);

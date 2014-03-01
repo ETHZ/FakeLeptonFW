@@ -51,7 +51,7 @@ void Fakerates::loop(){
     */
 
 
-    float Lum = 19500.0;
+    float Lum = 24.6;
 	int ntot = 0;
 
     // open output file and define histograms
@@ -69,6 +69,7 @@ void Fakerates::loop(){
     TH1F * EventCount = (TH1F*) file_->Get("EventCount");
     double Ngen = EventCount->GetEntries();
     if(!fIsData) fEventweight = fXSec * Lum / (fMaxSize>0?fMaxSize:Ngen);
+	else fEventweight = 1.;
     cout << "eventweight is " << fEventweight << endl;
 
 	// loop on events in the tree
@@ -94,14 +95,6 @@ void Fakerates::loop(){
 	pFile->Close();
 }
 
-
-void Fakerates::synchOutput(){
-	int mu = -1, jet = -1;
-	bool a = isCalibrationRegionMuEvent(mu, jet);
-
-}
-
-
 bool Fakerates::isCalibrationRegionMuEvent(int &mu, int &jet){
     /*
     checks, whether the event contains exactly one muon and at least one away-jet in the calibration region
@@ -124,6 +117,7 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu, int &jet){
 
 	// count numbers of loose and veto muons in the event
 	for(int i=0; i < MuPt->size(); ++i){
+		if(MuPt->at(i) < 20.) continue;
 		if(MuIsLoose->at(i)){
 			nloose++;
 			mu = i;
