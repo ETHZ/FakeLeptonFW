@@ -1,4 +1,4 @@
-import ROOT, helper
+import ROOT, helper, commands
 
 ROOT.gROOT.SetBatch(1)
 ROOT.gStyle.SetOptStat(0)
@@ -50,10 +50,10 @@ plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR'
 
 for hist in qcd.hists:
 	if hist.GetName() == 'h_muFLoose':
-		FR_qcd_den = hist.ProjectionX()
+		FR_qcd_den = hist.ProjectionX('e')
 		FR_qcd_den.SetName("FR_qcd_den")
 	if hist.GetName() == 'h_muFTight':
-		FR_qcd = hist.ProjectionX()
+		FR_qcd = hist.ProjectionX('e')
 		FR_qcd.SetName("FR_qcd")
 
 
@@ -61,24 +61,26 @@ for hist in data.hists:
 
 	i = data.hists.index(hist)
 	if hist.GetName() == 'h_muFLoose':
-		FR_data_den = hist.ProjectionX()
+		FR_data_den = hist.ProjectionX('e')
 		FR_data_den.SetName("FR_data_den")
 		FR_bg_den = FR_data_den.Clone()
+		FR_bg_den.Sumw2()
 		FR_bg_den.SetName("FR_bg_den")
 		FR_bg_den.Reset()
 
 		for mc in mc_samples:
-			FR_bg_den.Add(mc.hists[i].ProjectionX())
+			FR_bg_den.Add(mc.hists[i].ProjectionX('e'))
 		
 	if hist.GetName() == 'h_muFTight':
-		FR_data = hist.ProjectionX()
+		FR_data = hist.ProjectionX('e')
 		FR_data.SetName("FR_data")
 		FR_bg = FR_data.Clone()
+		FR_bg.Sumw2()
 		FR_bg.SetName("FR_bg")
 		FR_bg.Reset()
 
 		for mc in mc_samples:
-			FR_bg.Add(mc.hists[i].ProjectionX())
+			FR_bg.Add(mc.hists[i].ProjectionX('e'))
 
 	if not hist.GetName() in plotHists: continue
 
@@ -101,24 +103,36 @@ for hist in data.hists:
 	helper.saveCanvas(canv, prepend + helper.getSaveName(hist) + postpend)
 
 
+print 'vorher'
+for bin in range(1,FR_bg.GetNbinsX()+1):
+	print 'bincontent:', FR_bg.GetBinContent(bin), 'binerror:', FR_bg.GetBinError(bin)
 
 FR_data.Divide(FR_data_den)
 FR_data.SetMarkerColor(ROOT.kBlack)
 FR_bg.Divide(FR_bg_den)
+FR_bg.SetMarkerSize(1.2)
+FR_bg.SetMarkerStyle(20)
 FR_bg.SetMarkerColor(ROOT.kRed)
 FR_qcd.Divide(FR_qcd_den)
+FR_qcd.SetMarkerSize(1.2)
+FR_qcd.SetMarkerStyle(20)
 FR_qcd.SetMarkerColor(getColor(qcd))
 
-FR_data.Draw("e")
-FR_bg.Draw("e same")
-FR_qcd.Draw("e same")
+print 'nachher'
+for bin in range(1,FR_bg.GetNbinsX()+1):
+	print 'bincontent:', FR_bg.GetBinContent(bin), 'binerror:', FR_bg.GetBinError(bin)
+	##print 'dencontetn:', FR_bg_den.GetBinContent(bin), 'denerror:', FR_bg_den.GetBinError(bin)
 
-FR_data.SetMaximum(0.4) 
+FR_data.Draw("pe")
+FR_bg.Draw("p e same")
+FR_qcd.Draw("p e same")
+
+FR_data.SetMaximum(0.3) 
 
 legend = helper.makeLegend(0.15, 0.65, 0.4, 0.90)
 legend.AddEntry(FR_data, 'Data'  , 'pe')
-legend.AddEntry(FR_bg, 'QCD + EW', 'f' )
-legend.AddEntry(FR_qcd, 'QCD'    , 'f' )
+legend.AddEntry(FR_bg, 'QCD + EW', 'pe')
+legend.AddEntry(FR_qcd, 'QCD'    , 'pe')
 legend.Draw()
 
 helper.saveCanvas(canv, "muFakeRatio")
