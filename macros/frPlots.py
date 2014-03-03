@@ -103,17 +103,19 @@ for hist in data.hists:
 
 
 FR_data.Divide(FR_data_den)
-FR_data.SetFillColor(ROOT.kBlack)
+FR_data.SetMarkerColor(ROOT.kBlack)
 FR_bg.Divide(FR_bg_den)
 FR_bg.SetMarkerColor(ROOT.kRed)
 FR_qcd.Divide(FR_qcd_den)
 FR_qcd.SetMarkerColor(getColor(qcd))
 
-FR_bg.Draw("hist")
-FR_qcd.Draw("hist same")
-FR_data.Draw("e same")
+FR_data.Draw("e")
+FR_bg.Draw("e same")
+FR_qcd.Draw("e same")
 
-legend = helper.makeLegend(0.15, 0.35, 0.4, 0.60)
+FR_data.SetMaximum(0.4) 
+
+legend = helper.makeLegend(0.15, 0.65, 0.4, 0.90)
 legend.AddEntry(FR_data, 'Data'  , 'pe')
 legend.AddEntry(FR_bg, 'QCD + EW', 'f' )
 legend.AddEntry(FR_qcd, 'QCD'    , 'f' )
