@@ -42,3 +42,9 @@ def getXTitle(hist):
 def getSaveName(hist):
 	name = hist.GetName()
 	return name.split('_')[-1]
+
+def saveCanvas(canv, name):
+	canv.SaveAs(name + '.pdf')
+	canv.SaveAs(name + '.png')
+
+
