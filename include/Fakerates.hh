@@ -166,9 +166,14 @@ public:
 	int fCutflow_afterJetSel;
 	int fCutflow_afterMETCut;
 	int fCutflow_afterMTCut;
-	int fLepPtBinN;
-	float fLepPtBinMin;
-	float fLepPtBinMax;
+
+	// binning for the pt-eta FR histogram
+	// float fFRbinseta;
+	// float fFRbinspt;
+	std::vector<float> fFRbinseta;
+	std::vector<float> fFRbinspt;
+	int fFRn_binseta;
+	int fFRn_binspt ;
 	
 
     // SAMPLE CLASS

@@ -29,10 +29,34 @@ void Fakerates::init(bool verbose){
 	fCutflow_afterJetSel = 0;
 	fCutflow_afterMETCut = 0;
 	fCutflow_afterMTCut  = 0;
-	fLepPtBinN   = 20;
-	fLepPtBinMin = 10.;
-	fLepPtBinMax = 50.;
 	Util::SetStyle();
+
+
+	// set the binning for the FR histo here.
+	fFRbinseta.push_back(0.0);
+	fFRbinseta.push_back(1.4);
+	fFRbinseta.push_back(2.5);
+
+	// fFRbinseta[] = {0., 1.4, 2.5};
+	// fFRbinspt[]  = {10., 20., 25., 30., 35., 40., 45., 50., 51.};
+	// pT binning
+	fFRbinspt.push_back(10.);
+	fFRbinspt.push_back(20.);
+	fFRbinspt.push_back(25.);
+	fFRbinspt.push_back(30.);
+	fFRbinspt.push_back(35.);
+	fFRbinspt.push_back(40.);
+	fFRbinspt.push_back(45.);
+	fFRbinspt.push_back(50.);
+	fFRbinspt.push_back(51.);
+
+	// fFRn_binseta  = sizeof(fFRbinseta)/sizeof(float)-1;
+	// fFRn_binspt   = sizeof(fFRbinspt )/sizeof(float)-1;
+	fFRn_binseta  = fFRbinseta.size();
+	fFRn_binspt   = fFRbinspt .size();
+	cout << "size of pt bins: " << fFRbinspt .size() << endl;;
+
+	cout << "fFRbinspt[fFRbinspt]: " << fFRbinspt[fFRn_binspt-1] << endl;
 
 	float fLumi = 24.9;
 }
@@ -386,8 +410,14 @@ void Fakerates::fillIsoPlots(){
 			h_Loose_muNVertices ->Fill(NVrtx, fEventweight);
 
 			h_Loose_muD0        ->Fill(MuD0->at(mu), fEventweight);
-			h_Loose_muF         ->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
-			h_Loose_muLepPtforFR->Fill((MuPt->at(mu)<fLepPtBinMax?MuPt->at(mu):fLepPtBinMax), fEventweight);
+
+			if( MuPt->at(mu) >  fFRbinspt[fFRn_binspt]){
+				int fillbin = h_muFLoose->FindBin(fFRbinspt[fFRn_binspt]-0.5, MuEta->at(mu));
+				h_muFLoose->AddBinContent(fillbin, fEventweight);
+			}
+			else{
+				h_muFLoose->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
+			}
 		}
 
 		if(passesMTCut(0, mu)) h_Loose_muMET->Fill(pfMET, fEventweight);
@@ -417,8 +447,14 @@ void Fakerates::fillIsoPlots(){
 				h_Tight_muNVertices ->Fill(NVrtx, fEventweight);
 
 				h_Tight_muD0        ->Fill(MuD0->at(mu), fEventweight);
-				h_Tight_muF         ->Fill(MuPt->at(mu), fEventweight);
-				h_Tight_muLepPtforFR->Fill((MuPt->at(mu)<fLepPtBinMax?MuPt->at(mu):fLepPtBinMax), fEventweight);
+
+				if( MuPt->at(mu) >  fFRbinspt[fFRn_binspt]){
+					int fillbin = h_muFTight->FindBin(fFRbinspt[fFRn_binspt]-0.5, MuEta->at(mu));
+					h_muFTight->AddBinContent(fillbin, fEventweight);
+				}
+				else{
+					h_muFTight->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
+				}
 			}
 
 			if(passesMTCut(0, mu)) h_Tight_muMET->Fill(pfMET, fEventweight);
@@ -428,7 +464,6 @@ void Fakerates::fillIsoPlots(){
 
 		}
 	}
-	h_muFakeRatio->Divide(h_Tight_muLepPtforFR, h_Loose_muLepPtforFR);
 
 
     // electrons
@@ -446,79 +481,79 @@ void Fakerates::bookHistos(){
 	return: none
 	*/ 
 
-	float binseta[] = {0., 1.4, 2.5};
-	float binspt[]  = {10., 15., 20., 25., 40};
-
-	int n_binseta  = sizeof(binseta)/sizeof(float)-1;
-	int n_binspt   = sizeof(binspt )/sizeof(float)-1;
+	float fr_ptbins[fFRn_binspt];
+	for(int i=0; i< fFRbinspt.size(); ++i){
+		fr_ptbins[i] = fFRbinspt[i];
+		cout << fFRbinspt[i] << endl;
+	} 
+	float fr_etabins[fFRn_binseta];
+	for(int i=0; i< fFRbinseta.size(); ++i){
+		fr_etabins[i] = fFRbinseta[i];
+		cout << fFRbinseta[i] << endl;
+	} 
 
 	// the ratio histograms, those are just divided versions of the following
-	h_elFRatio = new TH2F("h_elFRatio", "elFRatio", n_binspt, binspt, n_binseta, binseta); h_elFRatio->Sumw2(); 
-	h_muFRatio = new TH2F("h_muFRatio", "muFRatio", n_binspt, binspt, n_binseta, binseta); h_muFRatio->Sumw2(); 
-	h_elPRatio = new TH2F("h_elPRatio", "elPRatio", n_binspt, binspt, n_binseta, binseta); h_elPRatio->Sumw2(); 
-	h_muPRatio = new TH2F("h_muPRatio", "muPRatio", n_binspt, binspt, n_binseta, binseta); h_muPRatio->Sumw2(); 
+	h_elFRatio = new TH2F("h_elFRatio", "elFRatio", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_elFRatio->Sumw2(); 
+	h_muFRatio = new TH2F("h_muFRatio", "muFRatio", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_muFRatio->Sumw2(); 
+	h_elPRatio = new TH2F("h_elPRatio", "elPRatio", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_elPRatio->Sumw2(); 
+	h_muPRatio = new TH2F("h_muPRatio", "muPRatio", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_muPRatio->Sumw2(); 
 	
 	// passing histograms for electrons and muons, f and p rate
-	h_elFTight = new TH2F("h_elFTight", "elFTight", n_binspt, binspt, n_binseta, binseta); h_elFTight->Sumw2(); 
-	h_muFTight = new TH2F("h_muFTight", "muFTight", n_binspt, binspt, n_binseta, binseta); h_muFTight->Sumw2(); 
-	h_elPTight = new TH2F("h_elPTight", "elPTight", n_binspt, binspt, n_binseta, binseta); h_elPTight->Sumw2(); 
-	h_muPTight = new TH2F("h_muPTight", "muPTight", n_binspt, binspt, n_binseta, binseta); h_muPTight->Sumw2(); 
+	h_elFTight = new TH2F("h_elFTight", "elFTight", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_elFTight->Sumw2(); 
+	h_muFTight = new TH2F("h_muFTight", "muFTight", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_muFTight->Sumw2(); 
+	h_elPTight = new TH2F("h_elPTight", "elPTight", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_elPTight->Sumw2(); 
+	h_muPTight = new TH2F("h_muPTight", "muPTight", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_muPTight->Sumw2(); 
 
 	// failing histograms for electrons and muons, f and p rate
-	h_elFLoose = new TH2F("h_elFLoose", "elFLoose", n_binspt, binspt, n_binseta, binseta); h_elFLoose->Sumw2(); 
-	h_muFLoose = new TH2F("h_muFLoose", "muFLoose", n_binspt, binspt, n_binseta, binseta); h_muFLoose->Sumw2(); 
-	h_elPLoose = new TH2F("h_elPLoose", "elPLoose", n_binspt, binspt, n_binseta, binseta); h_elPLoose->Sumw2(); 
-	h_muPLoose = new TH2F("h_muPLoose", "muPLoose", n_binspt, binspt, n_binseta, binseta); h_muPLoose->Sumw2(); 
+	h_elFLoose = new TH2F("h_elFLoose", "elFLoose", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_elFLoose->Sumw2(); 
+	h_muFLoose = new TH2F("h_muFLoose", "muFLoose", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_muFLoose->Sumw2(); 
+	h_elPLoose = new TH2F("h_elPLoose", "elPLoose", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_elPLoose->Sumw2(); 
+	h_muPLoose = new TH2F("h_muPLoose", "muPLoose", fFRn_binspt, fr_ptbins, fFRn_binseta, fr_etabins); h_muPLoose->Sumw2(); 
 
-	h_Loose_muAwayJetDR = new TH1F("h_Loose_muAwayJetDR", "Loose_muAwayJetDR", 30, 0, 6); h_Loose_muAwayJetDR->Sumw2();
-	h_Loose_muAwayJetPt = new TH1F("h_Loose_muAwayJetPt", "Loose_muAwayJetPt", 13, 20, 150); h_Loose_muAwayJetPt->Sumw2();
-	h_Loose_muClosJetDR = new TH1F("h_Loose_muClosJetDR", "Loose_muClosJetDR", 30, 0, 6); h_Loose_muClosJetDR->Sumw2();
-	h_Loose_muClosJetPt = new TH1F("h_Loose_muClosJetPt", "Loose_muClosJetPt", 13, 20, 150); h_Loose_muClosJetPt->Sumw2();
+	h_Loose_muAwayJetDR  = new TH1F("h_Loose_muAwayJetDR" , "Loose_muAwayJetDR" , 30 , 0  , 6)   ; h_Loose_muAwayJetDR->Sumw2() ;
+	h_Loose_muAwayJetPt  = new TH1F("h_Loose_muAwayJetPt" , "Loose_muAwayJetPt" , 13 , 20 , 150) ; h_Loose_muAwayJetPt->Sumw2() ;
+	h_Loose_muClosJetDR  = new TH1F("h_Loose_muClosJetDR" , "Loose_muClosJetDR" , 30 , 0  , 6)   ; h_Loose_muClosJetDR->Sumw2() ;
+	h_Loose_muClosJetPt  = new TH1F("h_Loose_muClosJetPt" , "Loose_muClosJetPt" , 13 , 20 , 150) ; h_Loose_muClosJetPt->Sumw2() ;
 
-	h_Loose_muHT = new TH1F("h_Loose_muHT", "Loose_muHT", 10, 50, 500); h_Loose_muHT->Sumw2();
-	h_Loose_muLepEta = new TH1F("h_Loose_muLepEta", "Loose_muLepEta", 12, 0, 2.4); h_Loose_muLepEta->Sumw2();
- 	h_Loose_muLepIso = new TH1F("h_Loose_muLepIso", "Loose_muLepIso", 20, 0, 1); h_Loose_muLepIso->Sumw2();
-	h_Loose_muLepPt = new TH1F("h_Loose_muLepPt", "Loose_muLepPt", fLepPtBinN, fLepPtBinMin, fLepPtBinMax); h_Loose_muLepPt->Sumw2();
+	h_Loose_muHT         = new TH1F("h_Loose_muHT"         , "Loose_muHT"         , 10 , 50  , 500) ; h_Loose_muHT->Sumw2()         ;
+	h_Loose_muLepEta     = new TH1F("h_Loose_muLepEta"     , "Loose_muLepEta"     , 12 , 0   , 2.4) ; h_Loose_muLepEta->Sumw2()     ;
+ 	h_Loose_muLepIso     = new TH1F("h_Loose_muLepIso"     , "Loose_muLepIso"     , 20 , 0   , 1)   ; h_Loose_muLepIso->Sumw2()     ;
+	h_Loose_muLepPt      = new TH1F("h_Loose_muLepPt"      , "Loose_muLepPt"      , 20 , 10. , 70.) ; h_Loose_muLepPt->Sumw2()      ;
 
-	h_Loose_muMET = new TH1F("h_Loose_muMET", "Loose_muMET", 20, 0, 100); h_Loose_muMET->Sumw2();
-	h_Loose_muMETnoMTCut = new TH1F("h_Loose_muMETnoMTCut", "Loose_muMETnoMTCut", 20, 0, 100); h_Loose_muMETnoMTCut->Sumw2();
-	h_Loose_muMT = new TH1F("h_Loose_muMT", "Loose_muMT", 10, 0, 100); h_Loose_muMT->Sumw2();
-	h_Loose_muMTMET30 = new TH1F("h_Loose_muMTMET30", "Loose_muMTMET30", 20, 0, 200); h_Loose_muMTMET30->Sumw2();
+	h_Loose_muMET        = new TH1F("h_Loose_muMET"        , "Loose_muMET"        , 20 , 0   , 100) ; h_Loose_muMET->Sumw2()        ;
+	h_Loose_muMETnoMTCut = new TH1F("h_Loose_muMETnoMTCut" , "Loose_muMETnoMTCut" , 20 , 0   , 100) ; h_Loose_muMETnoMTCut->Sumw2() ;
+	h_Loose_muMT         = new TH1F("h_Loose_muMT"         , "Loose_muMT"         , 10 , 0   , 100) ; h_Loose_muMT->Sumw2()         ;
+	h_Loose_muMTMET30    = new TH1F("h_Loose_muMTMET30"    , "Loose_muMTMET30"    , 20 , 0   , 200) ; h_Loose_muMTMET30->Sumw2()    ;
 
-	h_Loose_muMaxJPt = new TH1F("h_Loose_muMaxJPt", "Loose_muMaxJPt", 13, 20, 150); h_Loose_muMaxJPt->Sumw2();
-	h_Loose_muNBJets = new TH1F("h_Loose_muNBJets", "Loose_muNBJets", 3, 0, 3); h_Loose_muNBJets->Sumw2();
-	h_Loose_muNJets = new TH1F("h_Loose_muNJets", "Loose_muNJets", 5, 1, 6); h_Loose_muNJets->Sumw2();
-	h_Loose_muNVertices = new TH1F("h_Loose_muNVertices", "Loose_muNVertices", 7, 5, 40); h_Loose_muNVertices->Sumw2();
+	h_Loose_muMaxJPt    = new TH1F("h_Loose_muMaxJPt"    , "Loose_muMaxJPt"    , 13 , 20 , 150) ; h_Loose_muMaxJPt->Sumw2()    ;
+	h_Loose_muNBJets    = new TH1F("h_Loose_muNBJets"    , "Loose_muNBJets"    , 3  , 0  , 3)   ; h_Loose_muNBJets->Sumw2()    ;
+	h_Loose_muNJets     = new TH1F("h_Loose_muNJets"     , "Loose_muNJets"     , 5  , 1  , 6)   ; h_Loose_muNJets->Sumw2()     ;
+	h_Loose_muNVertices = new TH1F("h_Loose_muNVertices" , "Loose_muNVertices" , 7  , 5  , 40)  ; h_Loose_muNVertices->Sumw2() ;
 
 	h_Loose_muD0 = new TH1F("h_Loose_muD0", "Loose_muD0", 20, 0., 0.2); h_Loose_muD0->Sumw2();
-	h_Loose_muF = new TH2F("h_Loose_muF", "Loose_muF", n_binspt, binspt, n_binseta, binseta); h_Loose_muF->Sumw2(); 
-	h_Loose_muLepPtforFR = new TH1F("h_Loose_muLepPtforFR", "Loose_muLepPtforFR", fLepPtBinN, fLepPtBinMin, fLepPtBinMax); h_Loose_muLepPtforFR->Sumw2();
 
-	h_Tight_muAwayJetDR = new TH1F("h_Tight_muAwayJetDR", "Tight_muAwayJetDR", 30, 0, 6); h_Tight_muAwayJetDR->Sumw2();
-	h_Tight_muAwayJetPt = new TH1F("h_Tight_muAwayJetPt", "Tight_muAwayJetPt", 13, 20, 150); h_Tight_muAwayJetPt->Sumw2();
-	h_Tight_muClosJetDR = new TH1F("h_Tight_muClosJetDR", "Tight_muClosJetDR", 30, 0, 6); h_Tight_muClosJetDR->Sumw2();
-	h_Tight_muClosJetPt = new TH1F("h_Tight_muClosJetPt", "Tight_muClosJetPt", 13, 20, 150); h_Tight_muClosJetPt->Sumw2();
+	h_Tight_muAwayJetDR = new TH1F("h_Tight_muAwayJetDR", "Tight_muAwayJetDR", 30, 0, 6)    ; h_Tight_muAwayJetDR->Sumw2() ;
+	h_Tight_muAwayJetPt = new TH1F("h_Tight_muAwayJetPt", "Tight_muAwayJetPt", 13, 20, 150) ; h_Tight_muAwayJetPt->Sumw2() ;
+	h_Tight_muClosJetDR = new TH1F("h_Tight_muClosJetDR", "Tight_muClosJetDR", 30, 0, 6)    ; h_Tight_muClosJetDR->Sumw2() ;
+	h_Tight_muClosJetPt = new TH1F("h_Tight_muClosJetPt", "Tight_muClosJetPt", 13, 20, 150) ; h_Tight_muClosJetPt->Sumw2() ;
 
-	h_Tight_muHT = new TH1F("h_Tight_muHT", "Tight_muHT", 10, 50, 500); h_Tight_muHT->Sumw2();
-	h_Tight_muLepEta = new TH1F("h_Tight_muLepEta", "Tight_muLepEta", 12, 0, 2.4); h_Tight_muLepEta->Sumw2();
-	h_Tight_muLepIso = new TH1F("h_Tight_muLepIso", "Tight_muLepIso", 20, 0, 1); h_Tight_muLepIso->Sumw2();
-	h_Tight_muLepPt = new TH1F("h_Tight_muLepPt", "Tight_muLepPt", fLepPtBinN, fLepPtBinMin, fLepPtBinMax); h_Tight_muLepPt->Sumw2();
+	h_Tight_muHT     = new TH1F("h_Tight_muHT"     , "Tight_muHT"     , 10 , 50  , 500); h_Tight_muHT->Sumw2();
+	h_Tight_muLepEta = new TH1F("h_Tight_muLepEta" , "Tight_muLepEta" , 12 , 0   , 2.4); h_Tight_muLepEta->Sumw2();
+	h_Tight_muLepIso = new TH1F("h_Tight_muLepIso" , "Tight_muLepIso" , 20 , 0   , 1)  ; h_Tight_muLepIso->Sumw2();
+	h_Tight_muLepPt  = new TH1F("h_Tight_muLepPt"  , "Tight_muLepPt"  , 20 , 10. , 70.); h_Tight_muLepPt->Sumw2();
 
-	h_Tight_muMET = new TH1F("h_Tight_muMET", "Tight_muMET", 20, 0, 100); h_Tight_muMET->Sumw2();
-	h_Tight_muMETnoMTCut = new TH1F("h_Tight_muMETnoMTCut", "Tight_muMETnoMTCut", 20, 0, 100); h_Tight_muMETnoMTCut->Sumw2();
-	h_Tight_muMT = new TH1F("h_Tight_muMT", "Tight_muMT", 10, 0, 100); h_Tight_muMT->Sumw2();
-	h_Tight_muMTMET30 = new TH1F("h_Tight_muMTMET30", "Tight_muMTMET30", 20, 0, 200); h_Tight_muMTMET30->Sumw2();
+	h_Tight_muMET        = new TH1F("h_Tight_muMET"        , "Tight_muMET"        , 20 , 0 , 100); h_Tight_muMET->Sumw2();
+	h_Tight_muMETnoMTCut = new TH1F("h_Tight_muMETnoMTCut" , "Tight_muMETnoMTCut" , 20 , 0 , 100); h_Tight_muMETnoMTCut->Sumw2();
+	h_Tight_muMT         = new TH1F("h_Tight_muMT"         , "Tight_muMT"         , 10 , 0 , 100); h_Tight_muMT->Sumw2();
+	h_Tight_muMTMET30    = new TH1F("h_Tight_muMTMET30"    , "Tight_muMTMET30"    , 20 , 0 , 200); h_Tight_muMTMET30->Sumw2();
 
-	h_Tight_muMaxJPt = new TH1F("h_Tight_muMaxJPt", "Tight_muMaxJPt", 13, 20, 150); h_Tight_muMaxJPt->Sumw2();
-	h_Tight_muNBJets = new TH1F("h_Tight_muNBJets", "Tight_muNBJets", 3, 0, 3); h_Tight_muNBJets->Sumw2();
-	h_Tight_muNJets = new TH1F("h_Tight_muNJets", "Tight_muNJets", 5, 1, 6); h_Tight_muNJets->Sumw2();
-	h_Tight_muNVertices = new TH1F("h_Tight_muNVertices", "Tight_muNVertices", 7, 5, 40); h_Tight_muNVertices->Sumw2();
+	h_Tight_muMaxJPt    = new TH1F("h_Tight_muMaxJPt"    , "Tight_muMaxJPt"    , 13 , 20 , 150); h_Tight_muMaxJPt->Sumw2();
+	h_Tight_muNBJets    = new TH1F("h_Tight_muNBJets"    , "Tight_muNBJets"    , 3  , 0  , 3)  ; h_Tight_muNBJets->Sumw2();
+	h_Tight_muNJets     = new TH1F("h_Tight_muNJets"     , "Tight_muNJets"     , 5  , 1  , 6)  ; h_Tight_muNJets->Sumw2();
+	h_Tight_muNVertices = new TH1F("h_Tight_muNVertices" , "Tight_muNVertices" , 7  , 5  , 40) ; h_Tight_muNVertices->Sumw2();
 
  	h_Tight_muD0 = new TH1F("h_Tight_muD0", "Tight_muD0", 20, 0., 0.2); h_Tight_muD0->Sumw2();
-	h_Tight_muF = new TH2F("h_Tight_muF", "Tight_muF", n_binspt, binspt, n_binseta, binseta); h_Tight_muF->Sumw2(); 
-	h_Tight_muLepPtforFR = new TH1F("h_Tight_muLepPtforFR", "Tight_muLepPtforFR", fLepPtBinN, fLepPtBinMin, fLepPtBinMax); h_Tight_muLepPtforFR->Sumw2();
 
-	h_muFakeRatio = new TH1F("h_muFakeRatio", "muFakeRatio", fLepPtBinN, fLepPtBinMin, fLepPtBinMax); h_muFakeRatio->Sumw2();
 
 }
 
@@ -598,10 +633,6 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Tight_muNVertices ->Write(fName+h_Tight_muNVertices->GetName(), TObject::kWriteDelete);
 
 	h_Tight_muD0        ->Write(fName+h_Tight_muD0->GetName(),        TObject::kWriteDelete);
-	h_Tight_muF         ->Write(fName+h_Tight_muF->GetName(),         TObject::kWriteDelete);
-	h_Tight_muLepPtforFR->Write(fName+h_Tight_muLepPtforFR->GetName(),TObject::kWriteDelete);
-
-	h_muFakeRatio       ->Write(fName+h_muFakeRatio->GetName(),       TObject::kWriteDelete);
 
 }
 
