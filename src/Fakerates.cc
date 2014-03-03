@@ -52,7 +52,7 @@ void Fakerates::init(bool verbose){
 	fFRbinspt.push_back(51.);
 	fFRn_binspt   = fFRbinspt .size();
 
-	float fLumi = 24.9;
+	fLumi = 24.9;
 }
 
 // -------------------------------------------------------------
@@ -100,7 +100,6 @@ void Fakerates::loop(){
 		tree_->GetEntry(jentry);
 		ntot++;
 
-		// fillRatios();
 		fillIsoPlots();
 
 	}
