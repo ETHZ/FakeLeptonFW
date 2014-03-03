@@ -44,13 +44,17 @@ leg.AddEntry(wjets .hists[0], 'W+Jets'  , 'f' )
 leg.AddEntry(dyjets.hists[0], 'DY+Jets' , 'f' )
 leg.AddEntry(qcd   .hists[0], 'QCD'     , 'f' )
 
-plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Loose_muF', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0', 'h_Tight_muF']
+plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Loose_muF', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0', 'h_Tight_muF', 'h_muFakeRatio']
 
 plotSingle = ['h_Loose_muF', 'h_Tight_muF']
 
 for hist in data.hists:
 
 	i = data.hists.index(hist)
+	if hist.GetName() == 'h_Loose_muLepPt':
+		FR_den = hist
+	if hist.GetName() == 'h_Tight_muLepPt':
+		FR_num = hist
 	if not hist.GetName() in plotHists: continue
 
 	prepend = ''
@@ -83,6 +87,12 @@ for hist in data.hists:
 			hist.Draw('p e1 same')
 			leg.Draw()
 		helper.saveCanvas(canv, prepend + helper.getSaveName(hist) + postpend)
+
+
+
+
+
+
 
 
 

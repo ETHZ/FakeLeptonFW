@@ -121,6 +121,7 @@ public:
 	TH1F * h_Loose_muLepEta;
 	TH1F * h_Loose_muLepIso;
 	TH1F * h_Loose_muLepPt;
+	TH1F * h_Loose_muLepPtforFR;
 	TH1F * h_Loose_muMET;
 	TH1F * h_Loose_muMETnoMTCut;
 	TH1F * h_Loose_muMT;
@@ -140,6 +141,7 @@ public:
 	TH1F * h_Tight_muLepEta;
 	TH1F * h_Tight_muLepIso;
 	TH1F * h_Tight_muLepPt;
+	TH1F * h_Tight_muLepPtforFR;
 	TH1F * h_Tight_muMET;
 	TH1F * h_Tight_muMETnoMTCut;
 	TH1F * h_Tight_muMT;
@@ -151,6 +153,8 @@ public:
 	TH1F * h_Tight_muD0;
 	TH2F * h_Tight_muF;
 
+    TH1F * h_muFakeRatio;
+
 	void bookHistos();
 	void writeHistos(TFile *);
 
@@ -160,7 +164,10 @@ public:
 	int fCutflow_afterLepSel;
 	int fCutflow_afterJetSel;
 	int fCutflow_afterMETCut;
-	int fCutflow_afterMTCut ;
+	int fCutflow_afterMTCut;
+    int fLepPtBinN;
+    float fLepPtBinMin;
+    float fLepPtBinMax;
 	
 
     // SAMPLE CLASS

@@ -29,6 +29,9 @@ void Fakerates::init(bool verbose){
 	fCutflow_afterJetSel = 0;
 	fCutflow_afterMETCut = 0;
 	fCutflow_afterMTCut  = 0;
+	fLepPtBinN   = 20;
+	fLepPtBinMin = 10.;
+	fLepPtBinMax = 50.;
 	Util::SetStyle();
 }
 
@@ -383,6 +386,7 @@ void Fakerates::fillIsoPlots(){
 
 			h_Loose_muD0        ->Fill(MuD0->at(mu), fEventweight);
 			h_Loose_muF         ->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
+            h_Loose_muLepPtforFR->Fill((MuPt->at(mu)<fLepPtBinMax?MuPt->at(mu):fLepPtBinMax), fEventweight);
 		}
 
 		if(passesMTCut(0, mu)) h_Loose_muMET->Fill(pfMET, fEventweight);
@@ -413,6 +417,7 @@ void Fakerates::fillIsoPlots(){
 
 				h_Tight_muD0        ->Fill(MuD0->at(mu), fEventweight);
 				h_Tight_muF         ->Fill(MuPt->at(mu), fEventweight);
+                h_Tight_muLepPtforFR->Fill((MuPt->at(mu)<fLepPtBinMax?MuPt->at(mu):fLepPtBinMax), fEventweight);
 			}
 
 			if(passesMTCut(0, mu)) h_Tight_muMET->Fill(pfMET, fEventweight);
@@ -422,7 +427,7 @@ void Fakerates::fillIsoPlots(){
 
 		}
 	}
-	h_muFRatio->Divide(h_muFTight, h_muFLoose);
+	h_muFakeRatio->Divide(h_Tight_muLepPtforFR, h_Loose_muLepPtforFR);
 
 
     // electrons
@@ -472,7 +477,7 @@ void Fakerates::bookHistos(){
 	h_Loose_muHT = new TH1F("h_Loose_muHT", "Loose_muHT", 10, 50, 500); h_Loose_muHT->Sumw2();
 	h_Loose_muLepEta = new TH1F("h_Loose_muLepEta", "Loose_muLepEta", 12, 0, 2.4); h_Loose_muLepEta->Sumw2();
  	h_Loose_muLepIso = new TH1F("h_Loose_muLepIso", "Loose_muLepIso", 20, 0, 1); h_Loose_muLepIso->Sumw2();
-	h_Loose_muLepPt = new TH1F("h_Loose_muLepPt", "Loose_muLepPt", 20, 10, 50); h_Loose_muLepPt->Sumw2();
+	h_Loose_muLepPt = new TH1F("h_Loose_muLepPt", "Loose_muLepPt", fLepPtBinN, fLepPtBinMin, fLepPtBinMax); h_Loose_muLepPt->Sumw2();
 
 	h_Loose_muMET = new TH1F("h_Loose_muMET", "Loose_muMET", 20, 0, 100); h_Loose_muMET->Sumw2();
 	h_Loose_muMETnoMTCut = new TH1F("h_Loose_muMETnoMTCut", "Loose_muMETnoMTCut", 20, 0, 100); h_Loose_muMETnoMTCut->Sumw2();
@@ -486,6 +491,7 @@ void Fakerates::bookHistos(){
 
 	h_Loose_muD0 = new TH1F("h_Loose_muD0", "Loose_muD0", 20, 0., 0.2); h_Loose_muD0->Sumw2();
 	h_Loose_muF = new TH2F("h_Loose_muF", "Loose_muF", n_binspt, binspt, n_binseta, binseta); h_Loose_muF->Sumw2(); 
+    h_Loose_muLepPtforFR = new TH1F("h_Loose_muLepPtforFR", "Loose_muLepPtforFR", fLepPtBinN, fLepPtBinMin, fLepPtBinMax); h_Loose_muLepPtforFR->Sumw2();
 
 	h_Tight_muAwayJetDR = new TH1F("h_Tight_muAwayJetDR", "Tight_muAwayJetDR", 30, 0, 6); h_Tight_muAwayJetDR->Sumw2();
 	h_Tight_muAwayJetPt = new TH1F("h_Tight_muAwayJetPt", "Tight_muAwayJetPt", 13, 20, 150); h_Tight_muAwayJetPt->Sumw2();
@@ -495,7 +501,7 @@ void Fakerates::bookHistos(){
 	h_Tight_muHT = new TH1F("h_Tight_muHT", "Tight_muHT", 10, 50, 500); h_Tight_muHT->Sumw2();
 	h_Tight_muLepEta = new TH1F("h_Tight_muLepEta", "Tight_muLepEta", 12, 0, 2.4); h_Tight_muLepEta->Sumw2();
 	h_Tight_muLepIso = new TH1F("h_Tight_muLepIso", "Tight_muLepIso", 20, 0, 1); h_Tight_muLepIso->Sumw2();
-	h_Tight_muLepPt = new TH1F("h_Tight_muLepPt", "Tight_muLepPt", 20, 10, 50); h_Tight_muLepPt->Sumw2();
+	h_Tight_muLepPt = new TH1F("h_Tight_muLepPt", "Tight_muLepPt", fLepPtBinN, fLepPtBinMin, fLepPtBinMax); h_Tight_muLepPt->Sumw2();
 
 	h_Tight_muMET = new TH1F("h_Tight_muMET", "Tight_muMET", 20, 0, 100); h_Tight_muMET->Sumw2();
 	h_Tight_muMETnoMTCut = new TH1F("h_Tight_muMETnoMTCut", "Tight_muMETnoMTCut", 20, 0, 100); h_Tight_muMETnoMTCut->Sumw2();
@@ -509,6 +515,9 @@ void Fakerates::bookHistos(){
 
  	h_Tight_muD0 = new TH1F("h_Tight_muD0", "Tight_muD0", 20, 0., 0.2); h_Tight_muD0->Sumw2();
 	h_Tight_muF = new TH2F("h_Tight_muF", "Tight_muF", n_binspt, binspt, n_binseta, binseta); h_Tight_muF->Sumw2(); 
+    h_Tight_muLepPtforFR = new TH1F("h_Tight_muLepPtforFR", "Tight_muLepPtforFR", fLepPtBinN, fLepPtBinMin, fLepPtBinMax); h_Tight_muLepPtforFR->Sumw2();
+
+    h_muFakeRatio = new TH1F("h_muFakeRatio", "muFakeRatio", fLepPtBinN, fLepPtBinMin, fLepPtBinMax); h_muFakeRatio->Sumw2();
 
 }
 
@@ -565,6 +574,7 @@ void Fakerates::writeHistos(TFile* pFile){
 
 	h_Loose_muD0        ->Write(fName+h_Loose_muD0->GetName(),        TObject::kWriteDelete);
 	h_Loose_muF         ->Write(fName+h_Loose_muF->GetName(),         TObject::kWriteDelete);
+	h_Loose_muLepPtforFR->Write(fName+h_Loose_muLepPtforFR->GetName(),TObject::kWriteDelete);
 
 	h_Tight_muAwayJetDR ->Write(fName+h_Tight_muAwayJetDR->GetName(), TObject::kWriteDelete);
 	h_Tight_muAwayJetPt ->Write(fName+h_Tight_muAwayJetPt->GetName(), TObject::kWriteDelete);
@@ -588,6 +598,10 @@ void Fakerates::writeHistos(TFile* pFile){
 
 	h_Tight_muD0        ->Write(fName+h_Tight_muD0->GetName(),        TObject::kWriteDelete);
 	h_Tight_muF         ->Write(fName+h_Tight_muF->GetName(),         TObject::kWriteDelete);
+	h_Tight_muLepPtforFR->Write(fName+h_Tight_muLepPtforFR->GetName(),TObject::kWriteDelete);
+
+	h_muFakeRatio       ->Write(fName+h_muFakeRatio->GetName(),       TObject::kWriteDelete);
+
 }
 
 
