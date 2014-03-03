@@ -24,10 +24,10 @@ class sample:
 	color  = getColor
 	
 
-data   = sample('data'         , '../fakeHistos/data_ratios.root')
-wjets  = sample('wjets'        , '../fakeHistos/wjets_ratios.root')
-dyjets = sample('dyjets'       , '../fakeHistos/dyjets_ratios.root')
-qcd    = sample('qcdMuEnriched', '../fakeHistos/qcdMuEnriched_ratios.root')
+data   = sample('data'         , '/shome/cheidegg/FakeLeptonFW/fakeHistos/data_ratios.root')
+wjets  = sample('wjets'        , '/shome/cheidegg/FakeLeptonFW/fakeHistos/wjets_ratios.root')
+dyjets = sample('dyjets'       , '/shome/cheidegg/FakeLeptonFW/fakeHistos/dyjets_ratios.root')
+qcd    = sample('qcdMuEnriched', '/shome/cheidegg/FakeLeptonFW/fakeHistos/qcdMuEnriched_ratios.root')
 
 mc_samples = []
 mc_samples.append(qcd   )
@@ -105,9 +105,9 @@ for hist in data.hists:
 FR_data.Divide(FR_data_den)
 FR_data.SetFillColor(ROOT.kBlack)
 FR_bg.Divide(FR_bg_den)
-FR_bg.SetFillColor(ROOT.kRed)
+FR_bg.SetMarkerColor(ROOT.kRed)
 FR_qcd.Divide(FR_qcd_den)
-FR_qcd.SetFillColor(ROOT.kBlue)
+FR_qcd.SetMarkerColor(getColor(qcd))
 
 FR_bg.Draw("hist")
 FR_qcd.Draw("hist same")
@@ -120,9 +120,5 @@ legend.AddEntry(FR_qcd, 'QCD'    , 'f' )
 legend.Draw()
 
 helper.saveCanvas(canv, "muFakeRatio")
-
-
-
-
 
 
