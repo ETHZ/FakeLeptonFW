@@ -387,22 +387,22 @@ void Fakerates::fillIsoPlots(){
 
 		if(passesUpperMETMT(0,mu)) {
  
-			h_Loose_muAwayJetDR ->Fill(getAwayJet(1,mu), fEventweight);
-			h_Loose_muAwayJetPt ->Fill(getAwayJet(0,mu), fEventweight);
-			h_Loose_muClosJetDR ->Fill(getClosestJet(1,mu), fEventweight);
-			h_Loose_muClosJetPt ->Fill(getClosestJet(0,mu), fEventweight);
+			h_Loose_muAwayJetDR ->Fill(getAwayJet(1,mu)    , fEventweight);
+			h_Loose_muAwayJetPt ->Fill(getAwayJet(0,mu)    , fEventweight);
+			h_Loose_muClosJetDR ->Fill(getClosestJet(1,mu) , fEventweight);
+			h_Loose_muClosJetPt ->Fill(getClosestJet(0,mu) , fEventweight);
 
-			h_Loose_muHT        ->Fill(getHT(), fEventweight);
-			h_Loose_muLepEta    ->Fill(fabs(MuEta->at(mu)), fEventweight);
-			h_Loose_muLepIso    ->Fill(MuPFIso->at(mu), fEventweight);
-			h_Loose_muLepPt     ->Fill(MuPt->at(mu), fEventweight);
+			h_Loose_muHT        ->Fill(getHT()             , fEventweight);
+			h_Loose_muLepEta    ->Fill(fabs(MuEta->at(mu)) , fEventweight);
+			h_Loose_muLepIso    ->Fill(MuPFIso->at(mu)     , fEventweight);
+			h_Loose_muLepPt     ->Fill(MuPt->at(mu)        , fEventweight);
 
-			h_Loose_muMaxJPt    ->Fill(JetRawPt->at(jet), fEventweight);
-			h_Loose_muNBJets    ->Fill(getNJets(1), fEventweight);
-			h_Loose_muNJets     ->Fill(getNJets(), fEventweight);
-			h_Loose_muNVertices ->Fill(NVrtx, fEventweight);
+			h_Loose_muMaxJPt    ->Fill(JetRawPt->at(jet)   , fEventweight);
+			h_Loose_muNBJets    ->Fill(getNJets(1)         , fEventweight);
+			h_Loose_muNJets     ->Fill(getNJets()          , fEventweight);
+			h_Loose_muNVertices ->Fill(NVrtx               , fEventweight);
 
-			h_Loose_muD0        ->Fill(MuD0->at(mu), fEventweight);
+			h_Loose_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
 
 			if( MuPt->at(mu) >  fFRbinspt.back() ){
 				int fillbin = h_muFLoose->FindBin(fFRbinspt.back()-0.5, MuEta->at(mu));
@@ -413,10 +413,10 @@ void Fakerates::fillIsoPlots(){
 			}
 		}
 
-		if(passesMTCut(0, mu)) h_Loose_muMET->Fill(pfMET, fEventweight);
-		h_Loose_muMETnoMTCut->Fill(pfMET, fEventweight);
-		if(passesMETCut()) h_Loose_muMT->Fill(MuMT->at(mu), fEventweight);
-		if(passesMETCut(20,1)) h_Loose_muMTMET30->Fill(MuMT->at(mu), fEventweight);
+		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(pfMET       , fEventweight);
+		                       h_Loose_muMETnoMTCut->Fill(pfMET       , fEventweight);
+		if(passesMETCut())     h_Loose_muMT        ->Fill(MuMT->at(mu), fEventweight);
+		if(passesMETCut(20,1)) h_Loose_muMTMET30   ->Fill(MuMT->at(mu), fEventweight);
 
 
 		// tight muons
@@ -424,22 +424,22 @@ void Fakerates::fillIsoPlots(){
 
 			if(passesUpperMETMT(0,mu)) {
   
-				h_Tight_muAwayJetDR ->Fill(getAwayJet(1,mu), fEventweight);
-				h_Tight_muAwayJetPt ->Fill(getAwayJet(0,mu), fEventweight);
-				h_Tight_muClosJetDR ->Fill(getClosestJet(1,mu), fEventweight);
-				h_Tight_muClosJetPt ->Fill(getClosestJet(0,mu), fEventweight);
+				h_Tight_muAwayJetDR ->Fill(getAwayJet(1,mu)    , fEventweight);
+				h_Tight_muAwayJetPt ->Fill(getAwayJet(0,mu)    , fEventweight);
+				h_Tight_muClosJetDR ->Fill(getClosestJet(1,mu) , fEventweight);
+				h_Tight_muClosJetPt ->Fill(getClosestJet(0,mu) , fEventweight);
 
-				h_Tight_muHT        ->Fill(getHT(), fEventweight);
-				h_Tight_muLepEta    ->Fill(fabs(MuEta->at(mu)), fEventweight);
-				h_Tight_muLepIso    ->Fill(MuPFIso->at(mu), fEventweight);
-				h_Tight_muLepPt     ->Fill(MuPt->at(mu), fEventweight);
-		
-				h_Tight_muMaxJPt    ->Fill(JetRawPt->at(jet), fEventweight);
-				h_Tight_muNBJets    ->Fill(getNJets(1), fEventweight);
-				h_Tight_muNJets     ->Fill(getNJets(), fEventweight);
-				h_Tight_muNVertices ->Fill(NVrtx, fEventweight);
+				h_Tight_muHT        ->Fill(getHT()             , fEventweight);
+				h_Tight_muLepEta    ->Fill(fabs(MuEta->at(mu)) , fEventweight);
+				h_Tight_muLepIso    ->Fill(MuPFIso->at(mu)     , fEventweight);
+				h_Tight_muLepPt     ->Fill(MuPt->at(mu)        , fEventweight);
 
-				h_Tight_muD0        ->Fill(MuD0->at(mu), fEventweight);
+				h_Tight_muMaxJPt    ->Fill(JetRawPt->at(jet)   , fEventweight);
+				h_Tight_muNBJets    ->Fill(getNJets(1)         , fEventweight);
+				h_Tight_muNJets     ->Fill(getNJets()          , fEventweight);
+				h_Tight_muNVertices ->Fill(NVrtx               , fEventweight);
+
+				h_Tight_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
 
 				if( MuPt->at(mu) >  fFRbinspt.back() ){
 					int fillbin = h_muFTight->FindBin(fFRbinspt.back(), MuEta->at(mu));
@@ -450,10 +450,10 @@ void Fakerates::fillIsoPlots(){
 				}
 			}
 
-			if(passesMTCut(0, mu)) h_Tight_muMET->Fill(pfMET, fEventweight);
-			h_Tight_muMETnoMTCut->Fill(pfMET, fEventweight);
-			if(passesMETCut()) h_Tight_muMT->Fill(MuMT->at(mu), fEventweight);
-			if(passesMETCut(20,1)) h_Tight_muMTMET30->Fill(MuMT->at(mu), fEventweight);
+			if(passesMTCut(0, mu)) h_Tight_muMET        -> Fill(pfMET        , fEventweight);
+			                       h_Tight_muMETnoMTCut -> Fill(pfMET        , fEventweight);
+			if(passesMETCut())     h_Tight_muMT         -> Fill(MuMT-> at(mu), fEventweight);
+			if(passesMETCut(20,1)) h_Tight_muMTMET30    -> Fill(MuMT-> at(mu), fEventweight);
 
 		}
 	}
