@@ -153,7 +153,7 @@ public:
 	TH1F * h_Tight_muD0;
 	TH2F * h_Tight_muF;
 
-    TH1F * h_muFakeRatio;
+	TH1F * h_muFakeRatio;
 
 	void bookHistos();
 	void writeHistos(TFile *);
@@ -165,9 +165,9 @@ public:
 	int fCutflow_afterJetSel;
 	int fCutflow_afterMETCut;
 	int fCutflow_afterMTCut;
-    int fLepPtBinN;
-    float fLepPtBinMin;
-    float fLepPtBinMax;
+	int fLepPtBinN;
+	float fLepPtBinMin;
+	float fLepPtBinMax;
 	
 
     // SAMPLE CLASS
