@@ -63,24 +63,16 @@ for hist in data.hists:
 	if hist.GetName() == 'h_muFLoose':
 		FR_data_den = hist.ProjectionX('e')
 		FR_data_den.SetName("FR_data_den")
-		FR_bg_den = FR_data_den.Clone()
-		FR_bg_den.Sumw2()
-		FR_bg_den.SetName("FR_bg_den")
-		FR_bg_den.Reset()
-
+		FR_bg_den = ROOT.THStack()
 		for mc in mc_samples:
 			FR_bg_den.Add(mc.hists[i].ProjectionX('e'))
 		
 	if hist.GetName() == 'h_muFTight':
 		FR_data = hist.ProjectionX('e')
 		FR_data.SetName("FR_data")
-		FR_bg = FR_data.Clone()
-		FR_bg.Sumw2()
-		FR_bg.SetName("FR_bg")
-		FR_bg.Reset()
-
+		FR_bg_num = ROOT.THStack()
 		for mc in mc_samples:
-			FR_bg.Add(mc.hists[i].ProjectionX('e'))
+			FR_bg_num.Add(mc.hists[i].ProjectionX('e'))
 
 	if not hist.GetName() in plotHists: continue
 
@@ -103,13 +95,21 @@ for hist in data.hists:
 	helper.saveCanvas(canv, prepend + helper.getSaveName(hist) + postpend)
 
 
-print 'vorher'
-for bin in range(1,FR_bg.GetNbinsX()+1):
-	print 'bincontent:', FR_bg.GetBinContent(bin), 'binerror:', FR_bg.GetBinError(bin)
+#print 'vorher'
+#for bin in range(1,FR_qcd.GetNbinsX()+1):
+#	print 'bincontent:', FR_bg.GetBinContent(bin), 'binerror:', FR_bg.GetBinError(bin)
 
 FR_data.Divide(FR_data_den)
 FR_data.SetMarkerColor(ROOT.kBlack)
-FR_bg.Divide(FR_bg_den)
+
+FR_bg_num.Draw("nostack")
+#helper.saveCanvas(canv, "test_num")
+FR_bg = FR_bg_num.GetHistogram()
+FR_bg.Draw()
+helper.saveCanvas(canv, "test")
+FR_bg_den.Draw("nostack")
+#helper.saveCanvas(canv, "test_den")
+FR_bg.Divide(FR_bg_den.GetHistogram())
 FR_bg.SetMarkerSize(1.2)
 FR_bg.SetMarkerStyle(20)
 FR_bg.SetMarkerColor(ROOT.kRed)
@@ -118,10 +118,10 @@ FR_qcd.SetMarkerSize(1.2)
 FR_qcd.SetMarkerStyle(20)
 FR_qcd.SetMarkerColor(getColor(qcd))
 
-print 'nachher'
-for bin in range(1,FR_bg.GetNbinsX()+1):
-	print 'bincontent:', FR_bg.GetBinContent(bin), 'binerror:', FR_bg.GetBinError(bin)
-	##print 'dencontetn:', FR_bg_den.GetBinContent(bin), 'denerror:', FR_bg_den.GetBinError(bin)
+#print 'nachher'
+#for bin in range(1,FR_qcd.GetNbinsX()+1):
+#	print 'bincontent:', FR_bg.GetBinContent(bin), 'binerror:', FR_bg.GetBinError(bin)
+#	#print 'dencontetn:', FR_bg_den.GetBinContent(bin), 'denerror:', FR_bg_den.GetBinError(bin)
 
 FR_data.Draw("pe")
 FR_bg.Draw("p e same")
