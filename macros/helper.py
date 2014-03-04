@@ -18,6 +18,25 @@ def makeCanvas(x, y):
 	canv.SetTopMargin(0.07)
 	return canv
 
+def makePad(which):
+	pad = ROOT.TPad('p', 'p', 0.0, 0.0, 1.0, 1.0, 0, 0)
+
+	if which == 'plot':
+		pad.SetPad(0.0, 0.3, 1.0, 1.0)
+		pad.SetBorderSize(0)
+		pad.SetBottomMargin(0.0)
+		pad.SetTicks(1,1)
+
+	if which == 'ratio':
+		pad.SetPad(0.0, 0.0, 1.0, 0.3)
+		pad.SetBorderSize(0)
+		pad.SetTopMargin(0.0)
+		pad.SetBottomMargin(0.4)
+		pad.SetTicks(1,1)
+
+	pad.Draw()
+	return pad		
+
 def getXTitle(hist):
 	name = hist.GetName()
 	if   'NBJets'     in name: return 'N_{b-jets}'

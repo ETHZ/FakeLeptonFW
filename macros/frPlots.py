@@ -1,9 +1,8 @@
-import ROOT, helper, commands, sys
-##
-##
-##
+## frPlots.py
 
 ## HEADER
+
+import ROOT, helper, commands, sys
 
 ROOT.gROOT.SetBatch(1)
 ROOT.gStyle.SetOptStat(0)
@@ -14,29 +13,50 @@ def getColor(self):
 	elif self.name == 'dyjets'       : return mycolor.GetColor(255, 204, 0)
 	elif self.name == 'qcdMuEnriched': return mycolor.GetColor(51, 102, 153)
 	elif self.name == 'data'         : return ROOT.kBlack
-	
+
+
+def getScaleFactor(dataset, histforscale, datasetforscale, minforint = 0, maxforint = 0):
+	scalefactor = 1.0
+
+	for hist in datasetforscale.hists:
+		i = datasetforscale.hists.index(hist)
+		if hist.GetName() == histforscale:
+			if minforint == 0: minbin = 1
+			else: minbin = hist.FindBin(minforint)
+			if maxforint == 0: maxbin = hist.GetNbinsX()
+			else: maxbin = hist.FindBin(maxforint)
+
+			scalefactor = hist.Integral(minbin, maxbin) / dataset.hists[i].Integral(minbin, maxbin) 
+
+	return scalefactor
+
 
 class sample:
 	def __init__(self, name, infile):
 		self.name   = name
 		self.file   = ROOT.TFile(infile)
 		self.hists  = [self.file.Get(self.name+'/'+i.GetName()) for i in self.file.GetDirectory(self.name).GetListOfKeys() ]
-		for i in self.hists:
-			i.SetFillColor(getColor(self))
+		for h in self.hists: 
+			h.SetFillColor(getColor(self))
 		self.isdata = (self.name == 'data')
 		if self.isdata: 
-			for i in self.hists: i.SetMarkerStyle(20)
+			for h in self.hists: 
+				h.SetMarkerStyle(20)
 	color  = getColor
 	scale  = 1.0
+
+	def Rescale(self, newscale):
+		self.scale = newscale
+		for h in self.hists: h.Scale(newscale)
 	
+
 args = sys.argv
-print args
 directory = args[1]
 
-data   = sample('data'         , directory+'/data_ratios.root')
-wjets  = sample('wjets'        , directory+'/wjets_ratios.root')
-dyjets = sample('dyjets'       , directory+'/dyjets_ratios.root')
-qcd    = sample('qcdMuEnriched', directory+'/qcdMuEnriched_ratios.root')
+data   = sample('data'         , directory + 'data_ratios.root')
+wjets  = sample('wjets'        , directory + 'wjets_ratios.root')
+dyjets = sample('dyjets'       , directory + 'dyjets_ratios.root')
+qcd    = sample('qcdMuEnriched', directory + 'qcdMuEnriched_ratios.root')
 
 
 
@@ -48,10 +68,11 @@ mc_samples.append(wjets )
 mc_samples.append(dyjets)
 
 canv = helper.makeCanvas(900, 675)
-canv.cd()
+pad_plot = helper.makePad('plot')
+pad_ratio = helper.makePad('ratio')
+pad_plot.cd()
 
 leg = helper.makeLegend(0.70, 0.65, 0.95, 0.90)
-
 leg.AddEntry(data  .hists[0], 'Data'    , 'pe')
 leg.AddEntry(wjets .hists[0], 'W+Jets'  , 'f' )
 leg.AddEntry(dyjets.hists[0], 'DY+Jets' , 'f' )
@@ -63,23 +84,15 @@ leg.AddEntry(qcd   .hists[0], 'QCD'     , 'f' )
 plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0']
 
 
-# Get Overall Scaling Factor for QCD Sample Alone
+# Set Scaling Factors
 
-scalefactor = [1.0 for i in range(len(mc_samples))]
-cutoff = [0.2, 0.0, 0.0]
-
-for hist in data.hists:
-	i = data.hists.index(hist)
-	if hist.GetName() == 'h_Loose_muLepIso':
-		scalefactor[0] = hist.Integral(hist.FindBin(cutoff[0]),hist.GetNbinsX())/qcd.hists[i].Integral(qcd.hists[i].FindBin(cutoff[0]),qcd.hists[i].GetNbinsX()) 
-
-print scalefactor
+qcd.Rescale(getScaleFactor(qcd, 'h_Loose_muLepIso', data, 0.2))
+wjets.Rescale(getScaleFactor(wjets, 'h_Tight_muMTMET30', data, 60, 90))
 
 
 # Get Numerator and Denominator from QCD Sample Alone
 
 for hist in qcd.hists:
-	hist.Scale(scalefactor[0])
 	if hist.GetName() == 'h_muFLoose':
 		FR_qcd_den = hist
 		FR_qcd_den.SetName("FR_qcd_den")
@@ -93,6 +106,7 @@ for hist in qcd.hists:
 for hist in data.hists:
 
 	i = data.hists.index(hist)
+	pad_plot.cd()
 
 	# Get Numerator Plots
 	if hist.GetName() == 'h_muFTight':
@@ -116,22 +130,30 @@ for hist in data.hists:
 	if '_Loose_' in hist.GetName(): prepend = 'Loose_'
 	if '_Tight_' in hist.GetName(): prepend = 'Tight_'
 
+	# Sum Contributions in Stack
 	stack = ROOT.THStack()
 	stackint = 0.
 	for j,mc in enumerate(mc_samples):
 		stackint += mc.hists[i].Integral()
 		stack.Add(mc.hists[i])
 	yscale = max(stack.GetMaximum(), hist.GetMaximum())
+	
 	stack.Draw('hist')
 	stack.SetMaximum(1.2*yscale)
 	stack.GetXaxis().SetTitle(helper.getXTitle(hist))
 	hist.Draw('p e1 same')
 	leg.Draw()
+
+	pad_ratio.cd()
+
+
 	helper.saveCanvas(canv, prepend + helper.getSaveName(hist) + postpend)
 
 
 
 # Computing FakeRate
+
+pad_plot.cd()
 
 FR_data_pt  = FR_data.ProjectionX('FR_data_pt')
 FR_data_pt.Divide(FR_data_den.ProjectionX('FR_data_den_pt'))
@@ -175,6 +197,9 @@ FR_bg_pt.Draw("p e1 same")
 FR_qcd_pt.Draw("p e1 same")
 
 FR_data_pt.SetMaximum(0.3)
+FR_data_pt.GetXaxis().SetTitle(helper.getXTitle(data.hists[12]))
+FR_data_pt.GetYaxis().SetTitle('FR')
+FR_data_pt.SetTitle('muFakeRatio_pt')
 
 l_pt = helper.makeLegend(0.15, 0.65, 0.4, 0.90)
 l_pt.AddEntry(FR_data_pt, 'Data'    , 'pe')
@@ -205,6 +230,9 @@ FR_bg_eta.Draw("p e1 same")
 FR_qcd_eta.Draw("p e1 same")
 
 FR_data_eta.SetMaximum(0.3)
+FR_data_eta.GetXaxis().SetTitle(helper.getXTitle(data.hists[13]))
+FR_data_eta.GetYaxis().SetTitle('FR')
+FR_data_eta.SetTitle('muFakeRatio_eta')
 
 l_eta = helper.makeLegend(0.15, 0.65, 0.4, 0.90)
 l_eta.AddEntry(FR_data_eta, 'Data'    , 'pe')
