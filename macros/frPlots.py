@@ -24,10 +24,10 @@ class sample:
 	color  = getColor
 	
 
-data   = sample('data'         , '/shome/cheidegg/FakeLeptonFW/fakeHistos/data_ratios.root')
-wjets  = sample('wjets'        , '/shome/cheidegg/FakeLeptonFW/fakeHistos/wjets_ratios.root')
-dyjets = sample('dyjets'       , '/shome/cheidegg/FakeLeptonFW/fakeHistos/dyjets_ratios.root')
-qcd    = sample('qcdMuEnriched', '/shome/cheidegg/FakeLeptonFW/fakeHistos/qcdMuEnriched_ratios.root')
+data   = sample('data'         , '/shome/mdunser/framework/fakeHistos/data_ratios.root')
+wjets  = sample('wjets'        , '/shome/mdunser/framework/fakeHistos/wjets_ratios.root')
+dyjets = sample('dyjets'       , '/shome/mdunser/framework/fakeHistos/dyjets_ratios.root')
+qcd    = sample('qcdMuEnriched', '/shome/mdunser/framework/fakeHistos/qcdMuEnriched_ratios.root')
 
 mc_samples = []
 mc_samples.append(qcd   )
@@ -45,7 +45,8 @@ leg.AddEntry(wjets .hists[0], 'W+Jets'  , 'f' )
 leg.AddEntry(dyjets.hists[0], 'DY+Jets' , 'f' )
 leg.AddEntry(qcd   .hists[0], 'QCD'     , 'f' )
 
-plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0']
+## plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0']
+plotHists = []
 
 
 for hist in qcd.hists:
@@ -66,7 +67,7 @@ for hist in data.hists:
 		for j, mc in enumerate(mc_samples):
 			mc.hists[i].Draw('text colz e')
 			helper.saveCanvas(canv, 'test_den_mc'+str(j))
-			FR_bg_ds.Add(mc.hists[i])
+			FR_bg_ds.Add(mc.hists[i],'e')
 		
 	if hist.GetName() == 'h_muFTight':
 		FR_data = hist.ProjectionX()
@@ -113,7 +114,8 @@ FR_bg_num = FR_bg_ns.GetStack().Last().ProjectionX()
 FR_bg_num.Draw()
 helper.saveCanvas(canv, "test_num_proj")
 
-FR_bg_ds.Draw("nostack")
+#FR_bg_ds.Draw("nostack")
+FR_bg_ds.Draw()
 FR_bg_den = FR_bg_ds.GetStack().Last().ProjectionX()
 FR_bg_den.Draw()
 helper.saveCanvas(canv, "test_den")
