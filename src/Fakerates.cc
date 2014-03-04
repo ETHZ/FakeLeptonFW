@@ -405,11 +405,11 @@ void Fakerates::fillIsoPlots(){
 			h_Loose_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
 
 			if( MuPt->at(mu) >  fFRbinspt.back() ){
-				int fillbin = h_muFLoose->FindBin(fFRbinspt.back()-0.5, MuEta->at(mu));
+				int fillbin = h_muFLoose->FindBin(fFRbinspt.back()-0.5, fabs(MuEta->at(mu)));
 				h_muFLoose->AddBinContent(fillbin, fEventweight);
 			}
 			else{
-				h_muFLoose->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
+				h_muFLoose->Fill(MuPt->at(mu), fabs(MuEta->at(mu)), fEventweight);
 			}
 		}
 
@@ -442,11 +442,11 @@ void Fakerates::fillIsoPlots(){
 				h_Tight_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
 
 				if( MuPt->at(mu) >  fFRbinspt.back() ){
-					int fillbin = h_muFTight->FindBin(fFRbinspt.back(), MuEta->at(mu));
+					int fillbin = h_muFTight->FindBin(fFRbinspt.back(), fabs(MuEta->at(mu)));
 					h_muFTight->AddBinContent(fillbin, fEventweight);
 				}
 				else{
-					h_muFTight->Fill(MuPt->at(mu), MuEta->at(mu), fEventweight);
+					h_muFTight->Fill(MuPt->at(mu), fabs(MuEta->at(mu)), fEventweight);
 				}
 			}
 
