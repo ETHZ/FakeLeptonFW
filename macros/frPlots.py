@@ -50,10 +50,10 @@ plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR'
 
 for hist in qcd.hists:
 	if hist.GetName() == 'h_muFLoose':
-		FR_qcd_den = hist.ProjectionX('e')
+		FR_qcd_den = hist.ProjectionX()
 		FR_qcd_den.SetName("FR_qcd_den")
 	if hist.GetName() == 'h_muFTight':
-		FR_qcd = hist.ProjectionX('e')
+		FR_qcd = hist.ProjectionX()
 		FR_qcd.SetName("FR_qcd")
 
 
@@ -61,18 +61,21 @@ for hist in data.hists:
 
 	i = data.hists.index(hist)
 	if hist.GetName() == 'h_muFLoose':
-		FR_data_den = hist.ProjectionX('e')
-		FR_data_den.SetName("FR_data_den")
-		FR_bg_den = ROOT.THStack()
-		for mc in mc_samples:
-			FR_bg_den.Add(mc.hists[i].ProjectionX('e'))
+		FR_data_den = hist.ProjectionX()
+		FR_bg_ds = ROOT.THStack()
+		for j, mc in enumerate(mc_samples):
+			mc.hists[i].Draw('text colz e')
+			helper.saveCanvas(canv, 'test_den_mc'+str(j))
+			FR_bg_ds.Add(mc.hists[i])
 		
 	if hist.GetName() == 'h_muFTight':
-		FR_data = hist.ProjectionX('e')
-		FR_data.SetName("FR_data")
-		FR_bg_num = ROOT.THStack()
-		for mc in mc_samples:
-			FR_bg_num.Add(mc.hists[i].ProjectionX('e'))
+		FR_data = hist.ProjectionX()
+		FR_bg_ns = ROOT.THStack()
+		for j, mc in enumerate(mc_samples):
+			mc.hists[i].Draw('text colz e')
+			helper.saveCanvas(canv, 'test_num_mc'+str(j))
+			print "mc " + str(j) + ": " + str(mc.hists[i].ProjectionX('e').GetBinContent(2))
+			FR_bg_ns.Add(mc.hists[i])
 
 	if not hist.GetName() in plotHists: continue
 
@@ -102,17 +105,53 @@ for hist in data.hists:
 FR_data.Divide(FR_data_den)
 FR_data.SetMarkerColor(ROOT.kBlack)
 
-FR_bg_num.Draw("nostack")
-#helper.saveCanvas(canv, "test_num")
-FR_bg = FR_bg_num.GetHistogram()
+FR_bg_ns.Draw()
+helper.saveCanvas(canv, "test_num_stack")
+
+FR_bg_ns.Draw("nostack")
+FR_bg_num = FR_bg_ns.GetStack().Last().ProjectionX()
+FR_bg_num.Draw()
+helper.saveCanvas(canv, "test_num_proj")
+
+FR_bg_ds.Draw("nostack")
+FR_bg_den = FR_bg_ds.GetStack().Last().ProjectionX()
+FR_bg_den.Draw()
+helper.saveCanvas(canv, "test_den")
+print FR_bg_den.GetBinContent(5)
+FR_bg = FR_bg_num
+
+for i in range(1,FR_bg.GetNbinsX()):
+	print "bin " + str(i) + ": " + str(FR_bg.GetBinContent(i))
+
+FR_bg.Divide(FR_bg_den)
+
+for i in range(1,FR_bg.GetNbinsX()):
+	print "bin " + str(i) + ": " + str(FR_bg.GetBinContent(i))
+#	if FR_bg_den.GetBinContent(i)>0:
+#		FR_bg.SetBinContent(i, FR_bg_num.GetBinContent(i)*1.0/FR_bg_den.GetBinContent(i))
+#		print "bin " + str(i) + ": " + str(FR_bg_num.GetBinContent(i)) + "/" + str(FR_bg_den.GetBinContent(i)) + " = " + str(FR_bg_num.GetBinContent(i)*1.0/FR_bg_den.GetBinContent(i))
+
+FR_bg.Rebuild()
 FR_bg.Draw()
 helper.saveCanvas(canv, "test")
-FR_bg_den.Draw("nostack")
-#helper.saveCanvas(canv, "test_den")
-FR_bg.Divide(FR_bg_den.GetHistogram())
-FR_bg.SetMarkerSize(1.2)
-FR_bg.SetMarkerStyle(20)
-FR_bg.SetMarkerColor(ROOT.kRed)
+
+##FR_bg_num.Draw("nostack")
+##helper.saveCanvas(canv, "test_num")
+##FR_bg_num = FR_bg_num.GetStack().Last()
+##FR_bg.Draw()
+##helper.saveCanvas(canv, "test")
+##FR_bg_den.Draw("nostack")
+##helper.saveCanvas(canv, "test_den")
+##FR_bg_test = FR_bg_den.GetStack().Last()
+##FR_bg_test.Draw()
+##helper.saveCanvas(canv, "test_draw")
+##FR_bg.Divide(FR_bg_test)
+##FR_bg.Draw()
+##helper.saveCanvas(canv, "test_div")
+#FR_bg.SetMarkerSize(1.2)
+#FR_bg.SetMarkerStyle(20)
+#FR_bg.SetMarkerColor(ROOT.kRed)
+
 FR_qcd.Divide(FR_qcd_den)
 FR_qcd.SetMarkerSize(1.2)
 FR_qcd.SetMarkerStyle(20)
