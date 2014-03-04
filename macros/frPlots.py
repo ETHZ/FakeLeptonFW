@@ -1,4 +1,4 @@
-import ROOT, helper, commands
+import ROOT, helper, commands, sys
 
 ROOT.gROOT.SetBatch(1)
 ROOT.gStyle.SetOptStat(0)
@@ -23,11 +23,14 @@ class sample:
 			for i in self.hists: i.SetMarkerStyle(20)
 	color  = getColor
 	
+args = sys.argv
+print args
+directory = args[1]
 
-data   = sample('data'         , '/shome/mdunser/framework/fakeHistos/data_ratios.root')
-wjets  = sample('wjets'        , '/shome/mdunser/framework/fakeHistos/wjets_ratios.root')
-dyjets = sample('dyjets'       , '/shome/mdunser/framework/fakeHistos/dyjets_ratios.root')
-qcd    = sample('qcdMuEnriched', '/shome/mdunser/framework/fakeHistos/qcdMuEnriched_ratios.root')
+data   = sample('data'         , directory+'/data_ratios.root')
+wjets  = sample('wjets'        , directory+'/wjets_ratios.root')
+dyjets = sample('dyjets'       , directory+'/dyjets_ratios.root')
+qcd    = sample('qcdMuEnriched', directory+'/qcdMuEnriched_ratios.root')
 
 mc_samples = []
 mc_samples.append(qcd   )
