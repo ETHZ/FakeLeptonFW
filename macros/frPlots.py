@@ -1,3 +1,9 @@
+##
+##
+##
+
+## HEADER
+
 import ROOT, helper, commands
 
 ROOT.gROOT.SetBatch(1)
@@ -22,18 +28,20 @@ class sample:
 		if self.isdata: 
 			for i in self.hists: i.SetMarkerStyle(20)
 	color  = getColor
-	
 
-data   = sample('data'         , '/shome/mdunser/framework/fakeHistos/data_ratios.root')
-wjets  = sample('wjets'        , '/shome/mdunser/framework/fakeHistos/wjets_ratios.root')
-dyjets = sample('dyjets'       , '/shome/mdunser/framework/fakeHistos/dyjets_ratios.root')
-qcd    = sample('qcdMuEnriched', '/shome/mdunser/framework/fakeHistos/qcdMuEnriched_ratios.root')
+
+
+## INITIALIZING SAMPLES, CANVAS, LEGEND
+
+data   = sample('data'         , '../fakeHistos/data_ratios.root')
+wjets  = sample('wjets'        , '../fakeHistos/wjets_ratios.root')
+dyjets = sample('dyjets'       , '../fakeHistos/dyjets_ratios.root')
+qcd    = sample('qcdMuEnriched', '../fakeHistos/qcdMuEnriched_ratios.root')
 
 mc_samples = []
 mc_samples.append(qcd   )
 mc_samples.append(wjets )
 mc_samples.append(dyjets)
-
 
 canv = helper.makeCanvas(900, 675)
 canv.cd()
@@ -45,39 +53,58 @@ leg.AddEntry(wjets .hists[0], 'W+Jets'  , 'f' )
 leg.AddEntry(dyjets.hists[0], 'DY+Jets' , 'f' )
 leg.AddEntry(qcd   .hists[0], 'QCD'     , 'f' )
 
-## plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0']
-plotHists = []
 
+## LIST OF HISTOGRAMS TO PLOT
+
+plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0']
+
+
+# Get Overall Scaling Factor for QCD Sample Alone
+
+scalefactor = [1.0 for i in range(len(mc_samples))]
+cutoff = [0.2, 0.0, 0.0]
+
+for hist in data.hists:
+	i = data.hists.index(hist)
+	if hist.GetName() == 'h_Loose_muLepIso':
+		scalefactor[0] = hist.Integral(hist.FindBin(cutoff[0]),hist.GetNbinsX())/qcd.hists[i].Integral(qcd.hists[i].FindBin(cutoff[0]),qcd.hists[i].GetNbinsX()) 
+
+print scalefactor
+
+
+# Get Numerator and Denominator from QCD Sample Alone
 
 for hist in qcd.hists:
+	hist.Scale(scalefactor[0])
 	if hist.GetName() == 'h_muFLoose':
-		FR_qcd_den = hist.ProjectionX()
+		FR_qcd_den = hist
 		FR_qcd_den.SetName("FR_qcd_den")
 	if hist.GetName() == 'h_muFTight':
-		FR_qcd = hist.ProjectionX()
+		FR_qcd = hist
 		FR_qcd.SetName("FR_qcd")
 
+
+# Run Over All Samples to Produce Plots
 
 for hist in data.hists:
 
 	i = data.hists.index(hist)
-	if hist.GetName() == 'h_muFLoose':
-		FR_data_den = hist.ProjectionX()
-		FR_bg_ds = ROOT.THStack()
-		for j, mc in enumerate(mc_samples):
-			mc.hists[i].Draw('text colz e')
-			helper.saveCanvas(canv, 'test_den_mc'+str(j))
-			FR_bg_ds.Add(mc.hists[i],'e')
-		
+
+	# Get Numerator Plots
 	if hist.GetName() == 'h_muFTight':
-		FR_data = hist.ProjectionX()
+		FR_data = hist
 		FR_bg_ns = ROOT.THStack()
-		for j, mc in enumerate(mc_samples):
-			mc.hists[i].Draw('text colz e')
-			helper.saveCanvas(canv, 'test_num_mc'+str(j))
-			print "mc " + str(j) + ": " + str(mc.hists[i].ProjectionX('e').GetBinContent(2))
+		for mc in mc_samples:
 			FR_bg_ns.Add(mc.hists[i])
 
+	# Get Denominator Histograms
+	if hist.GetName() == 'h_muFLoose':
+		FR_data_den = hist
+		FR_bg_ds = ROOT.THStack()
+		for mc in mc_samples:
+			FR_bg_ds.Add(mc.hists[i])
+	
+	# Plot Histogram	
 	if not hist.GetName() in plotHists: continue
 
 	prepend = ''
@@ -87,7 +114,7 @@ for hist in data.hists:
 
 	stack = ROOT.THStack()
 	stackint = 0.
-	for mc in mc_samples:
+	for j,mc in enumerate(mc_samples):
 		stackint += mc.hists[i].Integral()
 		stack.Add(mc.hists[i])
 	yscale = max(stack.GetMaximum(), hist.GetMaximum())
@@ -99,83 +126,88 @@ for hist in data.hists:
 	helper.saveCanvas(canv, prepend + helper.getSaveName(hist) + postpend)
 
 
-#print 'vorher'
-#for bin in range(1,FR_qcd.GetNbinsX()+1):
-#	print 'bincontent:', FR_bg.GetBinContent(bin), 'binerror:', FR_bg.GetBinError(bin)
 
-FR_data.Divide(FR_data_den)
-FR_data.SetMarkerColor(ROOT.kBlack)
+# Computing FakeRate
 
-FR_bg_ns.Draw()
-helper.saveCanvas(canv, "test_num_stack")
+FR_data_pt  = FR_data.ProjectionX('FR_data_pt')
+FR_data_pt.Divide(FR_data_den.ProjectionX('FR_data_den_pt'))
 
-FR_bg_ns.Draw("nostack")
-FR_bg_num = FR_bg_ns.GetStack().Last().ProjectionX()
-FR_bg_num.Draw()
-helper.saveCanvas(canv, "test_num_proj")
+FR_data_eta = FR_data.ProjectionY('FR_data_eta')
+FR_data_eta.Divide(FR_data_den.ProjectionY('FR_data_den_eta'))
 
-#FR_bg_ds.Draw("nostack")
-FR_bg_ds.Draw()
-FR_bg_den = FR_bg_ds.GetStack().Last().ProjectionX()
-FR_bg_den.Draw()
-helper.saveCanvas(canv, "test_den")
-print FR_bg_den.GetBinContent(5)
-FR_bg = FR_bg_num
+FR_qcd_pt   = FR_qcd.ProjectionX('FR_qcd_pt')
+FR_qcd_pt.Divide(FR_qcd_den.ProjectionX('FR_qcd_den_pt'))
 
-for i in range(1,FR_bg.GetNbinsX()):
-	print "bin " + str(i) + ": " + str(FR_bg.GetBinContent(i))
+FR_qcd_eta  = FR_qcd.ProjectionY('FR_qcd_eta')
+FR_qcd_eta.Divide(FR_qcd_den.ProjectionY('FR_qcd_den_eta'))
 
-FR_bg.Divide(FR_bg_den)
+FR_bg       = FR_bg_ns.GetStack().Last()
+FR_bg_den   = FR_bg_ds.GetStack().Last()
 
-for i in range(1,FR_bg.GetNbinsX()):
-	print "bin " + str(i) + ": " + str(FR_bg.GetBinContent(i))
-#	if FR_bg_den.GetBinContent(i)>0:
-#		FR_bg.SetBinContent(i, FR_bg_num.GetBinContent(i)*1.0/FR_bg_den.GetBinContent(i))
-#		print "bin " + str(i) + ": " + str(FR_bg_num.GetBinContent(i)) + "/" + str(FR_bg_den.GetBinContent(i)) + " = " + str(FR_bg_num.GetBinContent(i)*1.0/FR_bg_den.GetBinContent(i))
+FR_bg_pt    = FR_bg.ProjectionX('FR_bg_pt')
+FR_bg_pt.Divide(FR_bg_den.ProjectionX('FR_bg_den_pt'))
 
-FR_bg.Rebuild()
-FR_bg.Draw()
-helper.saveCanvas(canv, "test")
+FR_bg_eta   = FR_bg.ProjectionY('FR_bg_eta')
+FR_bg_eta.Divide(FR_bg_den.ProjectionY('FR_bg_den_eta'))
 
-##FR_bg_num.Draw("nostack")
-##helper.saveCanvas(canv, "test_num")
-##FR_bg_num = FR_bg_num.GetStack().Last()
-##FR_bg.Draw()
-##helper.saveCanvas(canv, "test")
-##FR_bg_den.Draw("nostack")
-##helper.saveCanvas(canv, "test_den")
-##FR_bg_test = FR_bg_den.GetStack().Last()
-##FR_bg_test.Draw()
-##helper.saveCanvas(canv, "test_draw")
-##FR_bg.Divide(FR_bg_test)
-##FR_bg.Draw()
-##helper.saveCanvas(canv, "test_div")
-#FR_bg.SetMarkerSize(1.2)
-#FR_bg.SetMarkerStyle(20)
-#FR_bg.SetMarkerColor(ROOT.kRed)
 
-FR_qcd.Divide(FR_qcd_den)
-FR_qcd.SetMarkerSize(1.2)
-FR_qcd.SetMarkerStyle(20)
-FR_qcd.SetMarkerColor(getColor(qcd))
 
-#print 'nachher'
-#for bin in range(1,FR_qcd.GetNbinsX()+1):
-#	print 'bincontent:', FR_bg.GetBinContent(bin), 'binerror:', FR_bg.GetBinError(bin)
-#	#print 'dencontetn:', FR_bg_den.GetBinContent(bin), 'denerror:', FR_bg_den.GetBinError(bin)
+# Plotting FR vs Pt
 
-FR_data.Draw("pe")
-FR_bg.Draw("p e same")
-FR_qcd.Draw("p e same")
+FR_data_pt.SetMarkerSize(1.2)
+FR_data_pt.SetMarkerStyle(20)
+FR_data_pt.SetMarkerColor(getColor(data))
 
-FR_data.SetMaximum(0.3) 
+FR_bg_pt.SetMarkerSize(1.2)
+FR_bg_pt.SetMarkerStyle(20)
+FR_bg_pt.SetMarkerColor(getColor(wjets))
 
-legend = helper.makeLegend(0.15, 0.65, 0.4, 0.90)
-legend.AddEntry(FR_data, 'Data'  , 'pe')
-legend.AddEntry(FR_bg, 'QCD + EW', 'pe')
-legend.AddEntry(FR_qcd, 'QCD'    , 'pe')
-legend.Draw()
+FR_qcd_pt.SetMarkerSize(1.2)
+FR_qcd_pt.SetMarkerStyle(20)
+FR_qcd_pt.SetMarkerColor(getColor(qcd))
 
-helper.saveCanvas(canv, "muFakeRatio")
+FR_data_pt.Draw("p e1")
+FR_bg_pt.Draw("p e1 same")
+FR_qcd_pt.Draw("p e1 same")
+
+FR_data_pt.SetMaximum(0.3)
+
+l_pt = helper.makeLegend(0.15, 0.65, 0.4, 0.90)
+l_pt.AddEntry(FR_data_pt, 'Data'    , 'pe')
+l_pt.AddEntry(FR_bg_pt,   'QCD + EW', 'pe')
+l_pt.AddEntry(FR_qcd_pt,  'QCD'     , 'pe')
+l_pt.Draw()
+
+helper.saveCanvas(canv, "muFakeRatio_pt")
+
+
+
+# Plotting FR vs Eta
+
+FR_data_eta.SetMarkerSize(1.2)
+FR_data_eta.SetMarkerStyle(20)
+FR_data_eta.SetMarkerColor(getColor(data))
+
+FR_bg_eta.SetMarkerSize(1.2)
+FR_bg_eta.SetMarkerStyle(20)
+FR_bg_eta.SetMarkerColor(getColor(wjets))
+
+FR_qcd_eta.SetMarkerSize(1.2)
+FR_qcd_eta.SetMarkerStyle(20)
+FR_qcd_eta.SetMarkerColor(getColor(qcd))
+
+FR_data_eta.Draw("p e1")
+FR_bg_eta.Draw("p e1 same")
+FR_qcd_eta.Draw("p e1 same")
+
+FR_data_eta.SetMaximum(0.3)
+
+l_eta = helper.makeLegend(0.15, 0.65, 0.4, 0.90)
+l_eta.AddEntry(FR_data_eta, 'Data'    , 'pe')
+l_eta.AddEntry(FR_bg_eta,   'QCD + EW', 'pe')
+l_eta.AddEntry(FR_qcd_eta,  'QCD'     , 'pe')
+l_eta.Draw()
+
+helper.saveCanvas(canv, "muFakeRatio_eta")
 
 
