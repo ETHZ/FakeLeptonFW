@@ -27,6 +27,7 @@ class sample:
 		if self.isdata: 
 			for i in self.hists: i.SetMarkerStyle(20)
 	color  = getColor
+	scale  = 1.0
 	
 args = sys.argv
 print args
