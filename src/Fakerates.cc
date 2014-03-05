@@ -243,11 +243,13 @@ bool Fakerates::passesUpperMETMT(int type, int index){
 // MUON OBJECT FUNCTIONS
 bool Fakerates::isLooseMuon(int ind){
 	if(! MuIsLoose->at(ind)) return false;
+	if(fabs(MuD0->at(ind)) > 0.05  ) return false;
 	return true;
 }
 bool Fakerates::isTightMuon(int ind){
 	if(!isLooseMuon(ind))   return false;
 	if(!MuIsTight->at(ind)) return false;
+	if(MuPFIso->at(mu) > 0.05 ) return false;
 	return true;
 }
 

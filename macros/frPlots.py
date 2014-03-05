@@ -3,6 +3,7 @@
 ## HEADER
 
 import ROOT, helper, commands, sys, copy
+import fitAndScale as fit
 
 ROOT.gROOT.SetBatch(1)
 ROOT.gStyle.SetOptStat(0)
@@ -13,28 +14,6 @@ def getColor(self):
 	elif self.name == 'dyjets'       : return mycolor.GetColor(255, 204, 0)
 	elif self.name == 'qcdMuEnriched': return mycolor.GetColor(51, 102, 153)
 	elif self.name == 'data'         : return ROOT.kBlack
-
-
-def getMCScaleFactor(mcdataset, histforscale, datalist, mclist = [], minforint = 0, maxforint = 0):
-	scalefactor = 1.0
-	numerator = 0.0
-
-	for hist in mcdataset.hists:
-		i = mcdataset.hists.index(hist)
-		if hist.GetName() == histforscale:
-			if minforint == 0: minbin = 1
-			else: minbin = hist.FindBin(minforint)
-			if maxforint == 0: maxbin = hist.GetNbinsX()
-			else: maxbin = hist.FindBin(maxforint)
-
-			for j in range(len(datalist)):
-				numerator += datalist[j].hists[i].Integral(minbin, maxbin)
-			for j in range(len(mclist)):
-				numerator -= mclist[j].hists[i].Integral(minbin, maxbin)
-
-			scalefactor = numerator / hist.Integral(minbin, maxbin) 
-
-	return scalefactor
 
 
 class sample:
@@ -92,8 +71,13 @@ plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR'
 
 # Set Scaling Factors
 
-qcd.Rescale(getMCScaleFactor(qcd, 'h_Loose_muLepIso', [data], [], 0.2))
-wjets.Rescale(getMCScaleFactor(wjets, 'h_Tight_muMTMET30', [data], [qcd, dyjets], 60, 90))
+#qcd.Rescale(fit.getMCScaleFactor(qcd, 'h_Loose_muLepIso', [data], [], 0.2))
+#wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_muMTMET30', [data], [qcd, dyjets], 60, 90))
+
+scalefactors = fit.doSimScaling(data.hists[37], qcd.hists[37], wjets.hists[37], dyjets.hists[37])
+qcd.Rescale(scalefactors[0])
+wjets.Rescale(scalefactors[1])
+dyjets.Rescale(scalefactors[2])
 
 
 # Get Numerator and Denominator from QCD Sample Alone
