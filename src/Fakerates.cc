@@ -139,7 +139,7 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu, int &jet){
 	// count numbers of loose and veto muons in the event
 	for(int i=0; i < MuPt->size(); ++i){
 		if(MuPt->at(i) < 20.) continue;
-		if(MuIsLoose->at(i)){
+		if(isLooseMuon(i)){
 			nloose++;
 			mu = i;
 			loosemu_inds.push_back(i);
@@ -235,6 +235,17 @@ bool Fakerates::passesUpperMETMT(int type, int index){
     if(!passesMTCut(type, index)) return false;
     fCutflow_afterMTCut++;
 	
+	return true;
+}
+
+// MUON OBJECT FUNCTIONS
+bool Fakerates::isLooseMuon(int ind){
+	if(! MuIsLoose->at(ind)) return false;
+	return true;
+}
+bool Fakerates::isTightMuon(int ind){
+	if(!isLooseMuon(ind))   return false;
+	if(!MuIsTight->at(ind)) return false;
 	return true;
 }
 
@@ -420,7 +431,7 @@ void Fakerates::fillIsoPlots(){
 
 
 		// tight muons
-		if(MuIsTight->at(mu)) {
+		if(isTightMuon(mu)) {
 
 			if(passesUpperMETMT(0,mu)) {
   

@@ -83,11 +83,18 @@ public:
 	bool isCalibrationRegionMuEvent(int&, int&);
 	bool isCalibrationRegionElEvent(int&);
 
+
+	// OBJECT FUNCTIONS
+		// MUONS
+	bool isLooseMuon(int);
+	bool isTightMuon(int);
+
+		// JETS
 	bool isGoodJet(int, float);
 	bool isGoodSynchJet(int, float);
-
 	float getAwayJet(int, int);
 	float getClosestJet(int, int);
+
 	float getHT();
 	int getNJets(int);
 
