@@ -76,7 +76,7 @@ void Fakerates::loop(){
 	*/
 
 
-	int ntot = 0;
+	Long64_t ntot = 0;
 
 	// open output file and define histograms
 	TFile *pFile = new TFile(fOutputFilename, "RECREATE");
@@ -91,9 +91,10 @@ void Fakerates::loop(){
     
     // calculate the eventweight
     TH1F * EventCount = (TH1F*) file_->Get("EventCount");
-    double Ngen = EventCount->GetEntries();
+    Long64_t Ngen = EventCount->GetEntries();
     if(!fIsData) fEventweight = fXSec * fLumi / (fMaxSize>0?fMaxSize:Ngen);
 	else fEventweight = 1.;
+	cout << "going to loop over " << (fMaxSize>0?fMaxSize:Ngen) << " events..." << endl;
     cout << "eventweight is " << fEventweight << endl;
 
 	// loop on events in the tree
@@ -243,13 +244,13 @@ bool Fakerates::passesUpperMETMT(int type, int index){
 // MUON OBJECT FUNCTIONS
 bool Fakerates::isLooseMuon(int ind){
 	if(! MuIsLoose->at(ind)) return false;
-	if(fabs(MuD0->at(ind)) > 0.05  ) return false;
+	if(fabs(MuD0->at(ind)) > 0.005  ) return false;
 	return true;
 }
 bool Fakerates::isTightMuon(int ind){
-	if(!isLooseMuon(ind))   return false;
+	if(!isLooseMuon(ind))   return false; // every tight muon has to pass the loose point
 	if(!MuIsTight->at(ind)) return false;
-	if(MuPFIso->at(mu) > 0.05 ) return false;
+	if(MuPFIso->at(ind) > 0.05 ) return false;
 	return true;
 }
 
