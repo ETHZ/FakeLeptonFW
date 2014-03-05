@@ -124,6 +124,7 @@ for num in data_nums:
 	num.SetMarkerSize(1.2)
 	num.SetMarkerStyle(20)
 	num.GetYaxis().SetRangeUser(0., 0.2)
+	num.SetTitle('FR as function of '+helper.getXTitle(num))
 	num.Draw('pe')
 	mc_nums[i].Divide(mc_dens[i])
 	mc_nums[i].SetMarkerColor(getColor(wjets))
@@ -149,10 +150,11 @@ for num in data_nums:
 	ratio.GetXaxis().SetLabelSize(0.10)
 	ratio.GetXaxis().SetTitle(helper.getXTitle(ratio))
 	ratio.GetXaxis().SetTitleSize(0.15)
+	ratio.SetTitle('')
 	line = helper.makeLine(ratio.GetXaxis().GetXmin(), 1.00, ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
-	canv.SaveAs(data_nums[i].GetName()+'.pdf')
-	canv.SaveAs(data_nums[i].GetName()+'.png')
+	canv.SaveAs('muFR_'+data_nums[i].GetName().lstrip('h_Tight_mu')+'.pdf')
+	canv.SaveAs('muFR_'+data_nums[i].GetName().lstrip('h_Tight_mu')+'.png')
 
 	
 
