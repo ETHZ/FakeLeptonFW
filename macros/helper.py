@@ -43,7 +43,8 @@ def makeLine(x1, y1, x2, y2):
 	line.SetLineStyle(7)
 	return line
 
-def setRatioStyle(hist):
+def setRatioStyle(hist, titlehist=''):
+	if titlehist=='': titlehist = hist
 	hist.SetTitle('')
 	hist.GetYaxis().SetNdivisions(505)
 	hist.GetYaxis().SetTitle('Data/Pred.')
@@ -52,6 +53,7 @@ def setRatioStyle(hist):
 	hist.GetYaxis().SetLabelSize(0.09)
 	hist.GetXaxis().SetNdivisions(505)
 	hist.GetXaxis().SetLabelSize(0.11)
+	hist.GetXaxis().SetTitle(getXTitle(titlehist))
 	hist.GetXaxis().SetTitleSize(0.11)
 	hist.GetXaxis().SetTitleOffset(1.0)
 	hist.SetMaximum(1.99)

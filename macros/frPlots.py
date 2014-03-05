@@ -15,18 +15,24 @@ def getColor(self):
 	elif self.name == 'data'         : return ROOT.kBlack
 
 
-def getScaleFactor(dataset, histforscale, datasetforscale, minforint = 0, maxforint = 0):
+def getMCScaleFactor(mcdataset, histforscale, datalist, mclist = [], minforint = 0, maxforint = 0):
 	scalefactor = 1.0
+	numerator = 0.0
 
-	for hist in datasetforscale.hists:
-		i = datasetforscale.hists.index(hist)
+	for hist in mcdataset.hists:
+		i = mcdataset.hists.index(hist)
 		if hist.GetName() == histforscale:
 			if minforint == 0: minbin = 1
 			else: minbin = hist.FindBin(minforint)
 			if maxforint == 0: maxbin = hist.GetNbinsX()
 			else: maxbin = hist.FindBin(maxforint)
 
-			scalefactor = hist.Integral(minbin, maxbin) / dataset.hists[i].Integral(minbin, maxbin) 
+			for j in range(len(datalist)):
+				numerator += datalist[j].hists[i].Integral(minbin, maxbin)
+			for j in range(len(mclist)):
+				numerator -= mclist[j].hists[i].Integral(minbin, maxbin)
+
+			scalefactor = numerator / hist.Integral(minbin, maxbin) 
 
 	return scalefactor
 
@@ -86,8 +92,8 @@ plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR'
 
 # Set Scaling Factors
 
-qcd.Rescale(getScaleFactor(qcd, 'h_Loose_muLepIso', data, 0.2))
-wjets.Rescale(getScaleFactor(wjets, 'h_Tight_muMTMET30', data, 60, 90))
+qcd.Rescale(getMCScaleFactor(qcd, 'h_Loose_muLepIso', [data], [], 0.2))
+wjets.Rescale(getMCScaleFactor(wjets, 'h_Tight_muMTMET30', [data], [qcd, dyjets], 60, 90))
 
 
 # Get Numerator and Denominator from QCD Sample Alone
@@ -148,7 +154,7 @@ for hist in data.hists:
 	hist_ratio = hist.Clone()
 	hist_ratio.Divide(stack.GetStack().Last())
 	hist_ratio.Draw("p e1")
-	hist_ratio = helper.setRatioStyle(hist_ratio)
+	hist_ratio = helper.setRatioStyle(hist_ratio, hist)
 	line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
 	helper.saveCanvas(canv, prepend + helper.getSaveName(hist) + postpend)
@@ -215,7 +221,7 @@ pad_ratio.cd()
 data_bg_ratio = FR_data_pt.Clone()
 data_bg_ratio.Divide(FR_bg_pt)
 data_bg_ratio.Draw("p e1")
-data_bg_ratio = helper.setRatioStyle(data_bg_ratio)
+data_bg_ratio = helper.setRatioStyle(data_bg_ratio, data.hists[12])
 line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 line.Draw()
 
@@ -258,7 +264,7 @@ pad_ratio.cd()
 data_bg_ratio = FR_data_eta.Clone()
 data_bg_ratio.Divide(FR_bg_eta)
 data_bg_ratio.Draw("p e1")
-data_bg_ratio = helper.setRatioStyle(data_bg_ratio)
+data_bg_ratio = helper.setRatioStyle(data_bg_ratio, data.hists[13])
 line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 line.Draw()
 
