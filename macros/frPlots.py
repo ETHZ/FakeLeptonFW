@@ -72,7 +72,7 @@ pad_plot = helper.makePad('plot')
 pad_ratio = helper.makePad('ratio')
 pad_plot.cd()
 
-leg = helper.makeLegend(0.70, 0.65, 0.95, 0.90)
+leg = helper.makeLegend(0.7, 0.7, 0.85, 0.85)
 leg.AddEntry(data  .hists[0], 'Data'    , 'pe')
 leg.AddEntry(wjets .hists[0], 'W+Jets'  , 'f' )
 leg.AddEntry(dyjets.hists[0], 'DY+Jets' , 'f' )
@@ -145,15 +145,17 @@ for hist in data.hists:
 	leg.Draw()
 
 	pad_ratio.cd()
-
-
+	hist_ratio = hist.Clone()
+	hist_ratio.Divide(stack.GetStack().Last())
+	hist_ratio.Draw("p e1")
+	hist_ratio = helper.setRatioStyle(hist_ratio)
+	line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
+	line.Draw()
 	helper.saveCanvas(canv, prepend + helper.getSaveName(hist) + postpend)
 
 
 
 # Computing FakeRate
-
-pad_plot.cd()
 
 FR_data_pt  = FR_data.ProjectionX('FR_data_pt')
 FR_data_pt.Divide(FR_data_den.ProjectionX('FR_data_den_pt'))
@@ -180,6 +182,8 @@ FR_bg_eta.Divide(FR_bg_den.ProjectionY('FR_bg_den_eta'))
 
 # Plotting FR vs Pt
 
+pad_plot.cd()
+
 FR_data_pt.SetMarkerSize(1.2)
 FR_data_pt.SetMarkerStyle(20)
 FR_data_pt.SetMarkerColor(getColor(data))
@@ -201,17 +205,27 @@ FR_data_pt.GetXaxis().SetTitle(helper.getXTitle(data.hists[12]))
 FR_data_pt.GetYaxis().SetTitle('FR')
 FR_data_pt.SetTitle('muFakeRatio_pt')
 
-l_pt = helper.makeLegend(0.15, 0.65, 0.4, 0.90)
+l_pt = helper.makeLegend(0.15, 0.75, 0.35, 0.85)
 l_pt.AddEntry(FR_data_pt, 'Data'    , 'pe')
 l_pt.AddEntry(FR_bg_pt,   'QCD + EW', 'pe')
 l_pt.AddEntry(FR_qcd_pt,  'QCD'     , 'pe')
 l_pt.Draw()
+
+pad_ratio.cd()
+data_bg_ratio = FR_data_pt.Clone()
+data_bg_ratio.Divide(FR_bg_pt)
+data_bg_ratio.Draw("p e1")
+data_bg_ratio = helper.setRatioStyle(data_bg_ratio)
+line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
+line.Draw()
 
 helper.saveCanvas(canv, "muFakeRatio_pt")
 
 
 
 # Plotting FR vs Eta
+
+pad_plot.cd()
 
 FR_data_eta.SetMarkerSize(1.2)
 FR_data_eta.SetMarkerStyle(20)
@@ -234,11 +248,19 @@ FR_data_eta.GetXaxis().SetTitle(helper.getXTitle(data.hists[13]))
 FR_data_eta.GetYaxis().SetTitle('FR')
 FR_data_eta.SetTitle('muFakeRatio_eta')
 
-l_eta = helper.makeLegend(0.15, 0.65, 0.4, 0.90)
+l_eta = helper.makeLegend(0.15, 0.75, 0.35, 0.85)
 l_eta.AddEntry(FR_data_eta, 'Data'    , 'pe')
 l_eta.AddEntry(FR_bg_eta,   'QCD + EW', 'pe')
 l_eta.AddEntry(FR_qcd_eta,  'QCD'     , 'pe')
 l_eta.Draw()
+
+pad_ratio.cd()
+data_bg_ratio = FR_data_eta.Clone()
+data_bg_ratio.Divide(FR_bg_eta)
+data_bg_ratio.Draw("p e1")
+data_bg_ratio = helper.setRatioStyle(data_bg_ratio)
+line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
+line.Draw()
 
 helper.saveCanvas(canv, "muFakeRatio_eta")
 

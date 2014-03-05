@@ -37,6 +37,27 @@ def makePad(which):
 	pad.Draw()
 	return pad		
 
+def makeLine(x1, y1, x2, y2):
+	line = ROOT.TLine(x1, y1, x2, y2)
+	line.SetLineWidth(2)
+	line.SetLineStyle(7)
+	return line
+
+def setRatioStyle(hist):
+	hist.SetTitle('')
+	hist.GetYaxis().SetNdivisions(505)
+	hist.GetYaxis().SetTitle('Data/Pred.')
+	hist.GetYaxis().SetTitleSize(0.09)
+	hist.GetYaxis().SetTitleOffset(0.35)
+	hist.GetYaxis().SetLabelSize(0.09)
+	hist.GetXaxis().SetNdivisions(505)
+	hist.GetXaxis().SetLabelSize(0.11)
+	hist.GetXaxis().SetTitleSize(0.11)
+	hist.GetXaxis().SetTitleOffset(1.0)
+	hist.SetMaximum(1.99)
+	hist.SetMinimum(0.0)
+	return hist
+
 def getXTitle(hist):
 	name = hist.GetName()
 	if   'NBJets'     in name: return 'N_{b-jets}'
