@@ -36,20 +36,22 @@ void Fakerates::init(bool verbose){
 
 	// ETA BINNING
 	fFRbinseta.push_back(0.0);
-	fFRbinseta.push_back(1.4);
+	fFRbinseta.push_back(0.5);
+	fFRbinseta.push_back(1.0);
+	fFRbinseta.push_back(1.5);
+	fFRbinseta.push_back(2.0);
 	fFRbinseta.push_back(2.5);
 	fFRn_binseta  = fFRbinseta.size();
 
 	// PT BINNING
 	fFRbinspt.push_back(10.);
+	fFRbinspt.push_back(15.);
 	fFRbinspt.push_back(20.);
 	fFRbinspt.push_back(25.);
 	fFRbinspt.push_back(30.);
 	fFRbinspt.push_back(35.);
-	fFRbinspt.push_back(40.);
 	fFRbinspt.push_back(45.);
-	fFRbinspt.push_back(50.);
-	fFRbinspt.push_back(51.);
+	fFRbinspt.push_back(46.);
 	fFRn_binspt   = fFRbinspt .size();
 
 	fLumi = 24.9;
@@ -411,7 +413,7 @@ void Fakerates::fillIsoPlots(){
 			h_Loose_muMaxJPt    ->Fill(JetRawPt->at(jet)   , fEventweight);
 			h_Loose_muNBJets    ->Fill(getNJets(1)         , fEventweight);
 			h_Loose_muNJets     ->Fill(getNJets()          , fEventweight);
-			h_Loose_muNVertices ->Fill(NVrtx               , fEventweight);
+			h_Loose_muNVertices ->Fill((NVrtx>30)?30:NVrtx , fEventweight);
 
 			h_Loose_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
 
@@ -448,7 +450,7 @@ void Fakerates::fillIsoPlots(){
 				h_Tight_muMaxJPt    ->Fill(JetRawPt->at(jet)   , fEventweight);
 				h_Tight_muNBJets    ->Fill(getNJets(1)         , fEventweight);
 				h_Tight_muNJets     ->Fill(getNJets()          , fEventweight);
-				h_Tight_muNVertices ->Fill(NVrtx               , fEventweight);
+				h_Tight_muNVertices ->Fill((NVrtx>30)?30:NVrtx , fEventweight);
 
 				h_Tight_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
 
@@ -486,6 +488,17 @@ void Fakerates::bookHistos(){
 	return: none
 	*/ 
 
+	std::vector<float> nvrtx_bins;
+	nvrtx_bins.push_back( 0.);
+	nvrtx_bins.push_back( 5.);
+	nvrtx_bins.push_back(10.);
+	nvrtx_bins.push_back(15.);
+	nvrtx_bins.push_back(20.);
+	nvrtx_bins.push_back(25.);
+	nvrtx_bins.push_back(30.);
+	nvrtx_bins.push_back(31.);
+	int nvrtx_nbins = nvrtx_bins.size();
+
 	// the ratio histograms, those are just divided versions of the following
 	h_elFRatio = new TH2F("h_elFRatio", "elFRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_elFRatio->Sumw2(); 
 	h_muFRatio = new TH2F("h_muFRatio", "muFRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_muFRatio->Sumw2(); 
@@ -518,7 +531,7 @@ void Fakerates::bookHistos(){
 	h_Loose_muMaxJPt     = new TH1F("h_Loose_muMaxJPt"     , "Loose_muMaxJPt"    , 13 ,  20 , 150); h_Loose_muMaxJPt     -> Sumw2();
 	h_Loose_muNBJets     = new TH1F("h_Loose_muNBJets"     , "Loose_muNBJets"    , 3  ,  0  , 3  ); h_Loose_muNBJets     -> Sumw2();
 	h_Loose_muNJets      = new TH1F("h_Loose_muNJets"      , "Loose_muNJets"     , 5  ,  1  , 6  ); h_Loose_muNJets      -> Sumw2();
-	h_Loose_muNVertices  = new TH1F("h_Loose_muNVertices"  , "Loose_muNVertices" , 7  ,  5  , 40 ); h_Loose_muNVertices  -> Sumw2();
+	h_Loose_muNVertices  = new TH1F("h_Loose_muNVertices"  , "Loose_muNVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Loose_muNVertices  -> Sumw2();
 
 	h_Loose_muAwayJetDR  = new TH1F("h_Loose_muAwayJetDR"  , "Loose_muAwayJetDR" , 30 ,  0  , 6  ); h_Loose_muAwayJetDR  -> Sumw2();
 	h_Loose_muAwayJetPt  = new TH1F("h_Loose_muAwayJetPt"  , "Loose_muAwayJetPt" , 13 ,  20 , 150); h_Loose_muAwayJetPt  -> Sumw2();
@@ -540,7 +553,7 @@ void Fakerates::bookHistos(){
 	h_Tight_muMaxJPt     = new TH1F("h_Tight_muMaxJPt"     , "Tight_muMaxJPt"    , 13 ,  20 , 150); h_Tight_muMaxJPt     -> Sumw2();
 	h_Tight_muNBJets     = new TH1F("h_Tight_muNBJets"     , "Tight_muNBJets"    , 3  ,  0  , 3  ); h_Tight_muNBJets     -> Sumw2();
 	h_Tight_muNJets      = new TH1F("h_Tight_muNJets"      , "Tight_muNJets"     , 5  ,  1  , 6  ); h_Tight_muNJets      -> Sumw2();
-	h_Tight_muNVertices  = new TH1F("h_Tight_muNVertices"  , "Tight_muNVertices" , 7  ,  5  , 40 ); h_Tight_muNVertices  -> Sumw2();
+	h_Tight_muNVertices  = new TH1F("h_Tight_muNVertices"  , "Tight_muNVertices" ,nvrtx_nbins-1, &nvrtx_bins[0]); h_Tight_muNVertices  -> Sumw2();
                                                                                                  
 	h_Tight_muAwayJetDR  = new TH1F("h_Tight_muAwayJetDR"  , "Tight_muAwayJetDR" , 30 ,  0  , 6  ); h_Tight_muAwayJetDR  -> Sumw2();
 	h_Tight_muAwayJetPt  = new TH1F("h_Tight_muAwayJetPt"  , "Tight_muAwayJetPt" , 13 ,  20 , 150); h_Tight_muAwayJetPt  -> Sumw2();

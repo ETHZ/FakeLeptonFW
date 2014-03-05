@@ -2,7 +2,7 @@
 
 ## HEADER
 
-import ROOT, helper, commands, sys
+import ROOT, helper, commands, sys, copy
 
 ROOT.gROOT.SetBatch(1)
 ROOT.gStyle.SetOptStat(0)
@@ -106,6 +106,71 @@ for hist in qcd.hists:
 		FR_qcd = hist
 		FR_qcd.SetName("FR_qcd")
 
+data_nums = []
+data_dens = []
+mc_nums = []
+mc_dens = []
+qcd_nums = []
+qcd_dens = []
+for hist in data.hists:
+	i = data.hists.index(hist)
+	if 'h_Loose_' in hist.GetName():
+		data_dens.append( copy.deepcopy(hist) )
+		mcstack = ROOT.THStack()
+		for mc in mc_samples:
+			if mc == qcd:
+				qcd_dens.append(copy.deepcopy(mc.hists[i]) )
+			mcstack.Add(mc.hists[i])
+		mc_dens.append( copy.deepcopy( mcstack.GetStack().Last() ) )
+	if 'h_Tight_' in hist.GetName():
+		data_nums.append( copy.deepcopy(hist) )
+		mcstack = ROOT.THStack()
+		for mc in mc_samples:
+			if mc == qcd:
+				qcd_nums.append(copy.deepcopy(mc.hists[i]) )
+			mcstack.Add(mc.hists[i])
+		mc_nums.append( copy.deepcopy( mcstack.GetStack().Last() ) )
+
+for num in data_nums:
+	i = data_nums.index(num)
+	## the plot itself
+	pad_plot.cd()
+	num.Divide(data_dens[i])
+	num.SetMarkerColor(getColor(data))
+	num.SetMarkerSize(1.2)
+	num.SetMarkerStyle(20)
+	num.GetYaxis().SetRangeUser(0., 0.2)
+	num.Draw('pe')
+	mc_nums[i].Divide(mc_dens[i])
+	mc_nums[i].SetMarkerColor(getColor(wjets))
+	mc_nums[i].SetMarkerSize(1.2)
+	mc_nums[i].SetMarkerStyle(20)
+	mc_nums[i].Draw('pe1 same')
+	qcd_nums[i].Divide(mc_dens[i])
+	qcd_nums[i].SetMarkerColor(getColor(qcd))
+	qcd_nums[i].SetMarkerSize(1.2)
+	qcd_nums[i].SetMarkerStyle(20)
+	qcd_nums[i].Draw('pe1 same')
+	leg1 = helper.makeLegend(0.4, 0.5, 0.60, 0.85)
+	leg1.AddEntry(num        , 'Data', 'pe')
+	leg1.AddEntry(mc_nums[i] , 'MC'  , 'pe' )
+	leg1.AddEntry(qcd_nums[i], 'QCD only'  , 'pe' )
+	leg1.Draw()
+	## moving to the ratio
+	pad_ratio.cd()
+	ratio = copy.deepcopy(num)
+	ratio.GetYaxis().SetRangeUser(0., 2.)
+	ratio.Divide(mc_nums[i])
+	ratio.Draw('p1 e')
+	ratio.GetXaxis().SetLabelSize(0.10)
+	ratio.GetXaxis().SetTitle(helper.getXTitle(ratio))
+	ratio.GetXaxis().SetTitleSize(0.15)
+	line = helper.makeLine(ratio.GetXaxis().GetXmin(), 1.00, ratio.GetXaxis().GetXmax(), 1.00)
+	line.Draw()
+	canv.SaveAs(data_nums[i].GetName()+'.pdf')
+	canv.SaveAs(data_nums[i].GetName()+'.png')
+
+	
 
 # Run Over All Samples to Produce Plots
 
