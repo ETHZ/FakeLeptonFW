@@ -74,10 +74,10 @@ plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR'
 #qcd.Rescale(fit.getMCScaleFactor(qcd, 'h_Loose_muLepIso', [data], [], 0.2))
 #wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_muMTMET30', [data], [qcd, dyjets], 60, 90))
 
-scalefactors = fit.doSimScaling(data.hists[37], qcd.hists[37], wjets.hists[37], dyjets.hists[37])
-qcd.Rescale(scalefactors[0])
-wjets.Rescale(scalefactors[1])
-dyjets.Rescale(scalefactors[2])
+#scalefactors = fit.doSimScaling(data.hists[37], qcd.hists[37], wjets.hists[37], dyjets.hists[37])
+#qcd.Rescale(scalefactors[0])
+#wjets.Rescale(scalefactors[1])
+#dyjets.Rescale(scalefactors[2])
 
 
 # Get Numerator and Denominator from QCD Sample Alone
@@ -212,11 +212,20 @@ for hist in data.hists:
 
 # Computing FakeRate
 
+setMin = 0.0
+setMax = 0.25
+
+FR_data_2d  = FR_data
+FR_data_2d.Divide(FR_data_den)
+
 FR_data_pt  = FR_data.ProjectionX('FR_data_pt')
 FR_data_pt.Divide(FR_data_den.ProjectionX('FR_data_den_pt'))
 
 FR_data_eta = FR_data.ProjectionY('FR_data_eta')
 FR_data_eta.Divide(FR_data_den.ProjectionY('FR_data_den_eta'))
+
+FR_qcd_2d   = FR_qcd
+FR_qcd_2d.Divide(FR_qcd_den)
 
 FR_qcd_pt   = FR_qcd.ProjectionX('FR_qcd_pt')
 FR_qcd_pt.Divide(FR_qcd_den.ProjectionX('FR_qcd_den_pt'))
@@ -226,6 +235,9 @@ FR_qcd_eta.Divide(FR_qcd_den.ProjectionY('FR_qcd_den_eta'))
 
 FR_bg       = FR_bg_ns.GetStack().Last()
 FR_bg_den   = FR_bg_ds.GetStack().Last()
+
+FR_bg_2d    = FR_bg
+FR_bg_2d.Divide(FR_bg_den)
 
 FR_bg_pt    = FR_bg.ProjectionX('FR_bg_pt')
 FR_bg_pt.Divide(FR_bg_den.ProjectionX('FR_bg_den_pt'))
@@ -255,12 +267,13 @@ FR_data_pt.Draw("p e1")
 FR_bg_pt.Draw("p e1 same")
 FR_qcd_pt.Draw("p e1 same")
 
-FR_data_pt.SetMaximum(0.3)
+FR_data_pt.SetMinimum(setMin)
+FR_data_pt.SetMaximum(setMax)
 FR_data_pt.GetXaxis().SetTitle(helper.getXTitle(data.hists[12]))
 FR_data_pt.GetYaxis().SetTitle('FR')
 FR_data_pt.SetTitle('muFakeRatio_pt')
 
-l_pt = helper.makeLegend(0.15, 0.75, 0.35, 0.85)
+l_pt = helper.makeLegend(0.15, 0.65, 0.35, 0.85)
 l_pt.AddEntry(FR_data_pt, 'Data'    , 'pe')
 l_pt.AddEntry(FR_bg_pt,   'QCD + EW', 'pe')
 l_pt.AddEntry(FR_qcd_pt,  'QCD'     , 'pe')
@@ -274,7 +287,7 @@ data_bg_ratio = helper.setRatioStyle(data_bg_ratio, data.hists[12])
 line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 line.Draw()
 
-helper.saveCanvas(canv, "muFakeRatio_pt")
+#helper.saveCanvas(canv, "muFakeRatio_pt")
 
 
 
@@ -298,12 +311,13 @@ FR_data_eta.Draw("p e1")
 FR_bg_eta.Draw("p e1 same")
 FR_qcd_eta.Draw("p e1 same")
 
-FR_data_eta.SetMaximum(0.3)
+FR_data_eta.SetMinimum(setMin)
+FR_data_eta.SetMaximum(setMax)
 FR_data_eta.GetXaxis().SetTitle(helper.getXTitle(data.hists[13]))
 FR_data_eta.GetYaxis().SetTitle('FR')
 FR_data_eta.SetTitle('muFakeRatio_eta')
 
-l_eta = helper.makeLegend(0.15, 0.75, 0.35, 0.85)
+l_eta = helper.makeLegend(0.15, 0.65, 0.35, 0.85)
 l_eta.AddEntry(FR_data_eta, 'Data'    , 'pe')
 l_eta.AddEntry(FR_bg_eta,   'QCD + EW', 'pe')
 l_eta.AddEntry(FR_qcd_eta,  'QCD'     , 'pe')
@@ -317,6 +331,34 @@ data_bg_ratio = helper.setRatioStyle(data_bg_ratio, data.hists[13])
 line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 line.Draw()
 
-helper.saveCanvas(canv, "muFakeRatio_eta")
+#helper.saveCanvas(canv, "muFakeRatio_eta")
+
+
+
+# Plotting 2D FR map
+
+canv = helper.makeCanvas(900, 675)
+canv.SetRightMargin(0.1)
+
+FR_data_2d.SetFillColor(getColor(data))
+FR_data_2d.Draw("text colz e")
+FR_data_2d.GetXaxis().SetTitle(helper.getXTitle(data.hists[12]))
+FR_data_2d.GetYaxis().SetTitle(helper.getXTitle(data.hists[13]))
+FR_data_2d.SetMinimum(setMin)
+FR_data_2d.SetMaximum(setMax)
+FR_data_2d.SetTitle('muFakeRatio_data')
+helper.saveCanvas(canv, "muFakeRatio_data")
+
+FR_bg_2d.SetFillColor(getColor(data))
+FR_bg_2d.Draw("text colz e")
+FR_bg_2d.GetXaxis().SetTitle(helper.getXTitle(data.hists[12]))
+FR_bg_2d.GetYaxis().SetTitle(helper.getXTitle(data.hists[13]))
+FR_bg_2d.SetMinimum(setMin)
+FR_bg_2d.SetMaximum(setMax)
+FR_bg_2d.SetTitle('muFakeRatio_bg')
+helper.saveCanvas(canv, "muFakeRatio_bg")
+
+
+
 
 
