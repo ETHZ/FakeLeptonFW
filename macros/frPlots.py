@@ -78,14 +78,6 @@ plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR'
 #dyjets.Rescale(scalefactors[2])
 
 
-
-for hist in qcd.hists:
-	if hist.GetName() == 'h_muFLoose':
-		FR_qcd_den = hist
-	if hist.GetName() == 'h_muFTight':
-		FR_qcd = hist
-	
-
 # Run Over All Samples to Produce Plots
 
 for hist in data.hists:

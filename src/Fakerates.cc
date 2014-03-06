@@ -176,7 +176,7 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu, int &jet){
 	jet = awayjet_inds[0];
 	if(awayjet_inds.size() > 1)
 		for(int thisjet=0; thisjet < nawayjets; ++thisjet)
-			if(JetRawPt->at(awayjet_inds[thisjet]) > JetRawPt->at(jet) ) jet = awayjet_inds[thisjet];
+			if(JetPt->at(awayjet_inds[thisjet]) > JetPt->at(jet) ) jet = awayjet_inds[thisjet];
 
 
 	// upper cuts on MT and MET
@@ -293,7 +293,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0.){
 	float minDR = 0.4;
 
 	// if pt too low, eta too large, jet beta star too large then return false
-	if(pt>0. && JetRawPt->at(j) < pt) return false;
+	if(pt>0. && JetPt->at(j) < pt) return false;
 	if(fabs(JetEta->at(j)) > 2.5) return false;
 	// if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
 
@@ -337,10 +337,10 @@ float Fakerates::getAwayJet(int info = 0, int mu = 0){
 	jetind = awayjet_inds[0];
 	if(awayjet_inds.size() > 1)
 		for(int thisjet=0; thisjet < nawayjets; ++thisjet)
-			if(JetRawPt->at(awayjet_inds[thisjet]) > JetRawPt->at(jetind) ) jetind = awayjet_inds[thisjet];
+			if(JetPt->at(awayjet_inds[thisjet]) > JetPt->at(jetind) ) jetind = awayjet_inds[thisjet];
 
 	if(info==1) return Util::GetDeltaR(JetEta->at(jetind), MuEta->at(mu), JetPhi->at(jetind), MuPhi->at(mu));
-	return JetRawPt->at(jetind);
+	return JetPt->at(jetind);
 }
 
 
@@ -369,7 +369,7 @@ float Fakerates::getClosestJet(int info = 0, int mu = 0){
 			if(Util::GetDeltaR(JetEta->at(closjet_inds[thisjet]), MuEta->at(mu), JetPhi->at(closjet_inds[thisjet]), MuPhi->at(mu)) < Util::GetDeltaR(JetEta->at(jetind), MuEta->at(mu), JetPhi->at(jetind), MuPhi->at(mu)) ) jetind = closjet_inds[thisjet];
 
 	if(info==1) return Util::GetDeltaR(JetEta->at(jetind), MuEta->at(mu), JetPhi->at(jetind), MuPhi->at(mu));
-	return JetRawPt->at(jetind);
+	return JetPt->at(jetind);
 }
 
 
@@ -384,7 +384,7 @@ float Fakerates::getHT(){
 	
 	for(int thisjet=0; thisjet < JetPt->size(); ++thisjet){
 		if(!isGoodJet(thisjet, 40.)) continue;
-		HT += JetRawPt->at(thisjet);
+		HT += JetPt->at(thisjet);
 	}
 
 	return HT;
@@ -441,7 +441,7 @@ void Fakerates::fillIsoPlots(){
 			h_Loose_muLepIso    ->Fill(MuPFIso->at(mu)     , fEventweight);
 			h_Loose_muLepPt     ->Fill(MuPt->at(mu)        , fEventweight);
 
-			h_Loose_muMaxJPt    ->Fill(JetRawPt->at(jet)   , fEventweight);
+			h_Loose_muMaxJPt    ->Fill(JetPt->at(jet)      , fEventweight);
 			h_Loose_muNBJets    ->Fill(getNJets(1)         , fEventweight);
 			h_Loose_muNJets     ->Fill(getNJets()          , fEventweight);
 			h_Loose_muNVertices ->Fill((NVrtx>30)?30:NVrtx , fEventweight);
@@ -479,7 +479,7 @@ cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Ev
 				h_Tight_muLepIso    ->Fill(MuPFIso->at(mu)     , fEventweight);
 				h_Tight_muLepPt     ->Fill(MuPt->at(mu)        , fEventweight);
 
-				h_Tight_muMaxJPt    ->Fill(JetRawPt->at(jet)   , fEventweight);
+				h_Tight_muMaxJPt    ->Fill(JetPt->at(jet)      , fEventweight);
 				h_Tight_muNBJets    ->Fill(getNJets(1)         , fEventweight);
 				h_Tight_muNJets     ->Fill(getNJets()          , fEventweight);
 				h_Tight_muNVertices ->Fill((NVrtx>30)?30:NVrtx , fEventweight);
