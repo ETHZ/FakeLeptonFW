@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Feb 19 19:20:03 2014 by ROOT version 5.34/14
+// Thu Mar  6 14:10:15 2014 by ROOT version 5.34/14
 // from TTree Analysis/AnalysisTree
-// found on file: fakeminitree.root
+// found on file: qcdBigFile_START53_V20.root
 //////////////////////////////////////////////////////////
 
 #ifndef FWBaseClass_h
@@ -30,26 +30,6 @@ public :
    Int_t           HLT_MU8_PS;
    Int_t           HLT_MU17;
    Int_t           HLT_MU17_PS;
-   Int_t           HLT_MU24_ETA2P1;
-   Int_t           HLT_MU24_ETA2P1_PS;
-   Int_t           HLT_ELE17_TIGHT;
-   Int_t           HLT_ELE17_TIGHT_PS;
-   Int_t           HLT_ELE17_JET30_TIGHT;
-   Int_t           HLT_ELE17_JET30_TIGHT_PS;
-   Int_t           HLT_ELE8_TIGHT;
-   Int_t           HLT_ELE8_TIGHT_PS;
-   Int_t           HLT_ELE8_JET30_TIGHT;
-   Int_t           HLT_ELE8_JET30_TIGHT_PS;
-   Int_t           HLT_MU17_MU8;
-   Int_t           HLT_MU17_MU8_PS;
-   Int_t           HLT_MU17_TKMU8;
-   Int_t           HLT_MU17_TKMU8_PS;
-   Int_t           HLT_ELE17_ELE8_TIGHT;
-   Int_t           HLT_ELE17_ELE8_TIGHT_PS;
-   Int_t           HLT_MU8_ELE17_TIGHT;
-   Int_t           HLT_MU8_ELE17_TIGHT_PS;
-   Int_t           HLT_MU17_ELE8_TIGHT;
-   Int_t           HLT_MU17_ELE8_TIGHT_PS;
    Int_t           NVrtx;
    Float_t         PUWeight;
    Float_t         PUWeightUp;
@@ -61,7 +41,7 @@ public :
    std::vector<int>     *MuCharge;
    std::vector<float>   *MuPFIso;
    std::vector<float>   *MuD0;
-   std::vector<float>   *MuMT;
+
    std::vector<bool>    *MuIsGlobal;
    std::vector<bool>    *MuIsPF;
    std::vector<float>   *MuChi2;
@@ -79,12 +59,14 @@ public :
    std::vector<int>     *ElCharge;
    std::vector<float>   *ElPFIso;
    std::vector<float>   *ElD0;
-   std::vector<float>   *ElMT;
+
    std::vector<bool>    *ElIsVeto;
    std::vector<bool>    *ElIsLoose;
    std::vector<bool>    *ElIsTight;
    Float_t         pfMET;
    Float_t         pfMETPhi;
+   Float_t         pfMET1;
+   Float_t         pfMET1Phi;
    std::vector<float>   *JetPt;
    std::vector<float>   *JetRawPt;
    std::vector<float>   *JetEta;
@@ -102,26 +84,6 @@ public :
    TBranch        *b_HLT_MU8_PS;   //!
    TBranch        *b_HLT_MU17;   //!
    TBranch        *b_HLT_MU17_PS;   //!
-   TBranch        *b_HLT_MU24_ETA2P1;   //!
-   TBranch        *b_HLT_MU24_ETA2P1_PS;   //!
-   TBranch        *b_HLT_ELE17_TIGHT;   //!
-   TBranch        *b_HLT_ELE17_TIGHT_PS;   //!
-   TBranch        *b_HLT_ELE17_JET30_TIGHT;   //!
-   TBranch        *b_HLT_ELE17_JET30_TIGHT_PS;   //!
-   TBranch        *b_HLT_ELE8_TIGHT;   //!
-   TBranch        *b_HLT_ELE8_TIGHT_PS;   //!
-   TBranch        *b_HLT_ELE8_JET30_TIGHT;   //!
-   TBranch        *b_HLT_ELE8_JET30_TIGHT_PS;   //!
-   TBranch        *b_HLT_MU17_MU8;   //!
-   TBranch        *b_HLT_MU17_MU8_PS;   //!
-   TBranch        *b_HLT_MU17_TKMU8;   //!
-   TBranch        *b_HLT_MU17_TKMU8_PS;   //!
-   TBranch        *b_HLT_ELE17_ELE8_TIGHT;   //!
-   TBranch        *b_HLT_ELE17_ELE8_TIGHT_PS;   //!
-   TBranch        *b_HLT_MU8_ELE17_TIGHT;   //!
-   TBranch        *b_HLT_MU8_ELE17_TIGHT_PS;   //!
-   TBranch        *b_HLT_MU17_ELE8_TIGHT;   //!
-   TBranch        *b_HLT_MU17_ELE8_TIGHT_PS;   //!
    TBranch        *b_NVrtx;   //!
    TBranch        *b_PUWeight;   //!
    TBranch        *b_PUWeightUp;   //!
@@ -133,7 +95,6 @@ public :
    TBranch        *b_MuCharge;   //!
    TBranch        *b_MuPFIso;   //!
    TBranch        *b_MuD0;   //!
-   TBranch        *b_MuMT;   //!
    TBranch        *b_MuIsGlobal;   //!
    TBranch        *b_MuIsPF;   //!
    TBranch        *b_MuChi2;   //!
@@ -151,12 +112,13 @@ public :
    TBranch        *b_ElCharge;   //!
    TBranch        *b_ElPFIso;   //!
    TBranch        *b_ElD0;   //!
-   TBranch        *b_ElMT;   //!
    TBranch        *b_ElIsVeto;   //!
    TBranch        *b_ElIsLoose;   //!
    TBranch        *b_ElIsTight;   //!
    TBranch        *b_pfMET;   //!
    TBranch        *b_pfMETPhi;   //!
+   TBranch        *b_pfMET1;   //!
+   TBranch        *b_pfMET1Phi;   //!
    TBranch        *b_JetPt;   //!
    TBranch        *b_JetRawPt;   //!
    TBranch        *b_JetEta;   //!
@@ -185,9 +147,9 @@ FWBaseClass::FWBaseClass(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("fakeminitree.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("qcdBigFile_START53_V20.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("fakeminitree.root");
+         f = new TFile("qcdBigFile_START53_V20.root");
       }
       f->GetObject("Analysis",tree);
 
@@ -237,7 +199,6 @@ void FWBaseClass::Init(TTree *tree)
    MuCharge = 0;
    MuPFIso = 0;
    MuD0 = 0;
-   MuMT = 0;
    MuIsGlobal = 0;
    MuIsPF = 0;
    MuChi2 = 0;
@@ -255,7 +216,6 @@ void FWBaseClass::Init(TTree *tree)
    ElCharge = 0;
    ElPFIso = 0;
    ElD0 = 0;
-   ElMT = 0;
    ElIsVeto = 0;
    ElIsLoose = 0;
    ElIsTight = 0;
@@ -280,26 +240,6 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_MU8_PS", &HLT_MU8_PS, &b_HLT_MU8_PS);
    fChain->SetBranchAddress("HLT_MU17", &HLT_MU17, &b_HLT_MU17);
    fChain->SetBranchAddress("HLT_MU17_PS", &HLT_MU17_PS, &b_HLT_MU17_PS);
-   fChain->SetBranchAddress("HLT_MU24_ETA2P1", &HLT_MU24_ETA2P1, &b_HLT_MU24_ETA2P1);
-   fChain->SetBranchAddress("HLT_MU24_ETA2P1_PS", &HLT_MU24_ETA2P1_PS, &b_HLT_MU24_ETA2P1_PS);
-   fChain->SetBranchAddress("HLT_ELE17_TIGHT", &HLT_ELE17_TIGHT, &b_HLT_ELE17_TIGHT);
-   fChain->SetBranchAddress("HLT_ELE17_TIGHT_PS", &HLT_ELE17_TIGHT_PS, &b_HLT_ELE17_TIGHT_PS);
-   fChain->SetBranchAddress("HLT_ELE17_JET30_TIGHT", &HLT_ELE17_JET30_TIGHT, &b_HLT_ELE17_JET30_TIGHT);
-   fChain->SetBranchAddress("HLT_ELE17_JET30_TIGHT_PS", &HLT_ELE17_JET30_TIGHT_PS, &b_HLT_ELE17_JET30_TIGHT_PS);
-   fChain->SetBranchAddress("HLT_ELE8_TIGHT", &HLT_ELE8_TIGHT, &b_HLT_ELE8_TIGHT);
-   fChain->SetBranchAddress("HLT_ELE8_TIGHT_PS", &HLT_ELE8_TIGHT_PS, &b_HLT_ELE8_TIGHT_PS);
-   fChain->SetBranchAddress("HLT_ELE8_JET30_TIGHT", &HLT_ELE8_JET30_TIGHT, &b_HLT_ELE8_JET30_TIGHT);
-   fChain->SetBranchAddress("HLT_ELE8_JET30_TIGHT_PS", &HLT_ELE8_JET30_TIGHT_PS, &b_HLT_ELE8_JET30_TIGHT_PS);
-   fChain->SetBranchAddress("HLT_MU17_MU8", &HLT_MU17_MU8, &b_HLT_MU17_MU8);
-   fChain->SetBranchAddress("HLT_MU17_MU8_PS", &HLT_MU17_MU8_PS, &b_HLT_MU17_MU8_PS);
-   fChain->SetBranchAddress("HLT_MU17_TKMU8", &HLT_MU17_TKMU8, &b_HLT_MU17_TKMU8);
-   fChain->SetBranchAddress("HLT_MU17_TKMU8_PS", &HLT_MU17_TKMU8_PS, &b_HLT_MU17_TKMU8_PS);
-   fChain->SetBranchAddress("HLT_ELE17_ELE8_TIGHT", &HLT_ELE17_ELE8_TIGHT, &b_HLT_ELE17_ELE8_TIGHT);
-   fChain->SetBranchAddress("HLT_ELE17_ELE8_TIGHT_PS", &HLT_ELE17_ELE8_TIGHT_PS, &b_HLT_ELE17_ELE8_TIGHT_PS);
-   fChain->SetBranchAddress("HLT_MU8_ELE17_TIGHT", &HLT_MU8_ELE17_TIGHT, &b_HLT_MU8_ELE17_TIGHT);
-   fChain->SetBranchAddress("HLT_MU8_ELE17_TIGHT_PS", &HLT_MU8_ELE17_TIGHT_PS, &b_HLT_MU8_ELE17_TIGHT_PS);
-   fChain->SetBranchAddress("HLT_MU17_ELE8_TIGHT", &HLT_MU17_ELE8_TIGHT, &b_HLT_MU17_ELE8_TIGHT);
-   fChain->SetBranchAddress("HLT_MU17_ELE8_TIGHT_PS", &HLT_MU17_ELE8_TIGHT_PS, &b_HLT_MU17_ELE8_TIGHT_PS);
    fChain->SetBranchAddress("NVrtx", &NVrtx, &b_NVrtx);
    fChain->SetBranchAddress("PUWeight", &PUWeight, &b_PUWeight);
    fChain->SetBranchAddress("PUWeightUp", &PUWeightUp, &b_PUWeightUp);
@@ -311,7 +251,6 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuCharge", &MuCharge, &b_MuCharge);
    fChain->SetBranchAddress("MuPFIso", &MuPFIso, &b_MuPFIso);
    fChain->SetBranchAddress("MuD0", &MuD0, &b_MuD0);
-   fChain->SetBranchAddress("MuMT", &MuMT, &b_MuMT);
    fChain->SetBranchAddress("MuIsGlobal", &MuIsGlobal, &b_MuIsGlobal);
    fChain->SetBranchAddress("MuIsPF", &MuIsPF, &b_MuIsPF);
    fChain->SetBranchAddress("MuChi2", &MuChi2, &b_MuChi2);
@@ -329,12 +268,13 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("ElCharge", &ElCharge, &b_ElCharge);
    fChain->SetBranchAddress("ElPFIso", &ElPFIso, &b_ElPFIso);
    fChain->SetBranchAddress("ElD0", &ElD0, &b_ElD0);
-   fChain->SetBranchAddress("ElMT", &ElMT, &b_ElMT);
    fChain->SetBranchAddress("ElIsVeto", &ElIsVeto, &b_ElIsVeto);
    fChain->SetBranchAddress("ElIsLoose", &ElIsLoose, &b_ElIsLoose);
    fChain->SetBranchAddress("ElIsTight", &ElIsTight, &b_ElIsTight);
    fChain->SetBranchAddress("pfMET", &pfMET, &b_pfMET);
    fChain->SetBranchAddress("pfMETPhi", &pfMETPhi, &b_pfMETPhi);
+   fChain->SetBranchAddress("pfMET1", &pfMET1, &b_pfMET1);
+   fChain->SetBranchAddress("pfMET1Phi", &pfMET1Phi, &b_pfMET1Phi);
    fChain->SetBranchAddress("JetPt", &JetPt, &b_JetPt);
    fChain->SetBranchAddress("JetRawPt", &JetRawPt, &b_JetRawPt);
    fChain->SetBranchAddress("JetEta", &JetEta, &b_JetEta);

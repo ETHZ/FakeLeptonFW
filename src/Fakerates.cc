@@ -91,7 +91,7 @@ void Fakerates::loop(){
     
     // calculate the eventweight
     TH1F * EventCount = (TH1F*) file_->Get("EventCount");
-    Long64_t Ngen = EventCount->GetEntries();
+    Double_t Ngen = EventCount->GetEntries();
     if(!fIsData) fEventweight = fXSec * fLumi / (fMaxSize>0?fMaxSize:Ngen);
 	else fEventweight = 1.;
 	cout << "going to loop over " << (fMaxSize>0?fMaxSize:Ngen) << " events..." << endl;
@@ -141,7 +141,7 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu, int &jet){
 
 	// count numbers of loose and veto muons in the event
 	for(int i=0; i < MuPt->size(); ++i){
-		if(MuPt->at(i) < 20.) continue;
+		//if(MuPt->at(i) < 20.) continue;
 		if(isLooseMuon(i)){
 			nloose++;
 			mu = i;
@@ -211,10 +211,10 @@ bool Fakerates::passesMTCut(int type, int index){
 
 	// mu or el MT too large then return false
 	if(type == 0){
-		if(MuMT->at(index) > value_mt) return false;
+		if(getMT(type, index) > value_mt) return false;
 	}
 	else if(type == 1){
-		if(ElMT->at(index) > value_mt) return false;
+		if(getMT(type, index) > value_mt) return false;
 	}
 	else{
 		cout << "ERROR in passesUpperMETMT! you're not calling it right..." << endl;
@@ -244,14 +244,42 @@ bool Fakerates::passesUpperMETMT(int type, int index){
 // MUON OBJECT FUNCTIONS
 bool Fakerates::isLooseMuon(int ind){
 	if(! MuIsLoose->at(ind)) return false;
-	if(fabs(MuD0->at(ind)) > 0.005  ) return false;
+	// leave this commented for synching!! if(fabs(MuD0->at(ind)) > 0.005  ) return false;
 	return true;
 }
 bool Fakerates::isTightMuon(int ind){
 	if(!isLooseMuon(ind))   return false; // every tight muon has to pass the loose point
 	if(!MuIsTight->at(ind)) return false;
-	if(MuPFIso->at(ind) > 0.05 ) return false;
+	// leave this commented for synching!! if(MuPFIso->at(ind) > 0.05 ) return false;
 	return true;
+}
+
+// MUON and ELECTRON
+float Fakerates::getMT(int type, int ind, int met){
+	float pt   = -1;
+	float dphi = -1.;
+	if(type == 0){
+		dphi = Util::DeltaPhi(getMETPhi(met), MuPhi->at(ind));
+		pt   = MuPt->at(ind);
+	}
+	else if(type ==1){
+		dphi = Util::DeltaPhi(getMETPhi(met), ElPhi->at(ind));
+		pt   = ElPt->at(ind);
+	}
+	else {
+		cout << "ERROR: you're calling mT incorrectly" << endl;
+		exit(0);
+	}
+
+	return TMath::Sqrt(2*getMET(met)*pt * (1.- TMath::Cos(dphi)) );
+}
+float Fakerates::getMET(int type=1){
+	if(type==0) return pfMET;
+	if(type==1) return pfMET1;
+}
+float Fakerates::getMETPhi(int type=1){
+	if(type==0) return pfMETPhi;
+	if(type==1) return pfMET1Phi;
 }
 
 
@@ -427,12 +455,13 @@ void Fakerates::fillIsoPlots(){
 			else{
 				h_muFLoose->Fill(MuPt->at(mu), fabs(MuEta->at(mu)), fEventweight);
 			}
+cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), getAwayJet(0,mu), getAwayJet(1,mu), getHT(), isTightMuon(mu), getMT(0, mu), getMET()) << endl;
 		}
 
-		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(pfMET       , fEventweight);
-		                       h_Loose_muMETnoMTCut->Fill(pfMET       , fEventweight);
-		if(passesMETCut())     h_Loose_muMT        ->Fill(MuMT->at(mu), fEventweight);
-		if(passesMETCut(20,1)) h_Loose_muMTMET30   ->Fill(MuMT->at(mu), fEventweight);
+		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(getMET()    , fEventweight);
+		                       h_Loose_muMETnoMTCut->Fill(getMET()    , fEventweight);
+		if(passesMETCut())     h_Loose_muMT        ->Fill(getMT(0, mu), fEventweight);
+		if(passesMETCut(20,1)) h_Loose_muMTMET30   ->Fill(getMT(0, mu), fEventweight);
 
 
 		// tight muons
@@ -466,10 +495,10 @@ void Fakerates::fillIsoPlots(){
 				}
 			}
 
-			if(passesMTCut(0, mu)) h_Tight_muMET        -> Fill(pfMET        , fEventweight);
-			                       h_Tight_muMETnoMTCut -> Fill(pfMET        , fEventweight);
-			if(passesMETCut())     h_Tight_muMT         -> Fill(MuMT-> at(mu), fEventweight);
-			if(passesMETCut(20,1)) h_Tight_muMTMET30    -> Fill(MuMT-> at(mu), fEventweight);
+			if(passesMTCut(0, mu)) h_Tight_muMET        -> Fill(getMET()    , fEventweight);
+			                       h_Tight_muMETnoMTCut -> Fill(getMET()    , fEventweight);
+			if(passesMETCut())     h_Tight_muMT         -> Fill(getMT(0, mu), fEventweight);
+			if(passesMETCut(20,1)) h_Tight_muMTMET30    -> Fill(getMT(0, mu), fEventweight);
 
 		}
 	}

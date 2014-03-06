@@ -89,6 +89,8 @@ public:
 	bool isLooseMuon(int);
 	bool isTightMuon(int);
 
+	float getMT(int, int, int =1);
+
 		// JETS
 	bool isGoodJet(int, float);
 	bool isGoodSynchJet(int, float);
@@ -97,6 +99,10 @@ public:
 
 	float getHT();
 	int getNJets(int);
+
+		// MET
+	float getMET(int);
+	float getMETPhi(int);
 
 	std::vector<float>::const_iterator fITFloat;
 	std::vector<bool >::const_iterator fITBool;
