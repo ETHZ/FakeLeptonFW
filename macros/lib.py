@@ -54,7 +54,7 @@ def makeLine(x1, y1, x2, y2):
 	line.SetLineStyle(7)
 	return line
 
-def setFRPlotStyle(hist, title, color, title_hist = ''):
+def setFRPlotStyle(hist, color, title = '', title_hist = ''):
 	if title_hist == '': title_hist = hist
 	hist.SetMarkerColor(color)
 	hist.SetMarkerSize(1.2)
@@ -69,7 +69,7 @@ def setRatioStyle(hist, titlehist=''):
 	if titlehist=='': titlehist = hist
 	hist.SetTitle('')
 	hist.GetYaxis().SetNdivisions(505)
-	hist.GetYaxis().SetTitle('Data/Pred.')
+	hist.GetYaxis().SetTitle('Data/MC')
 	hist.GetYaxis().SetTitleSize(0.09)
 	hist.GetYaxis().SetTitleOffset(0.35)
 	hist.GetYaxis().SetLabelSize(0.09)
