@@ -2,7 +2,7 @@
 
 ## HEADER
 
-import ROOT, commands, sys, copy
+import ROOT, commands, sys, copy, os
 import lib as helper
 import lib_FitScale as fit
 import lib_FakeRates as FR
@@ -26,18 +26,24 @@ class sample:
 	color  = helper.getSampleColor
 	scale  = 1.0
 
+	def GetName(self):
+		return self.name
+
 	def Rescale(self, newscale):
 		self.scale = newscale
 		for h in self.hists: h.Scale(newscale)
 	
 
 args = sys.argv
-directory = args[1]
+inputDir = args[1]
+outputDir = args[2]
 
-data   = sample('data'         , directory + 'data_ratios.root')
-wjets  = sample('wjets'        , directory + 'wjets_ratios.root')
-dyjets = sample('dyjets'       , directory + 'dyjets_ratios.root')
-qcd    = sample('qcdMuEnriched', directory + 'qcdMuEnriched_ratios.root')
+data   = sample('data'         , inputDir + 'data_ratios.root')
+wjets  = sample('wjets'        , inputDir + 'wjets_ratios.root')
+dyjets = sample('dyjets'       , inputDir + 'dyjets_ratios.root')
+qcd    = sample('qcdMuEnriched', inputDir + 'qcdMuEnriched_ratios.root')
+
+if not os.path.exists(outputDir): os.mkdir(outputDir)
 
 
 
@@ -76,6 +82,7 @@ plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR'
 #qcd.Rescale(scalefactors[0])
 #wjets.Rescale(scalefactors[1])
 #dyjets.Rescale(scalefactors[2])
+
 
 
 # Run Over All Samples to Produce Plots
@@ -126,20 +133,19 @@ for hist in data.hists:
 	hist_ratio = helper.setRatioStyle(hist_ratio, hist)
 	line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
-	helper.saveCanvas(canv, prepend + helper.getSaveName(hist) + postpend)
+	helper.saveCanvas(canv, outputDir, prepend + helper.getSaveName(hist) + postpend)
 
 
 
 # compute and plot FR for every variable
 
-FR.PlotFR(data, mc_samples, [qcd])
+FR.PlotFR(outputDir, data, mc_samples, [qcd])
 
 
 
 # compute and plot FR 2d Map (+ Projections)
 
-FR.Plot2dFRMap(data, mc_samples, [qcd], True)
-
+FR.Plot2dFRMap(outputDir, data, mc_samples, [qcd], True, [wjets, dyjets])
 
 
 

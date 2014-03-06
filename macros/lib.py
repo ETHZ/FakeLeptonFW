@@ -54,11 +54,14 @@ def makeLine(x1, y1, x2, y2):
 	line.SetLineStyle(7)
 	return line
 
-def setFRPlotStyle(hist, title, color):
+def setFRPlotStyle(hist, title, color, title_hist = ''):
+	if title_hist == '': title_hist = hist
 	hist.SetMarkerColor(color)
 	hist.SetMarkerSize(1.2)
 	hist.SetMarkerStyle(20)
+	hist.GetXaxis().SetTitle(getXTitle(title_hist))
 	hist.GetYaxis().SetRangeUser(0., 0.25)
+	hist.GetYaxis().SetTitle("FR")
 	hist.SetTitle(title)
 	return hist
 
@@ -104,8 +107,8 @@ def getSaveName(hist):
 	name = hist.GetName()
 	return name.split('_')[-1]
 
-def saveCanvas(canv, name):
-	canv.SaveAs(name + '.pdf')
-	canv.SaveAs(name + '.png')
+def saveCanvas(canv, outputDir, name):
+	canv.SaveAs(outputDir + name + '.pdf')
+	canv.SaveAs(outputDir + name + '.png')
 
 
