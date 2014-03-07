@@ -119,7 +119,7 @@ void Fakerates::loop(){
 	pFile->Close();
 }
 
-bool Fakerates::isFRRegionMuEvent(int &mu, int &jet){
+bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float btagcut = 0., float phicut = 0.){
 	/*
 	checks, whether the event contains exactly one muon and at least one away-jet in the calibration region
 	parameters: &mu (address of muon index)
@@ -133,7 +133,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet){
 	std::vector<int> awayjet_inds;
 
 
-	// Event fails HLT muon trigger (if data)
+	// Event fails HLT muon trigger (if data) then return false
 	if(fIsData && !HLT_MU17) return false;
 
 	// muon Pt is not reasonable then return false
@@ -162,7 +162,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet){
 
 	// count the number of away jets
 	for(int thisjet=0; thisjet < JetPt->size(); ++thisjet){
-		if(!isGoodJet(thisjet, 40.)) continue;
+		if(!isGoodJet(thisjet, 40., btagcut)) continue;
 		if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(mu), JetPhi->at(thisjet), MuPhi->at(mu)) < 1.0 ) continue;
 		nawayjets++;
 		awayjet_inds.push_back(thisjet);
@@ -178,10 +178,11 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet){
 		for(int thisjet=0; thisjet < nawayjets; ++thisjet)
 			if(JetPt->at(awayjet_inds[thisjet]) > JetPt->at(jet) ) jet = awayjet_inds[thisjet];
 
-
 	// upper cuts on MT and MET
 	//if(!passesUpperMETMT(0, loosemu_inds[0]) ) return false;
-	//float dphi =  Util::DeltaPhi(JetPhi->at(awayjet_inds[0]), MuPhi->at(loosemu_inds[0]));
+
+	// phi cut
+	if(phicut > 0. && Util::DeltaPhi(JetPhi->at(jet), MuPhi->at(mu))<phicut) return false;
 	
     return true;
 }
@@ -259,11 +260,11 @@ float Fakerates::getMT(int type, int ind, int met){
 	float pt   = -1;
 	float dphi = -1.;
 	if(type == 0){
-		dphi = Util::DeltaPhi(getMETPhi(met), MuPhi->at(ind));
+		dphi = Util::DeltaPhi(getMETPhi(0), MuPhi->at(ind));
 		pt   = MuPt->at(ind);
 	}
 	else if(type ==1){
-		dphi = Util::DeltaPhi(getMETPhi(met), ElPhi->at(ind));
+		dphi = Util::DeltaPhi(getMETPhi(0), ElPhi->at(ind));
 		pt   = ElPt->at(ind);
 	}
 	else {
@@ -271,19 +272,23 @@ float Fakerates::getMT(int type, int ind, int met){
 		exit(0);
 	}
 
-	return TMath::Sqrt(2*getMET(met)*pt * (1.- TMath::Cos(dphi)) );
+	return TMath::Sqrt(2*getMET(0)*pt * (1.- TMath::Cos(dphi)) );
 }
+
+
 float Fakerates::getMET(int type=1){
 	if(type==0) return pfMET;
 	if(type==1) return pfMET1;
 }
+
+
 float Fakerates::getMETPhi(int type=1){
 	if(type==0) return pfMETPhi;
 	if(type==1) return pfMET1Phi;
 }
 
 
-bool Fakerates::isGoodJet(int j, float pt = 0.){
+bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 	/*
 	checks, if the given jet passes certain cuts defining it as a "good" jet
 	parameters: j (jet index), pt (cut on pt)
@@ -294,6 +299,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0.){
 
 	// if pt too low, eta too large, jet beta star too large then return false
 	if(pt>0. && JetPt->at(j) < pt) return false;
+	if(btag>0. && JetCSVBTag->at(j) < btag) return false;
 	if(fabs(JetEta->at(j)) > 2.5) return false;
 	// if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
 
@@ -427,7 +433,7 @@ void Fakerates::fillFRPlots(){
 
 	// muons, first loose, then tight
 	int mu(-1), jet(-1);
-	if(isFRRegionMuEvent(mu, jet)){
+	if(isFRRegionMuEvent(mu, jet)){ //, 0.679, 2.0)){
 
 		if(passesUpperMETMT(0,mu)) {
  
@@ -458,8 +464,8 @@ void Fakerates::fillFRPlots(){
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), getAwayJet(0,mu), getAwayJet(1,mu), getHT(), isTightMuon(mu), getMT(0, mu), getMET()) << endl;
 		}
 
-		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(getMET()    , fEventweight);
-		                       h_Loose_muMETnoMTCut->Fill(getMET()    , fEventweight);
+		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(getMET(0)   , fEventweight);
+		                       h_Loose_muMETnoMTCut->Fill(getMET(0)   , fEventweight);
 		if(passesMETCut())     h_Loose_muMT        ->Fill(getMT(0, mu), fEventweight);
 		if(passesMETCut(20,1)) h_Loose_muMTMET30   ->Fill(getMT(0, mu), fEventweight);
 
@@ -495,8 +501,8 @@ void Fakerates::fillFRPlots(){
 				}
 			}
 
-			if(passesMTCut(0, mu)) h_Tight_muMET        -> Fill(getMET()    , fEventweight);
-			                       h_Tight_muMETnoMTCut -> Fill(getMET()    , fEventweight);
+			if(passesMTCut(0, mu)) h_Tight_muMET        -> Fill(getMET(0)   , fEventweight);
+			                       h_Tight_muMETnoMTCut -> Fill(getMET(0)   , fEventweight);
 			if(passesMETCut())     h_Tight_muMT         -> Fill(getMT(0, mu), fEventweight);
 			if(passesMETCut(20,1)) h_Tight_muMTMET30    -> Fill(getMT(0, mu), fEventweight);
 

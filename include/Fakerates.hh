@@ -80,7 +80,7 @@ public:
 	bool passesMETCut(float, int);
 	bool passesMTCut(int, int);
 
-	bool isFRRegionMuEvent(int&, int&);
+	bool isFRRegionMuEvent(int&, int&, float, float);
 	bool isFRRegionElEvent(int&);
 
 
@@ -92,7 +92,7 @@ public:
 	float getMT(int, int, int =1);
 
 		// JETS
-	bool isGoodJet(int, float);
+	bool isGoodJet(int, float, float);
 	bool isGoodSynchJet(int, float);
 	float getAwayJet(int, int);
 	float getClosestJet(int, int);

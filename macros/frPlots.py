@@ -59,7 +59,7 @@ pad_plot = helper.makePad('plot')
 pad_ratio = helper.makePad('ratio')
 pad_plot.cd()
 
-leg = helper.makeLegend(0.7, 0.65, 0.85, 0.85)
+leg = helper.makeLegend(0.7, 0.6, 0.85, 0.85)
 leg.AddEntry(data  .hists[0], 'Data'    , 'pe')
 leg.AddEntry(wjets .hists[0], 'W+Jets'  , 'f' )
 leg.AddEntry(dyjets.hists[0], 'DY+Jets' , 'f' )

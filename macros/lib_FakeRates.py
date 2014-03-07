@@ -24,7 +24,7 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 	for i in range(1,len(hists)):
 		hists[i][0].Draw("p e1 same")
 
-	leg1 = helper.makeLegend(0.6, 0.7, 0.85, 0.85)
+	leg1 = helper.makeLegend(0.6, 0.6, 0.85, 0.85)
 	for i in range(len(hists)):
 		leg1.AddEntry(hists[i][0], helper.getLegendName(hists[i][1]), 'pe')
 	leg1.Draw()
@@ -67,7 +67,7 @@ def make2dFRPlot(canv, outputDir, dataset, hist, name=""):
 	hist.SetMinimum(0.0)
 	hist.SetMaximum(0.25)
 	hist.SetTitle("FR 2d Map (" + name + ")")
-	helper.saveCanvas(canv, outputDir, "muFR_2dmap_" + name)
+	helper.saveCanvas(canv, outputDir, "muFR_2dmap_" + name.lower())
 
 
 

@@ -1,1 +1,1 @@
-python frPlots.py /shome/mdunser/framework/fakeHistos_newBinning/ unweighted/
+python frPlots.py ../fakeHistos/ unweighted/
