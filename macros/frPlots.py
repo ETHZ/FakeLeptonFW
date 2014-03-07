@@ -139,13 +139,13 @@ for hist in data.hists:
 
 # compute and plot FR for every variable
 
-FR.PlotFR(outputDir, data, mc_samples, [qcd])
+FR.PlotFR(outputDir, data, mc_samples, [qcd], [wjets, dyjets])
 
 
 
 # compute and plot FR 2d Map (+ Projections)
 
-FR.Plot2dFRMap(outputDir, data, mc_samples, [qcd], True, [wjets, dyjets])
+FR.Plot2dFRMap(outputDir, data, mc_samples, [qcd], [wjets, dyjets], True)
 
 
 

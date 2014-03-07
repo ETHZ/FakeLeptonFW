@@ -7,9 +7,18 @@ def getColor(name):
 	elif name == 'qcdMuEnriched' : return mycolor.GetColor(51, 102, 153)
 	elif name == 'totbg'         : return mycolor.GetColor(102, 0, 0)
 	elif name == 'data'          : return ROOT.kBlack
+	elif name == 'datamcsub'     : return ROOT.kYellow
 
 def getSampleColor(self):
 	return getColor(self.name)
+
+def getLegendName(name):
+	if   name == 'wjets'         : return 'W + Jets'
+	elif name == 'dyjets'        : return 'DY + Jets'
+	elif name == 'qcdMuEnriched' : return 'QCD'
+	elif name == 'totbg'         : return 'QCD + EW'
+	elif name == 'data'          : return 'Data'
+	elif name == 'datamcsub'     : return 'Data - EW'
 
 def makeLegend(x1,y1,x2,y2):
 	leg = ROOT.TLegend(x1,y1,x2,y2)
@@ -17,7 +26,7 @@ def makeLegend(x1,y1,x2,y2):
 	leg.SetTextFont(42)
 	leg.SetBorderSize(0)
 	leg.SetMargin(0.35)
-	leg.SetTextSize(0.04)
+	leg.SetTextSize(0.05)
 	return leg
 
 def makeCanvas(x, y):
