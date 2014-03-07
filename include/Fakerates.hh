@@ -74,14 +74,14 @@ public:
 	void loop();
 
 	//void fillRatios();
-	void fillIsoPlots();
+	void fillFRPlots();
 
 	bool passesUpperMETMT(int, int);
 	bool passesMETCut(float, int);
 	bool passesMTCut(int, int);
 
-	bool isCalibrationRegionMuEvent(int&, int&);
-	bool isCalibrationRegionElEvent(int&);
+	bool isFRRegionMuEvent(int&, int&);
+	bool isFRRegionElEvent(int&);
 
 
 	// OBJECT FUNCTIONS

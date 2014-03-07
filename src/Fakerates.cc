@@ -103,7 +103,7 @@ void Fakerates::loop(){
 		tree_->GetEntry(jentry);
 		ntot++;
 
-		fillIsoPlots();
+		fillFRPlots();
 
 	}
 
@@ -119,7 +119,7 @@ void Fakerates::loop(){
 	pFile->Close();
 }
 
-bool Fakerates::isCalibrationRegionMuEvent(int &mu, int &jet){
+bool Fakerates::isFRRegionMuEvent(int &mu, int &jet){
 	/*
 	checks, whether the event contains exactly one muon and at least one away-jet in the calibration region
 	parameters: &mu (address of muon index)
@@ -141,7 +141,7 @@ bool Fakerates::isCalibrationRegionMuEvent(int &mu, int &jet){
 
 	// count numbers of loose and veto muons in the event
 	for(int i=0; i < MuPt->size(); ++i){
-		//if(MuPt->at(i) < 20.) continue;
+		if(MuPt->at(i) < 20.) continue;
 		if(isLooseMuon(i)){
 			nloose++;
 			mu = i;
@@ -412,12 +412,12 @@ int Fakerates::getNJets(int btag = 0){
 }
 
 
-bool Fakerates::isCalibrationRegionElEvent(int &el){
+bool Fakerates::isFRRegionElEvent(int &el){
 	return false;	
 }
 
 
-void Fakerates::fillIsoPlots(){
+void Fakerates::fillFRPlots(){
 	/* 
 	create plos for muons and electrons
 	parameters: none
@@ -427,7 +427,7 @@ void Fakerates::fillIsoPlots(){
 
 	// muons, first loose, then tight
 	int mu(-1), jet(-1);
-	if(isCalibrationRegionMuEvent(mu, jet)){
+	if(isFRRegionMuEvent(mu, jet)){
 
 		if(passesUpperMETMT(0,mu)) {
  
@@ -507,7 +507,7 @@ void Fakerates::fillIsoPlots(){
 
     // electrons
 	//int el(-1);
-	//if(isCalibrationRegionElEvent(el)) {
+	//if(isFRRegionElEvent(el)) {
 	//	h_elIsoPlot->Fill(ElPFIso->at(el), fEventweight);
 	//}
 }
