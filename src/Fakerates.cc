@@ -455,7 +455,7 @@ void Fakerates::fillIsoPlots(){
 			else{
 				h_muFLoose->Fill(MuPt->at(mu), fabs(MuEta->at(mu)), fEventweight);
 			}
-cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), getAwayJet(0,mu), getAwayJet(1,mu), getHT(), isTightMuon(mu), getMT(0, mu), getMET()) << endl;
+// cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), getAwayJet(0,mu), getAwayJet(1,mu), getHT(), isTightMuon(mu), getMT(0, mu), getMET()) << endl;
 		}
 
 		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(getMET()    , fEventweight);
@@ -554,21 +554,21 @@ void Fakerates::bookHistos(){
  	h_Loose_muLepIso     = new TH1F("h_Loose_muLepIso"     , "Loose_muLepIso"    , 20 ,   0 , 1  ); h_Loose_muLepIso     -> Sumw2();
 	h_Loose_muD0         = new TH1F("h_Loose_muD0"         , "Loose_muD0"        , 20 ,   0., 0.2); h_Loose_muD0         -> Sumw2();
 
-	h_Loose_muHT         = new TH1F("h_Loose_muHT"         , "Loose_muHT"        , 10 ,  50 , 500); h_Loose_muHT         -> Sumw2();
-	h_Loose_muMET        = new TH1F("h_Loose_muMET"        , "Loose_muMET"       , 20 ,  0  , 100); h_Loose_muMET        -> Sumw2();
-	h_Loose_muMETnoMTCut = new TH1F("h_Loose_muMETnoMTCut" , "Loose_muMETnoMTCut", 20 ,  0  , 100); h_Loose_muMETnoMTCut -> Sumw2();
+	h_Loose_muHT         = new TH1F("h_Loose_muHT"         , "Loose_muHT"        , 10 ,  0  , 400); h_Loose_muHT         -> Sumw2();
+	h_Loose_muMET        = new TH1F("h_Loose_muMET"        , "Loose_muMET"       , 10 ,  0  , 100); h_Loose_muMET        -> Sumw2();
+	h_Loose_muMETnoMTCut = new TH1F("h_Loose_muMETnoMTCut" , "Loose_muMETnoMTCut", 10 ,  0  , 100); h_Loose_muMETnoMTCut -> Sumw2();
 	h_Loose_muMT         = new TH1F("h_Loose_muMT"         , "Loose_muMT"        , 10 ,  0  , 100); h_Loose_muMT         -> Sumw2();
 	h_Loose_muMTMET30    = new TH1F("h_Loose_muMTMET30"    , "Loose_muMTMET30"   , 20 ,  0  , 200); h_Loose_muMTMET30    -> Sumw2();
 
-	h_Loose_muMaxJPt     = new TH1F("h_Loose_muMaxJPt"     , "Loose_muMaxJPt"    , 13 ,  20 , 150); h_Loose_muMaxJPt     -> Sumw2();
+	h_Loose_muMaxJPt     = new TH1F("h_Loose_muMaxJPt"     , "Loose_muMaxJPt"    , 10 ,  20 , 120); h_Loose_muMaxJPt     -> Sumw2();
 	h_Loose_muNBJets     = new TH1F("h_Loose_muNBJets"     , "Loose_muNBJets"    , 3  ,  0  , 3  ); h_Loose_muNBJets     -> Sumw2();
 	h_Loose_muNJets      = new TH1F("h_Loose_muNJets"      , "Loose_muNJets"     , 5  ,  1  , 6  ); h_Loose_muNJets      -> Sumw2();
 	h_Loose_muNVertices  = new TH1F("h_Loose_muNVertices"  , "Loose_muNVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Loose_muNVertices  -> Sumw2();
 
-	h_Loose_muAwayJetDR  = new TH1F("h_Loose_muAwayJetDR"  , "Loose_muAwayJetDR" , 30 ,  0  , 6  ); h_Loose_muAwayJetDR  -> Sumw2();
-	h_Loose_muAwayJetPt  = new TH1F("h_Loose_muAwayJetPt"  , "Loose_muAwayJetPt" , 13 ,  20 , 150); h_Loose_muAwayJetPt  -> Sumw2();
-	h_Loose_muClosJetDR  = new TH1F("h_Loose_muClosJetDR"  , "Loose_muClosJetDR" , 30 ,  0  , 6  ); h_Loose_muClosJetDR  -> Sumw2();
-	h_Loose_muClosJetPt  = new TH1F("h_Loose_muClosJetPt"  , "Loose_muClosJetPt" , 13 ,  20 , 150); h_Loose_muClosJetPt  -> Sumw2();
+	h_Loose_muAwayJetDR  = new TH1F("h_Loose_muAwayJetDR"  , "Loose_muAwayJetDR" , 15 ,  0  , 6  ); h_Loose_muAwayJetDR  -> Sumw2();
+	h_Loose_muAwayJetPt  = new TH1F("h_Loose_muAwayJetPt"  , "Loose_muAwayJetPt" , 10 ,  20 , 120); h_Loose_muAwayJetPt  -> Sumw2();
+	h_Loose_muClosJetDR  = new TH1F("h_Loose_muClosJetDR"  , "Loose_muClosJetDR" , 15 ,  0  , 1  ); h_Loose_muClosJetDR  -> Sumw2();
+	h_Loose_muClosJetPt  = new TH1F("h_Loose_muClosJetPt"  , "Loose_muClosJetPt" , 10 ,  20 , 120); h_Loose_muClosJetPt  -> Sumw2();
 
 
 	h_Tight_muLepPt      = new TH1F("h_Tight_muLepPt"      , "Tight_muLepPt"     , 20 ,  10., 70.); h_Tight_muLepPt      -> Sumw2();
@@ -576,21 +576,21 @@ void Fakerates::bookHistos(){
 	h_Tight_muLepIso     = new TH1F("h_Tight_muLepIso"     , "Tight_muLepIso"    , 20 ,   0 , 1  ); h_Tight_muLepIso     -> Sumw2();
  	h_Tight_muD0         = new TH1F("h_Tight_muD0"         , "Tight_muD0"        , 20 ,   0., 0.2); h_Tight_muD0         -> Sumw2();
                                                                                                  
-	h_Tight_muHT         = new TH1F("h_Tight_muHT"         , "Tight_muHT"        , 10 ,  50 , 500); h_Tight_muHT         -> Sumw2();
-	h_Tight_muMET        = new TH1F("h_Tight_muMET"        , "Tight_muMET"       , 20 ,  0  , 100); h_Tight_muMET        -> Sumw2();
-	h_Tight_muMETnoMTCut = new TH1F("h_Tight_muMETnoMTCut" , "Tight_muMETnoMTCut", 20 ,  0  , 100); h_Tight_muMETnoMTCut -> Sumw2();
+	h_Tight_muHT         = new TH1F("h_Tight_muHT"         , "Tight_muHT"        , 10 ,  0  , 400); h_Tight_muHT         -> Sumw2();
+	h_Tight_muMET        = new TH1F("h_Tight_muMET"        , "Tight_muMET"       , 10 ,  0  , 100); h_Tight_muMET        -> Sumw2();
+	h_Tight_muMETnoMTCut = new TH1F("h_Tight_muMETnoMTCut" , "Tight_muMETnoMTCut", 10 ,  0  , 100); h_Tight_muMETnoMTCut -> Sumw2();
 	h_Tight_muMT         = new TH1F("h_Tight_muMT"         , "Tight_muMT"        , 10 ,  0  , 100); h_Tight_muMT         -> Sumw2();
 	h_Tight_muMTMET30    = new TH1F("h_Tight_muMTMET30"    , "Tight_muMTMET30"   , 20 ,  0  , 200); h_Tight_muMTMET30    -> Sumw2();
                                                                                                  
-	h_Tight_muMaxJPt     = new TH1F("h_Tight_muMaxJPt"     , "Tight_muMaxJPt"    , 13 ,  20 , 150); h_Tight_muMaxJPt     -> Sumw2();
+	h_Tight_muMaxJPt     = new TH1F("h_Tight_muMaxJPt"     , "Tight_muMaxJPt"    , 10 ,  20 , 120); h_Tight_muMaxJPt     -> Sumw2();
 	h_Tight_muNBJets     = new TH1F("h_Tight_muNBJets"     , "Tight_muNBJets"    , 3  ,  0  , 3  ); h_Tight_muNBJets     -> Sumw2();
 	h_Tight_muNJets      = new TH1F("h_Tight_muNJets"      , "Tight_muNJets"     , 5  ,  1  , 6  ); h_Tight_muNJets      -> Sumw2();
 	h_Tight_muNVertices  = new TH1F("h_Tight_muNVertices"  , "Tight_muNVertices" ,nvrtx_nbins-1, &nvrtx_bins[0]); h_Tight_muNVertices  -> Sumw2();
                                                                                                  
-	h_Tight_muAwayJetDR  = new TH1F("h_Tight_muAwayJetDR"  , "Tight_muAwayJetDR" , 30 ,  0  , 6  ); h_Tight_muAwayJetDR  -> Sumw2();
-	h_Tight_muAwayJetPt  = new TH1F("h_Tight_muAwayJetPt"  , "Tight_muAwayJetPt" , 13 ,  20 , 150); h_Tight_muAwayJetPt  -> Sumw2();
-	h_Tight_muClosJetDR  = new TH1F("h_Tight_muClosJetDR"  , "Tight_muClosJetDR" , 30 ,  0  , 6  ); h_Tight_muClosJetDR  -> Sumw2();
-	h_Tight_muClosJetPt  = new TH1F("h_Tight_muClosJetPt"  , "Tight_muClosJetPt" , 13 ,  20 , 150); h_Tight_muClosJetPt  -> Sumw2();
+	h_Tight_muAwayJetDR  = new TH1F("h_Tight_muAwayJetDR"  , "Tight_muAwayJetDR" , 15 ,  0  , 6  ); h_Tight_muAwayJetDR  -> Sumw2();
+	h_Tight_muAwayJetPt  = new TH1F("h_Tight_muAwayJetPt"  , "Tight_muAwayJetPt" , 10 ,  20 , 120); h_Tight_muAwayJetPt  -> Sumw2();
+	h_Tight_muClosJetDR  = new TH1F("h_Tight_muClosJetDR"  , "Tight_muClosJetDR" , 15 ,  0  , 1  ); h_Tight_muClosJetDR  -> Sumw2();
+	h_Tight_muClosJetPt  = new TH1F("h_Tight_muClosJetPt"  , "Tight_muClosJetPt" , 10 ,  20 , 120); h_Tight_muClosJetPt  -> Sumw2();
 
 
 }
