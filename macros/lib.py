@@ -1,4 +1,4 @@
-import ROOT
+import ROOT, math
 
 def getColor(name):
 	mycolor = ROOT.TColor()
@@ -8,6 +8,10 @@ def getColor(name):
 	elif name == 'totbg'         : return mycolor.GetColor(102, 0, 0)
 	elif name == 'data'          : return ROOT.kBlack
 	elif name == 'datamcsub'     : return ROOT.kYellow
+	elif name == 'data30'        : return ROOT.kBlack
+	elif name == 'data40'        : return ROOT.kRed
+	elif name == 'data50'        : return ROOT.kBlue
+	elif name == 'data60'        : return ROOT.kGreen
 
 def getSampleColor(self):
 	return getColor(self.name)
@@ -19,6 +23,10 @@ def getLegendName(name):
 	elif name == 'totbg'         : return 'QCD + EW'
 	elif name == 'data'          : return 'Data'
 	elif name == 'datamcsub'     : return 'Data - EW'
+	elif name == 'data30'        : return 'Data (30GeV)'
+	elif name == 'data40'        : return 'Data (40GeV)'
+	elif name == 'data50'        : return 'Data (50GeV)'
+	elif name == 'data60'        : return 'Data (60GeV)'
 
 def makeLegend(x1,y1,x2,y2):
 	leg = ROOT.TLegend(x1,y1,x2,y2)
@@ -119,5 +127,32 @@ def getSaveName(hist):
 def saveCanvas(canv, outputDir, name):
 	canv.SaveAs(outputDir + name + '.pdf')
 	canv.SaveAs(outputDir + name + '.png')
+
+
+def PrintScale(canv, outputDir, datasets):
+
+	hists = [ROOT.TH1F("h" + str(i), "H" + str(i), len(datasets), 0, len(datasets)) for i in range(len(datasets))]
+	
+	for i, set in enumerate(datasets): 
+		hists[i].SetBinContent(i+1, set.GetScale())
+		hists[i].SetFillColor(getColor(set.GetName()))
+	
+	hists[0].Draw("hist text")
+	for i in range(1,len(hists)): hists[i].Draw("hist text same")
+	
+	hists[0].SetMaximum(math.ceil(max([set.GetScale() for set in datasets])))
+	hists[0].GetYaxis().SetTitle('Scale Factor')
+	
+	y = ROOT.gPad.GetUymin() + 0.15*hists[0].GetXaxis().GetBinWidth(1)
+	t = ROOT.TText()
+	t.SetTextAngle(90)
+	t.SetTextSize(0.08)
+	t.SetTextAlign(13)
+	t.SetTextColor(ROOT.kWhite)
+	for i in range(len(hists)): 
+		x = hists[0].GetXaxis().GetBinCenter(i+1) - 0.1
+		t.DrawText(x, y, getLegendName(datasets[i].GetName()))
+	
+	saveCanvas(canv, outputDir, 'scales')
 
 

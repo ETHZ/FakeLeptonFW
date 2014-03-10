@@ -29,6 +29,9 @@ class sample:
 	def GetName(self):
 		return self.name
 
+	def GetScale(self):
+		return self.scale
+
 	def Rescale(self, newscale):
 		self.scale = newscale
 		for h in self.hists: h.Scale(newscale)
@@ -37,6 +40,7 @@ class sample:
 args = sys.argv
 inputDir = args[1]
 outputDir = args[2]
+scaling = args[3]
 
 data   = sample('data'         , inputDir + 'data_ratios.root')
 wjets  = sample('wjets'        , inputDir + 'wjets_ratios.root')
@@ -55,9 +59,6 @@ mc_samples.append(wjets )
 mc_samples.append(dyjets)
 
 canv = helper.makeCanvas(900, 675)
-pad_plot = helper.makePad('plot')
-pad_ratio = helper.makePad('ratio')
-pad_plot.cd()
 
 leg = helper.makeLegend(0.7, 0.6, 0.85, 0.85)
 leg.AddEntry(data  .hists[0], 'Data'    , 'pe')
@@ -75,34 +76,39 @@ plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR'
 
 # SET SCALING
 
-#qcd.Rescale(fit.getMCScaleFactor(qcd, 'h_Loose_muLepIso', [data], [], 0.2))
-#wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_muMTMET30', [data], [qcd, dyjets], 60, 90))
+if 'qcd' in scaling:
+	qcd.Rescale(fit.getMCScaleFactor(qcd, 'h_Loose_muLepIso', [data], [], 0.2))
 
-#scalefactors = fit.doSimScaling(data.hists[37], qcd.hists[37], wjets.hists[37], dyjets.hists[37])
-#qcd.Rescale(scalefactors[0])
-#wjets.Rescale(scalefactors[1])
-#dyjets.Rescale(scalefactors[2])
+if 'wjets' in scaling:
+	wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_muMTMET30', [data], [qcd, dyjets], 60, 90))
+
+if 'fit' in scaling:
+	scalefactors = fit.doSimScaling(data.hists[37], qcd.hists[37], wjets.hists[37], dyjets.hists[37])
+	qcd.Rescale(scalefactors[0])
+	wjets.Rescale(scalefactors[1])
+	dyjets.Rescale(scalefactors[2])
+
+
+helper.PrintScale(canv, outputDir, [qcd,wjets,dyjets])
+
+print "scale factors after " + scaling + " scaling:"
+print "qcd scale: " + str(qcd.GetScale())
+print "wjets scale: " + str(wjets.GetScale())
+print "dyjets scale: " + str(dyjets.GetScale())
 
 
 
 # Run Over All Samples to Produce Plots
+
+pad_plot = helper.makePad('plot')
+pad_ratio = helper.makePad('ratio')
+pad_plot.cd()
 
 for hist in data.hists:
 
 	i = data.hists.index(hist)
 	pad_plot.cd()
 
-	#if hist.GetName() == 'h_muFTight':
-	#	FR_data = hist
-	#	FR_bg_ns = ROOT.THStack()
-	#	for mc in mc_samples:
-	#		FR_bg_ns.Add(mc.hists[i])
-
-	#if hist.GetName() == 'h_muFLoose':
-	#	FR_data_den = hist
-	#	FR_bg_ds = ROOT.THStack()
-	#	for mc in mc_samples:
-	#		FR_bg_ds.Add(mc.hists[i])
 
 	# Plot Histogram	
 	if not hist.GetName() in plotHists: continue
@@ -149,153 +155,55 @@ FR.Plot2dFRMap(outputDir, data, mc_samples, [qcd], [wjets, dyjets], True)
 
 
 
+# hard-coded to produce FR vs LepEta plot for different jet cuts
+
+canv = helper.makeCanvas(900, 675)
+pad_plot = helper.makePad('plot')
+pad_ratio = helper.makePad('ratio')
 
 
-# Computing FakeRate
+for hist in data.hists:
 
-#setMin = 0.0
-#setMax = 0.25
-
-#FR_data_2d  = FR_data
-#FR_data_2d.Divide(FR_data_den)
-
-#FR_data_pt  = FR_data.ProjectionX('FR_data_pt')
-#FR_data_pt.Divide(FR_data_den.ProjectionX('FR_data_den_pt'))
-#
-#FR_data_eta = FR_data.ProjectionY('FR_data_eta')
-#FR_data_eta.Divide(FR_data_den.ProjectionY('FR_data_den_eta'))
-
-#FR_qcd_2d   = FR_qcd
-#FR_qcd_2d.Divide(FR_qcd_den)
-
-#FR_qcd_pt   = FR_qcd.ProjectionX('FR_qcd_pt')
-#FR_qcd_pt.Divide(FR_qcd_den.ProjectionX('FR_qcd_den_pt'))
-#
-#FR_qcd_eta  = FR_qcd.ProjectionY('FR_qcd_eta')
-#FR_qcd_eta.Divide(FR_qcd_den.ProjectionY('FR_qcd_den_eta'))
-
-#FR_bg       = FR_bg_ns.GetStack().Last()
-#FR_bg_den   = FR_bg_ds.GetStack().Last()
-
-#FR_bg_2d    = FR_bg
-#FR_bg_2d.Divide(FR_bg_den)
-
-#FR_bg_pt    = FR_bg.ProjectionX('FR_bg_pt')
-#FR_bg_pt.Divide(FR_bg_den.ProjectionX('FR_bg_den_pt'))
-#
-#FR_bg_eta   = FR_bg.ProjectionY('FR_bg_eta')
-#FR_bg_eta.Divide(FR_bg_den.ProjectionY('FR_bg_den_eta'))
+	i = data.hists.index(hist)
+			
+	# Get Numerator Plots
+	if hist.GetName() == 'h_Tight_muLepEta_30':
+		histindex = i
+		data_numerator_30 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Tight_muLepEta_40':
+		data_numerator_40 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Tight_muLepEta_50':
+		data_numerator_50 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Tight_muLepEta_60':
+		data_numerator_60 = copy.deepcopy(hist)
+			
+	# Get Denominator Plots
+	if hist.GetName() == 'h_Loose_muLepEta_30':
+		data_denominator_30 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Loose_muLepEta_40':
+		data_denominator_40 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Loose_muLepEta_50':
+		data_denominator_50 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Loose_muLepEta_60':
+		data_denominator_60 = copy.deepcopy(hist)
 
 
-
-# Plotting FR vs Pt
-
-#pad_plot.cd()
-#
-#FR_data_pt.SetMarkerSize(1.2)
-#FR_data_pt.SetMarkerStyle(20)
-#FR_data_pt.SetMarkerColor(getColor(data))
-#
-#FR_bg_pt.SetMarkerSize(1.2)
-#FR_bg_pt.SetMarkerStyle(20)
-#FR_bg_pt.SetMarkerColor(getColor(wjets))
-#
-#FR_qcd_pt.SetMarkerSize(1.2)
-#FR_qcd_pt.SetMarkerStyle(20)
-#FR_qcd_pt.SetMarkerColor(getColor(qcd))
-#
-#FR_data_pt.Draw("p e1")
-#FR_bg_pt.Draw("p e1 same")
-#FR_qcd_pt.Draw("p e1 same")
-#
-#FR_data_pt.SetMinimum(setMin)
-#FR_data_pt.SetMaximum(setMax)
-#FR_data_pt.GetXaxis().SetTitle(helper.getXTitle(data.hists[12]))
-#FR_data_pt.GetYaxis().SetTitle('FR')
-#FR_data_pt.SetTitle('muFakeRatio_pt')
-#
-#l_pt = helper.makeLegend(0.15, 0.65, 0.35, 0.85)
-#l_pt.AddEntry(FR_data_pt, 'Data'    , 'pe')
-#l_pt.AddEntry(FR_bg_pt,   'QCD + EW', 'pe')
-#l_pt.AddEntry(FR_qcd_pt,  'QCD'     , 'pe')
-#l_pt.Draw()
-#
-#pad_ratio.cd()
-#data_bg_ratio = FR_data_pt.Clone()
-#data_bg_ratio.Divide(FR_bg_pt)
-#data_bg_ratio.Draw("p e1")
-#data_bg_ratio = helper.setRatioStyle(data_bg_ratio, data.hists[12])
-#line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
-#line.Draw()
-#
-##helper.saveCanvas(canv, "muFakeRatio_pt")
-#
-#
-#
-## Plotting FR vs Eta
-#
-#pad_plot.cd()
-#
-#FR_data_eta.SetMarkerSize(1.2)
-#FR_data_eta.SetMarkerStyle(20)
-#FR_data_eta.SetMarkerColor(getColor(data))
-#
-#FR_bg_eta.SetMarkerSize(1.2)
-#FR_bg_eta.SetMarkerStyle(20)
-#FR_bg_eta.SetMarkerColor(getColor(wjets))
-#
-#FR_qcd_eta.SetMarkerSize(1.2)
-#FR_qcd_eta.SetMarkerStyle(20)
-#FR_qcd_eta.SetMarkerColor(getColor(qcd))
-#
-#FR_data_eta.Draw("p e1")
-#FR_bg_eta.Draw("p e1 same")
-#FR_qcd_eta.Draw("p e1 same")
-#
-#FR_data_eta.SetMinimum(setMin)
-#FR_data_eta.SetMaximum(setMax)
-#FR_data_eta.GetXaxis().SetTitle(helper.getXTitle(data.hists[13]))
-#FR_data_eta.GetYaxis().SetTitle('FR')
-#FR_data_eta.SetTitle('muFakeRatio_eta')
-#
-#l_eta = helper.makeLegend(0.15, 0.65, 0.35, 0.85)
-#l_eta.AddEntry(FR_data_eta, 'Data'    , 'pe')
-#l_eta.AddEntry(FR_bg_eta,   'QCD + EW', 'pe')
-#l_eta.AddEntry(FR_qcd_eta,  'QCD'     , 'pe')
-#l_eta.Draw()
-#
-#pad_ratio.cd()
-#data_bg_ratio = FR_data_eta.Clone()
-#data_bg_ratio.Divide(FR_bg_eta)
-#data_bg_ratio.Draw("p e1")
-#data_bg_ratio = helper.setRatioStyle(data_bg_ratio, data.hists[13])
-#line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
-#line.Draw()
-#
-##helper.saveCanvas(canv, "muFakeRatio_eta")
-#
+# Compute FR
+data_numerator_30.Divide(data_denominator_30)
+data_numerator_40.Divide(data_denominator_40)
+data_numerator_50.Divide(data_denominator_50)
+data_numerator_60.Divide(data_denominator_60)
 
 
-# Plotting 2D FR map
+# this part needs adjustment
+histstoplot = []
+histstoplot.append([data_numerator_30, 'data30'])
+histstoplot.append([data_numerator_40, 'data40'])
+histstoplot.append([data_numerator_50, 'data50'])
+histstoplot.append([data_numerator_60, 'data60'])
 
-#canv = helper.makeCanvas(900, 675)
-#canv.SetRightMargin(0.1)
-#
-#FR_data_2d.Draw("text colz e")
-#FR_data_2d.GetXaxis().SetTitle(helper.getXTitle(data.hists[12]))
-#FR_data_2d.GetYaxis().SetTitle(helper.getXTitle(data.hists[13]))
-#FR_data_2d.SetMinimum(setMin)
-#FR_data_2d.SetMaximum(setMax)
-#FR_data_2d.SetTitle('muFakeRatio_data')
-#helper.saveCanvas(canv, "muFakeRatio_data")
-#
-#FR_bg_2d.Draw("text colz e")
-#FR_bg_2d.GetXaxis().SetTitle(helper.getXTitle(data.hists[12]))
-#FR_bg_2d.GetYaxis().SetTitle(helper.getXTitle(data.hists[13]))
-#FR_bg_2d.SetMinimum(setMin)
-#FR_bg_2d.SetMaximum(setMax)
-#FR_bg_2d.SetTitle('muFakeRatio_bg')
-#helper.saveCanvas(canv, "muFakeRatio_bg")
+FR.make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex], "muFR_LepEta_compare")
+
 
 
 

@@ -30,21 +30,6 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 	leg1.Draw()
 
 
-
-	#mc_hist = helper.setFRPlotStyle(mc_hist, helper.getColor('totbg'))
-	#for mc in mcplot_hists: mc = helper.setFRPlotStyle(mc, helper.getColor('qcdMuEnriched'))
-	#data_hist = helper.setFRPlotStyle(data_hist, helper.getColor('data'), 'FR as function of ' + helper.getXTitle(title_hist), title_hist)
-
-	#data_hist.Draw("p e1")
-	#mc_hist.Draw("p e1 same")
-	#for mc in mcplot_hists: mc.Draw("p e1 same")
-
-	#leg1 = helper.makeLegend(0.6, 0.7, 0.85, 0.85)
-	#leg1.AddEntry(data_hist, 'Data - EW', 'pe')
-	#leg1.AddEntry(mc_hist, 'QCD + EW', 'pe')
-	#for mc in mcplot_hists: leg1.AddEntry(mc, 'QCD', 'pe')
-	#leg1.Draw()
-
 	# create RATIO PLOT
 
 	pad_ratio.cd()
