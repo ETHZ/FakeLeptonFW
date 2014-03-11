@@ -21,6 +21,7 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 			hists[i][0] = helper.setFRPlotStyle(hists[i][0], helper.getColor(hists[i][1]), 'FR as function of ' + helper.getXTitle(title_hist), title_hist)
 
 	hists[0][0].Draw("p e1")
+	hists[0][0].SetMaximum(1.5*hists[0][0].GetMaximum())
 	for i in range(1,len(hists)):
 		hists[i][0].Draw("p e1 same")
 

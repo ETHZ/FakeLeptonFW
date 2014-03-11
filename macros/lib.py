@@ -142,6 +142,8 @@ def PrintScale(canv, outputDir, datasets):
 	
 	hists[0].SetMaximum(math.ceil(max([set.GetScale() for set in datasets])))
 	hists[0].GetYaxis().SetTitle('Scale Factor')
+	hists[0].GetXaxis().SetLabelSize(0)
+	hists[0].SetTitle('Scale Factors')
 	
 	y = ROOT.gPad.GetUymin() + 0.15*hists[0].GetXaxis().GetBinWidth(1)
 	t = ROOT.TText()

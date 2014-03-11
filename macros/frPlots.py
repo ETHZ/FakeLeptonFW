@@ -91,11 +91,6 @@ if 'fit' in scaling:
 
 helper.PrintScale(canv, outputDir, [qcd,wjets,dyjets])
 
-print "scale factors after " + scaling + " scaling:"
-print "qcd scale: " + str(qcd.GetScale())
-print "wjets scale: " + str(wjets.GetScale())
-print "dyjets scale: " + str(dyjets.GetScale())
-
 
 
 # Run Over All Samples to Produce Plots
