@@ -80,7 +80,7 @@ public:
 	bool passesMETCut(float, int);
 	bool passesMTCut(int, int);
 
-	bool isFRRegionMuEvent(int&, int&, float, float);
+	bool isFRRegionMuEvent(int&, int&, float, float, float);
 	bool isFRRegionElEvent(int&);
 
 
@@ -133,6 +133,10 @@ public:
 	TH1F * h_Loose_muClosJetPt;
 	TH1F * h_Loose_muHT;
 	TH1F * h_Loose_muLepEta;
+	TH1F * h_Loose_muLepEta_30;
+	TH1F * h_Loose_muLepEta_40;
+	TH1F * h_Loose_muLepEta_50;
+	TH1F * h_Loose_muLepEta_60;
 	TH1F * h_Loose_muLepIso;
 	TH1F * h_Loose_muLepPt;
 	TH1F * h_Loose_muMET;
@@ -151,6 +155,10 @@ public:
 	TH1F * h_Tight_muClosJetPt;
 	TH1F * h_Tight_muHT;
 	TH1F * h_Tight_muLepEta;
+	TH1F * h_Tight_muLepEta_30;
+	TH1F * h_Tight_muLepEta_40;
+	TH1F * h_Tight_muLepEta_50;
+	TH1F * h_Tight_muLepEta_60;
 	TH1F * h_Tight_muLepIso;
 	TH1F * h_Tight_muLepPt;
 	TH1F * h_Tight_muMET;

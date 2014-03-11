@@ -83,11 +83,14 @@ if 'wjets' in scaling:
 	wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_muMTMET30', [data], [qcd, dyjets], 60, 90))
 
 if 'fit' in scaling:
-	scalefactors = fit.doSimScaling(data.hists[37], qcd.hists[37], wjets.hists[37], dyjets.hists[37])
+	scind = 0
+	for i, hist in enumerate(data.hists): 
+		if hist.GetName() == 'h_Tight_muMTMET30': 
+			scind = i
+	scalefactors = fit.doSimScaling(data.hists[scind], qcd.hists[scind], wjets.hists[scind], dyjets.hists[scind])
 	qcd.Rescale(scalefactors[0])
 	wjets.Rescale(scalefactors[1])
 	dyjets.Rescale(scalefactors[2])
-
 
 helper.PrintScale(canv, outputDir, [qcd,wjets,dyjets])
 
@@ -119,12 +122,12 @@ for hist in data.hists:
 	for j,mc in enumerate(mc_samples):
 		stackint += mc.hists[i].Integral()
 		stack.Add(mc.hists[i])
-	yscale = max(stack.GetMaximum(), hist.GetMaximum())
 	
 	stack.Draw('hist')
-	stack.SetMaximum(1.2*yscale)
+	stack.SetMaximum(1.5*hist.GetMaximum())
 	stack.GetXaxis().SetTitle(helper.getXTitle(hist))
 	hist.Draw('p e1 same')
+	hist.SetMaximum(1.5*hist.GetMaximum())
 	leg.Draw()
 
 	pad_ratio.cd()

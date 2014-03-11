@@ -119,7 +119,7 @@ void Fakerates::loop(){
 	pFile->Close();
 }
 
-bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float btagcut = 0., float phicut = 0.){
+bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut = 40., float btagcut = 0., float phicut = 0.){
 	/*
 	checks, whether the event contains exactly one muon and at least one away-jet in the calibration region
 	parameters: &mu (address of muon index)
@@ -162,7 +162,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float btagcut = 0., float p
 
 	// count the number of away jets
 	for(int thisjet=0; thisjet < JetPt->size(); ++thisjet){
-		if(!isGoodJet(thisjet, 40., btagcut)) continue;
+		if(!isGoodJet(thisjet, jetcut, btagcut)) continue;
 		if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(mu), JetPhi->at(thisjet), MuPhi->at(mu)) < 1.0 ) continue;
 		nawayjets++;
 		awayjet_inds.push_back(thisjet);
@@ -246,12 +246,14 @@ bool Fakerates::passesUpperMETMT(int type, int index){
 bool Fakerates::isLooseMuon(int ind){
 	if(! MuIsLoose->at(ind)) return false;
 	// leave this commented for synching!! if(fabs(MuD0->at(ind)) > 0.005  ) return false;
+	if(fabs(MuD0->at(ind)) > 0.005  ) return false;
 	return true;
 }
 bool Fakerates::isTightMuon(int ind){
 	if(!isLooseMuon(ind))   return false; // every tight muon has to pass the loose point
 	if(!MuIsTight->at(ind)) return false;
 	// leave this commented for synching!! if(MuPFIso->at(ind) > 0.05 ) return false;
+	if(fabs(MuPFIso->at(ind)) > 0.05 ) return false;
 	return true;
 }
 
@@ -430,10 +432,44 @@ void Fakerates::fillFRPlots(){
 	return: none
 	*/
 
+	int mu(-1), jet(-1);
+
+
+	if(isFRRegionMuEvent(mu, jet, 30., 0.679, 2.0)) {
+		if(passesUpperMETMT(0,mu)) {
+			h_Loose_muLepEta_30 ->Fill(fabs(MuEta->at(mu)), fEventweight);
+			if(isTightMuon(mu))
+				h_Tight_muLepEta_30 ->Fill(fabs(MuEta->at(mu)), fEventweight);
+		}
+	}
+
+	if(isFRRegionMuEvent(mu, jet, 40., 0.679, 2.0)) {
+		if(passesUpperMETMT(0,mu)) {
+			h_Loose_muLepEta_40 ->Fill(fabs(MuEta->at(mu)), fEventweight);
+			if(isTightMuon(mu))
+				h_Tight_muLepEta_40 ->Fill(fabs(MuEta->at(mu)), fEventweight);
+		}
+	}
+
+	if(isFRRegionMuEvent(mu, jet, 50., 0.679, 2.0)) {
+		if(passesUpperMETMT(0,mu)) {
+			h_Loose_muLepEta_50 ->Fill(fabs(MuEta->at(mu)), fEventweight);
+			if(isTightMuon(mu))
+				h_Tight_muLepEta_50 ->Fill(fabs(MuEta->at(mu)), fEventweight);
+		}
+	}
+
+	if(isFRRegionMuEvent(mu, jet, 60., 0.679, 2.0)) {
+		if(passesUpperMETMT(0,mu)) {
+			h_Loose_muLepEta_60 ->Fill(fabs(MuEta->at(mu)), fEventweight);
+			if(isTightMuon(mu))
+				h_Tight_muLepEta_60 ->Fill(fabs(MuEta->at(mu)), fEventweight);
+		}
+	}
+
 
 	// muons, first loose, then tight
-	int mu(-1), jet(-1);
-	if(isFRRegionMuEvent(mu, jet)){ //, 0.679, 2.0)){
+	if(isFRRegionMuEvent(mu, jet, 40., 0.679, 2.0)){
 
 		if(passesUpperMETMT(0,mu)) {
  
@@ -555,10 +591,19 @@ void Fakerates::bookHistos(){
 	h_elPLoose = new TH2F("h_elPLoose", "elPLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_elPLoose->Sumw2(); 
 	h_muPLoose = new TH2F("h_muPLoose", "muPLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_muPLoose->Sumw2(); 
 
+	float eta_min = 0.;
+	float eta_max = 2.4;
+	int eta_bin = 12;
+
 	h_Loose_muLepPt      = new TH1F("h_Loose_muLepPt"      , "Loose_muLepPt"     , 20 ,  10., 70.); h_Loose_muLepPt      -> Sumw2();
-	h_Loose_muLepEta     = new TH1F("h_Loose_muLepEta"     , "Loose_muLepEta"    , 12 ,   0 , 2.4); h_Loose_muLepEta     -> Sumw2();
+	h_Loose_muLepEta     = new TH1F("h_Loose_muLepEta"     , "Loose_muLepEta"    , eta_bin , eta_min , eta_max); h_Loose_muLepEta    -> Sumw2();
  	h_Loose_muLepIso     = new TH1F("h_Loose_muLepIso"     , "Loose_muLepIso"    , 20 ,   0 , 1  ); h_Loose_muLepIso     -> Sumw2();
 	h_Loose_muD0         = new TH1F("h_Loose_muD0"         , "Loose_muD0"        , 20 ,   0., 0.2); h_Loose_muD0         -> Sumw2();
+
+	h_Loose_muLepEta_30  = new TH1F("h_Loose_muLepEta_30"  , "Loose_muLepEta_30" , eta_bin , eta_min , eta_max); h_Loose_muLepEta_30 -> Sumw2();
+	h_Loose_muLepEta_40  = new TH1F("h_Loose_muLepEta_40"  , "Loose_muLepEta_40" , eta_bin , eta_min , eta_max); h_Loose_muLepEta_40 -> Sumw2();
+	h_Loose_muLepEta_50  = new TH1F("h_Loose_muLepEta_50"  , "Loose_muLepEta_50" , eta_bin , eta_min , eta_max); h_Loose_muLepEta_50 -> Sumw2();
+	h_Loose_muLepEta_60  = new TH1F("h_Loose_muLepEta_60"  , "Loose_muLepEta_60" , eta_bin , eta_min , eta_max); h_Loose_muLepEta_60 -> Sumw2();
 
 	h_Loose_muHT         = new TH1F("h_Loose_muHT"         , "Loose_muHT"        , 10 ,  0  , 400); h_Loose_muHT         -> Sumw2();
 	h_Loose_muMET        = new TH1F("h_Loose_muMET"        , "Loose_muMET"       , 10 ,  0  , 100); h_Loose_muMET        -> Sumw2();
@@ -578,10 +623,15 @@ void Fakerates::bookHistos(){
 
 
 	h_Tight_muLepPt      = new TH1F("h_Tight_muLepPt"      , "Tight_muLepPt"     , 20 ,  10., 70.); h_Tight_muLepPt      -> Sumw2();
-	h_Tight_muLepEta     = new TH1F("h_Tight_muLepEta"     , "Tight_muLepEta"    , 12 ,   0 , 2.4); h_Tight_muLepEta     -> Sumw2();
+	h_Tight_muLepEta     = new TH1F("h_Tight_muLepEta"     , "Tight_muLepEta"    , eta_bin , eta_min , eta_max); h_Tight_muLepEta   -> Sumw2();
 	h_Tight_muLepIso     = new TH1F("h_Tight_muLepIso"     , "Tight_muLepIso"    , 20 ,   0 , 1  ); h_Tight_muLepIso     -> Sumw2();
  	h_Tight_muD0         = new TH1F("h_Tight_muD0"         , "Tight_muD0"        , 20 ,   0., 0.2); h_Tight_muD0         -> Sumw2();
-                                                                                                 
+    
+	h_Tight_muLepEta_30  = new TH1F("h_Tight_muLepEta_30"  , "Tight_muLepEta_30" , eta_bin , eta_min , eta_max); h_Tight_muLepEta_30 -> Sumw2();
+	h_Tight_muLepEta_40  = new TH1F("h_Tight_muLepEta_40"  , "Tight_muLepEta_40" , eta_bin , eta_min , eta_max); h_Tight_muLepEta_40 -> Sumw2();
+	h_Tight_muLepEta_50  = new TH1F("h_Tight_muLepEta_50"  , "Tight_muLepEta_50" , eta_bin , eta_min , eta_max); h_Tight_muLepEta_50 -> Sumw2();
+	h_Tight_muLepEta_60  = new TH1F("h_Tight_muLepEta_60"  , "Tight_muLepEta_60" , eta_bin , eta_min , eta_max); h_Tight_muLepEta_60 -> Sumw2();
+                                                                                             
 	h_Tight_muHT         = new TH1F("h_Tight_muHT"         , "Tight_muHT"        , 10 ,  0  , 400); h_Tight_muHT         -> Sumw2();
 	h_Tight_muMET        = new TH1F("h_Tight_muMET"        , "Tight_muMET"       , 10 ,  0  , 100); h_Tight_muMET        -> Sumw2();
 	h_Tight_muMETnoMTCut = new TH1F("h_Tight_muMETnoMTCut" , "Tight_muMETnoMTCut", 10 ,  0  , 100); h_Tight_muMETnoMTCut -> Sumw2();
@@ -637,6 +687,11 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Loose_muLepIso    ->Write(fName+"_"+h_Loose_muLepIso->GetName(),    TObject::kWriteDelete);
 	h_Loose_muD0        ->Write(fName+"_"+h_Loose_muD0->GetName(),        TObject::kWriteDelete);
 
+	h_Loose_muLepEta_30 ->Write(fName+"_"+h_Loose_muLepEta_30->GetName(), TObject::kWriteDelete);
+	h_Loose_muLepEta_40 ->Write(fName+"_"+h_Loose_muLepEta_40->GetName(), TObject::kWriteDelete);
+	h_Loose_muLepEta_50 ->Write(fName+"_"+h_Loose_muLepEta_50->GetName(), TObject::kWriteDelete);
+	h_Loose_muLepEta_60 ->Write(fName+"_"+h_Loose_muLepEta_60->GetName(), TObject::kWriteDelete);
+
 	h_Loose_muHT        ->Write(fName+"_"+h_Loose_muHT->GetName(),        TObject::kWriteDelete);
 	h_Loose_muMET       ->Write(fName+"_"+h_Loose_muMET->GetName(),       TObject::kWriteDelete);
 	h_Loose_muMETnoMTCut->Write(fName+"_"+h_Loose_muMETnoMTCut->GetName(),TObject::kWriteDelete);
@@ -658,6 +713,11 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Tight_muLepEta    ->Write(fName+"_"+h_Tight_muLepEta->GetName(),    TObject::kWriteDelete);
 	h_Tight_muLepIso    ->Write(fName+"_"+h_Tight_muLepIso->GetName(),    TObject::kWriteDelete);
 	h_Tight_muD0        ->Write(fName+"_"+h_Tight_muD0->GetName(),        TObject::kWriteDelete);
+
+	h_Tight_muLepEta_30 ->Write(fName+"_"+h_Tight_muLepEta_30->GetName(), TObject::kWriteDelete);
+	h_Tight_muLepEta_40 ->Write(fName+"_"+h_Tight_muLepEta_40->GetName(), TObject::kWriteDelete);
+	h_Tight_muLepEta_50 ->Write(fName+"_"+h_Tight_muLepEta_50->GetName(), TObject::kWriteDelete);
+	h_Tight_muLepEta_60 ->Write(fName+"_"+h_Tight_muLepEta_60->GetName(), TObject::kWriteDelete);
 
 	h_Tight_muHT        ->Write(fName+"_"+h_Tight_muHT->GetName(),        TObject::kWriteDelete);
 	h_Tight_muMET       ->Write(fName+"_"+h_Tight_muMET->GetName(),       TObject::kWriteDelete);
