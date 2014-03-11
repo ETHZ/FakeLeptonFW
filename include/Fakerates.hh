@@ -137,6 +137,10 @@ public:
 	TH1F * h_Loose_muLepEta_40;
 	TH1F * h_Loose_muLepEta_50;
 	TH1F * h_Loose_muLepEta_60;
+	TH1F * h_Loose_muLepPt_30;
+	TH1F * h_Loose_muLepPt_40;
+	TH1F * h_Loose_muLepPt_50;
+	TH1F * h_Loose_muLepPt_60;
 	TH1F * h_Loose_muLepIso;
 	TH1F * h_Loose_muLepPt;
 	TH1F * h_Loose_muMET;
@@ -159,6 +163,10 @@ public:
 	TH1F * h_Tight_muLepEta_40;
 	TH1F * h_Tight_muLepEta_50;
 	TH1F * h_Tight_muLepEta_60;
+	TH1F * h_Tight_muLepPt_30;
+	TH1F * h_Tight_muLepPt_40;
+	TH1F * h_Tight_muLepPt_50;
+	TH1F * h_Tight_muLepPt_60;
 	TH1F * h_Tight_muLepIso;
 	TH1F * h_Tight_muLepPt;
 	TH1F * h_Tight_muMET;

@@ -153,7 +153,7 @@ FR.Plot2dFRMap(outputDir, data, mc_samples, [qcd], [wjets, dyjets], True)
 
 
 
-# hard-coded to produce FR vs LepEta plot for different jet cuts
+# hard-coded to produce FR vs LepEta and LepPt plots for different jet cuts
 
 canv = helper.makeCanvas(900, 675)
 pad_plot = helper.makePad('plot')
@@ -166,43 +166,73 @@ for hist in data.hists:
 			
 	# Get Numerator Plots
 	if hist.GetName() == 'h_Tight_muLepEta_30':
-		histindex = i
-		data_numerator_30 = copy.deepcopy(hist)
+		histindex_eta = i
+		data_numerator_eta30 = copy.deepcopy(hist)
 	if hist.GetName() == 'h_Tight_muLepEta_40':
-		data_numerator_40 = copy.deepcopy(hist)
+		data_numerator_eta40 = copy.deepcopy(hist)
 	if hist.GetName() == 'h_Tight_muLepEta_50':
-		data_numerator_50 = copy.deepcopy(hist)
+		data_numerator_eta50 = copy.deepcopy(hist)
 	if hist.GetName() == 'h_Tight_muLepEta_60':
-		data_numerator_60 = copy.deepcopy(hist)
+		data_numerator_eta60 = copy.deepcopy(hist)
+
+	if hist.GetName() == 'h_Tight_muLepPt_30':
+		histindex_pt = i
+		data_numerator_pt30 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Tight_muLepPt_40':
+		data_numerator_pt40 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Tight_muLepPt_50':
+		data_numerator_pt50 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Tight_muLepPt_60':
+		data_numerator_pt60 = copy.deepcopy(hist)
 			
 	# Get Denominator Plots
 	if hist.GetName() == 'h_Loose_muLepEta_30':
-		data_denominator_30 = copy.deepcopy(hist)
+		data_denominator_eta30 = copy.deepcopy(hist)
 	if hist.GetName() == 'h_Loose_muLepEta_40':
-		data_denominator_40 = copy.deepcopy(hist)
+		data_denominator_eta40 = copy.deepcopy(hist)
 	if hist.GetName() == 'h_Loose_muLepEta_50':
-		data_denominator_50 = copy.deepcopy(hist)
+		data_denominator_eta50 = copy.deepcopy(hist)
 	if hist.GetName() == 'h_Loose_muLepEta_60':
-		data_denominator_60 = copy.deepcopy(hist)
+		data_denominator_eta60 = copy.deepcopy(hist)
+
+	if hist.GetName() == 'h_Loose_muLepPt_30':
+		data_denominator_pt30 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Loose_muLepPt_40':
+		data_denominator_pt40 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Loose_muLepPt_50':
+		data_denominator_pt50 = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Loose_muLepPt_60':
+		data_denominator_pt60 = copy.deepcopy(hist)
 
 
 # Compute FR
-data_numerator_30.Divide(data_denominator_30)
-data_numerator_40.Divide(data_denominator_40)
-data_numerator_50.Divide(data_denominator_50)
-data_numerator_60.Divide(data_denominator_60)
+data_numerator_eta30.Divide(data_denominator_eta30)
+data_numerator_eta40.Divide(data_denominator_eta40)
+data_numerator_eta50.Divide(data_denominator_eta50)
+data_numerator_eta60.Divide(data_denominator_eta60)
+
+data_numerator_pt30.Divide(data_denominator_pt30)
+data_numerator_pt40.Divide(data_denominator_pt40)
+data_numerator_pt50.Divide(data_denominator_pt50)
+data_numerator_pt60.Divide(data_denominator_pt60)
 
 
 # this part needs adjustment
 histstoplot = []
-histstoplot.append([data_numerator_30, 'data30'])
-histstoplot.append([data_numerator_40, 'data40'])
-histstoplot.append([data_numerator_50, 'data50'])
-histstoplot.append([data_numerator_60, 'data60'])
+histstoplot.append([data_numerator_eta30, 'data30'])
+histstoplot.append([data_numerator_eta40, 'data40'])
+histstoplot.append([data_numerator_eta50, 'data50'])
+histstoplot.append([data_numerator_eta60, 'data60'])
 
-FR.make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex], "muFR_LepEta_compare")
+FR.make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_eta], "muFR_LepEta_compare")
 
+histstoplot = []
+histstoplot.append([data_numerator_pt30, 'data30'])
+histstoplot.append([data_numerator_pt40, 'data40'])
+histstoplot.append([data_numerator_pt50, 'data50'])
+histstoplot.append([data_numerator_pt60, 'data60'])
 
+FR.make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_pt], "muFR_LepPt_compare")
 
 
 
