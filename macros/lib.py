@@ -12,6 +12,8 @@ def getColor(name):
 	elif name == 'data40'        : return ROOT.kRed
 	elif name == 'data50'        : return ROOT.kBlue
 	elif name == 'data60'        : return ROOT.kGreen
+	elif name == 'dataJCPt'      : return ROOT.kRed
+	elif name == 'dataJRPt'      : return ROOT.kBlue
 
 def getSampleColor(self):
 	return getColor(self.name)
@@ -27,6 +29,8 @@ def getLegendName(name):
 	elif name == 'data40'        : return 'Data (40GeV)'
 	elif name == 'data50'        : return 'Data (50GeV)'
 	elif name == 'data60'        : return 'Data (60GeV)'
+	elif name == 'dataJCPt'      : return 'Data (corr. Jet Pt)'
+	elif name == 'dataJRPt'      : return 'Data (raw Jet Pt)'
 
 def makeLegend(x1,y1,x2,y2):
 	leg = ROOT.TLegend(x1,y1,x2,y2)
@@ -60,6 +64,11 @@ def makePad(which):
 		pad.SetBorderSize(0)
 		pad.SetTopMargin(0.0)
 		pad.SetBottomMargin(0.4)
+		pad.SetTicks(1,1)
+
+	if which == 'tot':
+		pad.SetPad(0.0, 0.0, 1.0, 1.0)
+		pad.SetBorderSize(0)
 		pad.SetTicks(1,1)
 
 	pad.Draw()
@@ -124,12 +133,21 @@ def getSaveName(hist):
 	name = hist.GetName()
 	return name.split('_')[-1]
 
-def saveCanvas(canv, outputDir, name):
-	canv.SaveAs(outputDir + name + '.pdf')
-	canv.SaveAs(outputDir + name + '.png')
+def saveCanvas(canv, pad_plot, outputDir, name, plotlog = 1):
+	canv.SaveAs(outputDir + name + '_lin.pdf')
+	canv.SaveAs(outputDir + name + '_lin.png')
+
+	if plotlog == 1:
+		pad_plot.SetLogy(1)
+		canv.SaveAs(outputDir + name + '_log.pdf')
+		canv.SaveAs(outputDir + name + '_log.png')
+		pad_plot.SetLogy(0)
 
 
 def PrintScale(canv, outputDir, datasets):
+
+	pad_plot = makePad('tot')
+	pad_plot.cd()
 
 	hists = [ROOT.TH1F("h" + str(i), "H" + str(i), len(datasets), 0, len(datasets)) for i in range(len(datasets))]
 	
@@ -155,6 +173,6 @@ def PrintScale(canv, outputDir, datasets):
 		x = hists[0].GetXaxis().GetBinCenter(i+1) - 0.1
 		t.DrawText(x, y, getLegendName(datasets[i].GetName()))
 	
-	saveCanvas(canv, outputDir, 'scales')
-
+	saveCanvas(canv, pad_plot, outputDir, 'scales', 0)
+	pad_plot.Close()
 

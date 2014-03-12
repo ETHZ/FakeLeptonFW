@@ -100,7 +100,7 @@ helper.PrintScale(canv, outputDir, [qcd,wjets,dyjets])
 
 pad_plot = helper.makePad('plot')
 pad_ratio = helper.makePad('ratio')
-pad_plot.cd()
+pad_ratio.cd()
 
 for hist in data.hists:
 
@@ -122,12 +122,13 @@ for hist in data.hists:
 	for j,mc in enumerate(mc_samples):
 		stackint += mc.hists[i].Integral()
 		stack.Add(mc.hists[i])
-	
+
+	yscale = 1.5*max(hist.GetMaximum(), stack.GetMaximum())
 	stack.Draw('hist')
-	stack.SetMaximum(1.5*hist.GetMaximum())
+	stack.SetMaximum(yscale)
 	stack.GetXaxis().SetTitle(helper.getXTitle(hist))
 	hist.Draw('p e1 same')
-	hist.SetMaximum(1.5*hist.GetMaximum())
+	hist.SetMaximum(yscale)
 	leg.Draw()
 
 	pad_ratio.cd()
@@ -137,7 +138,7 @@ for hist in data.hists:
 	hist_ratio = helper.setRatioStyle(hist_ratio, hist)
 	line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
-	helper.saveCanvas(canv, outputDir, prepend + helper.getSaveName(hist) + postpend)
+	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend)
 
 
 
@@ -153,7 +154,7 @@ FR.Plot2dFRMap(outputDir, data, mc_samples, [qcd], [wjets, dyjets], True)
 
 
 
-# hard-coded to produce FR vs LepEta and LepPt plots for different jet cuts
+# hard-coded to produce FR vs LepEta and LepPt plots for different jet cuts and different Jet Pts
 
 canv = helper.makeCanvas(900, 675)
 pad_plot = helper.makePad('plot')
@@ -184,6 +185,12 @@ for hist in data.hists:
 		data_numerator_pt50 = copy.deepcopy(hist)
 	if hist.GetName() == 'h_Tight_muLepPt_60':
 		data_numerator_pt60 = copy.deepcopy(hist)
+
+	if hist.GetName() == 'h_Tight_muMaxJCPt':
+		histindex_cpt = i
+		data_numerator_cpt = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Tight_muMaxJRPt':
+		data_numerator_rpt = copy.deepcopy(hist)
 			
 	# Get Denominator Plots
 	if hist.GetName() == 'h_Loose_muLepEta_30':
@@ -204,6 +211,11 @@ for hist in data.hists:
 	if hist.GetName() == 'h_Loose_muLepPt_60':
 		data_denominator_pt60 = copy.deepcopy(hist)
 
+	if hist.GetName() == 'h_Loose_muMaxJCPt':
+		data_denominator_cpt = copy.deepcopy(hist)
+	if hist.GetName() == 'h_Loose_muMaxJRPt':
+		data_denominator_rpt = copy.deepcopy(hist)
+
 
 # Compute FR
 data_numerator_eta30.Divide(data_denominator_eta30)
@@ -215,6 +227,9 @@ data_numerator_pt30.Divide(data_denominator_pt30)
 data_numerator_pt40.Divide(data_denominator_pt40)
 data_numerator_pt50.Divide(data_denominator_pt50)
 data_numerator_pt60.Divide(data_denominator_pt60)
+
+data_numerator_cpt.Divide(data_denominator_cpt)
+data_numerator_rpt.Divide(data_denominator_rpt)
 
 
 # this part needs adjustment
@@ -233,6 +248,14 @@ histstoplot.append([data_numerator_pt50, 'data50'])
 histstoplot.append([data_numerator_pt60, 'data60'])
 
 FR.make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_pt], "muFR_LepPt_compare")
+
+histstoplot = []
+histstoplot.append([data_numerator_cpt, 'dataJCPt'])
+histstoplot.append([data_numerator_rpt, 'dataJRPt'])
+
+FR.make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_cpt], "muFR_JetPt_compare")
+
+
 
 
 

@@ -21,8 +21,10 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 			hists[i][0] = helper.setFRPlotStyle(hists[i][0], helper.getColor(hists[i][1]), 'FR as function of ' + helper.getXTitle(title_hist), title_hist)
 
 	hists[0][0].Draw("p e1")
+	hists[0][0].SetMinimum(0.0001)
 	hists[0][0].SetMaximum(1.5*hists[0][0].GetMaximum())
 	for i in range(1,len(hists)):
+		hists[i][0].SetMinimum(0.0001)
 		hists[i][0].Draw("p e1 same")
 
 	leg1 = helper.makeLegend(0.6, 0.6, 0.85, 0.85)
@@ -41,19 +43,22 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 	line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
 	
-	helper.saveCanvas(canv, outputDir, file_name)
+	helper.saveCanvas(canv, pad_plot, outputDir, file_name)
 
 
 
 def make2dFRPlot(canv, outputDir, dataset, hist, name=""):
 
+	pad_plot = helper.makePad('tot')
+	pad_plot.cd()
 	hist.Draw("text colz e")
 	hist.GetXaxis().SetTitle(helper.getXTitle(dataset.hists[12]))
 	hist.GetYaxis().SetTitle(helper.getXTitle(dataset.hists[13]))
 	hist.SetMinimum(0.0)
 	hist.SetMaximum(0.25)
 	hist.SetTitle("FR 2d Map (" + name + ")")
-	helper.saveCanvas(canv, outputDir, "muFR_2dmap_" + name.lower())
+	helper.saveCanvas(canv, pad_plot, outputDir, "muFR_2dmap_" + name.lower(), 0)
+	pad_plot.Close()
 
 
 
