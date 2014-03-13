@@ -68,6 +68,8 @@ def makePad(which):
 
 	if which == 'tot':
 		pad.SetPad(0.0, 0.0, 1.0, 1.0)
+		pad.SetTopMargin(0.1)
+		pad.SetBottomMargin(0.1)
 		pad.SetBorderSize(0)
 		pad.SetTicks(1,1)
 
@@ -81,18 +83,16 @@ def makeLine(x1, y1, x2, y2):
 	return line
 
 def setFRPlotStyle(hist, color, title = '', title_hist = ''):
-	if title_hist == '': title_hist = hist
 	hist.SetMarkerColor(color)
 	hist.SetMarkerSize(1.2)
 	hist.SetMarkerStyle(20)
-	hist.GetXaxis().SetTitle(getXTitle(title_hist))
+	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
 	hist.GetYaxis().SetRangeUser(0., 0.25)
 	hist.GetYaxis().SetTitle("FR")
 	hist.SetTitle(title)
 	return hist
 
-def setRatioStyle(hist, titlehist=''):
-	if titlehist=='': titlehist = hist
+def setRatioStyle(hist, title_hist=''):
 	hist.SetTitle('')
 	hist.GetYaxis().SetNdivisions(505)
 	hist.GetYaxis().SetTitle('Data/MC')
@@ -101,7 +101,7 @@ def setRatioStyle(hist, titlehist=''):
 	hist.GetYaxis().SetLabelSize(0.09)
 	hist.GetXaxis().SetNdivisions(505)
 	hist.GetXaxis().SetLabelSize(0.11)
-	hist.GetXaxis().SetTitle(getXTitle(titlehist))
+	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
 	hist.GetXaxis().SetTitleSize(0.11)
 	hist.GetXaxis().SetTitleOffset(1.0)
 	hist.SetMaximum(1.99)
@@ -124,6 +124,8 @@ def getXTitle(hist):
 	elif 'muMT'       in name: return 'm_{T}'
 	elif 'MTMET30'    in name: return 'm_{T}'
 	elif 'MaxJPt'     in name: return 'max. jet-p_{T}'
+	elif 'MaxJCPt'    in name: return 'max. jet-p_{T}'
+	elif 'MaxJRPt'    in name: return 'max. jet-p_{T}'
 	elif 'NVertices'  in name: return 'n_{vertices}'
 	elif 'D0'         in name: return 'd_{0}^{lep}'
 	elif 'F'          in name: return 'F'

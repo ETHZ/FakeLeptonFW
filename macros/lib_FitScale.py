@@ -47,7 +47,7 @@ def doSimScaling(data_hist, qcd_hist, wjets_hist, dyjets_hist):
 
 	qcd_n = ROOT.RooRealVar("qcd_n", "number of qcd", qcd_int, qcd_int*0.5, qcd_int*2.0)
 	wjets_n = ROOT.RooRealVar("wjets_n", "number of wjets", wjets_int, wjets_int*0.5, wjets_int*1.3)
-	dyjets_n = ROOT.RooRealVar("dyjets_n", "number of dyjets", dyjets_int, dyjets_int*0.5, dyjets_int*1.3)
+	dyjets_n = ROOT.RooRealVar("dyjets_n", "number of dyjets", dyjets_int, dyjets_int*0.5, dyjets_int*1.0)
 
 	model = ROOT.RooAddPdf("model", "model", ROOT.RooArgList(qcd_pdf, wjets_pdf, dyjets_pdf), ROOT.RooArgList(qcd_n, wjets_n, dyjets_n))
 

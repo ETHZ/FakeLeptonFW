@@ -36,10 +36,11 @@
 class Fakerates: public FWBaseClass{
 
 public:
-	Fakerates();
+	Fakerates(TString);
 	virtual ~Fakerates();
 
 	virtual void init(bool = false); // Careful, MakeClass produces Init with capital I!
+	void loadConfigFile(TString);
 
 	template <class T> inline void getObjectSafe(TFile* pFile, TString name, T*& object){
 		pFile->GetObject(name, object);
@@ -50,28 +51,34 @@ public:
 		return;
 	};
 
-	inline virtual void setVerbose   (int     v) {fVerbose   = v;};
-	inline virtual void setData      (bool    d) {fIsData    = d;};
-	inline virtual void setInputFile (TString f) {fInputFile = f;};
-	inline virtual void setOutputDir (TString d) {fOutputDir = d;};
-	inline virtual void setMaxSize   (int     m) {fMaxSize   = m;};
-	inline virtual void setName      (TString n) {fName      = n;};
-	inline virtual void setXS        (float   x) {if (!fIsData) fXSec = x; else fXSec = -1.;};
+	inline virtual void setVerbose      (int     v) {fVerbose      = v;};
+	inline virtual void setData         (bool    d) {fIsData       = d;};
+	inline virtual void setInputFile    (TString i) {fInputFile    = i;};
+	inline virtual void setName         (TString n) {fName         = n;};
+	inline virtual void setMaxSize      (int     m) {fMaxSize      = m;};
+	inline virtual void setXS           (float   x) {if (!fIsData) fXSec = x; else fXSec = -1.;};
 
 	int  fVerbose;
 	bool fIsData;
-	float fXSec;
-	float fLumi;
 	TString fInputFile;
-	TString fOutputDir;
-	TString fOutputFilename;
-	int fMaxSize;
 	TString fName;
+	int fMaxSize;
+	float fXSec;
+
+	TString fOutputDir;
+	TString fInputDir;
+	float fLuminosity;
+	int fJetCorrection;
+	float fJetPtCut;
+	float fMuD0Cut;
+	float fMuIsoCut;
+	float fAwayJetBTagCut;
+	float fAwayJetDPhiCut;
 	
 
     // FUNCTIONS
 	void doStuff(); // this one gets called by the executable
-	void loop();
+	void loop(TFile *);
 
 	//void fillRatios();
 	void fillFRPlots();
@@ -80,7 +87,7 @@ public:
 	bool passesMETCut(float, int);
 	bool passesMTCut(int, int);
 
-	bool isFRRegionMuEvent(int&, int&, float, float, float);
+	bool isFRRegionMuEvent(int&, int&, float);
 	bool isFRRegionElEvent(int&);
 
 
@@ -89,7 +96,8 @@ public:
 	bool isLooseMuon(int);
 	bool isTightMuon(int);
 
-	float getMT(int, int, int =1);
+	float getJetPt(int);
+	float getMT(int, int, int);
 
 		// JETS
 	bool isGoodJet(int, float, float);

@@ -93,7 +93,9 @@ if 'fit' in scaling:
 	dyjets.Rescale(scalefactors[2])
 
 helper.PrintScale(canv, outputDir, [qcd,wjets,dyjets])
-
+print "scale of qcd = " + str(qcd.GetScale())
+print "scale of wjets = " + str(wjets.GetScale())
+print "scale of dyjets = " + str(dyjets.GetScale())
 
 
 # Run Over All Samples to Produce Plots
