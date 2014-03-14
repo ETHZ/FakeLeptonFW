@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <map>
 #include <time.h> // access to date/time
+//#include <windows.h>
 
 #include "include/FWBaseClass.h"
 #include "Utilities.hh"
@@ -162,6 +163,14 @@ public:
 	TH1F * h_Loose_muNJets;
 	TH1F * h_Loose_muNVertices;
 	TH1F * h_Loose_muD0;
+	TH2F * h_Loose_muJCPtJEta; 
+	TH2F * h_Loose_muJRPtJEta;
+	TH2F * h_Loose_muJCPtJPt;
+	TH2F * h_Loose_muJRPtJPt;
+	TH2F * h_Loose_muDJPtJEta;
+	TH2F * h_Loose_muFJPtJEta;
+	TH2F * h_Loose_muDJPtJPt;
+	TH2F * h_Loose_muFJPtJPt;
 
 	TH1F * h_Tight_muAwayJetDR;
 	TH1F * h_Tight_muAwayJetPt;
@@ -190,7 +199,14 @@ public:
 	TH1F * h_Tight_muNJets;
 	TH1F * h_Tight_muNVertices;   
 	TH1F * h_Tight_muD0;
-
+	TH2F * h_Tight_muJCPtJEta;
+	TH2F * h_Tight_muJRPtJEta;
+	TH2F * h_Tight_muJCPtJPt;
+	TH2F * h_Tight_muJRPtJPt;
+	TH2F * h_Tight_muDJPtJEta;
+	TH2F * h_Tight_muFJPtJEta;
+	TH2F * h_Tight_muDJPtJPt;
+	TH2F * h_Tight_muFJPtJPt;
 
 	void bookHistos();
 	void writeHistos(TFile *);

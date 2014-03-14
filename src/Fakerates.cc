@@ -135,7 +135,7 @@ void Fakerates::loadConfigFile(TString configfile){
 void Fakerates::doStuff(){
 	
 	TString OutputFilename = fOutputDir + fName + "_ratios.root";
-	if(!access(fOutputDir, F_OK)) Util::MakeOutputDir(fOutputDir);
+	//if(CreateDirectory(fOutputDir, NULL) || GetLastError() == ERROR_ALREADY_EXISTS) Util::MakeOutputDir(fOutputDir);
 	TFile *pFile = new TFile(OutputFilename, "RECREATE");
 	
 	loop(pFile);
@@ -272,7 +272,7 @@ bool Fakerates::isLooseMuon(int index){
 	*/
 
 	if(!MuIsLoose->at(index)) return false;
-	if(fabs(MuD0->at(index)) > fMuD0Cut) return false; // leave this commented for synching!!
+	if(fMuD0Cut > 0.0 && fabs(MuD0->at(index)) > fMuD0Cut) return false; // leave this commented for synching!!
 	return true;
 }
 
@@ -287,7 +287,7 @@ bool Fakerates::isTightMuon(int index){
 
 	if(!isLooseMuon(index)) return false;
 	if(!MuIsTight->at(index)) return false;
-	if(fabs(MuPFIso->at(index)) > fMuIsoCut) return false; // leave this commented for synching!!
+	if(fMuIsoCut > 0.0 && fabs(MuPFIso->at(index)) > fMuIsoCut) return false; // leave this commented for synching!!
 
 	return true;
 }
@@ -647,6 +647,16 @@ void Fakerates::fillFRPlots(){
 			h_Loose_muMaxJCPt   ->Fill(JetPt->at(jet)      , fEventweight); // always corrected Jet Pt!
 			h_Loose_muMaxJRPt   ->Fill(JetRawPt->at(jet)   , fEventweight); // always raw Jet Pt!
 
+			h_Loose_muJCPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet), fEventweight);
+			h_Loose_muJRPtJEta  ->Fill(fabs(JetEta->at(jet)), JetRawPt->at(jet), fEventweight);
+			h_Loose_muJCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
+			h_Loose_muJRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
+
+			h_Loose_muDJPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet)-JetRawPt->at(jet), fEventweight);
+			h_Loose_muFJPtJEta  ->Fill(fabs(JetEta->at(jet)), (JetPt->at(jet)-JetRawPt->at(jet))/JetRawPt->at(jet), fEventweight);
+			h_Loose_muDJPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet)-JetRawPt->at(jet), fEventweight);
+			h_Loose_muFJPtJPt   ->Fill(JetPt->at(jet), (JetPt->at(jet)-JetRawPt->at(jet))/JetRawPt->at(jet), fEventweight);
+
 			if( MuPt->at(mu) >  fFRbinspt.back() ){
 				int fillbin = h_muFLoose->FindBin(fFRbinspt.back()-0.5, fabs(MuEta->at(mu)));
 				h_muFLoose->AddBinContent(fillbin, fEventweight);
@@ -686,6 +696,16 @@ void Fakerates::fillFRPlots(){
 				h_Tight_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
 				h_Tight_muMaxJCPt   ->Fill(JetPt->at(jet)      , fEventweight); // always corrected Jet Pt!
 				h_Tight_muMaxJRPt   ->Fill(JetRawPt->at(jet)   , fEventweight); // always raw Jet Pt!
+
+				h_Tight_muJCPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet), fEventweight);
+				h_Tight_muJRPtJEta  ->Fill(fabs(JetEta->at(jet)), JetRawPt->at(jet), fEventweight);
+				h_Tight_muJCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
+				h_Tight_muJRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
+
+				h_Tight_muDJPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet)-JetRawPt->at(jet), fEventweight);
+				h_Tight_muFJPtJEta  ->Fill(fabs(JetEta->at(jet)), (JetPt->at(jet)-JetRawPt->at(jet))/JetRawPt->at(jet), fEventweight);
+				h_Tight_muDJPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet)-JetRawPt->at(jet), fEventweight);
+				h_Tight_muFJPtJPt   ->Fill(JetPt->at(jet), (JetPt->at(jet)-JetRawPt->at(jet))/JetRawPt->at(jet), fEventweight);
 
 				if( MuPt->at(mu) >  fFRbinspt.back() ){
 					int fillbin = h_muFTight->FindBin(fFRbinspt.back(), fabs(MuEta->at(mu)));
@@ -789,6 +809,16 @@ void Fakerates::bookHistos(){
 	h_Loose_muClosJetDR  = new TH1F("h_Loose_muClosJetDR"  , "Loose_muClosJetDR" , 15 ,  0  , 1  ); h_Loose_muClosJetDR  -> Sumw2();
 	h_Loose_muClosJetPt  = new TH1F("h_Loose_muClosJetPt"  , "Loose_muClosJetPt" , 10 ,  20 , 120); h_Loose_muClosJetPt  -> Sumw2();
 
+	h_Loose_muJCPtJEta   = new TH2F("h_Loose_muJCPtJEta"   , "Loose_muJCPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Loose_muJCPtJEta->Sumw2();
+	h_Loose_muJRPtJEta   = new TH2F("h_Loose_muJRPtJEta"   , "Loose_muJRPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Loose_muJRPtJEta->Sumw2();
+	h_Loose_muJCPtJPt    = new TH2F("h_Loose_muJCPtJPt"    , "Loose_muJCPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Loose_muJCPtJPt ->Sumw2();
+	h_Loose_muJRPtJPt    = new TH2F("h_Loose_muJRPtJPt"    , "Loose_muJRPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Loose_muJRPtJPt ->Sumw2();
+
+	h_Loose_muDJPtJEta   = new TH2F("h_Loose_muDJPtJEta"   , "Loose_muDJPtJEta"  , eta_bin, eta_min, eta_max, 10, -50, 50); h_Loose_muDJPtJEta->Sumw2();
+	h_Loose_muFJPtJEta   = new TH2F("h_Loose_muFJPtJEta"   , "Loose_muFJPtJEta"  , eta_bin, eta_min, eta_max, 10, -2, 2);   h_Loose_muFJPtJEta->Sumw2();
+	h_Loose_muDJPtJPt    = new TH2F("h_Loose_muDJPtJPt"    , "Loose_muDJPtJPt"   , pt_bin,  pt_min,  pt_max,  10, -50, 50); h_Loose_muDJPtJPt ->Sumw2();
+	h_Loose_muFJPtJPt    = new TH2F("h_Loose_muFJPtJPt"    , "Loose_muFJPtJPt"   , pt_bin,  pt_min,  pt_max,  10, -2, 2);   h_Loose_muFJPtJPt ->Sumw2();
+
 
 	h_Tight_muLepPt      = new TH1F("h_Tight_muLepPt"      , "Tight_muLepPt"     , pt_bin  , pt_min  , pt_max ); h_Tight_muLepPt  -> Sumw2();
 	h_Tight_muLepEta     = new TH1F("h_Tight_muLepEta"     , "Tight_muLepEta"    , eta_bin , eta_min , eta_max); h_Tight_muLepEta -> Sumw2();
@@ -824,6 +854,15 @@ void Fakerates::bookHistos(){
 	h_Tight_muClosJetDR  = new TH1F("h_Tight_muClosJetDR"  , "Tight_muClosJetDR" , 15 ,  0  , 1  ); h_Tight_muClosJetDR  -> Sumw2();
 	h_Tight_muClosJetPt  = new TH1F("h_Tight_muClosJetPt"  , "Tight_muClosJetPt" , 10 ,  20 , 120); h_Tight_muClosJetPt  -> Sumw2();
 
+	h_Tight_muJCPtJEta   = new TH2F("h_Tight_muJCPtJEta"   , "Tight_muJCPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Tight_muJCPtJEta->Sumw2();
+	h_Tight_muJRPtJEta   = new TH2F("h_Tight_muJRPtJEta"   , "Tight_muJRPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Tight_muJRPtJEta->Sumw2();
+	h_Tight_muJCPtJPt    = new TH2F("h_Tight_muJCPtJPt"    , "Tight_muJCPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Tight_muJCPtJPt ->Sumw2();
+	h_Tight_muJRPtJPt    = new TH2F("h_Tight_muJRPtJPt"    , "Tight_muJRPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Tight_muJRPtJPt ->Sumw2();
+
+	h_Tight_muDJPtJEta   = new TH2F("h_Tight_muDJPtJEta"   , "Tight_muDJPtJEta"  , eta_bin, eta_min, eta_max, 10, -50, 50); h_Tight_muDJPtJEta->Sumw2();
+	h_Tight_muFJPtJEta   = new TH2F("h_Tight_muFJPtJEta"   , "Tight_muFJPtJEta"  , eta_bin, eta_min, eta_max, 10, -2, 2);   h_Tight_muFJPtJEta->Sumw2();
+	h_Tight_muDJPtJPt    = new TH2F("h_Tight_muDJPtJPt"    , "Tight_muDJPtJPt"   , pt_bin,  pt_min,  pt_max,  10, -50, 50); h_Tight_muDJPtJPt ->Sumw2();
+	h_Tight_muFJPtJPt    = new TH2F("h_Tight_muFJPtJPt"    , "Tight_muFJPtJPt"   , pt_bin,  pt_min,  pt_max,  10, -2, 2);   h_Tight_muFJPtJPt ->Sumw2();
 
 }
 
@@ -894,6 +933,17 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Loose_muClosJetDR ->Write(fName + "_" + h_Loose_muClosJetDR->GetName(), TObject::kWriteDelete);
 	h_Loose_muClosJetPt ->Write(fName + "_" + h_Loose_muClosJetPt->GetName(), TObject::kWriteDelete);
 
+	h_Loose_muJCPtJEta  ->Write(fName + "_" + h_Loose_muJCPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Loose_muJRPtJEta  ->Write(fName + "_" + h_Loose_muJRPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Loose_muJCPtJPt   ->Write(fName + "_" + h_Loose_muJCPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Loose_muJRPtJPt   ->Write(fName + "_" + h_Loose_muJRPtJPt  ->GetName(), TObject::kWriteDelete);
+
+	h_Loose_muDJPtJEta  ->Write(fName + "_" + h_Loose_muDJPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Loose_muFJPtJEta  ->Write(fName + "_" + h_Loose_muFJPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Loose_muDJPtJPt   ->Write(fName + "_" + h_Loose_muDJPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Loose_muFJPtJPt   ->Write(fName + "_" + h_Loose_muFJPtJPt  ->GetName(), TObject::kWriteDelete);
+
+
 	// tight histograms
 	h_Tight_muLepPt     ->Write(fName + "_" + h_Tight_muLepPt->GetName(),     TObject::kWriteDelete);
 	h_Tight_muLepEta    ->Write(fName + "_" + h_Tight_muLepEta->GetName(),    TObject::kWriteDelete);
@@ -928,6 +978,16 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Tight_muAwayJetPt ->Write(fName + "_" + h_Tight_muAwayJetPt->GetName(), TObject::kWriteDelete);
 	h_Tight_muClosJetDR ->Write(fName + "_" + h_Tight_muClosJetDR->GetName(), TObject::kWriteDelete);
 	h_Tight_muClosJetPt ->Write(fName + "_" + h_Tight_muClosJetPt->GetName(), TObject::kWriteDelete);
+
+	h_Tight_muJCPtJEta  ->Write(fName + "_" + h_Tight_muJCPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Tight_muJRPtJEta  ->Write(fName + "_" + h_Tight_muJRPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Tight_muJCPtJPt   ->Write(fName + "_" + h_Tight_muJCPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Tight_muJRPtJPt   ->Write(fName + "_" + h_Tight_muJRPtJPt  ->GetName(), TObject::kWriteDelete);
+
+	h_Tight_muDJPtJEta  ->Write(fName + "_" + h_Tight_muDJPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Tight_muFJPtJEta  ->Write(fName + "_" + h_Tight_muFJPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Tight_muDJPtJPt   ->Write(fName + "_" + h_Tight_muDJPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Tight_muFJPtJPt   ->Write(fName + "_" + h_Tight_muFJPtJPt  ->GetName(), TObject::kWriteDelete);
 
 }
 

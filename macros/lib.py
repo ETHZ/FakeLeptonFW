@@ -124,11 +124,30 @@ def getXTitle(hist):
 	elif 'muMT'       in name: return 'm_{T}'
 	elif 'MTMET30'    in name: return 'm_{T}'
 	elif 'MaxJPt'     in name: return 'max. jet-p_{T}'
-	elif 'MaxJCPt'    in name: return 'max. jet-p_{T}'
-	elif 'MaxJRPt'    in name: return 'max. jet-p_{T}'
+	elif 'MaxJCPt'    in name: return 'max. jet-p_{T} (corr.)'
+	elif 'MaxJRPt'    in name: return 'max. jet-p_{T} (raw)'
+	elif 'JCPtJEta'   in name: return '|#eta|_{jet}'
+	elif 'JRPtJEta'   in name: return '|#eta|_{jet}'
+	elif 'JCPtJPt'    in name: return 'max. jet-p_{T} (corr.)'
+	elif 'JRPtJPt'    in name: return 'max. jet-p_{T} (corr.)'
+	elif 'DJPtJEta'   in name: return '|#eta|_{jet}'
+	elif 'FJPtJEta'   in name: return '|#eta|_{jet}'
+	elif 'DJPtJPt'    in name: return 'max. jet-p_{T} (corr.)'
+	elif 'FJPtJPt'    in name: return 'max. jet-p_{T} (corr.)'
 	elif 'NVertices'  in name: return 'n_{vertices}'
 	elif 'D0'         in name: return 'd_{0}^{lep}'
-	elif 'F'          in name: return 'F'
+	else: return name
+
+def getYTitle(hist):
+	name = hist.GetName()
+	if   'JCPtJEta'   in name: return 'max. jet-p_{T} (corr.)'
+	elif 'JRPtJEta'   in name: return 'max. jet-p_{T} (raw)'
+	elif 'JCPtJPt'    in name: return 'max. jet-p_{T} (corr.)'
+	elif 'JRPtJPt'    in name: return 'max. jet-p_{T} (raw)'
+	elif 'DJPtJEta'   in name: return 'max. jet-p_{T} (corr.) - max. jet-p_{T} (raw)'
+	elif 'FJPtJEta'   in name: return '(max. jet-p_{T} (corr.) - max. jet-p_{T} (raw)/max. jet-p_{T} (raw)'
+	elif 'DJPtJPt'    in name: return 'max. jet-p_{T} (corr.) - max. jet-p_{T} (raw)'
+	elif 'FJPtJPt'    in name: return '(max. jet-p_{T} (corr.) - max. jet-p_{T})/max. jet-p_{T} (raw)'
 	else: return name
 
 def getSaveName(hist):

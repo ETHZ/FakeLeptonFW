@@ -70,8 +70,9 @@ leg.AddEntry(qcd   .hists[0], 'QCD'     , 'f' )
 
 ## LIST OF HISTOGRAMS TO PLOT
 
-plotHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0']
+plot1dHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0']
 
+plot2dHists = ['h_Loose_muDJPtJEta', 'h_Loose_muFJPtJEta', 'h_Loose_muDJPtJPt', 'h_Loose_muFJPtJPt', 'h_Tight_muDJPtJEta', 'h_Tight_muFJPtJEta', 'h_Tight_muDJPtJPt', 'h_Tight_muFJPtJPt'] 
 
 
 # SET SCALING
@@ -98,7 +99,7 @@ print "scale of wjets = " + str(wjets.GetScale())
 print "scale of dyjets = " + str(dyjets.GetScale())
 
 
-# Run Over All Samples to Produce Plots
+# Run Over All Samples to Produce 1d Plots
 
 pad_plot = helper.makePad('plot')
 pad_ratio = helper.makePad('ratio')
@@ -111,7 +112,7 @@ for hist in data.hists:
 
 
 	# Plot Histogram	
-	if not hist.GetName() in plotHists: continue
+	if not hist.GetName() in plot1dHists: continue
 
 	prepend = ''
 	postpend = ''
@@ -144,9 +145,51 @@ for hist in data.hists:
 
 
 
+# Run Over All Samples to Produce 2d Plots
+
+canv.SetRightMargin(0.1)
+pad_plot.Close()
+pad_ratio.Close()
+pad_plot = helper.makePad('tot')
+pad_plot.cd()
+
+for hist in data.hists:
+
+	i = data.hists.index(hist)
+
+
+	# Plot Histogram	
+	if not hist.GetName() in plot2dHists: continue
+
+	prepend = ''
+	postpend = ''
+	if '_Loose_' in hist.GetName(): prepend = 'Loose_'
+	if '_Tight_' in hist.GetName(): prepend = 'Tight_'
+
+	# Data
+	postpend = "_data"
+	hist.Draw('colz')
+	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
+	hist.GetYaxis().SetTitle(helper.getYTitle(hist))
+	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend)
+
+	# MC
+	for mc in mc_samples:
+		postpend = "_" + str(mc.GetName().lower())
+		mc.hists[i].Draw('colz')
+		mc.hists[i].GetXaxis().SetTitle(helper.getXTitle(hist))
+		mc.hists[i].GetYaxis().SetTitle(helper.getYTitle(hist))
+		helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend)
+
+
+canv.SetRightMargin(0.0)
+
+
+
+
 # compute and plot FR for every variable
 
-FR.PlotFR(outputDir, data, mc_samples, [qcd], [wjets, dyjets])
+FR.PlotFR(outputDir, data, mc_samples, plot1dHists, [qcd], [wjets, dyjets])
 
 
 

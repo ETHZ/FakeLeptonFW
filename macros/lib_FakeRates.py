@@ -62,7 +62,7 @@ def make2dFRPlot(canv, outputDir, dataset, hist, title_indeces, name=''):
 
 
 
-def PlotFR(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = []):
+def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = []):
 
 	canv = helper.makeCanvas(900, 675)
 	pad_plot = helper.makePad('plot')
@@ -81,6 +81,8 @@ def PlotFR(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = []):
 	for hist in dataset.hists:
 
 		i = dataset.hists.index(hist)
+
+		if not hist.GetName() in histlist: continue
 			
 		# Get Numerator Plots
 		if 'h_Tight_' in hist.GetName():
