@@ -132,27 +132,31 @@ def getXTitle(hist):
 	elif 'JRPtJPt'    in name: return 'max. jet-p_{T} (corr.)'
 	elif 'DJPtJEta'   in name: return '|#eta|_{jet}'
 	elif 'FJPtJEta'   in name: return '|#eta|_{jet}'
-	elif 'DJPtJPt'    in name: return 'max. jet-p_{T} (corr.)'
-	elif 'FJPtJPt'    in name: return 'max. jet-p_{T} (corr.)'
+	elif 'DJPtJPt'    in name: return 'jet-p_{T} (corr.)'
+	elif 'FJPtJPt'    in name: return 'jet-p_{T} (corr.)'
+	elif 'DJPtZoom'   in name: return 'jet-p_{T} (corr.)'
+	elif 'FJPtZoom'   in name: return 'jet-p_{T} (corr.)'
 	elif 'NVertices'  in name: return 'n_{vertices}'
 	elif 'D0'         in name: return 'd_{0}^{lep}'
 	else: return name
 
 def getYTitle(hist):
 	name = hist.GetName()
-	if   'JCPtJEta'   in name: return 'max. jet-p_{T} (corr.)'
-	elif 'JRPtJEta'   in name: return 'max. jet-p_{T} (raw)'
-	elif 'JCPtJPt'    in name: return 'max. jet-p_{T} (corr.)'
-	elif 'JRPtJPt'    in name: return 'max. jet-p_{T} (raw)'
-	elif 'DJPtJEta'   in name: return 'max. jet-p_{T} (corr.) - max. jet-p_{T} (raw)'
-	elif 'FJPtJEta'   in name: return '(max. jet-p_{T} (corr.) - max. jet-p_{T} (raw)/max. jet-p_{T} (raw)'
-	elif 'DJPtJPt'    in name: return 'max. jet-p_{T} (corr.) - max. jet-p_{T} (raw)'
-	elif 'FJPtJPt'    in name: return '(max. jet-p_{T} (corr.) - max. jet-p_{T})/max. jet-p_{T} (raw)'
+	if   'JCPtJEta'   in name: return 'jet-p_{T} (corr.)'
+	elif 'JRPtJEta'   in name: return 'jet-p_{T} (raw)'
+	elif 'JCPtJPt'    in name: return 'jet-p_{T} (corr.)'
+	elif 'JRPtJPt'    in name: return 'jet-p_{T} (raw)'
+	elif 'DJPtJEta'   in name: return 'jet-p_{T} (corr.) - jet-p_{T} (raw)'
+	elif 'FJPtJEta'   in name: return '(jet-p_{T} (corr.) - jet-p_{T} (raw)/jet-p_{T} (raw)'
+	elif 'DJPtJPt'    in name: return 'jet-p_{T} (corr.) - jet-p_{T} (raw)'
+	elif 'FJPtJPt'    in name: return '(jet-p_{T} (corr.) - jet-p_{T} (raw))/jet-p_{T} (raw)'
 	else: return name
 
-def getSaveName(hist):
+def getSaveName(hist, el = -1):
 	name = hist.GetName()
-	return name.split('_')[-1]
+	if isinstance(el, str) and ':' in el: exec("savename = '_'.join(name.split('_')[" + el + "])")
+	else: savename = name.split('_')[el]
+	return savename
 
 def saveCanvas(canv, pad_plot, outputDir, name, plotlog = 1):
 	canv.SaveAs(outputDir + name + '_lin.pdf')
@@ -196,4 +200,7 @@ def PrintScale(canv, outputDir, datasets):
 	
 	saveCanvas(canv, pad_plot, outputDir, 'scales', 0)
 	pad_plot.Close()
+	return True
+
+
 

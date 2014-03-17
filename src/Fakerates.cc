@@ -50,9 +50,9 @@ void Fakerates::init(bool verbose){
 	Util::SetStyle();
 
 
-	// SET THE BINNING FOR THE fr HISTO HERE.
+	// Binning for FakeRate Projection Plots
 
-	// ETA BINNING
+	// Eta Binning
 	fFRbinseta.push_back(0.0);
 	fFRbinseta.push_back(0.5);
 	fFRbinseta.push_back(1.0);
@@ -61,7 +61,7 @@ void Fakerates::init(bool verbose){
 	fFRbinseta.push_back(2.5);
 	fFRn_binseta  = fFRbinseta.size();
 
-	// PT BINNING
+	// Pt Binning
 	fFRbinspt.push_back(10.);
 	fFRbinspt.push_back(15.);
 	fFRbinspt.push_back(20.);
@@ -71,6 +71,31 @@ void Fakerates::init(bool verbose){
 	fFRbinspt.push_back(45.);
 	fFRbinspt.push_back(46.);
 	fFRn_binspt   = fFRbinspt .size();
+
+
+	// Binning for Difference/Fraction in JetPt Projection Plots
+
+	// Eta Binning
+	fDFbinseta.push_back(0.0);
+	fDFbinseta.push_back(1.0);
+	fDFbinseta.push_back(2.4);
+	fDFn_binseta  = fDFbinseta.size();
+
+	// Pt Binning
+	fDFbinspt.push_back(10.0);
+	fDFbinspt.push_back(20.0);
+	fDFbinspt.push_back(30.0);
+	fDFbinspt.push_back(35.0);
+	fDFbinspt.push_back(37.5);
+	fDFbinspt.push_back(40.0);
+	fDFbinspt.push_back(42.5);
+	fDFbinspt.push_back(45.0);
+	fDFbinspt.push_back(47.5);
+	fDFbinspt.push_back(50.0);
+	fDFbinspt.push_back(55.0);
+	fDFbinspt.push_back(60.0);
+	fDFbinspt.push_back(70.0);
+	fDFn_binspt    = fDFbinspt.size();
 }
 
 
@@ -652,10 +677,21 @@ void Fakerates::fillFRPlots(){
 			h_Loose_muJCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
 			h_Loose_muJRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
 
-			h_Loose_muDJPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet)-JetRawPt->at(jet), fEventweight);
-			h_Loose_muFJPtJEta  ->Fill(fabs(JetEta->at(jet)), (JetPt->at(jet)-JetRawPt->at(jet))/JetRawPt->at(jet), fEventweight);
-			h_Loose_muDJPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet)-JetRawPt->at(jet), fEventweight);
-			h_Loose_muFJPtJPt   ->Fill(JetPt->at(jet), (JetPt->at(jet)-JetRawPt->at(jet))/JetRawPt->at(jet), fEventweight);
+			for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
+				h_Loose_muDJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+				h_Loose_muFJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+				h_Loose_muDJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+				h_Loose_muFJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+
+				if((fDFbinspt[0]<=JetPt->at(thisjet) && JetPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]) && (fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1])) {
+					int i = h_Loose_muDFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
+					int j = h_Loose_muDFZoomPt  ->FindBin(JetPt->at(thisjet));
+
+					h_Loose_muDJPtZoom[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+					h_Loose_muFJPtZoom[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+				}
+			}
+
 
 			if( MuPt->at(mu) >  fFRbinspt.back() ){
 				int fillbin = h_muFLoose->FindBin(fFRbinspt.back()-0.5, fabs(MuEta->at(mu)));
@@ -702,10 +738,21 @@ void Fakerates::fillFRPlots(){
 				h_Tight_muJCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
 				h_Tight_muJRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
 
-				h_Tight_muDJPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet)-JetRawPt->at(jet), fEventweight);
-				h_Tight_muFJPtJEta  ->Fill(fabs(JetEta->at(jet)), (JetPt->at(jet)-JetRawPt->at(jet))/JetRawPt->at(jet), fEventweight);
-				h_Tight_muDJPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet)-JetRawPt->at(jet), fEventweight);
-				h_Tight_muFJPtJPt   ->Fill(JetPt->at(jet), (JetPt->at(jet)-JetRawPt->at(jet))/JetRawPt->at(jet), fEventweight);
+				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
+					h_Tight_muDJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+					h_Tight_muFJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+					h_Tight_muDJPtJPt  ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+					h_Tight_muFJPtJPt  ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+			
+					if((fDFbinspt[0]<=JetPt->at(thisjet) && JetPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]) && (fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1])) {
+	
+						int i = h_Tight_muDFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
+						int j = h_Tight_muDFZoomPt  ->FindBin(JetPt->at(thisjet));
+
+						h_Tight_muDJPtZoom[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+						h_Tight_muFJPtZoom[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+					}
+				}
 
 				if( MuPt->at(mu) >  fFRbinspt.back() ){
 					int fillbin = h_muFTight->FindBin(fFRbinspt.back(), fabs(MuEta->at(mu)));
@@ -814,16 +861,37 @@ void Fakerates::bookHistos(){
 	h_Loose_muJCPtJPt    = new TH2F("h_Loose_muJCPtJPt"    , "Loose_muJCPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Loose_muJCPtJPt ->Sumw2();
 	h_Loose_muJRPtJPt    = new TH2F("h_Loose_muJRPtJPt"    , "Loose_muJRPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Loose_muJRPtJPt ->Sumw2();
 
-	h_Loose_muDJPtJEta   = new TH2F("h_Loose_muDJPtJEta"   , "Loose_muDJPtJEta"  , eta_bin, eta_min, eta_max, 10, -50, 50); h_Loose_muDJPtJEta->Sumw2();
-	h_Loose_muFJPtJEta   = new TH2F("h_Loose_muFJPtJEta"   , "Loose_muFJPtJEta"  , eta_bin, eta_min, eta_max, 10, -2, 2);   h_Loose_muFJPtJEta->Sumw2();
-	h_Loose_muDJPtJPt    = new TH2F("h_Loose_muDJPtJPt"    , "Loose_muDJPtJPt"   , pt_bin,  pt_min,  pt_max,  10, -50, 50); h_Loose_muDJPtJPt ->Sumw2();
-	h_Loose_muFJPtJPt    = new TH2F("h_Loose_muFJPtJPt"    , "Loose_muFJPtJPt"   , pt_bin,  pt_min,  pt_max,  10, -2, 2);   h_Loose_muFJPtJPt ->Sumw2();
+	h_Loose_muDJPtJEta   = new TH2F("h_Loose_muDJPtJEta"   , "Loose_muDJPtJEta"  , eta_bin, eta_min, eta_max, 30, -30, 30); h_Loose_muDJPtJEta->Sumw2();
+	h_Loose_muFJPtJEta   = new TH2F("h_Loose_muFJPtJEta"   , "Loose_muFJPtJEta"  , eta_bin, eta_min, eta_max, 20, -1, 1);   h_Loose_muFJPtJEta->Sumw2();
+	h_Loose_muDJPtJPt    = new TH2F("h_Loose_muDJPtJPt"    , "Loose_muDJPtJPt"   , pt_bin,  pt_min,  pt_max,  30, -30, 30); h_Loose_muDJPtJPt ->Sumw2();
+	h_Loose_muFJPtJPt    = new TH2F("h_Loose_muFJPtJPt"    , "Loose_muFJPtJPt"   , pt_bin,  pt_min,  pt_max,  20, -1, 1);   h_Loose_muFJPtJPt ->Sumw2();
 
+	h_Loose_muDFZoomEta  = new TH1F("h_Loose_muDFZoomEta"  , "Loose_muDFZoomEta" , fDFn_binseta-1, &fDFbinseta[0]);
+	h_Loose_muDFZoomPt   = new TH1F("h_Loose_muDFZoomPt"   , "Loose_muDFZoomPt"  , fDFn_binspt-1 , &fDFbinspt[0] );
 
-	h_Tight_muLepPt      = new TH1F("h_Tight_muLepPt"      , "Tight_muLepPt"     , pt_bin  , pt_min  , pt_max ); h_Tight_muLepPt  -> Sumw2();
-	h_Tight_muLepEta     = new TH1F("h_Tight_muLepEta"     , "Tight_muLepEta"    , eta_bin , eta_min , eta_max); h_Tight_muLepEta -> Sumw2();
-	h_Tight_muLepIso     = new TH1F("h_Tight_muLepIso"     , "Tight_muLepIso"    , 20 ,   0 , 1  ); h_Tight_muLepIso     -> Sumw2();
- 	h_Tight_muD0         = new TH1F("h_Tight_muD0"         , "Tight_muD0"        , 20 ,   0., 0.2); h_Tight_muD0         -> Sumw2();
+	int n = 0;
+	char nn[2];
+	char name[150], title[150];
+	for(int i=0; i<fDFn_binseta-1; ++i) {
+		for(int j=0; j<fDFn_binspt-1; ++j) {
+			if(n<10) sprintf(nn, "0%d", n);
+			else sprintf(nn, "%d", n);
+			sprintf(name, "h_Loose_muDJPtZoom_%s", nn);
+			sprintf(title, "Loose_muDJPtZoom_%s", nn);
+			h_Loose_muDJPtZoom[n] = new TH1F(name, title, 20, -10., 10.); 
+			h_Loose_muDJPtZoom[n]->Sumw2();
+			sprintf(name, "h_Loose_muFJPtZoom_%s", nn);
+			sprintf(title, "Loose_muFJPtZoom_%s", nn);
+			h_Loose_muFJPtZoom[n] = new TH1F(name, title, 10, -1., 1.);
+			h_Loose_muFJPtZoom[n]->Sumw2();
+			++n;
+		}
+	}
+	
+	h_Tight_muLepPt      = new TH1F("h_Tight_muLepPt"      , "Tight_muLepPt"     , pt_bin  , pt_min  , pt_max ); h_Tight_muLepPt     -> Sumw2();
+	h_Tight_muLepEta     = new TH1F("h_Tight_muLepEta"     , "Tight_muLepEta"    , eta_bin , eta_min , eta_max); h_Tight_muLepEta    -> Sumw2();
+	h_Tight_muLepIso     = new TH1F("h_Tight_muLepIso"     , "Tight_muLepIso"    , 20,       0.,       1.0    ); h_Tight_muLepIso    -> Sumw2();
+ 	h_Tight_muD0         = new TH1F("h_Tight_muD0"         , "Tight_muD0"        , 20,       0.,       0.2    ); h_Tight_muD0        -> Sumw2();
     
 	h_Tight_muLepEta_30  = new TH1F("h_Tight_muLepEta_30"  , "Tight_muLepEta_30" , eta_bin , eta_min , eta_max); h_Tight_muLepEta_30 -> Sumw2();
 	h_Tight_muLepEta_40  = new TH1F("h_Tight_muLepEta_40"  , "Tight_muLepEta_40" , eta_bin , eta_min , eta_max); h_Tight_muLepEta_40 -> Sumw2();
@@ -859,11 +927,30 @@ void Fakerates::bookHistos(){
 	h_Tight_muJCPtJPt    = new TH2F("h_Tight_muJCPtJPt"    , "Tight_muJCPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Tight_muJCPtJPt ->Sumw2();
 	h_Tight_muJRPtJPt    = new TH2F("h_Tight_muJRPtJPt"    , "Tight_muJRPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Tight_muJRPtJPt ->Sumw2();
 
-	h_Tight_muDJPtJEta   = new TH2F("h_Tight_muDJPtJEta"   , "Tight_muDJPtJEta"  , eta_bin, eta_min, eta_max, 10, -50, 50); h_Tight_muDJPtJEta->Sumw2();
-	h_Tight_muFJPtJEta   = new TH2F("h_Tight_muFJPtJEta"   , "Tight_muFJPtJEta"  , eta_bin, eta_min, eta_max, 10, -2, 2);   h_Tight_muFJPtJEta->Sumw2();
-	h_Tight_muDJPtJPt    = new TH2F("h_Tight_muDJPtJPt"    , "Tight_muDJPtJPt"   , pt_bin,  pt_min,  pt_max,  10, -50, 50); h_Tight_muDJPtJPt ->Sumw2();
-	h_Tight_muFJPtJPt    = new TH2F("h_Tight_muFJPtJPt"    , "Tight_muFJPtJPt"   , pt_bin,  pt_min,  pt_max,  10, -2, 2);   h_Tight_muFJPtJPt ->Sumw2();
+	h_Tight_muDJPtJEta   = new TH2F("h_Tight_muDJPtJEta"   , "Tight_muDJPtJEta"  , eta_bin, eta_min, eta_max, 10, -30, 30); h_Tight_muDJPtJEta->Sumw2();
+	h_Tight_muFJPtJEta   = new TH2F("h_Tight_muFJPtJEta"   , "Tight_muFJPtJEta"  , eta_bin, eta_min, eta_max, 10, -1, 1);   h_Tight_muFJPtJEta->Sumw2();
+	h_Tight_muDJPtJPt    = new TH2F("h_Tight_muDJPtJPt"    , "Tight_muDJPtJPt"   , pt_bin,  pt_min,  pt_max,  10, -30, 30); h_Tight_muDJPtJPt ->Sumw2();
+	h_Tight_muFJPtJPt    = new TH2F("h_Tight_muFJPtJPt"    , "Tight_muFJPtJPt"   , pt_bin,  pt_min,  pt_max,  10, -1, 1);   h_Tight_muFJPtJPt ->Sumw2();
 
+	h_Tight_muDFZoomEta  = new TH1F("h_Tight_muDFZoomEta"  , "Tight_muDFZoomEta" , fDFn_binseta-1, &fDFbinseta[0]);
+	h_Tight_muDFZoomPt   = new TH1F("h_Tight_muDFZoomPt"   , "Tight_muDFZoomPt"  , fDFn_binspt-1 , &fDFbinspt[0] );
+
+	n = 0;
+	for(int i=0; i<fDFn_binseta-1; ++i) {
+		for(int j=0; j<fDFn_binspt-1; ++j) {
+			if(n<10) sprintf(nn, "0%d", n);
+			else sprintf(nn, "%d", n);
+			sprintf(name, "h_Tight_muDJPtZoom_%s", nn);
+			sprintf(title, "Tight_muDJPtZoom_%s", nn);
+			h_Tight_muDJPtZoom[n] = new TH1F(name, title, 20, -10., 10.);
+			h_Tight_muDJPtZoom[n]->Sumw2();
+			sprintf(name, "h_Tight_muFJPtZoom_%s", nn);
+			sprintf(title, "Tight_muFJPtZoom_%s", nn);
+			h_Tight_muFJPtZoom[n] = new TH1F(name, title, 10, -1., 1.);
+			h_Tight_muFJPtZoom[n]->Sumw2();
+			++n;
+		}
+	}
 }
 
 
@@ -943,6 +1030,11 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Loose_muDJPtJPt   ->Write(fName + "_" + h_Loose_muDJPtJPt  ->GetName(), TObject::kWriteDelete);
 	h_Loose_muFJPtJPt   ->Write(fName + "_" + h_Loose_muFJPtJPt  ->GetName(), TObject::kWriteDelete);
 
+	for(int n = 0; n < (fDFn_binseta-1)*(fDFn_binspt-1); ++n) {
+		h_Loose_muDJPtZoom[n] ->Write(fName + "_" + h_Loose_muDJPtZoom[n] ->GetName(), TObject::kWriteDelete);
+		h_Loose_muFJPtZoom[n] ->Write(fName + "_" + h_Loose_muFJPtZoom[n] ->GetName(), TObject::kWriteDelete);
+	}
+
 
 	// tight histograms
 	h_Tight_muLepPt     ->Write(fName + "_" + h_Tight_muLepPt->GetName(),     TObject::kWriteDelete);
@@ -988,6 +1080,12 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Tight_muFJPtJEta  ->Write(fName + "_" + h_Tight_muFJPtJEta ->GetName(), TObject::kWriteDelete);
 	h_Tight_muDJPtJPt   ->Write(fName + "_" + h_Tight_muDJPtJPt  ->GetName(), TObject::kWriteDelete);
 	h_Tight_muFJPtJPt   ->Write(fName + "_" + h_Tight_muFJPtJPt  ->GetName(), TObject::kWriteDelete);
+
+	for(int n = 0; n < (fDFn_binseta-1)*(fDFn_binspt-1); ++n) {
+		h_Tight_muDJPtZoom[n] ->Write(fName + "_" + h_Tight_muDJPtZoom[n] ->GetName(), TObject::kWriteDelete);
+		h_Tight_muFJPtZoom[n] ->Write(fName + "_" + h_Tight_muFJPtZoom[n] ->GetName(), TObject::kWriteDelete);
+	}
+
 
 }
 

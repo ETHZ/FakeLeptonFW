@@ -171,6 +171,10 @@ public:
 	TH2F * h_Loose_muFJPtJEta;
 	TH2F * h_Loose_muDJPtJPt;
 	TH2F * h_Loose_muFJPtJPt;
+	TH1F * h_Loose_muDFZoomEta;
+	TH1F * h_Loose_muDFZoomPt;
+	TH1F * h_Loose_muDJPtZoom[30];
+	TH1F * h_Loose_muFJPtZoom[30];
 
 	TH1F * h_Tight_muAwayJetDR;
 	TH1F * h_Tight_muAwayJetPt;
@@ -207,26 +211,36 @@ public:
 	TH2F * h_Tight_muFJPtJEta;
 	TH2F * h_Tight_muDJPtJPt;
 	TH2F * h_Tight_muFJPtJPt;
+	TH1F * h_Tight_muDFZoomEta;
+	TH1F * h_Tight_muDFZoomPt;
+	TH1F * h_Tight_muDJPtZoom[30];
+	TH1F * h_Tight_muFJPtZoom[30];
 
 	void bookHistos();
 	void writeHistos(TFile *);
 
 	// ===================================
 
+	// Eventweight
 	float fEventweight;
+
+	// Counters
 	int fCutflow_afterLepSel;
 	int fCutflow_afterJetSel;
 	int fCutflow_afterMETCut;
 	int fCutflow_afterMTCut;
 
-	// binning for the pt-eta FR histogram
-	// float fFRbinseta;
-	// float fFRbinspt;
+	// Binning for FakeRate Projection Plots
 	std::vector<float> fFRbinseta;
 	std::vector<float> fFRbinspt;
 	int fFRn_binseta;
 	int fFRn_binspt ;
-	
+
+	// Binning for Difference/Fraction in JetPt Projection Plots
+	std::vector<float> fDFbinseta;
+	std::vector<float> fDFbinspt;
+	int fDFn_binseta;
+	int fDFn_binspt;	
 
     // SAMPLE CLASS
 	class Sample{

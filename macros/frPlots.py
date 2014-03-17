@@ -61,10 +61,10 @@ mc_samples.append(dyjets)
 canv = helper.makeCanvas(900, 675)
 
 leg = helper.makeLegend(0.7, 0.6, 0.85, 0.85)
-leg.AddEntry(data  .hists[0], 'Data'    , 'pe')
-leg.AddEntry(wjets .hists[0], 'W+Jets'  , 'f' )
-leg.AddEntry(dyjets.hists[0], 'DY+Jets' , 'f' )
-leg.AddEntry(qcd   .hists[0], 'QCD'     , 'f' )
+leg.AddEntry(data  .hists[0], helper.getLegendName(data.GetName())  , 'pe')
+leg.AddEntry(wjets .hists[0], helper.getLegendName(wjets.GetName()) , 'f' )
+leg.AddEntry(dyjets.hists[0], helper.getLegendName(dyjets.GetName()), 'f' )
+leg.AddEntry(qcd   .hists[0], helper.getLegendName(qcd.GetName())   , 'f' )
 
 
 
@@ -171,7 +171,9 @@ for hist in data.hists:
 	hist.Draw('colz')
 	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
 	hist.GetYaxis().SetTitle(helper.getYTitle(hist))
-	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend)
+	savename = prepend + helper.getSaveName(hist) + postpend
+
+	helper.saveCanvas(canv, pad_plot, outputDir, savename)
 
 	# MC
 	for mc in mc_samples:
@@ -183,6 +185,77 @@ for hist in data.hists:
 
 
 canv.SetRightMargin(0.0)
+
+
+# Plot all Zoom's with Data, MC to compare
+
+pad_plot.Close()
+pad_ratio.Close()
+pad_plot = helper.makePad('tot')
+pad_plot.cd()
+leg1 = helper.makeLegend(0.7, 0.6, 0.85, 0.85)
+leg1.AddEntry(data  .hists[0], 'Data'    , 'pe')
+leg1.AddEntry(wjets .hists[0], 'W+Jets'  , 'pe' )
+leg1.AddEntry(dyjets.hists[0], 'DY+Jets' , 'pe' )
+leg1.AddEntry(qcd   .hists[0], 'QCD'     , 'pe' )
+t_eta = ROOT.TLatex()
+t_eta.SetNDC()
+t_eta.SetTextSize(0.02)
+t_eta.SetTextAlign(11)
+t_eta.SetTextColor(ROOT.kBlack)
+t_pt = ROOT.TLatex()
+t_pt.SetNDC()
+t_pt.SetTextSize(0.02)
+t_pt.SetTextAlign(11)
+t_pt.SetTextColor(ROOT.kBlack)
+
+bins_eta = [0.0, 1.0, 2.4]
+bins_pt  = [10.0, 20.0, 30.0, 35.0, 37.5, 40.0, 42.5, 45.0, 47.5, 50.0, 55.0, 60.0, 70.0]
+bins_tot = (len(bins_eta)-1)*(len(bins_pt)-1)
+
+for hist in data.hists:
+
+	i = data.hists.index(hist)
+
+	# Plot Histogram	
+	if not "Zoom" in hist.GetName(): continue
+
+	prepend = ''
+	postpend = ''
+	if '_Loose_' in hist.GetName(): prepend = 'Loose_'
+	if '_Tight_' in hist.GetName(): prepend = 'Tight_'
+
+	id = hist.GetName().split('_')[-1]
+
+	# Data
+	hist.Draw('p e1')
+	hist.SetMaximum(1.5*hist.GetMaximum())
+	hist.SetMarkerColor(helper.getColor('data'))
+	hist.SetMarkerStyle(20)
+	hist.SetMarkerSize(1.2)
+
+	# MC
+	for mc in mc_samples:
+		mc.hists[i].Draw('p e1 same')
+		mc.hists[i].SetMarkerColor(helper.getSampleColor(mc))
+		mc.hists[i].SetMarkerStyle(20)
+		mc.hists[i].SetMarkerSize(1.2)
+
+	# Cosmetics
+	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
+	leg1.Draw()
+
+	m = int(id)//(len(bins_pt)-1)
+	n = int(id)%(len(bins_pt)-1)
+
+	text_eta = str(bins_eta[m]) + " #leq |#eta|_{jet} < " + str(bins_eta[m+1])
+	text_pt  = str(bins_pt[n])  + " #leq jet-p_{T} (corr.) < " + str(bins_pt[n+1])
+
+	t_eta.DrawLatex(0.7, 0.55, text_eta)	
+	t_pt.DrawLatex(0.7, 0.50, text_pt)
+
+	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist, '-2:') + postpend)
+
 
 
 
