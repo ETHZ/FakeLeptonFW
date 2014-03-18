@@ -134,7 +134,7 @@ void Fakerates::loadConfigFile(TString configfile){
 				if      (type == "TString" && name == "fOutputDir")      fOutputDir      = value;
 				else if (type == "TString" && name == "fInputDir")       fInputDir       = value;
 				else if (type == "float"   && name == "fLuminosity")     fLuminosity     = value.Atof();
-				else if (type == "int"     && name == "fJetCorrection")  fJetCorrection  = value.Atoi();
+				else if (type == "bool"    && name == "fJetCorrection")  fJetCorrection  = (bool) value.Atoi();
 				else if (type == "float"   && name == "fJetPtCut")       fJetPtCut       = value.Atof();
 				else if (type == "float"   && name == "fMuD0Cut")        fMuD0Cut        = value.Atof();
 				else if (type == "float"   && name == "fMuIsoCut")       fMuIsoCut       = value.Atof();
@@ -149,6 +149,19 @@ void Fakerates::loadConfigFile(TString configfile){
 			}
 		}
 	}
+	cout << "=======================================================" << endl;
+	cout << "========  DONE LOADING CONFIG FILE !! =================" << endl;
+	cout << "fOutputDir:      " << fOutputDir      << endl;
+	cout << "fInputDir:       " << fInputDir       << endl;
+	cout << "fLuminosity:     " << fLuminosity     << endl;
+	cout << "fJetCorrection:  " << fJetCorrection  << endl;
+	cout << "fJetPtCut:       " << fJetPtCut       << endl;
+	cout << "fMuD0Cut:        " << fMuD0Cut        << endl;
+	cout << "fMuIsoCut:       " << fMuIsoCut       << endl;
+	cout << "fAwayJetBTagCut: " << fAwayJetBTagCut << endl;
+	cout << "fAwayJetDPhiCut: " << fAwayJetDPhiCut << endl;
+	cout << "=======================================================" << endl;
+	cout << "=======================================================" << endl;
 }
 
 
@@ -181,7 +194,7 @@ void Fakerates::loop(TFile* pFile){
 	bookHistos();
 
 	// open input file and read the tree
-	TFile * file_ = TFile::Open(fInputDir + fInputFile);
+	TFile * file_ = TFile::Open(fInputFile);
 	TTree * tree_ = (TTree *) file_->Get("Analysis"); // tree name has to be named "Analysis"
 	tree_->ResetBranchAddresses();
 	Init(tree_);
@@ -241,7 +254,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 
 	// count numbers of loose and veto muons in the event
 	for(int i=0; i < MuPt->size(); ++i){
-		if(MuPt->at(i) < 20.) continue;
+		//if(MuPt->at(i) < 20.) continue;
 		if(isLooseMuon(i)){
 			nloose++;
 			mu = i;
@@ -251,6 +264,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 			if(MuIsVeto->at(i)) nveto_add++;
 		}
 	}
+
 
 	// require exactly one loose muon and no additional veto muons
 	if(nloose != 1) return false;
@@ -326,48 +340,42 @@ float Fakerates::getJetPt(int index) {
 	return: JetPt or JetRawPt of the jet
 	*/
 
-	if(fJetCorrection == 0) return JetRawPt->at(index);
-	if(fJetCorrection == 1) return JetPt->at(index);
-
-	return 0.0;
+	if(fJetCorrection) return JetPt->at(index);
+	else return JetRawPt->at(index);
 }
 
 
 //____________________________________________________________________________
-float Fakerates::getMET(int type = 1){
+float Fakerates::getMET(){
 	/* 
 	select the right MET according to the level of correction
 	parameters: type (type of correction)
 	return: MET or MET1
 	*/
 
-	if(type == 0) return pfMET;
-	if(type == 1) return pfMET1;
-
-	return 0.0;
+	if(fJetCorrection) return pfMET1;
+	else return pfMET;
 }
 
 
 //____________________________________________________________________________
-float Fakerates::getMETPhi(int type = 1){
+float Fakerates::getMETPhi(){
 	/* 
 	select the right METPhi according to the level of correction
 	parameters: type (type of correction)
 	return: METPhi or MET1Phi
 	*/
 
-	if(type == 0) return pfMETPhi;
-	if(type == 1) return pfMET1Phi;
-
-	return 0.0;
+	if(fJetCorrection) return pfMET1Phi;
+	else return pfMETPhi;
 }
 
 
 //____________________________________________________________________________
-float Fakerates::getMT(int type, int ind, int met = 1) {
+float Fakerates::getMT(int type, int ind) {
 	/*
 	computes MT of the event
-	parameters: type (0 = muon, 1 = electron), ind (index of the particle), met (type of MET to use)
+	parameters: type (0 = muon, 1 = electron), ind (index of the particle)
 	return: MT
 	*/
 
@@ -376,11 +384,11 @@ float Fakerates::getMT(int type, int ind, int met = 1) {
 
 
 	if(type == 0) {
-		dphi = Util::DeltaPhi(getMETPhi(0), MuPhi->at(ind));
+		dphi = Util::DeltaPhi(getMETPhi(), MuPhi->at(ind));
 		pt   = MuPt->at(ind);
 	}
 	else if(type == 1) {
-		dphi = Util::DeltaPhi(getMETPhi(0), ElPhi->at(ind));
+		dphi = Util::DeltaPhi(getMETPhi(), ElPhi->at(ind));
 		pt   = ElPt->at(ind);
 	}
 	else {
@@ -388,7 +396,7 @@ float Fakerates::getMT(int type, int ind, int met = 1) {
 		exit(0);
 	}
 
-	return TMath::Sqrt( 2 * getMET(0) * pt * (1. - TMath::Cos(dphi)) );
+	return TMath::Sqrt( 2 * getMET() * pt * (1. - TMath::Cos(dphi)) );
 }
 
 //____________________________________________________________________________
@@ -399,8 +407,8 @@ bool Fakerates::passesMETCut(float value_met = 20., int sign = 0){
 	return: true (if event passes the cuts), false (else)
 	*/
 
-	if(sign == 1 && pfMET < value_met) return false;
-	if(sign == 0 && pfMET > value_met) return false;
+	if(sign == 1 && getMET() < value_met) return false;
+	if(sign == 0 && getMET() > value_met) return false;
 	return true;
 }
 
@@ -704,11 +712,11 @@ void Fakerates::fillFRPlots(){
 			else{
 				h_muFLoose->Fill(MuPt->at(mu), fabs(MuEta->at(mu)), fEventweight);
 			}
-// cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), getAwayJet(0,mu), getAwayJet(1,mu), getHT(), isTightMuon(mu), getMT(0, mu), getMET()) << endl;
+// cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getHT(), isTightMuon(mu), getMT(0, mu), getMET()) << endl;
 		}
 
-		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(getMET(0)   , fEventweight);
-		                       h_Loose_muMETnoMTCut->Fill(getMET(0)   , fEventweight);
+		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(getMET()    , fEventweight);
+		                       h_Loose_muMETnoMTCut->Fill(getMET()    , fEventweight);
 		if(passesMETCut())     h_Loose_muMT        ->Fill(getMT(0, mu), fEventweight);
 		if(passesMETCut(20,1)) h_Loose_muMTMET30   ->Fill(getMT(0, mu), fEventweight);
 
@@ -771,8 +779,8 @@ void Fakerates::fillFRPlots(){
 				}
 			}
 
-			if(passesMTCut(0, mu)) h_Tight_muMET        -> Fill(getMET(0)   , fEventweight);
-			                       h_Tight_muMETnoMTCut -> Fill(getMET(0)   , fEventweight);
+			if(passesMTCut(0, mu)) h_Tight_muMET        -> Fill(getMET()    , fEventweight);
+			                       h_Tight_muMETnoMTCut -> Fill(getMET()    , fEventweight);
 			if(passesMETCut())     h_Tight_muMT         -> Fill(getMT(0, mu), fEventweight);
 			if(passesMETCut(20,1)) h_Tight_muMTMET30    -> Fill(getMT(0, mu), fEventweight);
 
