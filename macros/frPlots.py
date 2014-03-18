@@ -18,6 +18,8 @@ class sample:
 		self.file   = ROOT.TFile(infile)
 		self.hists  = [self.file.Get(self.name+'/'+i.GetName()) for i in self.file.GetDirectory(self.name).GetListOfKeys() ]
 		for h in self.hists: 
+			h.SetMarkerColor(helper.getSampleColor(self))
+			h.SetLineColor(helper.getSampleColor(self))
 			h.SetFillColor(helper.getSampleColor(self))
 		self.isdata = (self.name == 'data')
 		if self.isdata: 
@@ -70,7 +72,7 @@ leg.AddEntry(qcd   .hists[0], helper.getLegendName(qcd.GetName())   , 'f' )
 
 ## LIST OF HISTOGRAMS TO PLOT
 
-plot1dHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0']
+plot1dHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muAllJCPt', 'h_Loose_muAllJRPt', 'h_Loose_muAllJEta', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muAllJCPt', 'h_Tight_muAllJRPt', 'h_Tight_muAllJEta', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0']
 
 plot2dHists = ['h_Loose_muDJPtJEta', 'h_Loose_muFJPtJEta', 'h_Loose_muDJPtJPt', 'h_Loose_muFJPtJPt', 'h_Tight_muDJPtJEta', 'h_Tight_muFJPtJEta', 'h_Tight_muDJPtJPt', 'h_Tight_muFJPtJPt'] 
 
@@ -144,6 +146,40 @@ for hist in data.hists:
 	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend)
 
 
+for hist in wjets.hists:
+
+	i = wjets.hists.index(hist)
+	pad_plot.cd()
+
+
+	# Plot Histogram	
+	if not "AllJ" in hist.GetName(): continue
+
+	prepend = ''
+	postpend = '_closer'
+	if '_Loose_' in hist.GetName(): prepend = 'Loose_'
+	if '_Tight_' in hist.GetName(): prepend = 'Tight_'
+
+	hist.Draw()
+	hist.Scale(1.0/hist.Integral())
+	dyjets.hists[i].Draw("same")
+	dyjets.hists[i].Scale(1.0/dyjets.hists[i].Integral())
+	hist.SetMaximum(1.5*max(hist.GetMaximum(), dyjets.hists[i].GetMaximum()))
+	hist.GetYaxis().SetTitle("1/Integral")
+	leg.Draw()
+
+	pad_ratio.cd()
+	hist_ratio = hist.Clone()
+	hist_ratio.Divide(dyjets.hists[i])
+	hist_ratio.Draw("p e1")
+	hist_ratio = helper.setRatioStyle(hist_ratio, hist)
+	line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
+	line.Draw()
+	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend)
+
+
+
+
 
 # Run Over All Samples to Produce 2d Plots
 
@@ -171,9 +207,7 @@ for hist in data.hists:
 	hist.Draw('colz')
 	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
 	hist.GetYaxis().SetTitle(helper.getYTitle(hist))
-	savename = prepend + helper.getSaveName(hist) + postpend
-
-	helper.saveCanvas(canv, pad_plot, outputDir, savename)
+	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend, 0)
 
 	# MC
 	for mc in mc_samples:
@@ -181,10 +215,12 @@ for hist in data.hists:
 		mc.hists[i].Draw('colz')
 		mc.hists[i].GetXaxis().SetTitle(helper.getXTitle(hist))
 		mc.hists[i].GetYaxis().SetTitle(helper.getYTitle(hist))
-		helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend)
+		helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend, 0)
 
 
 canv.SetRightMargin(0.0)
+
+
 
 
 # Plot all Zoom's with Data, MC to compare
@@ -193,11 +229,11 @@ pad_plot.Close()
 pad_ratio.Close()
 pad_plot = helper.makePad('tot')
 pad_plot.cd()
-leg1 = helper.makeLegend(0.7, 0.6, 0.85, 0.85)
-leg1.AddEntry(data  .hists[0], 'Data'    , 'pe')
-leg1.AddEntry(wjets .hists[0], 'W+Jets'  , 'pe' )
-leg1.AddEntry(dyjets.hists[0], 'DY+Jets' , 'pe' )
-leg1.AddEntry(qcd   .hists[0], 'QCD'     , 'pe' )
+leg0 = helper.makeLegend(0.7, 0.6, 0.85, 0.85)
+leg0.AddEntry(data  .hists[0], helper.getLegendName(data.GetName())   , 'l')
+leg0.AddEntry(wjets .hists[0], helper.getLegendName(wjets.GetName())  , 'l')
+leg0.AddEntry(dyjets.hists[0], helper.getLegendName(dyjets.GetName()) , 'l')
+leg0.AddEntry(qcd   .hists[0], helper.getLegendName(qcd.GetName())    , 'l')
 t_eta = ROOT.TLatex()
 t_eta.SetNDC()
 t_eta.SetTextSize(0.02)
@@ -228,22 +264,24 @@ for hist in data.hists:
 	id = hist.GetName().split('_')[-1]
 
 	# Data
-	hist.Draw('p e1')
-	hist.SetMaximum(1.5*hist.GetMaximum())
-	hist.SetMarkerColor(helper.getColor('data'))
-	hist.SetMarkerStyle(20)
-	hist.SetMarkerSize(1.2)
+	hist.Scale(1.0/hist.Integral())
+	hist.SetFillStyle(0)
+	hist.SetLineStyle(2)
+	hist.Draw("HIST")
+	max = hist.GetMaximum()
 
 	# MC
 	for mc in mc_samples:
-		mc.hists[i].Draw('p e1 same')
-		mc.hists[i].SetMarkerColor(helper.getSampleColor(mc))
-		mc.hists[i].SetMarkerStyle(20)
-		mc.hists[i].SetMarkerSize(1.2)
+		mc.hists[i].Scale(1.0/mc.hists[i].Integral())
+		mc.hists[i].SetFillStyle(0)
+		mc.hists[i].Draw("HIST SAME")
+		if mc.hists[i].GetMaximum()>max: max = mc.hists[i].GetMaximum()
 
 	# Cosmetics
+	hist.SetMaximum(1.5*max)
 	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
-	leg1.Draw()
+	hist.GetYaxis().SetTitle("1/Integral")
+	leg0.Draw()
 
 	m = int(id)//(len(bins_pt)-1)
 	n = int(id)%(len(bins_pt)-1)
@@ -254,7 +292,7 @@ for hist in data.hists:
 	t_eta.DrawLatex(0.7, 0.55, text_eta)	
 	t_pt.DrawLatex(0.7, 0.50, text_pt)
 
-	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist, '-2:') + postpend)
+	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist, '-2:') + postpend, 0)
 
 
 

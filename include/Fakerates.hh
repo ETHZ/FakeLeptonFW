@@ -159,6 +159,9 @@ public:
 	TH1F * h_Loose_muMaxJPt;
 	TH1F * h_Loose_muMaxJCPt;
 	TH1F * h_Loose_muMaxJRPt;
+	TH1F * h_Loose_muAllJCPt;
+	TH1F * h_Loose_muAllJRPt;
+	TH1F * h_Loose_muAllJEta;
 	TH1F * h_Loose_muNBJets;
 	TH1F * h_Loose_muNJets;
 	TH1F * h_Loose_muNVertices;
@@ -199,6 +202,9 @@ public:
 	TH1F * h_Tight_muMaxJPt;
 	TH1F * h_Tight_muMaxJCPt;
 	TH1F * h_Tight_muMaxJRPt;
+	TH1F * h_Tight_muAllJCPt;
+	TH1F * h_Tight_muAllJRPt;
+	TH1F * h_Tight_muAllJEta;
 	TH1F * h_Tight_muNBJets;
 	TH1F * h_Tight_muNJets;
 	TH1F * h_Tight_muNVertices;   
