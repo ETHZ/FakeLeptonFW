@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <map>
 #include <time.h> // access to date/time
+//#include <windows.h>
 
 #include "include/FWBaseClass.h"
 #include "Utilities.hh"
@@ -36,10 +37,11 @@
 class Fakerates: public FWBaseClass{
 
 public:
-	Fakerates();
+	Fakerates(TString);
 	virtual ~Fakerates();
 
 	virtual void init(bool = false); // Careful, MakeClass produces Init with capital I!
+	void loadConfigFile(TString);
 
 	template <class T> inline void getObjectSafe(TFile* pFile, TString name, T*& object){
 		pFile->GetObject(name, object);
@@ -50,28 +52,34 @@ public:
 		return;
 	};
 
-	inline virtual void setVerbose   (int     v) {fVerbose   = v;};
-	inline virtual void setData      (bool    d) {fIsData    = d;};
-	inline virtual void setInputFile (TString f) {fInputFile = f;};
-	inline virtual void setOutputDir (TString d) {fOutputDir = d;};
-	inline virtual void setMaxSize   (int     m) {fMaxSize   = m;};
-	inline virtual void setName      (TString n) {fName      = n;};
-	inline virtual void setXS        (float   x) {if (!fIsData) fXSec = x; else fXSec = -1.;};
+	inline virtual void setVerbose      (int     v) {fVerbose      = v;};
+	inline virtual void setData         (bool    d) {fIsData       = d;};
+	inline virtual void setInputFile    (TString i) {fInputFile    = i;};
+	inline virtual void setName         (TString n) {fName         = n;};
+	inline virtual void setMaxSize      (int     m) {fMaxSize      = m;};
+	inline virtual void setXS           (float   x) {if (!fIsData) fXSec = x; else fXSec = -1.;};
 
 	int  fVerbose;
 	bool fIsData;
-	float fXSec;
-	float fLumi;
 	TString fInputFile;
-	TString fOutputDir;
-	TString fOutputFilename;
-	int fMaxSize;
 	TString fName;
+	int fMaxSize;
+	float fXSec;
+
+	TString fOutputDir;
+	TString fInputDir;
+	float fLuminosity;
+	int fJetCorrection;
+	float fJetPtCut;
+	float fMuD0Cut;
+	float fMuIsoCut;
+	float fAwayJetBTagCut;
+	float fAwayJetDPhiCut;
 	
 
     // FUNCTIONS
 	void doStuff(); // this one gets called by the executable
-	void loop();
+	void loop(TFile *);
 
 	//void fillRatios();
 	void fillFRPlots();
@@ -80,7 +88,7 @@ public:
 	bool passesMETCut(float, int);
 	bool passesMTCut(int, int);
 
-	bool isFRRegionMuEvent(int&, int&);
+	bool isFRRegionMuEvent(int&, int&, float);
 	bool isFRRegionElEvent(int&);
 
 
@@ -89,10 +97,11 @@ public:
 	bool isLooseMuon(int);
 	bool isTightMuon(int);
 
-	float getMT(int, int, int =1);
+	float getJetPt(int);
+	float getMT(int, int, int);
 
 		// JETS
-	bool isGoodJet(int, float);
+	bool isGoodJet(int, float, float);
 	bool isGoodSynchJet(int, float);
 	float getAwayJet(int, int);
 	float getClosestJet(int, int);
@@ -133,6 +142,14 @@ public:
 	TH1F * h_Loose_muClosJetPt;
 	TH1F * h_Loose_muHT;
 	TH1F * h_Loose_muLepEta;
+	TH1F * h_Loose_muLepEta_30;
+	TH1F * h_Loose_muLepEta_40;
+	TH1F * h_Loose_muLepEta_50;
+	TH1F * h_Loose_muLepEta_60;
+	TH1F * h_Loose_muLepPt_30;
+	TH1F * h_Loose_muLepPt_40;
+	TH1F * h_Loose_muLepPt_50;
+	TH1F * h_Loose_muLepPt_60;
 	TH1F * h_Loose_muLepIso;
 	TH1F * h_Loose_muLepPt;
 	TH1F * h_Loose_muMET;
@@ -140,10 +157,24 @@ public:
 	TH1F * h_Loose_muMT;
 	TH1F * h_Loose_muMTMET30;
 	TH1F * h_Loose_muMaxJPt;
+	TH1F * h_Loose_muMaxJCPt;
+	TH1F * h_Loose_muMaxJRPt;
 	TH1F * h_Loose_muNBJets;
 	TH1F * h_Loose_muNJets;
 	TH1F * h_Loose_muNVertices;
 	TH1F * h_Loose_muD0;
+	TH2F * h_Loose_muJCPtJEta; 
+	TH2F * h_Loose_muJRPtJEta;
+	TH2F * h_Loose_muJCPtJPt;
+	TH2F * h_Loose_muJRPtJPt;
+	TH2F * h_Loose_muDJPtJEta;
+	TH2F * h_Loose_muFJPtJEta;
+	TH2F * h_Loose_muDJPtJPt;
+	TH2F * h_Loose_muFJPtJPt;
+	TH1F * h_Loose_muDFZoomEta;
+	TH1F * h_Loose_muDFZoomPt;
+	TH1F * h_Loose_muDJPtZoom[30];
+	TH1F * h_Loose_muFJPtZoom[30];
 
 	TH1F * h_Tight_muAwayJetDR;
 	TH1F * h_Tight_muAwayJetPt;
@@ -151,6 +182,14 @@ public:
 	TH1F * h_Tight_muClosJetPt;
 	TH1F * h_Tight_muHT;
 	TH1F * h_Tight_muLepEta;
+	TH1F * h_Tight_muLepEta_30;
+	TH1F * h_Tight_muLepEta_40;
+	TH1F * h_Tight_muLepEta_50;
+	TH1F * h_Tight_muLepEta_60;
+	TH1F * h_Tight_muLepPt_30;
+	TH1F * h_Tight_muLepPt_40;
+	TH1F * h_Tight_muLepPt_50;
+	TH1F * h_Tight_muLepPt_60;
 	TH1F * h_Tight_muLepIso;
 	TH1F * h_Tight_muLepPt;
 	TH1F * h_Tight_muMET;
@@ -158,31 +197,50 @@ public:
 	TH1F * h_Tight_muMT;
 	TH1F * h_Tight_muMTMET30;
 	TH1F * h_Tight_muMaxJPt;
+	TH1F * h_Tight_muMaxJCPt;
+	TH1F * h_Tight_muMaxJRPt;
 	TH1F * h_Tight_muNBJets;
 	TH1F * h_Tight_muNJets;
 	TH1F * h_Tight_muNVertices;   
 	TH1F * h_Tight_muD0;
-
+	TH2F * h_Tight_muJCPtJEta;
+	TH2F * h_Tight_muJRPtJEta;
+	TH2F * h_Tight_muJCPtJPt;
+	TH2F * h_Tight_muJRPtJPt;
+	TH2F * h_Tight_muDJPtJEta;
+	TH2F * h_Tight_muFJPtJEta;
+	TH2F * h_Tight_muDJPtJPt;
+	TH2F * h_Tight_muFJPtJPt;
+	TH1F * h_Tight_muDFZoomEta;
+	TH1F * h_Tight_muDFZoomPt;
+	TH1F * h_Tight_muDJPtZoom[30];
+	TH1F * h_Tight_muFJPtZoom[30];
 
 	void bookHistos();
 	void writeHistos(TFile *);
 
 	// ===================================
 
+	// Eventweight
 	float fEventweight;
+
+	// Counters
 	int fCutflow_afterLepSel;
 	int fCutflow_afterJetSel;
 	int fCutflow_afterMETCut;
 	int fCutflow_afterMTCut;
 
-	// binning for the pt-eta FR histogram
-	// float fFRbinseta;
-	// float fFRbinspt;
+	// Binning for FakeRate Projection Plots
 	std::vector<float> fFRbinseta;
 	std::vector<float> fFRbinspt;
 	int fFRn_binseta;
 	int fFRn_binspt ;
-	
+
+	// Binning for Difference/Fraction in JetPt Projection Plots
+	std::vector<float> fDFbinseta;
+	std::vector<float> fDFbinspt;
+	int fDFn_binseta;
+	int fDFn_binspt;	
 
     // SAMPLE CLASS
 	class Sample{

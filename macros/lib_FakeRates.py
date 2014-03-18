@@ -21,29 +21,17 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 			hists[i][0] = helper.setFRPlotStyle(hists[i][0], helper.getColor(hists[i][1]), 'FR as function of ' + helper.getXTitle(title_hist), title_hist)
 
 	hists[0][0].Draw("p e1")
+	hists[0][0].SetMinimum(0.0001)
+	hists[0][0].SetMaximum(1.5*hists[0][0].GetMaximum())
 	for i in range(1,len(hists)):
+		hists[i][0].SetMinimum(0.0001)
 		hists[i][0].Draw("p e1 same")
 
-	leg1 = helper.makeLegend(0.6, 0.7, 0.85, 0.85)
+	leg1 = helper.makeLegend(0.6, 0.6, 0.85, 0.85)
 	for i in range(len(hists)):
 		leg1.AddEntry(hists[i][0], helper.getLegendName(hists[i][1]), 'pe')
 	leg1.Draw()
 
-
-
-	#mc_hist = helper.setFRPlotStyle(mc_hist, helper.getColor('totbg'))
-	#for mc in mcplot_hists: mc = helper.setFRPlotStyle(mc, helper.getColor('qcdMuEnriched'))
-	#data_hist = helper.setFRPlotStyle(data_hist, helper.getColor('data'), 'FR as function of ' + helper.getXTitle(title_hist), title_hist)
-
-	#data_hist.Draw("p e1")
-	#mc_hist.Draw("p e1 same")
-	#for mc in mcplot_hists: mc.Draw("p e1 same")
-
-	#leg1 = helper.makeLegend(0.6, 0.7, 0.85, 0.85)
-	#leg1.AddEntry(data_hist, 'Data - EW', 'pe')
-	#leg1.AddEntry(mc_hist, 'QCD + EW', 'pe')
-	#for mc in mcplot_hists: leg1.AddEntry(mc, 'QCD', 'pe')
-	#leg1.Draw()
 
 	# create RATIO PLOT
 
@@ -51,27 +39,30 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 	data_bg_ratio = copy.deepcopy(hists[0][0])
 	data_bg_ratio.Divide(hists[1][0])
 	data_bg_ratio.Draw("p e1")
-	data_bg_ratio = helper.setRatioStyle(data_bg_ratio, hists[0][0])
+	data_bg_ratio = helper.setRatioStyle(data_bg_ratio, title_hist)
 	line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
 	
-	helper.saveCanvas(canv, outputDir, file_name)
+	helper.saveCanvas(canv, pad_plot, outputDir, file_name)
 
 
 
-def make2dFRPlot(canv, outputDir, dataset, hist, name=""):
+def make2dFRPlot(canv, outputDir, dataset, hist, title_indeces, name=''):
 
+	pad_plot = helper.makePad('tot')
+	pad_plot.cd()
 	hist.Draw("text colz e")
-	hist.GetXaxis().SetTitle(helper.getXTitle(dataset.hists[12]))
-	hist.GetYaxis().SetTitle(helper.getXTitle(dataset.hists[13]))
+	hist.GetXaxis().SetTitle(helper.getXTitle(dataset.hists[title_indeces[0]]))
+	hist.GetYaxis().SetTitle(helper.getXTitle(dataset.hists[title_indeces[1]]))
 	hist.SetMinimum(0.0)
 	hist.SetMaximum(0.25)
 	hist.SetTitle("FR 2d Map (" + name + ")")
-	helper.saveCanvas(canv, outputDir, "muFR_2dmap_" + name)
+	helper.saveCanvas(canv, pad_plot, outputDir, "muFR_2dmap_" + name.lower(), 0)
+	pad_plot.Close()
 
 
 
-def PlotFR(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = []):
+def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = []):
 
 	canv = helper.makeCanvas(900, 675)
 	pad_plot = helper.makePad('plot')
@@ -90,6 +81,8 @@ def PlotFR(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = []):
 	for hist in dataset.hists:
 
 		i = dataset.hists.index(hist)
+
+		if not hist.GetName() in histlist: continue
 			
 		# Get Numerator Plots
 		if 'h_Tight_' in hist.GetName():
@@ -170,10 +163,16 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 	index_denominator = 0
 	mcplot_numerator = [{} for j in range(len(mcsetsplot))]
 	mcplot_denominator = [{} for j in range(len(mcsetsplot))]
+	title_indeces = [0, 0]
 
 	for hist in dataset.hists:
 
 		i = dataset.hists.index(hist)
+
+		if hist.GetName() == 'h_Loose_muLepEta':
+			title_indeces[1] = i
+		if hist.GetName() == 'h_Loose_muLepPt':
+			title_indeces[0] = i
 			
 		# Get Numerator Plots
 		if hist.GetName() == 'h_muFTight':
@@ -194,8 +193,6 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 				mc_denominator.Add(copy.deepcopy(mc.hists[index_denominator]))
 			for j,mc in enumerate(mcsetsplot):
 				mcplot_denominator[j] = copy.deepcopy(mc.hists[index_denominator])
-
-
 
 	FR_data = data_numerator
 	FR_data_copy = copy.deepcopy(FR_data)
@@ -231,9 +228,9 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 		FR_mc_copy[j] = copy.deepcopy(FR_mc[j])
 		FR_mc[j].Divide(mcplot_denominator[j])
 
-	make2dFRPlot(canv, outputDir, dataset, FR_data, "data")
-	if len(mcsubstract)>0: make2dFRPlot(canv, outputDir, dataset, FR_data_mcsub, "data-EW")
-	make2dFRPlot(canv, outputDir, dataset, FR_bg, "bg")
+	make2dFRPlot(canv, outputDir, dataset, FR_data, title_indeces, 'data')
+	if len(mcsubstract)>0: make2dFRPlot(canv, outputDir, dataset, FR_data_mcsub, title_indeces, 'data-EW')
+	make2dFRPlot(canv, outputDir, dataset, FR_bg, title_indeces, 'bg')
 
 
 
@@ -272,14 +269,14 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 		histstoplot.append([FR_bg_px, 'totbg'])
 		histstoplot.append([FR_data_px_mcsub, 'datamcsub'])
 		for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_px[j], 'qcdMuEnriched'])
-		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[12], 'muFR_proj_Pt')
+		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt')
 
 		histstoplot = []
 		histstoplot.append([FR_data_py, 'data'])
 		histstoplot.append([FR_bg_py, 'totbg'])
 		histstoplot.append([FR_data_py_mcsub, 'datamcsub'])
 		for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_py[j], 'qcdMuEnriched'])
-		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[13], 'muFR_proj_Eta')
+		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta')
 
 	return True
 
