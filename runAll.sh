@@ -1,12 +1,12 @@
 #!/bin/bash
-bash bash/run_ETH_uncorrected.sh
-bash bash/run_ETH_corrected_jet.sh
-bash bash/run_ETH_corrected_jetd0.sh
-bash bash/run_ETH_corrected_tot.sh
-bash bash/run_UFL_uncorrected.sh
-bash bash/run_UFL_corrected_jet.sh
-bash bash/run_UFL_corrected_jetd0.sh
-bash bash/run_UFL_corrected_tot.sh
+## bash bash/run_ETH_uncorrected.sh
+## bash bash/run_ETH_corrected_jet.sh
+## bash bash/run_ETH_corrected_jetd0.sh
+## bash bash/run_ETH_corrected_tot.sh
+## bash bash/run_UFL_uncorrected.sh
+## bash bash/run_UFL_corrected_jet.sh
+## bash bash/run_UFL_corrected_jetd0.sh
+## bash bash/run_UFL_corrected_tot.sh
 #make Fakerates && \
 #./Fakerates -v 2    -c config/ETH_uncorrected.config     -i doubleMu_complete.root          -n data          -x 1.0
 #./Fakerates -v 2    -c config/ETH_corrected_jet.config   -i doubleMu_complete.root          -n data          -x 1.0

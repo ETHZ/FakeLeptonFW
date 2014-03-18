@@ -69,7 +69,7 @@ public:
 	TString fOutputDir;
 	TString fInputDir;
 	float fLuminosity;
-	int fJetCorrection;
+	bool  fJetCorrection;
 	float fJetPtCut;
 	float fMuD0Cut;
 	float fMuIsoCut;
@@ -98,7 +98,7 @@ public:
 	bool isTightMuon(int);
 
 	float getJetPt(int);
-	float getMT(int, int, int);
+	float getMT(int, int);
 
 		// JETS
 	bool isGoodJet(int, float, float);
@@ -110,8 +110,8 @@ public:
 	int getNJets(int);
 
 		// MET
-	float getMET(int);
-	float getMETPhi(int);
+	float getMET();
+	float getMETPhi();
 
 	std::vector<float>::const_iterator fITFloat;
 	std::vector<bool >::const_iterator fITBool;
