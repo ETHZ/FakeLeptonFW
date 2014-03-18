@@ -67,7 +67,6 @@ public:
 	float fXSec;
 
 	TString fOutputDir;
-	TString fInputDir;
 	float fLuminosity;
 	bool  fJetCorrection;
 	float fJetPtCut;

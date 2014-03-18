@@ -132,7 +132,6 @@ void Fakerates::loadConfigFile(TString configfile){
 				if(v != "v") { cout << "ERROR in reading variable (" << name << ")!" << endl; exit(1); }
 
 				if      (type == "TString" && name == "fOutputDir")      fOutputDir      = value;
-				else if (type == "TString" && name == "fInputDir")       fInputDir       = value;
 				else if (type == "float"   && name == "fLuminosity")     fLuminosity     = value.Atof();
 				else if (type == "bool"    && name == "fJetCorrection")  fJetCorrection  = (bool) value.Atoi();
 				else if (type == "float"   && name == "fJetPtCut")       fJetPtCut       = value.Atof();
@@ -152,7 +151,6 @@ void Fakerates::loadConfigFile(TString configfile){
 	cout << "=======================================================" << endl;
 	cout << "========  DONE LOADING CONFIG FILE !! =================" << endl;
 	cout << "fOutputDir:      " << fOutputDir      << endl;
-	cout << "fInputDir:       " << fInputDir       << endl;
 	cout << "fLuminosity:     " << fLuminosity     << endl;
 	cout << "fJetCorrection:  " << fJetCorrection  << endl;
 	cout << "fJetPtCut:       " << fJetPtCut       << endl;
