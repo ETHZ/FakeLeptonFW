@@ -141,7 +141,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet){
 
 	// count numbers of loose and veto muons in the event
 	for(int i=0; i < MuPt->size(); ++i){
-		if(MuPt->at(i) < 20.) continue;
+		//if(MuPt->at(i) < 20.) continue;
 		if(isLooseMuon(i)){
 			nloose++;
 			mu = i;
@@ -151,6 +151,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet){
 			if(MuIsVeto->at(i)) nveto_add++;
 		}
 	}
+
 
 	// require exactly one loose muon and no additional veto muons
 	if(nloose != 1) return false;
@@ -194,8 +195,8 @@ bool Fakerates::passesMETCut(float value_met = 20., int sign = 0){
 	return: true (if event passes the cuts), false (else)
 	*/
 
-	if(sign == 1 && pfMET < value_met) return false;
-	if(sign == 0 && pfMET > value_met) return false;
+	if(sign == 1 && getMET(1) < value_met) return false;
+	if(sign == 0 && getMET(1) > value_met) return false;
 	return true;
 }
 
@@ -455,7 +456,7 @@ void Fakerates::fillFRPlots(){
 			else{
 				h_muFLoose->Fill(MuPt->at(mu), fabs(MuEta->at(mu)), fEventweight);
 			}
-// cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), getAwayJet(0,mu), getAwayJet(1,mu), getHT(), isTightMuon(mu), getMT(0, mu), getMET()) << endl;
+// cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getHT(), isTightMuon(mu), getMT(0, mu), getMET()) << endl;
 		}
 
 		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(getMET()    , fEventweight);
