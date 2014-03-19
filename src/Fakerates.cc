@@ -135,6 +135,7 @@ void Fakerates::loadConfigFile(TString configfile){
 				else if (type == "float"   && name == "fLuminosity")     fLuminosity     = value.Atof();
 				else if (type == "bool"    && name == "fJetCorrection")  fJetCorrection  = (bool) value.Atoi();
 				else if (type == "float"   && name == "fJetPtCut")       fJetPtCut       = value.Atof();
+				else if (type == "float"   && name == "fMuPtCut")        fMuPtCut        = value.Atof();
 				else if (type == "float"   && name == "fMuD0Cut")        fMuD0Cut        = value.Atof();
 				else if (type == "float"   && name == "fMuIsoCut")       fMuIsoCut       = value.Atof();
 				else if (type == "float"   && name == "fAwayJetBTagCut") fAwayJetBTagCut = value.Atof();
@@ -154,6 +155,7 @@ void Fakerates::loadConfigFile(TString configfile){
 	cout << "fLuminosity:     " << fLuminosity     << endl;
 	cout << "fJetCorrection:  " << fJetCorrection  << endl;
 	cout << "fJetPtCut:       " << fJetPtCut       << endl;
+	cout << "fMuPtCut:        " << fMuPtCut        << endl;
 	cout << "fMuD0Cut:        " << fMuD0Cut        << endl;
 	cout << "fMuIsoCut:       " << fMuIsoCut       << endl;
 	cout << "fAwayJetBTagCut: " << fAwayJetBTagCut << endl;
@@ -171,7 +173,7 @@ void Fakerates::loadConfigFile(TString configfile){
 void Fakerates::doStuff(){
 	
 	TString OutputFilename = fOutputDir + fName + "_ratios.root";
-	//if(CreateDirectory(fOutputDir, NULL) || GetLastError() == ERROR_ALREADY_EXISTS) Util::MakeOutputDir(fOutputDir);
+	if(!Util::dirExists(fOutputDir)) Util::MakeOutputDir(fOutputDir);
 	TFile *pFile = new TFile(OutputFilename, "RECREATE");
 	
 	loop(pFile);
@@ -204,13 +206,13 @@ void Fakerates::loop(TFile* pFile){
 	Init(tree_);
 	Long64_t tot_events = tree_->GetEntriesFast();
     
-    // calculate the eventweight
-    TH1F * EventCount = (TH1F*) file_->Get("EventCount");
-    Double_t Ngen = EventCount->GetEntries();
-    if(!fIsData) fEventweight = fXSec * fLuminosity / (fMaxSize>0?fMaxSize:Ngen);
+	// calculate the eventweight
+	TH1F * EventCount = (TH1F*) file_->Get("EventCount");
+	Double_t Ngen = EventCount->GetEntries();
+	if(!fIsData) fEventweight = fXSec * fLuminosity / (fMaxSize>0?fMaxSize:Ngen);
 	else fEventweight = 1.;
 	cout << "going to loop over " << (fMaxSize>0?fMaxSize:Ngen) << " events..." << endl;
-    cout << "eventweight is " << fEventweight << endl;
+	cout << "eventweight is " << fEventweight << endl;
 
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events;jentry++) {
@@ -258,12 +260,12 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 
 	// count numbers of loose and veto muons in the event
 	for(int i=0; i < MuPt->size(); ++i){
-		if(isLooseMuon(i) && MuPt->at(i) > 20.){
+		if(isLooseMuon(i) && MuPt->at(i) > fMuPtCut){
 			nloose++;
 			mu = i;
 			loosemu_inds.push_back(i);
 		}
-		else if(isLooseMuon(i) && MuPt->at(i) < 20.){
+		else if(isLooseMuon(i) && MuPt->at(i) < fMuPtCut){
 			nveto_add++;
 		}
 	}

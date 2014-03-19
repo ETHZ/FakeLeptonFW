@@ -9,7 +9,7 @@ import lib_FakeRates as FR
 
 ROOT.gROOT.SetBatch(1)
 ROOT.gStyle.SetOptStat(0)
-
+ROOT.gStyle.SetPaintTextFormat("4.3f")
 
 
 class sample:
@@ -207,7 +207,7 @@ for hist in data.hists:
 	hist.Draw('colz')
 	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
 	hist.GetYaxis().SetTitle(helper.getYTitle(hist))
-	hist.SetTitle()
+	hist.SetTitle("")
 	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend, 0)
 
 	# MC
@@ -216,7 +216,7 @@ for hist in data.hists:
 		mc.hists[i].Draw('colz')
 		mc.hists[i].GetXaxis().SetTitle(helper.getXTitle(hist))
 		mc.hists[i].GetYaxis().SetTitle(helper.getYTitle(hist))
-		mc.hists[i].SetTitle()
+		mc.hists[i].SetTitle("")
 		helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend, 0)
 
 
@@ -283,7 +283,7 @@ for hist in data.hists:
 	hist.SetMaximum(1.5*max)
 	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
 	hist.GetYaxis().SetTitle("1/Integral")
-	hist.SetTitle()
+	hist.SetTitle("")
 	leg0.Draw()
 
 	m = int(id)//(len(bins_pt)-1)

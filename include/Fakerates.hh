@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <map>
 #include <time.h> // access to date/time
-//#include <windows.h>
 
 #include "include/FWBaseClass.h"
 #include "Utilities.hh"
@@ -70,6 +69,7 @@ public:
 	float fLuminosity;
 	bool  fJetCorrection;
 	float fJetPtCut;
+	float fMuPtCut;
 	float fMuD0Cut;
 	float fMuIsoCut;
 	float fAwayJetBTagCut;
