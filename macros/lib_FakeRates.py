@@ -52,6 +52,7 @@ def make2dFRPlot(canv, outputDir, dataset, hist, title_indeces, name=''):
 	pad_plot = helper.makePad('tot')
 	pad_plot.cd()
 	hist.Draw("text colz e")
+	hist.SetMarkerColor(ROOT.kBlack)
 	hist.GetXaxis().SetTitle(helper.getXTitle(dataset.hists[title_indeces[0]]))
 	hist.GetYaxis().SetTitle(helper.getXTitle(dataset.hists[title_indeces[1]]))
 	hist.SetMinimum(0.0)
