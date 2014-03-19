@@ -193,6 +193,12 @@ void Fakerates::loop(TFile* pFile){
 
 	// open input file and read the tree
 	TFile * file_ = TFile::Open(fInputFile);
+	if(file_ == NULL ) {
+		cout << "==========================================================================" << endl;
+		cout << "ERROR: THE FILE YOU ARE TRYING TO READ ISN'T OPEN. CHECK IT'S EXISTENCE!!!" << endl;
+		cout << " ... exiting" << endl;
+		exit(0);
+	}
 	TTree * tree_ = (TTree *) file_->Get("Analysis"); // tree name has to be named "Analysis"
 	tree_->ResetBranchAddresses();
 	Init(tree_);
