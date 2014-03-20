@@ -20,7 +20,7 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 		if i+1 == len(hists): 
 			hists[i][0] = helper.setFRPlotStyle(hists[i][0], helper.getColor(hists[i][1]), 'FR as function of ' + helper.getXTitle(title_hist), title_hist)
 
-	hists[0][0].Draw("p x0 e")
+	hists[0][0].Draw("p x0 e1")
 	hists[0][0].SetMarkerSize(1.4)
 	hists[0][0].SetMinimum(0.0001)
 	hists[0][0].SetMaximum(0.4) #1.5*hists[0][0].GetMaximum())
@@ -29,9 +29,9 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 		hists[i][0].SetMaximum(0.4)
 		hists[i][0].SetMarkerSize(0)
 		hists[i][0].Draw("E2 same")
-	hists[0][0].Draw("p x0 e same")
+	hists[0][0].Draw("p x0 e1 same")
 
-	leg1 = helper.makeLegend(0.15, 0.6, 0.4, 0.85)
+	leg1 = helper.makeLegend(0.22, 0.6, 0.47, 0.85)
 	leg1.AddEntry(hists[0][0], helper.getLegendName(hists[0][1]), 'pe')
 	for i in range(1,len(hists)):
 		leg1.AddEntry(hists[i][0], helper.getLegendName(hists[i][1]), 'f')
@@ -76,11 +76,7 @@ def make2dFRPlot(canv, outputDir, dataset, hist, title_indeces, name=''):
 
 def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = []):
 
-	canv = helper.makeCanvas(900, 675, 'c1dFR', 0)
-	canv.SetTopMargin(0.07)
-	canv.SetLeftMargin(0.25)
-	canv.SetRightMargin(0.0)
-	canv.SetBottomMargin(0.2)
+	canv = helper.makeCanvas(900, 675, 'c1dFR')
 	pad_plot = helper.makePad('plot')
 	pad_ratio = helper.makePad('ratio')
 	pad_plot.SetTicks(1,1)
@@ -142,14 +138,14 @@ def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = 
 					FR_data_mcsub.Add(mc.hists[index_numerators[i]], -1)
 					data_denominator_mcsub.Add(mc.hists[index_denominators[i]],-1)
 
-		FR_data.Divide(data_denominators[i])
-		FR_data_mcsub.Divide(data_denominator_mcsub)
+		FR_data.Divide(FR_data, data_denominators[i], 1, 1, 'B')
+		FR_data_mcsub.Divide(FR_data_mcsub, data_denominator_mcsub, 1, 1, 'B')
 		FR_bg.append(copy.deepcopy(mc_numerators[i].GetStack().Last()))
-		FR_bg[i].Divide(copy.deepcopy(mc_denominators[i].GetStack().Last()))
+		FR_bg[i].Divide(FR_bg[i], copy.deepcopy(mc_denominators[i].GetStack().Last()), 1, 1, 'B')
 		FR_mc.append([{} for j in range(len(mcsetsplot))])
 		for j in range(len(mcsetsplot)): 
 			FR_mc[i][j] = mcplot_numerators[i][j]
-			FR_mc[i][j].Divide(mcplot_denominators[i][j])
+			FR_mc[i][j].Divide(FR_mc[i][j], mcplot_denominators[i][j], 1, 1, 'B')
 		
 
 		# this part needs adjustment
@@ -178,11 +174,7 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 			print "Every MC that shall be substracted from data must also be given in the BG"
 			return False
 
-	canv = helper.makeCanvas(900, 675, 'c2dFR', 0)
-	canv.SetTopMargin(0.07)
-	canv.SetLeftMargin(0.25)
-	canv.SetRightMargin(0.1)
-	canv.SetBottomMargin(0.2)
+	canv = helper.makeCanvas(900, 675, 'c2dFR')
 	index_numerator = 0
 	index_denominator = 0
 	mcplot_numerator = [{} for j in range(len(mcsetsplot))]
@@ -239,15 +231,15 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 				data_denominator_mcsub.Add(mc.hists[index_denominator], -1)
 
 	FR_data_mcsub_copy = copy.deepcopy(FR_data_mcsub)
-	FR_data.Divide(data_denominator)
-	FR_data_mcsub.Divide(data_denominator_mcsub)
+	FR_data.Divide(FR_data, data_denominator, 1, 1, 'B')
+	FR_data_mcsub.Divide(FR_data_mcsub, data_denominator_mcsub, 1, 1, 'B')
 	FR_bg = copy.deepcopy(mc_numerator.GetStack().Last())
 	FR_bg_copy = copy.deepcopy(FR_bg)
-	FR_bg.Divide(copy.deepcopy(mc_denominator.GetStack().Last()))
+	FR_bg.Divide(FR_bg, copy.deepcopy(mc_denominator.GetStack().Last()), 1, 1, 'B')
 	for j in range(len(mcsetsplot)): 
 		FR_mc[j] = mcplot_numerator[j]
 		FR_mc_copy[j] = copy.deepcopy(FR_mc[j])
-		FR_mc[j].Divide(mcplot_denominator[j])
+		FR_mc[j].Divide(FR_mc[j], mcplot_denominator[j], 1, 1, 'B')
 
 	make2dFRPlot(canv, outputDir, dataset, FR_data, title_indeces, 'data')
 	if len(mcsubstract)>0: make2dFRPlot(canv, outputDir, dataset, FR_data_mcsub, title_indeces, 'data-EW')
@@ -264,24 +256,24 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 		pad_ratio = helper.makePad('ratio')
 
 		FR_data_px = copy.deepcopy(FR_data_copy.ProjectionX())
-		FR_data_px.Divide(copy.deepcopy(data_denominator.ProjectionX()))
+		FR_data_px.Divide(FR_data_px, copy.deepcopy(data_denominator.ProjectionX()), 1, 1, 'B')
 		FR_data_px_mcsub = copy.deepcopy(FR_data_mcsub_copy.ProjectionX())
-		FR_data_px_mcsub.Divide(copy.deepcopy(data_denominator_mcsub.ProjectionX()))		
+		FR_data_px_mcsub.Divide(FR_data_px_mcsub, copy.deepcopy(data_denominator_mcsub.ProjectionX()), 1, 1, 'B')		
 		FR_bg_px = copy.deepcopy(FR_bg_copy.ProjectionX())
-		FR_bg_px.Divide(copy.deepcopy(mc_denominator.GetStack().Last().ProjectionX()))
+		FR_bg_px.Divide(FR_bg_px, copy.deepcopy(mc_denominator.GetStack().Last().ProjectionX()), 1, 1, 'B')
 		for j in range(len(mcsetsplot)): 
 			FR_mc_px[j] = copy.deepcopy(FR_mc_copy[j].ProjectionX())
-			FR_mc_px[j].Divide(copy.deepcopy(mcplot_denominator[j].ProjectionX()))
+			FR_mc_px[j].Divide(FR_mc_px[j], copy.deepcopy(mcplot_denominator[j].ProjectionX()), 1, 1, 'B')
 
 		FR_data_py = copy.deepcopy(FR_data_copy.ProjectionY())
-		FR_data_py.Divide(copy.deepcopy(data_denominator.ProjectionY()))
+		FR_data_py.Divide(FR_data_py, copy.deepcopy(data_denominator.ProjectionY()), 1, 1, 'B')
 		FR_data_py_mcsub = copy.deepcopy(FR_data_mcsub_copy.ProjectionY())
-		FR_data_py_mcsub.Divide(copy.deepcopy(data_denominator_mcsub.ProjectionY()))
+		FR_data_py_mcsub.Divide(FR_data_py_mcsub, copy.deepcopy(data_denominator_mcsub.ProjectionY()), 1, 1, 'B')
 		FR_bg_py = copy.deepcopy(FR_bg_copy.ProjectionY())
-		FR_bg_py.Divide(copy.deepcopy(mc_denominator.GetStack().Last().ProjectionY()))
+		FR_bg_py.Divide(FR_bg_py, copy.deepcopy(mc_denominator.GetStack().Last().ProjectionY()), 1, 1, 'B')
 		for j in range(len(mcsetsplot)): 
 			FR_mc_py[j] = copy.deepcopy(FR_mc_copy[j].ProjectionY())
-			FR_mc_py[j].Divide(copy.deepcopy(mcplot_denominator[j].ProjectionY()))
+			FR_mc_py[j].Divide(FR_mc_py[j], copy.deepcopy(mcplot_denominator[j].ProjectionY()), 1, 1, 'B')
 
 
 		# this part needs adjustment!

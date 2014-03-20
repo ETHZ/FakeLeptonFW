@@ -84,15 +84,14 @@ void Fakerates::init(bool verbose){
 	// Pt Binning
 	fDFbinspt.push_back(10.0);
 	fDFbinspt.push_back(20.0);
+	fDFbinspt.push_back(22.5);
+	fDFbinspt.push_back(25.0);
+	fDFbinspt.push_back(27.5);
 	fDFbinspt.push_back(30.0);
+	fDFbinspt.push_back(32.5);
 	fDFbinspt.push_back(35.0);
-	fDFbinspt.push_back(37.5);
 	fDFbinspt.push_back(40.0);
-	fDFbinspt.push_back(42.5);
-	fDFbinspt.push_back(45.0);
-	fDFbinspt.push_back(47.5);
 	fDFbinspt.push_back(50.0);
-	fDFbinspt.push_back(55.0);
 	fDFbinspt.push_back(60.0);
 	fDFbinspt.push_back(70.0);
 	fDFn_binspt    = fDFbinspt.size();
@@ -480,12 +479,12 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	// if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
 
-	// // if a tight muon with dR too small found then return false
-	// for(int imu = 0; imu < MuPt->size(); ++imu){
-	//     if(!MuIsTight->at(imu)) continue;
-	//     if(Util::GetDeltaR(MuEta->at(imu), JetEta->at(j), MuPhi->at(imu), JetPhi->at(j)) > minDR ) continue;
-	//     return false;
-	// }
+	// if a tight muon with dR too small found then return false
+	for(int imu = 0; imu < MuPt->size(); ++imu){
+		if(!MuIsTight->at(imu)) continue;
+		if(Util::GetDeltaR(MuEta->at(imu), JetEta->at(j), MuPhi->at(imu), JetPhi->at(j)) > minDR ) continue;
+		return false;
+	}
 
     // // if a tight electron with dR too small found then return false
 	// for(int iel = 0; iel < ElPt->size(); ++iel){

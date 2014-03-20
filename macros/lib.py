@@ -58,19 +58,23 @@ def makePad(which):
 		pad.SetPad(0.0, 0.3, 1.0, 1.0)
 		pad.SetBorderSize(0)
 		pad.SetBottomMargin(0.0)
+		pad.SetLeftMargin(0.17)
 		pad.SetTicks(1,1)
 
 	if which == 'ratio':
 		pad.SetPad(0.0, 0.0, 1.0, 0.3)
 		pad.SetBorderSize(0)
 		pad.SetTopMargin(0.0)
-		pad.SetBottomMargin(0.4)
+		pad.SetBottomMargin(0.47)
+		pad.SetLeftMargin(0.17)
 		pad.SetTicks(1,1)
 
 	if which == 'tot':
 		pad.SetPad(0.0, 0.0, 1.0, 1.0)
-		#pad.SetTopMargin(0.1)
-		#pad.SetBottomMargin(0.1)
+		pad.SetTopMargin(0.1)
+		pad.SetBottomMargin(0.2)
+		pad.SetLeftMargin(0.17)
+		pad.SetRightMargin(0.1)
 		pad.SetBorderSize(0)
 		pad.SetTicks(1,1)
 
@@ -90,9 +94,11 @@ def set1dPlotStyle(hist, color, title = '', title_hist = ''):
 	hist.SetFillColor(color)
 	hist.SetLineColor(color)
 	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
+	hist.GetXaxis().SetNdivisions(505)
 	hist.GetYaxis().SetTitle("")
 	hist.GetYaxis().SetTitleSize(0.08)
 	hist.GetYaxis().SetLabelSize(0.08)
+	hist.GetYaxis().SetNdivisions(505)
 	hist.SetTitle(title)
 	return hist
 
@@ -100,6 +106,7 @@ def setFRPlotStyle(hist, color, title = '', title_hist = ''):
 	hist.SetMarkerColor(color)
 	hist.SetMarkerStyle(20)
 	hist.SetLineColor(color)
+	hist.SetLineWidth(3)
 	hist.SetFillColor(color)
 	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
 	hist.GetYaxis().SetRangeUser(0., 0.25)
@@ -119,7 +126,7 @@ def setRatioStyle(hist, title_hist=''):
 	hist.GetYaxis().SetTitleOffset(0.3)
 	hist.GetXaxis().SetNdivisions(505)
 	hist.GetXaxis().SetLabelSize(0.18)
-	hist.GetXaxis().SetTitleSize(0.18)
+	hist.GetXaxis().SetTitleSize(0.2)
 	hist.GetXaxis().SetTitleOffset(1.0)
 	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
 	hist.SetMaximum(1.99)
@@ -135,9 +142,9 @@ def getXTitle(hist):
 	elif 'ClosJetDR'  in name: return 'dR^{close}'
 	elif 'ClosJetPt'  in name: return 'p_{T}^{close}'
 	elif 'HT'         in name: return 'H_{T}'
-	elif 'LepEta'     in name: return '|#eta|_{lep}'
-	elif 'LepIso'     in name: return 'pfIso_{lep}'
-	elif 'LepPt'      in name: return 'p_{T}^{lep}'
+	elif 'LepEta'     in name: return '#mu-|#eta|' #'|#eta|_{lep}'
+	elif 'LepIso'     in name: return '#mu-pfIso'# 'pfIso_{lep}'
+	elif 'LepPt'      in name: return '#mu-pT' #'p_{T}^{lep}'
 	elif 'muMET'      in name: return 'MET'
 	elif 'muMT'       in name: return 'm_{T}'
 	elif 'MTMET30'    in name: return 'm_{T}'
@@ -157,7 +164,7 @@ def getXTitle(hist):
 	elif 'FJPtJPt'    in name: return 'jet-p_{T} (corr.)'
 	elif 'DJPtZoom'   in name: return 'jet-p_{T} (corr.) - jet-p_{T} (raw)'
 	elif 'FJPtZoom'   in name: return '(jet-p_{T} (corr.) - jet-p_{T} (raw))/jet-p_{T} (raw)'
-	elif 'NVertices'  in name: return 'n_{vertices}'
+	elif 'NVertices'  in name: return 'NVertices' #'n_{vertices}'
 	elif 'D0'         in name: return 'd_{0}^{lep}'
 	else: return name
 

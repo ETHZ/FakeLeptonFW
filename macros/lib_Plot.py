@@ -52,8 +52,9 @@ def make2dPlot(canv, pad_plot, outputDir, hist, postpend, file_name):
 	hist.Draw('colz')
 	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
 	hist.GetYaxis().SetTitle(helper.getYTitle(hist))	
-	hist.GetYaxis().SetTitleSize(0.07)
+	hist.GetYaxis().SetTitleSize(0.055)
 	hist.GetYaxis().SetLabelSize(0.07)
+	hist.GetYaxis().SetNdivisions(505)
 	hist.GetXaxis().SetTitleSize(0.07)
 	hist.GetXaxis().SetLabelSize(0.07)
 	hist.GetXaxis().SetNdivisions(505)
@@ -67,11 +68,7 @@ def make2dPlot(canv, pad_plot, outputDir, hist, postpend, file_name):
 
 def Plot1d(outputDir, dataset, mcsets, histlist, leg):
 
-	canv = helper.makeCanvas(900, 675, 'c1d', 0)
-	canv.SetTopMargin(0.07)
-	canv.SetLeftMargin(0.25)
-	canv.SetRightMargin(0.0)
-	canv.SetBottomMargin(0.2)
+	canv = helper.makeCanvas(900, 675, 'c1d')
 	pad_plot = helper.makePad('plot')
 	pad_ratio = helper.makePad('ratio')
 	pad_plot.SetTicks(1,1)
@@ -109,11 +106,7 @@ def Plot1d(outputDir, dataset, mcsets, histlist, leg):
 
 def PlotZooms(outputDir, dataset, mcsets, leg):
 
-	canv = helper.makeCanvas(900, 675, 'c1dZ', 0)
-	canv.SetTopMargin(0.07)
-	canv.SetLeftMargin(0.35)
-	canv.SetRightMargin(0.0)
-	canv.SetBottomMargin(0.2)
+	canv = helper.makeCanvas(900, 675, 'c1dZ')
 	pad_plot = helper.makePad('tot')
 	pad_plot.SetTicks(1,1)
 	pad_plot.cd()
@@ -131,7 +124,7 @@ def PlotZooms(outputDir, dataset, mcsets, leg):
 	t_pt.SetTextColor(ROOT.kBlack)
 
 	bins_eta = [0.0, 1.0, 2.4]
-	bins_pt  = [10.0, 20.0, 30.0, 35.0, 37.5, 40.0, 42.5, 45.0, 47.5, 50.0, 55.0, 60.0, 70.0]
+	bins_pt  = [10.0, 20.0, 22.5, 25.0, 27.5, 30.0, 32.5, 35.0, 40.0, 50.0, 60.0, 70.0]
 	bins_tot = (len(bins_eta)-1)*(len(bins_pt)-1)
 
 	for hist in dataset.hists:
@@ -171,6 +164,8 @@ def PlotZooms(outputDir, dataset, mcsets, leg):
 		hist.GetXaxis().SetLabelSize(0.07)
 		hist.GetYaxis().SetTitleSize(0.07)
 		hist.GetYaxis().SetLabelSize(0.07)
+		hist.GetXaxis().SetNdivisions(505)
+		hist.GetYaxis().SetNdivisions(505)
 		leg.Draw()
 
 		m = int(id)//(len(bins_pt)-1)
@@ -179,8 +174,8 @@ def PlotZooms(outputDir, dataset, mcsets, leg):
 		text_eta = str(bins_eta[m]) + " #leq |#eta|_{jet} < " + str(bins_eta[m+1])
 		text_pt  = str(bins_pt[n])  + " #leq jet-p_{T} (corr.) < " + str(bins_pt[n+1])
 
-		t_eta.DrawLatex(0.15, 0.8, text_eta)
-		t_pt.DrawLatex(0.15, 0.73, text_pt)
+		t_eta.DrawLatex(0.22, 0.8, text_eta)
+		t_pt.DrawLatex(0.22, 0.73, text_pt)
 
 		helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist, '-2:') + postpend, 0)
 
@@ -189,11 +184,7 @@ def PlotZooms(outputDir, dataset, mcsets, leg):
 
 def Plot2d(outputDir, dataset, mcsets, histlist):
 
-	canv = helper.makeCanvas(900, 675, 'c2d', 0)
-	canv.SetTopMargin(0.07)
-	canv.SetLeftMargin(0.2)
-	canv.SetRightMargin(0.1)
-	canv.SetBottomMargin(0.2)
+	canv = helper.makeCanvas(900, 675, 'c2d')
 	pad_plot = helper.makePad('tot')
 	pad_plot.cd()
 	pad_plot.SetTicks(1,1)
