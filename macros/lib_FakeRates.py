@@ -62,10 +62,10 @@ def make2dFRPlot(canv, outputDir, dataset, hist, title_indeces, name=''):
 	hist.SetMarkerSize(1.8)
 	hist.GetXaxis().SetTitle(helper.getXTitle(dataset.hists[title_indeces[0]]))
 	hist.GetYaxis().SetTitle(helper.getXTitle(dataset.hists[title_indeces[1]]))
-	hist.GetXaxis().SetTitleSize(0.04)
-	hist.GetXaxis().SetLabelSize(0.04)
-	hist.GetYaxis().SetTitleSize(0.04)
-	hist.GetYaxis().SetLabelSize(0.04)
+	hist.GetXaxis().SetTitleSize(0.07)
+	hist.GetXaxis().SetLabelSize(0.07)
+	hist.GetYaxis().SetTitleSize(0.07)
+	hist.GetYaxis().SetLabelSize(0.07)
 	hist.SetMinimum(0.0)
 	hist.SetMaximum(0.25)
 	hist.SetTitle("FR 2d Map (" + name + ")")
@@ -76,7 +76,11 @@ def make2dFRPlot(canv, outputDir, dataset, hist, title_indeces, name=''):
 
 def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = []):
 
-	canv = helper.makeCanvas(900, 675)
+	canv = helper.makeCanvas(900, 675, 'c1dFR', 0)
+	canv.SetTopMargin(0.07)
+	canv.SetLeftMargin(0.25)
+	canv.SetRightMargin(0.0)
+	canv.SetBottomMargin(0.2)
 	pad_plot = helper.makePad('plot')
 	pad_ratio = helper.makePad('ratio')
 	pad_plot.SetTicks(1,1)
@@ -174,7 +178,11 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 			print "Every MC that shall be substracted from data must also be given in the BG"
 			return False
 
-	canv = helper.makeCanvas(900, 675)
+	canv = helper.makeCanvas(900, 675, 'c2dFR', 0)
+	canv.SetTopMargin(0.07)
+	canv.SetLeftMargin(0.25)
+	canv.SetRightMargin(0.1)
+	canv.SetBottomMargin(0.2)
 	index_numerator = 0
 	index_denominator = 0
 	mcplot_numerator = [{} for j in range(len(mcsetsplot))]
@@ -223,9 +231,6 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 
 
 	# create 2d PLOT
-
-	canv = helper.makeCanvas(900, 675)
-	canv.SetRightMargin(0.1)
 
 	if len(mcsubstract)>0: 
 		for mc in mcsets:

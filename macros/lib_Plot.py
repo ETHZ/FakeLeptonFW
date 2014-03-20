@@ -52,10 +52,11 @@ def make2dPlot(canv, pad_plot, outputDir, hist, postpend, file_name):
 	hist.Draw('colz')
 	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
 	hist.GetYaxis().SetTitle(helper.getYTitle(hist))	
-	hist.GetYaxis().SetTitleSize(0.05)
-	hist.GetYaxis().SetLabelSize(0.05)
-	hist.GetXaxis().SetTitleSize(0.05)
-	hist.GetXaxis().SetLabelSize(0.05)
+	hist.GetYaxis().SetTitleSize(0.07)
+	hist.GetYaxis().SetLabelSize(0.07)
+	hist.GetXaxis().SetTitleSize(0.07)
+	hist.GetXaxis().SetLabelSize(0.07)
+	hist.GetXaxis().SetNdivisions(505)
 	hist.SetTitle("")
 	hist.SetMarkerColor(ROOT.kBlack)
 	hist.SetLineColor(ROOT.kBlack)
@@ -66,7 +67,11 @@ def make2dPlot(canv, pad_plot, outputDir, hist, postpend, file_name):
 
 def Plot1d(outputDir, dataset, mcsets, histlist, leg):
 
-	canv = helper.makeCanvas(900, 675)
+	canv = helper.makeCanvas(900, 675, 'c1d', 0)
+	canv.SetTopMargin(0.07)
+	canv.SetLeftMargin(0.25)
+	canv.SetRightMargin(0.0)
+	canv.SetBottomMargin(0.2)
 	pad_plot = helper.makePad('plot')
 	pad_ratio = helper.makePad('ratio')
 	pad_plot.SetTicks(1,1)
@@ -104,20 +109,24 @@ def Plot1d(outputDir, dataset, mcsets, histlist, leg):
 
 def PlotZooms(outputDir, dataset, mcsets, leg):
 
-	canv = helper.makeCanvas(900,675)
+	canv = helper.makeCanvas(900, 675, 'c1dZ', 0)
+	canv.SetTopMargin(0.07)
+	canv.SetLeftMargin(0.35)
+	canv.SetRightMargin(0.0)
+	canv.SetBottomMargin(0.2)
 	pad_plot = helper.makePad('tot')
 	pad_plot.SetTicks(1,1)
 	pad_plot.cd()
 
 	t_eta = ROOT.TLatex()
 	t_eta.SetNDC()
-	t_eta.SetTextSize(0.035)
+	t_eta.SetTextSize(0.05)
 	t_eta.SetTextAlign(11)
 	t_eta.SetTextColor(ROOT.kBlack)
 
 	t_pt = ROOT.TLatex()
 	t_pt.SetNDC()
-	t_pt.SetTextSize(0.035)
+	t_pt.SetTextSize(0.05)
 	t_pt.SetTextAlign(11)
 	t_pt.SetTextColor(ROOT.kBlack)
 
@@ -158,10 +167,10 @@ def PlotZooms(outputDir, dataset, mcsets, leg):
 		hist.GetXaxis().SetTitle(helper.getXTitle(hist))
 		hist.GetYaxis().SetTitle("1/Integral")
 		hist.SetTitle("")
-		hist.GetXaxis().SetTitleSize(0.05)
-		hist.GetXaxis().SetLabelSize(0.05)
-		hist.GetYaxis().SetTitleSize(0.05)
-		hist.GetYaxis().SetLabelSize(0.05)
+		hist.GetXaxis().SetTitleSize(0.07)
+		hist.GetXaxis().SetLabelSize(0.07)
+		hist.GetYaxis().SetTitleSize(0.07)
+		hist.GetYaxis().SetLabelSize(0.07)
 		leg.Draw()
 
 		m = int(id)//(len(bins_pt)-1)
@@ -180,8 +189,11 @@ def PlotZooms(outputDir, dataset, mcsets, leg):
 
 def Plot2d(outputDir, dataset, mcsets, histlist):
 
-	canv = helper.makeCanvas(900, 675)
+	canv = helper.makeCanvas(900, 675, 'c2d', 0)
+	canv.SetTopMargin(0.07)
+	canv.SetLeftMargin(0.2)
 	canv.SetRightMargin(0.1)
+	canv.SetBottomMargin(0.2)
 	pad_plot = helper.makePad('tot')
 	pad_plot.cd()
 	pad_plot.SetTicks(1,1)
