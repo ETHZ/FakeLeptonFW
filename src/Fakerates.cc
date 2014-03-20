@@ -62,8 +62,8 @@ void Fakerates::init(bool verbose){
 	fFRn_binseta  = fFRbinseta.size();
 
 	// Pt Binning
-	fFRbinspt.push_back(10.);
-	fFRbinspt.push_back(15.);
+	//fFRbinspt.push_back(10.);
+	//fFRbinspt.push_back(15.);
 	fFRbinspt.push_back(20.);
 	fFRbinspt.push_back(25.);
 	fFRbinspt.push_back(30.);
@@ -680,7 +680,8 @@ void Fakerates::fillFRPlots(){
 			h_Loose_muMaxJPt    ->Fill(getJetPt(jet)       , fEventweight);
 			h_Loose_muNBJets    ->Fill(getNJets(1)         , fEventweight);
 			h_Loose_muNJets     ->Fill(getNJets()          , fEventweight);
-			h_Loose_muNVertices ->Fill((NVrtx>30)?30:NVrtx , fEventweight);
+			h_Loose_muNVertices ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
+			h_Loose_muNVertices1->Fill((NVrtx>30)?30:NVrtx , fEventweight);
 
 			h_Loose_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
 			h_Loose_muMaxJCPt   ->Fill(JetPt->at(jet)      , fEventweight); // always corrected Jet Pt!
@@ -745,7 +746,8 @@ void Fakerates::fillFRPlots(){
 				h_Tight_muMaxJPt    ->Fill(getJetPt(jet)       , fEventweight);
 				h_Tight_muNBJets    ->Fill(getNJets(1)         , fEventweight);
 				h_Tight_muNJets     ->Fill(getNJets()          , fEventweight);
-				h_Tight_muNVertices ->Fill((NVrtx>30)?30:NVrtx , fEventweight);
+				h_Tight_muNVertices ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
+				h_Tight_muNVertices1->Fill((NVrtx>30)?30:NVrtx , fEventweight);
 
 				h_Tight_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
 				h_Tight_muMaxJCPt   ->Fill(JetPt->at(jet)      , fEventweight); // always corrected Jet Pt!
@@ -875,7 +877,8 @@ void Fakerates::bookHistos(){
 
 	h_Loose_muNBJets     = new TH1F("h_Loose_muNBJets"     , "Loose_muNBJets"    , 3  ,  0  , 3  ); h_Loose_muNBJets     -> Sumw2();
 	h_Loose_muNJets      = new TH1F("h_Loose_muNJets"      , "Loose_muNJets"     , 5  ,  1  , 6  ); h_Loose_muNJets      -> Sumw2();
-	h_Loose_muNVertices  = new TH1F("h_Loose_muNVertices"  , "Loose_muNVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Loose_muNVertices  -> Sumw2();
+	h_Loose_muNVertices  = new TH1F("h_Loose_muNVertices"  , "Loose_muNVertices" , 40 ,  0  , 40 ); h_Loose_muNVertices  -> Sumw2();
+	h_Loose_muNVertices1 = new TH1F("h_Loose_muNVertices1" , "Loose_muNVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Loose_muNVertices1 -> Sumw2();
 
 	h_Loose_muAwayJetDR  = new TH1F("h_Loose_muAwayJetDR"  , "Loose_muAwayJetDR" , 15 ,  0  , 6  ); h_Loose_muAwayJetDR  -> Sumw2();
 	h_Loose_muAwayJetPt  = new TH1F("h_Loose_muAwayJetPt"  , "Loose_muAwayJetPt" , 10 ,  20 , 120); h_Loose_muAwayJetPt  -> Sumw2();
@@ -945,7 +948,8 @@ void Fakerates::bookHistos(){
 
 	h_Tight_muNBJets     = new TH1F("h_Tight_muNBJets"     , "Tight_muNBJets"    , 3  ,  0  , 3  ); h_Tight_muNBJets     -> Sumw2();
 	h_Tight_muNJets      = new TH1F("h_Tight_muNJets"      , "Tight_muNJets"     , 5  ,  1  , 6  ); h_Tight_muNJets      -> Sumw2();
-	h_Tight_muNVertices  = new TH1F("h_Tight_muNVertices"  , "Tight_muNVertices" ,nvrtx_nbins-1, &nvrtx_bins[0]); h_Tight_muNVertices  -> Sumw2();
+	h_Tight_muNVertices  = new TH1F("h_Tight_muNVertices"  , "Tight_muNVertices" , 40 ,  0  , 40 ); h_Tight_muNVertices  -> Sumw2();
+	h_Tight_muNVertices1 = new TH1F("h_Tight_muNVertices1" , "Tight_muNVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Tight_muNVertices1  -> Sumw2();
                                                                                                  
 	h_Tight_muAwayJetDR  = new TH1F("h_Tight_muAwayJetDR"  , "Tight_muAwayJetDR" , 15 ,  0  , 6  ); h_Tight_muAwayJetDR  -> Sumw2();
 	h_Tight_muAwayJetPt  = new TH1F("h_Tight_muAwayJetPt"  , "Tight_muAwayJetPt" , 10 ,  20 , 120); h_Tight_muAwayJetPt  -> Sumw2();
@@ -1048,6 +1052,7 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Loose_muNBJets    ->Write(fName + "_" + h_Loose_muNBJets->GetName(),    TObject::kWriteDelete);
 	h_Loose_muNJets     ->Write(fName + "_" + h_Loose_muNJets->GetName(),     TObject::kWriteDelete);
 	h_Loose_muNVertices ->Write(fName + "_" + h_Loose_muNVertices->GetName(), TObject::kWriteDelete);
+	h_Loose_muNVertices1->Write(fName + "_" + h_Loose_muNVertices1->GetName(),TObject::kWriteDelete);
 
 	h_Loose_muAwayJetDR ->Write(fName + "_" + h_Loose_muAwayJetDR->GetName(), TObject::kWriteDelete);
 	h_Loose_muAwayJetPt ->Write(fName + "_" + h_Loose_muAwayJetPt->GetName(), TObject::kWriteDelete);
@@ -1103,6 +1108,7 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Tight_muNBJets    ->Write(fName + "_" + h_Tight_muNBJets->GetName(),    TObject::kWriteDelete);
 	h_Tight_muNJets     ->Write(fName + "_" + h_Tight_muNJets->GetName(),     TObject::kWriteDelete);
 	h_Tight_muNVertices ->Write(fName + "_" + h_Tight_muNVertices->GetName(), TObject::kWriteDelete);
+	h_Tight_muNVertices1->Write(fName + "_" + h_Tight_muNVertices1->GetName(),TObject::kWriteDelete);
 
 	h_Tight_muAwayJetDR ->Write(fName + "_" + h_Tight_muAwayJetDR->GetName(), TObject::kWriteDelete);
 	h_Tight_muAwayJetPt ->Write(fName + "_" + h_Tight_muAwayJetPt->GetName(), TObject::kWriteDelete);

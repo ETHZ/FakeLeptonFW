@@ -6,6 +6,7 @@ import ROOT, commands, sys, copy, os
 import lib as helper
 import lib_FitScale as fit
 import lib_FakeRates as FR
+import lib_Plot as Plot
 
 ROOT.gROOT.SetBatch(1)
 ROOT.gStyle.SetOptStat(0)
@@ -62,17 +63,11 @@ mc_samples.append(dyjets)
 
 canv = helper.makeCanvas(900, 675)
 
-leg = helper.makeLegend(0.7, 0.6, 0.85, 0.85)
-leg.AddEntry(data  .hists[0], helper.getLegendName(data.GetName())  , 'pe')
-leg.AddEntry(wjets .hists[0], helper.getLegendName(wjets.GetName()) , 'f' )
-leg.AddEntry(dyjets.hists[0], helper.getLegendName(dyjets.GetName()), 'f' )
-leg.AddEntry(qcd   .hists[0], helper.getLegendName(qcd.GetName())   , 'f' )
-
 
 
 ## LIST OF HISTOGRAMS TO PLOT
 
-plot1dHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muAllJCPt', 'h_Loose_muAllJRPt', 'h_Loose_muAllJEta', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muAllJCPt', 'h_Tight_muAllJRPt', 'h_Tight_muAllJEta', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muD0']
+plot1dHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muAllJCPt', 'h_Loose_muAllJRPt', 'h_Loose_muAllJEta', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muNVertices1', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muAllJCPt', 'h_Tight_muAllJRPt', 'h_Tight_muAllJEta', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muNVertices1', 'h_Tight_muD0']
 
 plot2dHists = ['h_Loose_muDJPtJEta', 'h_Loose_muFJPtJEta', 'h_Loose_muDJPtJPt', 'h_Loose_muFJPtJPt', 'h_Tight_muDJPtJEta', 'h_Tight_muFJPtJEta', 'h_Tight_muDJPtJPt', 'h_Tight_muFJPtJPt'] 
 
@@ -101,50 +96,53 @@ print "scale of wjets = " + str(wjets.GetScale())
 print "scale of dyjets = " + str(dyjets.GetScale())
 
 
-# Run Over All Samples to Produce 1d Plots
 
+# produce 1d Plots
+
+leg = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
+leg.AddEntry(data  .hists[0], helper.getLegendName(data.GetName())  , 'pe')
+leg.AddEntry(wjets .hists[0], helper.getLegendName(wjets.GetName()) , 'f' )
+leg.AddEntry(dyjets.hists[0], helper.getLegendName(dyjets.GetName()), 'f' )
+leg.AddEntry(qcd   .hists[0], helper.getLegendName(qcd.GetName())   , 'f' )
+Plot.Plot1d(outputDir, data, mc_samples, plot1dHists, leg)
+
+
+
+# produce 2d Plots
+
+Plot.Plot2d(outputDir, data, mc_samples, plot2dHists)
+
+
+
+# Plot all Zooms with Data, MC to compare
+
+leg0 = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
+leg0.AddEntry(data  .hists[0], helper.getLegendName(data.GetName())   , 'l')
+leg0.AddEntry(wjets .hists[0], helper.getLegendName(wjets.GetName())  , 'l')
+leg0.AddEntry(dyjets.hists[0], helper.getLegendName(dyjets.GetName()) , 'l')
+leg0.AddEntry(qcd   .hists[0], helper.getLegendName(qcd.GetName())    , 'l')
+Plot.PlotZooms(outputDir, data, mc_samples, leg0)
+
+
+
+# compute and plot FR for every variable
+
+FR.PlotFR(outputDir, data, mc_samples, plot1dHists, [qcd], [wjets, dyjets])
+
+
+
+# compute and plot FR 2d Map (+ Projections)
+
+FR.Plot2dFRMap(outputDir, data, mc_samples, [qcd], [wjets, dyjets], True)
+
+
+
+# hard-coded to produce wjets and dyjets All-Jet comparisons
+
+canv = helper.makeCanvas(900, 675)
 pad_plot = helper.makePad('plot')
 pad_ratio = helper.makePad('ratio')
 pad_ratio.cd()
-
-for hist in data.hists:
-
-	i = data.hists.index(hist)
-	pad_plot.cd()
-
-
-	# Plot Histogram	
-	if not hist.GetName() in plot1dHists: continue
-
-	prepend = ''
-	postpend = ''
-	if '_Loose_' in hist.GetName(): prepend = 'Loose_'
-	if '_Tight_' in hist.GetName(): prepend = 'Tight_'
-
-	# Sum BG Contributions in Stack
-	stack = ROOT.THStack()
-	stackint = 0.
-	for j,mc in enumerate(mc_samples):
-		stackint += mc.hists[i].Integral()
-		stack.Add(mc.hists[i])
-
-	yscale = 1.5*max(hist.GetMaximum(), stack.GetMaximum())
-	stack.Draw('hist')
-	stack.SetMaximum(yscale)
-	stack.GetXaxis().SetTitle(helper.getXTitle(hist))
-	hist.Draw('p e1 same')
-	hist.SetMaximum(yscale)
-	leg.Draw()
-
-	pad_ratio.cd()
-	hist_ratio = hist.Clone()
-	hist_ratio.Divide(stack.GetStack().Last())
-	hist_ratio.Draw("p e1")
-	hist_ratio = helper.setRatioStyle(hist_ratio, hist)
-	line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
-	line.Draw()
-	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend)
-
 
 for hist in wjets.hists:
 
@@ -176,140 +174,6 @@ for hist in wjets.hists:
 	line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
 	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend)
-
-
-
-
-
-# Run Over All Samples to Produce 2d Plots
-
-canv.SetRightMargin(0.1)
-pad_plot.Close()
-pad_ratio.Close()
-pad_plot = helper.makePad('tot')
-pad_plot.cd()
-
-for hist in data.hists:
-
-	i = data.hists.index(hist)
-
-
-	# Plot Histogram	
-	if not hist.GetName() in plot2dHists: continue
-
-	prepend = ''
-	postpend = ''
-	if '_Loose_' in hist.GetName(): prepend = 'Loose_'
-	if '_Tight_' in hist.GetName(): prepend = 'Tight_'
-
-	# Data
-	postpend = "_data"
-	hist.Draw('colz')
-	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
-	hist.GetYaxis().SetTitle(helper.getYTitle(hist))
-	hist.SetTitle("")
-	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend, 0)
-
-	# MC
-	for mc in mc_samples:
-		postpend = "_" + str(mc.GetName().lower())
-		mc.hists[i].Draw('colz')
-		mc.hists[i].GetXaxis().SetTitle(helper.getXTitle(hist))
-		mc.hists[i].GetYaxis().SetTitle(helper.getYTitle(hist))
-		mc.hists[i].SetTitle("")
-		helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend, 0)
-
-
-canv.SetRightMargin(0.0)
-
-
-
-
-# Plot all Zoom's with Data, MC to compare
-
-pad_plot.Close()
-pad_ratio.Close()
-pad_plot = helper.makePad('tot')
-pad_plot.cd()
-leg0 = helper.makeLegend(0.7, 0.6, 0.85, 0.85)
-leg0.AddEntry(data  .hists[0], helper.getLegendName(data.GetName())   , 'l')
-leg0.AddEntry(wjets .hists[0], helper.getLegendName(wjets.GetName())  , 'l')
-leg0.AddEntry(dyjets.hists[0], helper.getLegendName(dyjets.GetName()) , 'l')
-leg0.AddEntry(qcd   .hists[0], helper.getLegendName(qcd.GetName())    , 'l')
-t_eta = ROOT.TLatex()
-t_eta.SetNDC()
-t_eta.SetTextSize(0.02)
-t_eta.SetTextAlign(11)
-t_eta.SetTextColor(ROOT.kBlack)
-t_pt = ROOT.TLatex()
-t_pt.SetNDC()
-t_pt.SetTextSize(0.02)
-t_pt.SetTextAlign(11)
-t_pt.SetTextColor(ROOT.kBlack)
-
-bins_eta = [0.0, 1.0, 2.4]
-bins_pt  = [10.0, 20.0, 30.0, 35.0, 37.5, 40.0, 42.5, 45.0, 47.5, 50.0, 55.0, 60.0, 70.0]
-bins_tot = (len(bins_eta)-1)*(len(bins_pt)-1)
-
-for hist in data.hists:
-
-	i = data.hists.index(hist)
-
-	# Plot Histogram	
-	if not "Zoom" in hist.GetName(): continue
-
-	prepend = ''
-	postpend = ''
-	if '_Loose_' in hist.GetName(): prepend = 'Loose_'
-	if '_Tight_' in hist.GetName(): prepend = 'Tight_'
-
-	id = hist.GetName().split('_')[-1]
-
-	# Data
-	hist.Scale(1.0/hist.Integral())
-	hist.SetFillStyle(0)
-	hist.SetLineStyle(2)
-	hist.Draw("HIST")
-	max = hist.GetMaximum()
-
-	# MC
-	for mc in mc_samples:
-		mc.hists[i].Scale(1.0/mc.hists[i].Integral())
-		mc.hists[i].SetFillStyle(0)
-		mc.hists[i].Draw("HIST SAME")
-		if mc.hists[i].GetMaximum()>max: max = mc.hists[i].GetMaximum()
-
-	# Cosmetics
-	hist.SetMaximum(1.5*max)
-	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
-	hist.GetYaxis().SetTitle("1/Integral")
-	hist.SetTitle("")
-	leg0.Draw()
-
-	m = int(id)//(len(bins_pt)-1)
-	n = int(id)%(len(bins_pt)-1)
-
-	text_eta = str(bins_eta[m]) + " #leq |#eta|_{jet} < " + str(bins_eta[m+1])
-	text_pt  = str(bins_pt[n])  + " #leq jet-p_{T} (corr.) < " + str(bins_pt[n+1])
-
-	t_eta.DrawLatex(0.7, 0.55, text_eta)	
-	t_pt.DrawLatex(0.7, 0.50, text_pt)
-
-	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist, '-2:') + postpend, 0)
-
-
-
-
-
-# compute and plot FR for every variable
-
-FR.PlotFR(outputDir, data, mc_samples, plot1dHists, [qcd], [wjets, dyjets])
-
-
-
-# compute and plot FR 2d Map (+ Projections)
-
-FR.Plot2dFRMap(outputDir, data, mc_samples, [qcd], [wjets, dyjets], True)
 
 
 

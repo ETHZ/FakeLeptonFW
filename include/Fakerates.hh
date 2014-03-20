@@ -164,6 +164,7 @@ public:
 	TH1F * h_Loose_muNBJets;
 	TH1F * h_Loose_muNJets;
 	TH1F * h_Loose_muNVertices;
+	TH1F * h_Loose_muNVertices1;
 	TH1F * h_Loose_muD0;
 	TH2F * h_Loose_muJCPtJEta; 
 	TH2F * h_Loose_muJRPtJEta;
@@ -207,6 +208,7 @@ public:
 	TH1F * h_Tight_muNBJets;
 	TH1F * h_Tight_muNJets;
 	TH1F * h_Tight_muNVertices;   
+	TH1F * h_Tight_muNVertices1;
 	TH1F * h_Tight_muD0;
 	TH2F * h_Tight_muJCPtJEta;
 	TH2F * h_Tight_muJRPtJEta;

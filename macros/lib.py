@@ -5,7 +5,7 @@ def getColor(name):
 	if   name == 'wjets'         : return mycolor.GetColor(102, 0, 0)
 	elif name == 'dyjets'        : return mycolor.GetColor(255, 204, 0)
 	elif name == 'qcdMuEnriched' : return mycolor.GetColor(51, 102, 153)
-	elif name == 'totbg'         : return mycolor.GetColor(102, 0, 0)
+	elif name == 'totbg'         : return mycolor.GetColor(172, 0, 0)
 	elif name == 'data'          : return ROOT.kBlack
 	elif name == 'datamcsub'     : return ROOT.kYellow
 	elif name == 'data30'        : return ROOT.kBlack
@@ -82,13 +82,30 @@ def makeLine(x1, y1, x2, y2):
 	line.SetLineStyle(7)
 	return line
 
+def set1dPlotStyle(hist, color, title = '', title_hist = ''):
+	hist.SetMarkerColor(color)
+	hist.SetMarkerSize(1.4)
+	hist.SetMarkerStyle(20)
+	hist.SetFillColor(color)
+	hist.SetLineColor(color)
+	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
+	hist.GetYaxis().SetTitle("")
+	hist.GetYaxis().SetTitleSize(0.06)
+	hist.GetYaxis().SetLabelSize(0.06)
+	hist.SetTitle(title)
+	return hist
+
 def setFRPlotStyle(hist, color, title = '', title_hist = ''):
 	hist.SetMarkerColor(color)
-	hist.SetMarkerSize(1.2)
 	hist.SetMarkerStyle(20)
+	hist.SetLineColor(color)
+	hist.SetFillColor(color)
 	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
 	hist.GetYaxis().SetRangeUser(0., 0.25)
 	hist.GetYaxis().SetTitle("FR")
+	hist.GetYaxis().SetTitleOffset(0.75)
+	hist.GetYaxis().SetTitleSize(0.06)
+	hist.GetYaxis().SetLabelSize(0.06)
 	hist.SetTitle(title)
 	return hist
 
@@ -96,14 +113,14 @@ def setRatioStyle(hist, title_hist=''):
 	hist.SetTitle('')
 	hist.GetYaxis().SetNdivisions(505)
 	hist.GetYaxis().SetTitle('Data/MC')
-	hist.GetYaxis().SetTitleSize(0.09)
+	hist.GetYaxis().SetLabelSize(0.14)
+	hist.GetYaxis().SetTitleSize(0.14)
 	hist.GetYaxis().SetTitleOffset(0.35)
-	hist.GetYaxis().SetLabelSize(0.09)
 	hist.GetXaxis().SetNdivisions(505)
-	hist.GetXaxis().SetLabelSize(0.11)
-	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
-	hist.GetXaxis().SetTitleSize(0.11)
+	hist.GetXaxis().SetLabelSize(0.14)
+	hist.GetXaxis().SetTitleSize(0.14)
 	hist.GetXaxis().SetTitleOffset(1.0)
+	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
 	hist.SetMaximum(1.99)
 	hist.SetMinimum(0.0)
 	return hist
