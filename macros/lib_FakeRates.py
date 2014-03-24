@@ -20,10 +20,12 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 		markersize_mc = 1.4
 		drawoption_data = "p e1"
 		drawoption_mc = "p e1 same"
+		legendoption_mc = "pe"
 	else:
 		markersize_mc = 0
 		drawoption_data = "p e1 x0"
 		drawoption_mc = "e2 same"
+		legendoption_mc = "f"
 
 	for i in range(len(hists)):
 		hists[i][0] = helper.setFRPlotStyle(hists[i][0], helper.getColor(hists[i][1]))
@@ -44,7 +46,7 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 	leg1 = helper.makeLegend(0.22, 0.6, 0.47, 0.85)
 	leg1.AddEntry(hists[0][0], helper.getLegendName(hists[0][1]), 'pe')
 	for i in range(1,len(hists)):
-		leg1.AddEntry(hists[i][0], helper.getLegendName(hists[i][1]), 'f')
+		leg1.AddEntry(hists[i][0], helper.getLegendName(hists[i][1]), legendoption_mc)
 	leg1.Draw()
 
 
@@ -99,8 +101,18 @@ def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = 
 		lower    = scfirst[1][1]
 		upper    = scfirst[2][1]
 
+		print scfirst
+
 		scsecond = fit.getMCScaleFactorMutually(mcsubstract, 'h_Tight_muMTMET30', [dataset], mcsetsplot, 60, 100)
 		central2 = scsecond[0]
+
+
+	print "------**------"
+	print "central 1 = " + str(central1)
+	print "lower   1 = " + str(lower)
+	print "upper   1 = " + str(upper)
+	print "central 2 = " + str(central2)
+	print "------++------"
 
 	m = -1
 	n = -1

@@ -127,13 +127,13 @@ leg.AddEntry(data   .hists[0], helper.getLegendName(data.GetName())   , 'pe')
 leg.AddEntry(wjets  .hists[0], helper.getLegendName(wjets.GetName())  , 'f' )
 leg.AddEntry(dyjets1.hists[0], helper.getLegendName(dyjets1.GetName()), 'f' )
 leg.AddEntry(qcd    .hists[0], helper.getLegendName(qcd.GetName())    , 'f' )
-Plot.Plot1d(outputDir, data, mc_samples, plot1dHists, leg)
+#Plot.Plot1d(outputDir, data, mc_samples, plot1dHists, leg)
 
 
 
 # produce 2d Plots
 
-Plot.Plot2d(outputDir, data, mc_samples, plot2dHists)
+#Plot.Plot2d(outputDir, data, mc_samples, plot2dHists)
 
 
 
@@ -144,7 +144,7 @@ leg0.AddEntry(data   .hists[0], helper.getLegendName(data.GetName())    , 'l')
 leg0.AddEntry(wjets  .hists[0], helper.getLegendName(wjets.GetName())   , 'l')
 leg0.AddEntry(dyjets1.hists[0], helper.getLegendName(dyjets1.GetName()) , 'l')
 leg0.AddEntry(qcd    .hists[0], helper.getLegendName(qcd.GetName())     , 'l')
-Plot.PlotZooms(outputDir, data, [qcd, wjets, dyjets1], leg0)
+#Plot.PlotZooms(outputDir, data, [qcd, wjets, dyjets1], leg0)
 
 
 
@@ -156,7 +156,7 @@ FR.PlotFR(outputDir, data, mc_samples, plot1dHists, [qcd], [wjets, dyjets1, dyje
 
 # compute and plot FR 2d Map (+ Projections)
 
-FR.Plot2dFRMap(outputDir, data, mc_samples, [qcd], [wjets, dyjets1, dyjets2], True)
+#FR.Plot2dFRMap(outputDir, data, mc_samples, [qcd], [wjets, dyjets1, dyjets2], True)
 
 
 
