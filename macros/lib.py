@@ -2,35 +2,45 @@ import ROOT, math
 
 def getColor(name):
 	mycolor = ROOT.TColor()
-	if   name == 'wjets'         : return mycolor.GetColor(102, 0, 0)
-	elif name == 'dyjets'        : return mycolor.GetColor(255, 204, 0)
-	elif name == 'qcdMuEnriched' : return mycolor.GetColor(51, 102, 153)
-	elif name == 'totbg'         : return mycolor.GetColor(172, 0, 0)
-	elif name == 'data'          : return ROOT.kBlack
-	elif name == 'datamcsub'     : return ROOT.kYellow
-	elif name == 'data30'        : return ROOT.kBlack
-	elif name == 'data40'        : return ROOT.kRed
-	elif name == 'data50'        : return ROOT.kBlue
-	elif name == 'data60'        : return ROOT.kGreen
-	elif name == 'dataJCPt'      : return ROOT.kRed
-	elif name == 'dataJRPt'      : return ROOT.kBlue
+	if   name == 'wjets'              : return mycolor.GetColor(102,   0,   0)
+	elif name == 'dyjets1'            : return mycolor.GetColor(255, 204,   0)
+	elif name == 'dyjets2'            : return mycolor.GetColor(255, 204,   0)
+	elif name == 'qcdMuEnriched'      : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'totbg'              : return mycolor.GetColor(172,   0,   0)
+	elif name == 'data'               : return ROOT.kBlack
+	elif name == 'datamcsub'          : return ROOT.kOrange
+	elif name == 'datamcsub_central1' : return ROOT.kBlue
+	elif name == 'datamcsub_lower1'   : return mycolor.GetColor(106,  90, 205)
+	elif name == 'datamcsub_upper1'   : return mycolor.GetColor(  0,   0, 128)
+	elif name == 'datamcsub_central2' : return ROOT.kRed
+	elif name == 'data30'             : return ROOT.kBlack
+	elif name == 'data40'             : return ROOT.kRed
+	elif name == 'data50'             : return ROOT.kBlue
+	elif name == 'data60'             : return ROOT.kGreen
+	elif name == 'dataJCPt'           : return ROOT.kRed
+	elif name == 'dataJRPt'           : return ROOT.kBlue
 
 def getSampleColor(self):
 	return getColor(self.name)
 
 def getLegendName(name):
-	if   name == 'wjets'         : return 'W + Jets'
-	elif name == 'dyjets'        : return 'DY + Jets'
-	elif name == 'qcdMuEnriched' : return 'QCD'
-	elif name == 'totbg'         : return 'QCD + EW'
-	elif name == 'data'          : return 'Data'
-	elif name == 'datamcsub'     : return 'Data - EW'
-	elif name == 'data30'        : return 'Data (30GeV)'
-	elif name == 'data40'        : return 'Data (40GeV)'
-	elif name == 'data50'        : return 'Data (50GeV)'
-	elif name == 'data60'        : return 'Data (60GeV)'
-	elif name == 'dataJCPt'      : return 'Data (corr. Jet Pt)'
-	elif name == 'dataJRPt'      : return 'Data (raw Jet Pt)'
+	if   name == 'wjets'              : return 'W + Jets'
+	elif name == 'dyjets1'            : return 'DY + Jets'
+	elif name == 'dyjets2'            : return 'DY + Jets'
+	elif name == 'qcdMuEnriched'      : return 'QCD'
+	elif name == 'totbg'              : return 'QCD + EW'
+	elif name == 'data'               : return 'Data'
+	elif name == 'datamcsub'          : return 'Data - EW'
+	elif name == 'datamcsub_central1' : return 'Data - EW (central 1)'
+	elif name == 'datamcsub_lower1'   : return 'Data - EW (lower 1)'
+	elif name == 'datamcsub_upper1'   : return 'Data - EW (upper 1)'
+	elif name == 'datamcsub_central2' : return 'Data - EW (central 2)'
+	elif name == 'data30'             : return 'Data (30GeV)'
+	elif name == 'data40'             : return 'Data (40GeV)'
+	elif name == 'data50'             : return 'Data (50GeV)'
+	elif name == 'data60'             : return 'Data (60GeV)'
+	elif name == 'dataJCPt'           : return 'Data (corr. Jet Pt)'
+	elif name == 'dataJRPt'           : return 'Data (raw Jet Pt)'
 
 def makeLegend(x1,y1,x2,y2):
 	leg = ROOT.TLegend(x1,y1,x2,y2)
@@ -197,7 +207,9 @@ def saveCanvas(canv, pad_plot, outputDir, name, plotlog = 1):
 		pad_plot.SetLogy(0)
 
 
-def PrintScale(canv, outputDir, datasets):
+def PrintScale(canv, outputDir, datasets, lower = [], upper = []):
+
+	write = ""
 
 	pad_plot = makePad('tot')
 	pad_plot.cd()
@@ -207,6 +219,8 @@ def PrintScale(canv, outputDir, datasets):
 	for i, set in enumerate(datasets): 
 		hists[i].SetBinContent(i+1, set.GetScale())
 		hists[i].SetFillColor(getColor(set.GetName()))
+		if len(lower) == len(datasets): write = " (" + str(lower[i]) + ", " + str(upper[i]) + ")"
+		print "scale " + set.GetName() + " = " + str(set.GetScale()) + write 
 	
 	hists[0].Draw("hist text")
 	for i in range(1,len(hists)): hists[i].Draw("hist text same")

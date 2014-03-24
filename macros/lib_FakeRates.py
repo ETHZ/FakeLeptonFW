@@ -2,9 +2,10 @@
 
 import ROOT, copy
 import lib as helper
+import lib_FitScale as fit
 
 
-def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_name):
+def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_name, usemarkers = False):
 	# calling this function make sure that
 	# (1) the first histogram in hists is the total data, and the second is the total bg
 	# this function wants to be improved
@@ -14,22 +15,31 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 	# create PLOT
 
 	pad_plot.cd()
+	
+	if usemarkers:
+		markersize_mc = 1.4
+		drawoption_data = "p e1"
+		drawoption_mc = "p e1 same"
+	else:
+		markersize_mc = 0
+		drawoption_data = "p e1 x0"
+		drawoption_mc = "e2 same"
 
 	for i in range(len(hists)):
 		hists[i][0] = helper.setFRPlotStyle(hists[i][0], helper.getColor(hists[i][1]))
 		if i+1 == len(hists): 
 			hists[i][0] = helper.setFRPlotStyle(hists[i][0], helper.getColor(hists[i][1]), 'FR as function of ' + helper.getXTitle(title_hist), title_hist)
 
-	hists[0][0].Draw("p x0 e1")
+	hists[0][0].Draw(drawoption_data)
 	hists[0][0].SetMarkerSize(1.4)
 	hists[0][0].SetMinimum(0.0001)
 	hists[0][0].SetMaximum(0.4) #1.5*hists[0][0].GetMaximum())
 	for i in range(1,len(hists)):
 		hists[i][0].SetMinimum(0.0001)
 		hists[i][0].SetMaximum(0.4)
-		hists[i][0].SetMarkerSize(0)
-		hists[i][0].Draw("E2 same")
-	hists[0][0].Draw("p x0 e1 same")
+		hists[i][0].SetMarkerSize(markersize_mc)
+		hists[i][0].Draw(drawoption_mc)
+	hists[0][0].Draw(drawoption_data + " same")
 
 	leg1 = helper.makeLegend(0.22, 0.6, 0.47, 0.85)
 	leg1.AddEntry(hists[0][0], helper.getLegendName(hists[0][1]), 'pe')
@@ -74,13 +84,23 @@ def make2dFRPlot(canv, outputDir, dataset, hist, title_indeces, name=''):
 
 
 
-def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = []):
+def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = [], mcsubstractscales = False):
 
 	canv = helper.makeCanvas(900, 675, 'c1dFR')
 	pad_plot = helper.makePad('plot')
 	pad_ratio = helper.makePad('ratio')
 	pad_plot.SetTicks(1,1)
 	pad_ratio.SetTicks(1,1)
+
+	# this part needs adjustment
+	if mcsubstractscales:
+		scfirst = fit.getMCScaleFactorSimultaneouslyWithErrors(dataset, mcsetsplot[0], mcsubstract[0], mcsubstract[1], mcsubstract[2])
+		central1 = scfirst[0][1]
+		lower    = scfirst[1][1]
+		upper    = scfirst[2][1]
+
+		scsecond = fit.getMCScaleFactorMutually(mcsubstract, 'h_Tight_muMTMET30', [dataset], mcsetsplot, 60, 100)
+		central2 = scsecond[0]
 
 	m = -1
 	n = -1
@@ -130,16 +150,46 @@ def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = 
 
 	for i, FR_data in enumerate(data_numerators):
 
-		FR_data_mcsub = copy.deepcopy(FR_data)
-		data_denominator_mcsub = copy.deepcopy(data_denominators[i])
+		FR_data_mcsub    = copy.deepcopy(FR_data)
+		FR_data_mcsub_c1 = copy.deepcopy(FR_data)
+		FR_data_mcsub_l1 = copy.deepcopy(FR_data)
+		FR_data_mcsub_u1 = copy.deepcopy(FR_data)
+		FR_data_mcsub_c2 = copy.deepcopy(FR_data)
+		data_denominator_mcsub    = copy.deepcopy(data_denominators[i])
+		data_denominator_mcsub_c1 = copy.deepcopy(data_denominators[i])
+		data_denominator_mcsub_l1 = copy.deepcopy(data_denominators[i])
+		data_denominator_mcsub_u1 = copy.deepcopy(data_denominators[i])
+		data_denominator_mcsub_c2 = copy.deepcopy(data_denominators[i])
 		if len(mcsubstract)>0:
 			for mc in mcsets:
 				if mc in mcsubstract:
 					FR_data_mcsub.Add(mc.hists[index_numerators[i]], -1)
+					mc.hists[index_numerators[i]].Scale(central1)
+					FR_data_mcsub_c1.Add(mc.hists[index_numerators[i]], -1)
+					mc.hists[index_numerators[i]].Scale(lower/central1)
+					FR_data_mcsub_l1.Add(mc.hists[index_numerators[i]], -1)
+					mc.hists[index_numerators[i]].Scale(upper/lower)
+					FR_data_mcsub_u1.Add(mc.hists[index_numerators[i]], -1)
+					mc.hists[index_numerators[i]].Scale(central2/upper)
+					FR_data_mcsub_c2.Add(mc.hists[index_numerators[i]], -1)
+					mc.hists[index_numerators[i]].Scale(1/central2)
 					data_denominator_mcsub.Add(mc.hists[index_denominators[i]],-1)
+					mc.hists[index_denominators[i]].Scale(central1)
+					data_denominator_mcsub_c1.Add(mc.hists[index_denominators[i]],-1)
+					mc.hists[index_denominators[i]].Scale(lower/central1)
+					data_denominator_mcsub_l1.Add(mc.hists[index_denominators[i]],-1)
+					mc.hists[index_denominators[i]].Scale(upper/lower)
+					data_denominator_mcsub_u1.Add(mc.hists[index_denominators[i]],-1)
+					mc.hists[index_denominators[i]].Scale(central2/upper)
+					data_denominator_mcsub_c2.Add(mc.hists[index_denominators[i]],-1)
+					mc.hists[index_denominators[i]].Scale(1/central2)
 
 		FR_data.Divide(FR_data, data_denominators[i], 1, 1, 'B')
 		FR_data_mcsub.Divide(FR_data_mcsub, data_denominator_mcsub, 1, 1, 'B')
+		FR_data_mcsub_c1.Divide(FR_data_mcsub_c1, data_denominator_mcsub_c1, 1, 1, 'B')
+		FR_data_mcsub_l1.Divide(FR_data_mcsub_l1, data_denominator_mcsub_l1, 1, 1, 'B')
+		FR_data_mcsub_u1.Divide(FR_data_mcsub_u1, data_denominator_mcsub_u1, 1, 1, 'B')
+		FR_data_mcsub_c2.Divide(FR_data_mcsub_c2, data_denominator_mcsub_c2, 1, 1, 'B')
 		FR_bg.append(copy.deepcopy(mc_numerators[i].GetStack().Last()))
 		FR_bg[i].Divide(FR_bg[i], copy.deepcopy(mc_denominators[i].GetStack().Last()), 1, 1, 'B')
 		FR_mc.append([{} for j in range(len(mcsetsplot))])
@@ -152,9 +202,21 @@ def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = 
 		histstoplot = []
 		histstoplot.append([FR_data, 'data'])
 		histstoplot.append([FR_bg[i], 'totbg'])
-		#histstoplot.append([FR_data_mcsub, 'datamcsub'])
-		#for j in range(len(mcsetsplot)): histstoplot.append([FR_mc[i][j], 'qcdMuEnriched'])
-		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu'))
+		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + "_data")
+
+		if len(mcsubstract)>0:
+			histstoplot = []
+			histstoplot.append([FR_data_mcsub, 'datamcsub'])
+			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc[i][j], 'qcdMuEnriched'])
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + "_data-ew")
+
+		if len(mcsubstract)>0 and mcsubstractscales:
+			histstoplot = []
+			histstoplot.append([FR_data_mcsub_c1, 'datamcsub_central1'])
+			histstoplot.append([FR_data_mcsub_l1, 'datamcsub_lower1'])	
+			histstoplot.append([FR_data_mcsub_u1, 'datamcsub_upper1'])
+			histstoplot.append([FR_data_mcsub_c2, 'datamcsub_central2'])
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + "_data-ew-scales", True)
 
 	return True
 
@@ -230,6 +292,9 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 				FR_data_mcsub.Add(mc.hists[index_numerator], -1)
 				data_denominator_mcsub.Add(mc.hists[index_denominator], -1)
 
+	FR_data_test = copy.deepcopy(FR_data)
+	FR_data_test.Divide(data_denominator)
+
 	FR_data_mcsub_copy = copy.deepcopy(FR_data_mcsub)
 	FR_data.Divide(FR_data, data_denominator, 1, 1, 'B')
 	FR_data_mcsub.Divide(FR_data_mcsub, data_denominator_mcsub, 1, 1, 'B')
@@ -242,8 +307,10 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 		FR_mc[j].Divide(FR_mc[j], mcplot_denominator[j], 1, 1, 'B')
 
 	make2dFRPlot(canv, outputDir, dataset, FR_data, title_indeces, 'data')
+	make2dFRPlot(canv, outputDir, dataset, FR_data_test, title_indeces, 'data_test')
 	if len(mcsubstract)>0: make2dFRPlot(canv, outputDir, dataset, FR_data_mcsub, title_indeces, 'data-EW')
 	make2dFRPlot(canv, outputDir, dataset, FR_bg, title_indeces, 'bg')
+	for j in range(len(mcsetsplot)): make2dFRPlot(canv, outputDir, dataset, FR_mc[j], title_indeces, 'qcdMuEnriched')
 
 
 
@@ -280,16 +347,24 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 		histstoplot = []
 		histstoplot.append([FR_data_px, 'data'])
 		histstoplot.append([FR_bg_px, 'totbg'])
-		#histstoplot.append([FR_data_px_mcsub, 'datamcsub'])
-		#for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_px[j], 'qcdMuEnriched'])
-		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt')
+		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data')
+
+		histstoplot = []
+		histstoplot.append([FR_data_px_mcsub, 'datamcsub'])
+		for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_px[j], 'qcdMuEnriched'])
+		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew')
 
 		histstoplot = []
 		histstoplot.append([FR_data_py, 'data'])
 		histstoplot.append([FR_bg_py, 'totbg'])
-		#histstoplot.append([FR_data_py_mcsub, 'datamcsub'])
-		#for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_py[j], 'qcdMuEnriched'])
-		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta')
+		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta_data')
+
+		histstoplot = []
+		histstoplot.append([FR_data_py_mcsub, 'datamcsub'])
+		for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_py[j], 'qcdMuEnriched'])
+		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta_data-ew')
+
+
 
 	return True
 

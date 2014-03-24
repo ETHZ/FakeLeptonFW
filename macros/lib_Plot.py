@@ -124,7 +124,8 @@ def PlotZooms(outputDir, dataset, mcsets, leg):
 	t_pt.SetTextColor(ROOT.kBlack)
 
 	bins_eta = [0.0, 1.0, 2.4]
-	bins_pt  = [10.0, 20.0, 22.5, 25.0, 27.5, 30.0, 32.5, 35.0, 40.0, 50.0, 60.0, 70.0]
+	#bins_pt = [10.0, 20.0, 30.0, 35.0, 37.5, 40.0, 42.5, 45.0, 47.5, 50.0, 55.0, 60.0, 70.0] # old
+	bins_pt  = [10.0, 20.0, 22.5, 25.0, 27.5, 30.0, 32.5, 35.0, 40.0, 50.0, 60.0, 70.0] # new
 	bins_tot = (len(bins_eta)-1)*(len(bins_pt)-1)
 
 	for hist in dataset.hists:
@@ -170,9 +171,12 @@ def PlotZooms(outputDir, dataset, mcsets, leg):
 
 		m = int(id)//(len(bins_pt)-1)
 		n = int(id)%(len(bins_pt)-1)
+
+		if "ZoomC" in hist.GetName(): write = "corr."
+		else:                         write = "raw"
 	
-		text_eta = str(bins_eta[m]) + " #leq |#eta|_{jet} < " + str(bins_eta[m+1])
-		text_pt  = str(bins_pt[n])  + " #leq jet-p_{T} (corr.) < " + str(bins_pt[n+1])
+		text_eta = str(bins_eta[m]) + " #leq jet-|#eta| < " + str(bins_eta[m+1])
+		text_pt  = str(bins_pt[n])  + " #leq jet-p_{T} (" + write + ") < " + str(bins_pt[n+1])
 
 		t_eta.DrawLatex(0.22, 0.8, text_eta)
 		t_pt.DrawLatex(0.22, 0.73, text_pt)
@@ -203,4 +207,8 @@ def Plot2d(outputDir, dataset, mcsets, histlist):
 
 		make2dPlot(canv, pad_plot, outputDir, hist, 'data', prepend + helper.getSaveName(hist) + postpend)
 		for mc in mcsets: make2dPlot(canv, pad_plot, outputDir, mc.hists[i], mc.GetName(), prepend + helper.getSaveName(hist) + postpend)
+
+
+
+
 

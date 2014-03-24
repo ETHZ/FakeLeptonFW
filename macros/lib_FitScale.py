@@ -25,38 +25,170 @@ def getMCScaleFactor(mcdataset, histforscale, datalist, mclist = [], minforint =
 
 
 
-def doSimScaling(data_hist, qcd_hist, wjets_hist, dyjets_hist):
+def getMCScaleFactorMutually(mcdatasets, histforscale, datalist, mclist = [], minforint = 0, maxforint = 0):
 
-	scalefactors = [1.0, 1.0, 1.0]
+	scalefactors = [1.0 for i in range(len(mcdatasets))]
+	numerator = 0.0
+	denominator = 0.0
+
+	for hist in mcdatasets[0].hists:
+		i = mcdatasets[0].hists.index(hist)
+		if hist.GetName() == histforscale:
+			if minforint == 0: minbin = 1
+			else: minbin = hist.FindBin(minforint)
+			if maxforint == 0: maxbin = hist.GetNbinsX()
+			else: maxbin = hist.FindBin(maxforint)
+
+			for j in range(len(datalist)):
+				#print "num+ looping over " + datalist[j].GetName() + ", " + str(datalist[j].hists[i].Integral(minbin, maxbin))
+				numerator += datalist[j].hists[i].Integral(minbin, maxbin)
+			for j in range(len(mclist)):
+				#print "num- looping over " + mclist[j].GetName() + ", " + str(mclist[j].hists[i].Integral(minbin, maxbin))
+				numerator -= mclist[j].hists[i].Integral(minbin, maxbin)
+			for j in range(len(mcdatasets)):
+				#print "denum looping over " + mcdatasets[j].GetName() + ", " + str(mcdatasets[j].hists[i].Integral(minbin, maxbin))
+				denominator += mcdatasets[j].hists[i].Integral(minbin, maxbin)
+			scalefactors = [numerator / denominator for j in range(len(mcdatasets))]
+
+	return scalefactors
+
+
+
+def getMCScaleFactorSimultaneously2(data, qcd, wjets, dyjets1, dyjets2):
+
+	scalefactors = [1.0, 1.0, 1.0, 1.0]
+	
+	scind = 0
+ 	for i, hist in enumerate(data.hists): 
+ 		if hist.GetName() == 'h_Tight_muMTMET20':
+			scind = i
+
+	data_hist    = data.hists[scind]
+	qcd_hist     = qcd.hists[scind]
+	ewk_hist = wjets.hists[scind]
+	ewk_hist.Add(dyjets1.hists[scind])
+	ewk_hist.Add(dyjets2.hists[scind])
+
 	x = ROOT.RooRealVar("x", "x", data_hist.GetXaxis().GetXmin(), data_hist.GetXaxis().GetXmax())
 	list = ROOT.RooArgList(x)
 	set = ROOT.RooArgSet(x)
 
-	data_RDH = ROOT.RooDataHist("data", "data", list, data_hist)
-	qcd_RDH = ROOT.RooDataHist("qcd", "qcd", list, qcd_hist)
-	wjets_RDH = ROOT.RooDataHist("wjets", "wjets", list, wjets_hist)
-	dyjets_RDH = ROOT.RooDataHist("dyjets", "dyjets", list, dyjets_hist)
+	data_RDH    = ROOT.RooDataHist("data"  , "data"   , list, data_hist  )
+	qcd_RDH     = ROOT.RooDataHist("qcd"   , "qcd"    , list, qcd_hist   )
+	ewk_RDH     = ROOT.RooDataHist("ewk"   , "ewk"    , list, ewk_hist   )
 
-	qcd_pdf = ROOT.RooHistPdf("qcd_pdf", "qcd_pdf", set, qcd_RDH)
-	wjets_pdf = ROOT.RooHistPdf("wjets_pdf", "wjets_pdf", set, wjets_RDH)
-	dyjets_pdf = ROOT.RooHistPdf("dyjets_pdf", "dyjets_pdf", set, dyjets_RDH)
+	qcd_pdf     = ROOT.RooHistPdf("qcd_pdf", "qcd_pdf", set , qcd_RDH    )
+	ewk_pdf     = ROOT.RooHistPdf("ewk_pdf", "ewk_pdf", set , ewk_RDH    )
 
-	qcd_int = qcd_hist.Integral()
-	wjets_int = wjets_hist.Integral()
-	dyjets_int = dyjets_hist.Integral()
+	qcd_int     = qcd_hist.Integral()
+	ewk_int     = ewk_hist.Integral()
 
-	qcd_n = ROOT.RooRealVar("qcd_n", "number of qcd", qcd_int, qcd_int*0.5, qcd_int*2.0)
-	wjets_n = ROOT.RooRealVar("wjets_n", "number of wjets", wjets_int, wjets_int*0.5, wjets_int*1.3)
-	dyjets_n = ROOT.RooRealVar("dyjets_n", "number of dyjets", dyjets_int, dyjets_int*0.5, dyjets_int*1.0)
+	qcd_n       = ROOT.RooRealVar("qcd_n", "number of qcd", qcd_int, qcd_int*0.5, qcd_int*2.0)
+	ewk_n       = ROOT.RooRealVar("ewk_n", "number of ewk", ewk_int, ewk_int*0.5, ewk_int*1.0)
 
-	model = ROOT.RooAddPdf("model", "model", ROOT.RooArgList(qcd_pdf, wjets_pdf, dyjets_pdf), ROOT.RooArgList(qcd_n, wjets_n, dyjets_n))
+	model = ROOT.RooAddPdf("model", "model", ROOT.RooArgList(qcd_pdf, ewk_pdf), ROOT.RooArgList(qcd_n, ewk_n))
 
 	fitresult = model.fitTo(data_RDH, ROOT.RooFit.SumW2Error(ROOT.kFALSE), ROOT.RooFit.Extended(), ROOT.RooFit.PrintLevel(-1))
 
 	scalefactors[0] = qcd_n.getVal() / qcd_int
-	scalefactors[1] = wjets_n.getVal() / wjets_int
-	scalefactors[2] = dyjets_n.getVal() / dyjets_int
+	scalefactors[1] = ewk_n.getVal() / ewk_int
+	scalefactors[2] = ewk_n.getVal() / ewk_int
+	scalefactors[3] = ewk_n.getVal() / ewk_int
 
 	return scalefactors
+
+
+
+
+def getMCScaleFactorSimultaneously(data, qcd, wjets, dyjets1, dyjets2):
+
+	scalefactors = [1.0, 1.0, 1.0, 1.0]
+
+	scind = 0
+ 	for i, hist in enumerate(data.hists): 
+ 		if hist.GetName() == 'h_Tight_muMTMET20':
+			scind = i
+
+	data_hist    = data.hists[scind]
+	qcd_hist     = qcd.hists[scind]
+	wjets_hist   = wjets.hists[scind]
+	dyjets1_hist = dyjets1.hists[scind]
+	dyjets2_hist = dyjets2.hists[scind]
+
+	x = ROOT.RooRealVar("x", "x", data_hist.GetXaxis().GetXmin(), data_hist.GetXaxis().GetXmax())
+	list = ROOT.RooArgList(x)
+	set = ROOT.RooArgSet(x)
+
+	data_RDH    = ROOT.RooDataHist("data"   , "data"   , list, data_hist   )
+	qcd_RDH     = ROOT.RooDataHist("qcd"    , "qcd"    , list, qcd_hist    )
+	wjets_RDH   = ROOT.RooDataHist("wjets"  , "wjets"  , list, wjets_hist  )
+	dyjets1_RDH = ROOT.RooDataHist("dyjets1", "dyjets1", list, dyjets1_hist)
+	dyjets2_RDH = ROOT.RooDataHist("dyjets2", "dyjets2", list, dyjets2_hist)
+
+	qcd_pdf     = ROOT.RooHistPdf("qcd_pdf"    , "qcd_pdf"    , set, qcd_RDH    )
+	wjets_pdf   = ROOT.RooHistPdf("wjets_pdf"  , "wjets_pdf"  , set, wjets_RDH  )
+	dyjets1_pdf = ROOT.RooHistPdf("dyjets1_pdf", "dyjets1_pdf", set, dyjets1_RDH)
+	dyjets2_pdf = ROOT.RooHistPdf("dyjets2_pdf", "dyjets2_pdf", set, dyjets2_RDH)
+
+	qcd_int     = qcd_hist    .Integral()
+	wjets_int   = wjets_hist  .Integral()
+	dyjets1_int = dyjets1_hist.Integral()
+	dyjets2_int = dyjets2_hist.Integral()
+
+	qcd_n     = ROOT.RooRealVar("qcd_n"    , "number of qcd"    , qcd_int    , qcd_int*0.5    , qcd_int*2.0    )
+	wjets_n   = ROOT.RooRealVar("wjets_n"  , "number of wjets"  , wjets_int  , wjets_int*0.5  , wjets_int*1.3  )
+	dyjets1_n = ROOT.RooRealVar("dyjets1_n", "number of dyjets1", dyjets1_int, dyjets1_int*0.5, dyjets1_int*1.0)
+	dyjets2_n = ROOT.RooRealVar("dyjets2_n", "number of dyjets2", dyjets2_int, dyjets2_int*0.5, dyjets2_int*1.0)
+
+	model = ROOT.RooAddPdf("model", "model", ROOT.RooArgList(qcd_pdf, wjets_pdf, dyjets1_pdf, dyjets2_pdf), ROOT.RooArgList(qcd_n, wjets_n, dyjets1_n, dyjets2_n))
+
+	fitresult = model.fitTo(data_RDH, ROOT.RooFit.SumW2Error(ROOT.kFALSE), ROOT.RooFit.Extended(), ROOT.RooFit.PrintLevel(-1))
+
+	scalefactors[0] = qcd_n.getVal()     / qcd_int
+	scalefactors[1] = wjets_n.getVal()   / wjets_int
+	scalefactors[2] = dyjets1_n.getVal() / dyjets1_int
+	scalefactors[3] = dyjets2_n.getVal() / dyjets2_int
+
+	return scalefactors
+
+
+
+def getMCScaleFactorSimultaneouslyWithErrors(data, qcd, wjets, dyjets1, dyjets2, hist_min = 50, hist_max = 120):
+
+	central = [1.0, 1.0, 1.0, 1.0]
+	lower   = [1.0, 1.0, 1.0, 1.0]
+	upper   = [1.0, 1.0, 1.0, 1.0]
+
+	scalefactors = getMCScaleFactorSimultaneously(data, qcd, wjets, dyjets1, dyjets2)
+	central[0] = scalefactors[0]
+	qcd.Rescale(central[0])
+
+	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], 'h_Tight_muMTMET20', [data], [qcd], hist_min, hist_max)
+	central[1] = scalefactors[0]
+	central[2] = scalefactors[1]
+	central[3] = scalefactors[2]
+
+	qcd.Rescale(1.5/1.0)
+	upper[0] = 1.5*central[0]
+
+	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], 'h_Tight_muMTMET20', [data], [qcd], hist_min, hist_max)
+	upper[1] = scalefactors[0]
+	upper[2] = scalefactors[1]
+	upper[3] = scalefactors[2]
+
+	qcd.Rescale(0.5/1.5)
+	lower[0] = 0.5*central[0]
+
+	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], 'h_Tight_muMTMET20', [data], [qcd], hist_min, hist_max)
+	lower[1] = scalefactors[0]
+	lower[2] = scalefactors[1]
+	lower[3] = scalefactors[2]
+
+	qcd.Rescale(1.0/(0.5*central[0]))
+
+
+	return [central, lower, upper]
+
+
 
 

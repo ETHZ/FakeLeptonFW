@@ -81,7 +81,7 @@ public:
 	void loop(TFile *);
 
 	//void fillRatios();
-	void fillFRPlots();
+	void fillFRPlots(float);
 
 	bool passesUpperMETMT(int, int);
 	bool passesMETCut(float, int);
@@ -154,6 +154,7 @@ public:
 	TH1F * h_Loose_muMET;
 	TH1F * h_Loose_muMETnoMTCut;
 	TH1F * h_Loose_muMT;
+	TH1F * h_Loose_muMTMET20;
 	TH1F * h_Loose_muMTMET30;
 	TH1F * h_Loose_muMaxJPt;
 	TH1F * h_Loose_muMaxJCPt;
@@ -165,6 +166,7 @@ public:
 	TH1F * h_Loose_muNJets;
 	TH1F * h_Loose_muNVertices;
 	TH1F * h_Loose_muNVertices1;
+	TH1F * h_Loose_muNVerticesMET20;
 	TH1F * h_Loose_muD0;
 	TH2F * h_Loose_muJCPtJEta; 
 	TH2F * h_Loose_muJRPtJEta;
@@ -200,6 +202,7 @@ public:
 	TH1F * h_Tight_muMET;
 	TH1F * h_Tight_muMETnoMTCut;
 	TH1F * h_Tight_muMT;
+	TH1F * h_Tight_muMTMET20;
 	TH1F * h_Tight_muMTMET30;
 	TH1F * h_Tight_muMaxJPt;
 	TH1F * h_Tight_muMaxJCPt;
@@ -211,6 +214,7 @@ public:
 	TH1F * h_Tight_muNJets;
 	TH1F * h_Tight_muNVertices;   
 	TH1F * h_Tight_muNVertices1;
+	TH1F * h_Tight_muNVerticesMET20; 
 	TH1F * h_Tight_muD0;
 	TH2F * h_Tight_muJCPtJEta;
 	TH2F * h_Tight_muJRPtJEta;
@@ -233,7 +237,7 @@ public:
 	// ===================================
 
 	// Eventweight
-	float fEventweight;
+	float fLumiweight;
 
 	// Counters
 	int fCutflow_afterLepSel;

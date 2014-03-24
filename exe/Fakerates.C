@@ -22,6 +22,14 @@ void usage( int status = 0 ) {
 
 //_____________________________________________________________________________________
 int main(int argc, char* argv[]) {
+
+	cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+	cout << "=======================================================" << endl;
+	cout << "=======================================================" << endl;
+	cout << " Starting Fakerates ...                                " << endl;
+	cout << "=======================================================" << endl;
+	cout << "=======================================================" << endl;
+
 	TString inputfile    = "";
 	TString configfile   = "";
 	TString name         = "";
@@ -54,15 +62,15 @@ int main(int argc, char* argv[]) {
 		usage(-1);
 	}
 
-	cout << "------------------------------------" << endl;
-	cout << " config file is:    " << configfile << endl;
-	cout << "------------------------------------" << endl;
-	cout << " verbose level is:  " << verbose << endl;
-	cout << " inputfile is:      " << inputfile << endl;
-	cout << " name is:           " << name << endl;
+	cout << " verbose level is:   " << verbose     << endl;
+	cout << " config file is:     " << configfile  << endl;
+	cout << " inputfile is:       " << inputfile   << endl;
+	cout << " name is:            " << name        << endl;
 	cout << " running on " << (isdata?"data":"mc") << endl;
-	cout << " xsec:              " << xsec << endl;
-	cout << " sample max size:   " << maxsize << endl;
+	cout << " xsec is:            " << xsec        << endl;
+	cout << " sample max size is: " << maxsize     << endl;
+	cout << "=======================================================" << endl;
+	cout << "=======================================================" << endl;
 
 	Fakerates *frA = new Fakerates(configfile);
 	frA->setVerbose(verbose);
@@ -73,7 +81,12 @@ int main(int argc, char* argv[]) {
 	frA->setMaxSize(maxsize);
 	frA->doStuff();
 	// delete frA;
-	cout << "...done" << endl;
+	
+	cout << " done ...                                              " << endl;
+	cout << "=======================================================" << endl;
+	cout << "=======================================================" << endl;
+	cout << "......................................................." << endl;
+
 	return 0;
 }
 

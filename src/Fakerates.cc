@@ -38,11 +38,11 @@ void Fakerates::init(bool verbose){
 	initializing Class "Fakerates"
 	*/
 
-	cout << "------------------------------------" << endl;
-	cout << "Initializing Fakerates Class ...    " << endl;
-	cout << "------------------------------------" << endl;
+	cout << " Initializing Fakerates Class ...                      " << endl;
+	cout << "=======================================================" << endl;
+	cout << "=======================================================" << endl;
 
-	fEventweight = 1.0;
+	fLumiweight = 1.0;
 	fCutflow_afterLepSel = 0;
 	fCutflow_afterJetSel = 0;
 	fCutflow_afterMETCut = 0;
@@ -104,14 +104,17 @@ void Fakerates::loadConfigFile(TString configfile){
 	load configuration file
 	*/
 
-	cout << "Loading Config File ...             " << endl;
-	cout << "------------------------------------" << endl;
+	cout << " Reading Config File ...                               " << endl;
+	cout << "=======================================================" << endl;
+	cout << "=======================================================" << endl;
 	
 	char buffer[1000];
 	ifstream IN(configfile);
 	if(!IN.is_open()) {
-		cout << "ERROR IN LOADING CONFIG FILE" << endl;
-		cout << "Config File " << configfile << " could not be opened." << endl;
+		cout << "*******************************************************" << endl;
+		cout << " ERROR IN LOADING CONFIG FILE                          " << endl;
+		cout << " Config File " << configfile << " could not be opened. " << endl;
+		cout << "*******************************************************" << endl;
 		exit(1);
 	}
 
@@ -128,7 +131,7 @@ void Fakerates::loadConfigFile(TString configfile){
 				name = n; 
 				value = val;
 
-				if(v != "v") { cout << "ERROR in reading variable (" << name << ")!" << endl; exit(1); }
+				if(v != "v") { cout << " ERROR in reading variable (" << name << ")!" << endl; exit(1); }
 
 				if      (type == "TString" && name == "fOutputDir")      fOutputDir      = value;
 				else if (type == "float"   && name == "fLuminosity")     fLuminosity     = value.Atof();
@@ -142,23 +145,25 @@ void Fakerates::loadConfigFile(TString configfile){
 				else { cout << " ERROR in reading variable (" << name << ")!" << endl; exit(1); }
 			}
 			else {
-				cout << "ERROR IN READING CONFIG FILE!" << endl;
-				cout << "Same variable definitions have wrong format." << endl;
+				cout << "*******************************************************" << endl;
+				cout << " ERROR IN READING CONFIG FILE!                         " << endl;
+				cout << " Same variable definitions have wrong format.          " << endl;
+				cout << " exiting...                                            " << endl;
+				cout << "*******************************************************" << endl;
 				exit(1);
 			}
 		}
 	}
-	cout << "=======================================================" << endl;
-	cout << "========  DONE LOADING CONFIG FILE !! =================" << endl;
-	cout << "fOutputDir:      " << fOutputDir      << endl;
-	cout << "fLuminosity:     " << fLuminosity     << endl;
-	cout << "fJetCorrection:  " << fJetCorrection  << endl;
-	cout << "fJetPtCut:       " << fJetPtCut       << endl;
-	cout << "fMuPtCut:        " << fMuPtCut        << endl;
-	cout << "fMuD0Cut:        " << fMuD0Cut        << endl;
-	cout << "fMuIsoCut:       " << fMuIsoCut       << endl;
-	cout << "fAwayJetBTagCut: " << fAwayJetBTagCut << endl;
-	cout << "fAwayJetDPhiCut: " << fAwayJetDPhiCut << endl;
+	
+	cout << " fOutputDir:       " << fOutputDir      << endl;
+	cout << " fLuminosity:      " << fLuminosity     << endl;
+	cout << " fJetCorrection:   " << fJetCorrection  << endl;
+	cout << " fJetPtCut:        " << fJetPtCut       << endl;
+	cout << " fMuPtCut:         " << fMuPtCut        << endl;
+	cout << " fMuD0Cut:         " << fMuD0Cut        << endl;
+	cout << " fMuIsoCut:        " << fMuIsoCut       << endl;
+	cout << " fAwayJetBTagCut:  " << fAwayJetBTagCut << endl;
+	cout << " fAwayJetDPhiCut:  " << fAwayJetDPhiCut << endl;
 	cout << "=======================================================" << endl;
 	cout << "=======================================================" << endl;
 }
@@ -195,9 +200,10 @@ void Fakerates::loop(TFile* pFile){
 	// open input file and read the tree
 	TFile * file_ = TFile::Open(fInputFile);
 	if(file_ == NULL ) {
-		cout << "==========================================================================" << endl;
-		cout << "ERROR: THE FILE YOU ARE TRYING TO READ ISN'T OPEN. CHECK IT'S EXISTENCE!!!" << endl;
-		cout << " ... exiting" << endl;
+		cout << "*******************************************************" << endl;
+		cout << " ERROR: THE FILE YOU ARE TRYING TO READ ISN'T OPEN. CHECK IT'S EXISTENCE!!!" << endl;
+		cout << " exiting ...                                            " << endl;
+		cout << "*******************************************************" << endl;
 		exit(0);
 	}
 	TTree * tree_ = (TTree *) file_->Get("Analysis"); // tree name has to be named "Analysis"
@@ -208,10 +214,10 @@ void Fakerates::loop(TFile* pFile){
 	// calculate the eventweight
 	TH1F * EventCount = (TH1F*) file_->Get("EventCount");
 	Double_t Ngen = EventCount->GetEntries();
-	if(!fIsData) fEventweight = fXSec * fLuminosity / (fMaxSize>0?fMaxSize:Ngen);
-	else fEventweight = 1.;
-	cout << "going to loop over " << (fMaxSize>0?fMaxSize:Ngen) << " events..." << endl;
-	cout << "eventweight is " << fEventweight << endl;
+	if(!fIsData) fLumiweight = fXSec * fLuminosity / (fMaxSize>0?fMaxSize:Ngen);
+	else fLumiweight = 1.;
+	cout << " going to loop over " << (fMaxSize>0?fMaxSize:Ngen) << " events..." << endl;
+	cout << " eventweight is " << fLumiweight << endl;
 
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events;jentry++) {
@@ -219,15 +225,18 @@ void Fakerates::loop(TFile* pFile){
 		tree_->GetEntry(jentry);
 		ntot++;
 
-		fillFRPlots();
+		float fEventweight = fLumiweight;
+		if(!fIsData) fEventweight *= PUWeight;
+
+		fillFRPlots(fEventweight);
 
 	}
 
-	cout << "mu: nevents passing lepton selection: " << fCutflow_afterLepSel << endl;
-	cout << "mu: nevents passing jet    selection: " << fCutflow_afterJetSel << endl;
-	cout << "mu: nevents passing MET    selection: " << fCutflow_afterMETCut << endl;
-	cout << "mu: nevents passing MT     selection: " << fCutflow_afterMTCut  << endl;
-	cout << "i just looped on " << ntot << " events." << endl;
+	cout << " mu: nevents passing lepton selection: " << fCutflow_afterLepSel << endl;
+	cout << " mu: nevents passing jet    selection: " << fCutflow_afterJetSel << endl;
+	cout << " mu: nevents passing MET    selection: " << fCutflow_afterMETCut << endl;
+	cout << " mu: nevents passing MT     selection: " << fCutflow_afterMTCut  << endl;
+	cout << " i just looped on " << ntot << " events." << endl;
 	delete file_, tree_;
 
 	// write histograms in output file
@@ -397,7 +406,10 @@ float Fakerates::getMT(int type, int ind) {
 		pt   = ElPt->at(ind);
 	}
 	else {
-		cout << "ERROR: you're calling getMT incorrectly" << endl;
+		cout << "*******************************************************" << endl;
+		cout << " ERROR in getMT(): you are not calling it correctly!   " << endl;
+		cout << " exiting ...                                           " << endl;
+		cout << "*******************************************************" << endl;
 		exit(0);
 	}
 
@@ -436,7 +448,10 @@ bool Fakerates::passesMTCut(int type, int index){
 		if(getMT(type, index) > value_mt) return false;
 	}
 	else{
-		cout << "ERROR in passesUpperMETMT! you're not calling it right..." << endl;
+		cout << "*******************************************************" << endl;
+		cout << " ERROR in passesUpperMETMT(): you re not calling it correctly!" << endl;
+		cout << " exiting ...                                           " << endl;
+		cout << "*******************************************************" << endl;
 		exit(0);
 	}
 
@@ -606,7 +621,7 @@ bool Fakerates::isFRRegionElEvent(int &el){
 
 
 //____________________________________________________________________________
-void Fakerates::fillFRPlots(){
+void Fakerates::fillFRPlots(float fEventweight = 1.0){
 	/* 
 	create plos for muons and electrons
 	parameters: none
@@ -679,6 +694,7 @@ void Fakerates::fillFRPlots(){
 			h_Loose_muMaxJPt    ->Fill(getJetPt(jet)       , fEventweight);
 			h_Loose_muNBJets    ->Fill(getNJets(1)         , fEventweight);
 			h_Loose_muNJets     ->Fill(getNJets()          , fEventweight);
+			
 			h_Loose_muNVertices ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
 			h_Loose_muNVertices1->Fill((NVrtx>30)?30:NVrtx , fEventweight);
 
@@ -701,16 +717,20 @@ void Fakerates::fillFRPlots(){
 				h_Loose_muDJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
 				h_Loose_muFJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
 
-				if((fDFbinspt[0]<=JetPt->at(thisjet) && JetPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]) && (fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1])) {
-					int i = h_Loose_muDFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
-					int j = h_Loose_muDFZoomPt  ->FindBin(JetPt->at(thisjet));
-					int l = h_Loose_muDFZoomPt  ->FindBin(JetRawPt->at(thisjet));
+				int i = h_Loose_muDFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
+				if(fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1]){
+				
+					if(fDFbinspt[0]<=JetPt->at(thisjet) && JetPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
+						int j = h_Loose_muDFZoomPt  ->FindBin(JetPt->at(thisjet));
+						h_Loose_muDJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+						h_Loose_muFJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+					}
 
-					h_Loose_muDJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-					h_Loose_muFJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
-					h_Loose_muDJPtZoomR[(i-1)*(fDFn_binspt-1) + l - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-					h_Loose_muFJPtZoomR[(i-1)*(fDFn_binspt-1) + l - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
-
+					if(fDFbinspt[0]<=JetRawPt->at(thisjet) && JetRawPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
+						int k = h_Loose_muDFZoomPt  ->FindBin(JetRawPt->at(thisjet));
+						h_Loose_muDJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+						h_Loose_muFJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+					}
 				}
 			}
 
@@ -728,8 +748,9 @@ void Fakerates::fillFRPlots(){
 		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(getMET()    , fEventweight);
 		                       h_Loose_muMETnoMTCut->Fill(getMET()    , fEventweight);
 		if(passesMETCut())     h_Loose_muMT        ->Fill(getMT(0, mu), fEventweight);
-		if(passesMETCut(20,1)) h_Loose_muMTMET30   ->Fill(getMT(0, mu), fEventweight);
-
+		if(passesMETCut(20,1)) h_Loose_muMTMET20   ->Fill(getMT(0, mu), fEventweight);
+		if(passesMETCut(30,1)) h_Loose_muMTMET30   ->Fill(getMT(0, mu), fEventweight);
+		if(passesMETCut(20,1)) h_Loose_muNVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
 
 		// tight muons
 		if(isTightMuon(mu)) {
@@ -770,18 +791,21 @@ void Fakerates::fillFRPlots(){
 					h_Tight_muFJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
 					h_Tight_muDJPtJPt  ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
 					h_Tight_muFJPtJPt  ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
-			
-					if((fDFbinspt[0]<=JetPt->at(thisjet) && JetPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]) && (fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1])) {
-	
-						int i = h_Tight_muDFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
-						int j = h_Tight_muDFZoomPt  ->FindBin(JetPt->at(thisjet));
-						int l = h_Tight_muDFZoomPt  ->FindBin(JetRawPt->at(thisjet));
+				
+					int i = h_Tight_muDFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
+					if(fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1]){
+				
+						if(fDFbinspt[0]<=JetPt->at(thisjet) && JetPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
+							int j = h_Tight_muDFZoomPt  ->FindBin(JetPt->at(thisjet));
+							h_Tight_muDJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+							h_Tight_muFJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+						}
 
-						h_Tight_muDJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-						h_Tight_muFJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
-						h_Tight_muDJPtZoomR[(i-1)*(fDFn_binspt-1) + l - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-						h_Tight_muFJPtZoomR[(i-1)*(fDFn_binspt-1) + l - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
-
+						if(fDFbinspt[0]<=JetRawPt->at(thisjet) && JetRawPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
+							int k = h_Tight_muDFZoomPt  ->FindBin(JetRawPt->at(thisjet));
+							h_Tight_muDJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+							h_Tight_muFJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+						}
 					}
 				}
 
@@ -797,7 +821,9 @@ void Fakerates::fillFRPlots(){
 			if(passesMTCut(0, mu)) h_Tight_muMET        -> Fill(getMET()    , fEventweight);
 			                       h_Tight_muMETnoMTCut -> Fill(getMET()    , fEventweight);
 			if(passesMETCut())     h_Tight_muMT         -> Fill(getMT(0, mu), fEventweight);
-			if(passesMETCut(20,1)) h_Tight_muMTMET30    -> Fill(getMT(0, mu), fEventweight);
+			if(passesMETCut(20,1)) h_Tight_muMTMET20    -> Fill(getMT(0, mu), fEventweight);
+			if(passesMETCut(30,1)) h_Tight_muMTMET30    -> Fill(getMT(0, mu), fEventweight);
+			if(passesMETCut(20,1)) h_Tight_muNVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
 
 		}
 	}
@@ -872,6 +898,7 @@ void Fakerates::bookHistos(){
 	h_Loose_muMET        = new TH1F("h_Loose_muMET"        , "Loose_muMET"       , 10 ,  0  , 100); h_Loose_muMET        -> Sumw2();
 	h_Loose_muMETnoMTCut = new TH1F("h_Loose_muMETnoMTCut" , "Loose_muMETnoMTCut", 10 ,  0  , 100); h_Loose_muMETnoMTCut -> Sumw2();
 	h_Loose_muMT         = new TH1F("h_Loose_muMT"         , "Loose_muMT"        , 10 ,  0  , 100); h_Loose_muMT         -> Sumw2();
+	h_Loose_muMTMET20    = new TH1F("h_Loose_muMTMET20"    , "Loose_muMTMET20"   , 20 ,  0  , 200); h_Loose_muMTMET20    -> Sumw2();
 	h_Loose_muMTMET30    = new TH1F("h_Loose_muMTMET30"    , "Loose_muMTMET30"   , 20 ,  0  , 200); h_Loose_muMTMET30    -> Sumw2();
 
 	h_Loose_muMaxJPt     = new TH1F("h_Loose_muMaxJPt"     , "Loose_muMaxJPt"    , 10 ,  20 , 120); h_Loose_muMaxJPt     -> Sumw2();
@@ -886,6 +913,7 @@ void Fakerates::bookHistos(){
 	h_Loose_muNJets      = new TH1F("h_Loose_muNJets"      , "Loose_muNJets"     , 5  ,  1  , 6  ); h_Loose_muNJets      -> Sumw2();
 	h_Loose_muNVertices  = new TH1F("h_Loose_muNVertices"  , "Loose_muNVertices" , 40 ,  0  , 40 ); h_Loose_muNVertices  -> Sumw2();
 	h_Loose_muNVertices1 = new TH1F("h_Loose_muNVertices1" , "Loose_muNVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Loose_muNVertices1 -> Sumw2();
+	h_Loose_muNVerticesMET20 = new TH1F("h_Loose_muNVerticesMET20", "Loose_muNVerticesMET20", 40, 0, 40); h_Loose_muNVerticesMET20 -> Sumw2();
 
 	h_Loose_muAwayJetDR  = new TH1F("h_Loose_muAwayJetDR"  , "Loose_muAwayJetDR" , 15 ,  0  , 6  ); h_Loose_muAwayJetDR  -> Sumw2();
 	h_Loose_muAwayJetPt  = new TH1F("h_Loose_muAwayJetPt"  , "Loose_muAwayJetPt" , 10 ,  20 , 120); h_Loose_muAwayJetPt  -> Sumw2();
@@ -951,6 +979,7 @@ void Fakerates::bookHistos(){
 	h_Tight_muMET        = new TH1F("h_Tight_muMET"        , "Tight_muMET"       , 10 ,  0  , 100); h_Tight_muMET        -> Sumw2();
 	h_Tight_muMETnoMTCut = new TH1F("h_Tight_muMETnoMTCut" , "Tight_muMETnoMTCut", 10 ,  0  , 100); h_Tight_muMETnoMTCut -> Sumw2();
 	h_Tight_muMT         = new TH1F("h_Tight_muMT"         , "Tight_muMT"        , 10 ,  0  , 100); h_Tight_muMT         -> Sumw2();
+	h_Tight_muMTMET20    = new TH1F("h_Tight_muMTMET20"    , "Tight_muMTMET20"   , 20 ,  0  , 200); h_Tight_muMTMET20    -> Sumw2();
 	h_Tight_muMTMET30    = new TH1F("h_Tight_muMTMET30"    , "Tight_muMTMET30"   , 20 ,  0  , 200); h_Tight_muMTMET30    -> Sumw2();
                                                                                                  
 	h_Tight_muMaxJPt     = new TH1F("h_Tight_muMaxJPt"     , "Tight_muMaxJPt"    , 10 ,  20 , 120); h_Tight_muMaxJPt     -> Sumw2();
@@ -965,6 +994,7 @@ void Fakerates::bookHistos(){
 	h_Tight_muNJets      = new TH1F("h_Tight_muNJets"      , "Tight_muNJets"     , 5  ,  1  , 6  ); h_Tight_muNJets      -> Sumw2();
 	h_Tight_muNVertices  = new TH1F("h_Tight_muNVertices"  , "Tight_muNVertices" , 40 ,  0  , 40 ); h_Tight_muNVertices  -> Sumw2();
 	h_Tight_muNVertices1 = new TH1F("h_Tight_muNVertices1" , "Tight_muNVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Tight_muNVertices1  -> Sumw2();
+	h_Tight_muNVerticesMET20 = new TH1F("h_Tight_muNVerticesMET20", "Tight_muNVerticesMET20", 40, 0, 40); h_Tight_muNVerticesMET20 -> Sumw2();
                                                                                                  
 	h_Tight_muAwayJetDR  = new TH1F("h_Tight_muAwayJetDR"  , "Tight_muAwayJetDR" , 15 ,  0  , 6  ); h_Tight_muAwayJetDR  -> Sumw2();
 	h_Tight_muAwayJetPt  = new TH1F("h_Tight_muAwayJetPt"  , "Tight_muAwayJetPt" , 10 ,  20 , 120); h_Tight_muAwayJetPt  -> Sumw2();
@@ -1062,6 +1092,7 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Loose_muMET       ->Write(fName + "_" + h_Loose_muMET->GetName(),       TObject::kWriteDelete);
 	h_Loose_muMETnoMTCut->Write(fName + "_" + h_Loose_muMETnoMTCut->GetName(),TObject::kWriteDelete);
 	h_Loose_muMT        ->Write(fName + "_" + h_Loose_muMT->GetName(),        TObject::kWriteDelete);
+	h_Loose_muMTMET20   ->Write(fName + "_" + h_Loose_muMTMET20->GetName(),   TObject::kWriteDelete);
 	h_Loose_muMTMET30   ->Write(fName + "_" + h_Loose_muMTMET30->GetName(),   TObject::kWriteDelete);
 
 	h_Loose_muMaxJPt    ->Write(fName + "_" + h_Loose_muMaxJPt->GetName(),    TObject::kWriteDelete);
@@ -1076,6 +1107,7 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Loose_muNJets     ->Write(fName + "_" + h_Loose_muNJets->GetName(),     TObject::kWriteDelete);
 	h_Loose_muNVertices ->Write(fName + "_" + h_Loose_muNVertices->GetName(), TObject::kWriteDelete);
 	h_Loose_muNVertices1->Write(fName + "_" + h_Loose_muNVertices1->GetName(),TObject::kWriteDelete);
+	h_Loose_muNVerticesMET20 ->Write(fName + "_" + h_Loose_muNVerticesMET20->GetName(), TObject::kWriteDelete);
 
 	h_Loose_muAwayJetDR ->Write(fName + "_" + h_Loose_muAwayJetDR->GetName(), TObject::kWriteDelete);
 	h_Loose_muAwayJetPt ->Write(fName + "_" + h_Loose_muAwayJetPt->GetName(), TObject::kWriteDelete);
@@ -1120,6 +1152,7 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Tight_muMET       ->Write(fName + "_" + h_Tight_muMET->GetName(),       TObject::kWriteDelete);
 	h_Tight_muMETnoMTCut->Write(fName + "_" + h_Tight_muMETnoMTCut->GetName(),TObject::kWriteDelete);
 	h_Tight_muMT        ->Write(fName + "_" + h_Tight_muMT->GetName(),        TObject::kWriteDelete);
+	h_Tight_muMTMET20   ->Write(fName + "_" + h_Tight_muMTMET20->GetName(),   TObject::kWriteDelete);
 	h_Tight_muMTMET30   ->Write(fName + "_" + h_Tight_muMTMET30->GetName(),   TObject::kWriteDelete);
 
 	h_Tight_muMaxJPt    ->Write(fName + "_" + h_Tight_muMaxJPt->GetName(),    TObject::kWriteDelete);
@@ -1134,6 +1167,7 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Tight_muNJets     ->Write(fName + "_" + h_Tight_muNJets->GetName(),     TObject::kWriteDelete);
 	h_Tight_muNVertices ->Write(fName + "_" + h_Tight_muNVertices->GetName(), TObject::kWriteDelete);
 	h_Tight_muNVertices1->Write(fName + "_" + h_Tight_muNVertices1->GetName(),TObject::kWriteDelete);
+	h_Tight_muNVerticesMET20 ->Write(fName + "_" + h_Tight_muNVerticesMET20->GetName(), TObject::kWriteDelete);
 
 	h_Tight_muAwayJetDR ->Write(fName + "_" + h_Tight_muAwayJetDR->GetName(), TObject::kWriteDelete);
 	h_Tight_muAwayJetPt ->Write(fName + "_" + h_Tight_muAwayJetPt->GetName(), TObject::kWriteDelete);
