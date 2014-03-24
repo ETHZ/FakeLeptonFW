@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <map>
 #include <time.h> // access to date/time
-//#include <windows.h>
 
 #include "include/FWBaseClass.h"
 #include "Utilities.hh"
@@ -70,6 +69,7 @@ public:
 	float fLuminosity;
 	bool  fJetCorrection;
 	float fJetPtCut;
+	float fMuPtCut;
 	float fMuD0Cut;
 	float fMuIsoCut;
 	float fAwayJetBTagCut;
@@ -81,7 +81,7 @@ public:
 	void loop(TFile *);
 
 	//void fillRatios();
-	void fillFRPlots();
+	void fillFRPlots(float);
 
 	bool passesUpperMETMT(int, int);
 	bool passesMETCut(float, int);
@@ -154,6 +154,7 @@ public:
 	TH1F * h_Loose_muMET;
 	TH1F * h_Loose_muMETnoMTCut;
 	TH1F * h_Loose_muMT;
+	TH1F * h_Loose_muMTMET20;
 	TH1F * h_Loose_muMTMET30;
 	TH1F * h_Loose_muMaxJPt;
 	TH1F * h_Loose_muMaxJCPt;
@@ -164,6 +165,8 @@ public:
 	TH1F * h_Loose_muNBJets;
 	TH1F * h_Loose_muNJets;
 	TH1F * h_Loose_muNVertices;
+	TH1F * h_Loose_muNVertices1;
+	TH1F * h_Loose_muNVerticesMET20;
 	TH1F * h_Loose_muD0;
 	TH2F * h_Loose_muJCPtJEta; 
 	TH2F * h_Loose_muJRPtJEta;
@@ -175,8 +178,10 @@ public:
 	TH2F * h_Loose_muFJPtJPt;
 	TH1F * h_Loose_muDFZoomEta;
 	TH1F * h_Loose_muDFZoomPt;
-	TH1F * h_Loose_muDJPtZoom[30];
-	TH1F * h_Loose_muFJPtZoom[30];
+	TH1F * h_Loose_muDJPtZoomC[30];
+	TH1F * h_Loose_muFJPtZoomC[30];
+	TH1F * h_Loose_muDJPtZoomR[30];
+	TH1F * h_Loose_muFJPtZoomR[30];
 
 	TH1F * h_Tight_muAwayJetDR;
 	TH1F * h_Tight_muAwayJetPt;
@@ -197,6 +202,7 @@ public:
 	TH1F * h_Tight_muMET;
 	TH1F * h_Tight_muMETnoMTCut;
 	TH1F * h_Tight_muMT;
+	TH1F * h_Tight_muMTMET20;
 	TH1F * h_Tight_muMTMET30;
 	TH1F * h_Tight_muMaxJPt;
 	TH1F * h_Tight_muMaxJCPt;
@@ -207,6 +213,8 @@ public:
 	TH1F * h_Tight_muNBJets;
 	TH1F * h_Tight_muNJets;
 	TH1F * h_Tight_muNVertices;   
+	TH1F * h_Tight_muNVertices1;
+	TH1F * h_Tight_muNVerticesMET20; 
 	TH1F * h_Tight_muD0;
 	TH2F * h_Tight_muJCPtJEta;
 	TH2F * h_Tight_muJRPtJEta;
@@ -218,8 +226,10 @@ public:
 	TH2F * h_Tight_muFJPtJPt;
 	TH1F * h_Tight_muDFZoomEta;
 	TH1F * h_Tight_muDFZoomPt;
-	TH1F * h_Tight_muDJPtZoom[30];
-	TH1F * h_Tight_muFJPtZoom[30];
+	TH1F * h_Tight_muDJPtZoomC[30];
+	TH1F * h_Tight_muFJPtZoomC[30];
+	TH1F * h_Tight_muDJPtZoomR[30];
+	TH1F * h_Tight_muFJPtZoomR[30];
 
 	void bookHistos();
 	void writeHistos(TFile *);
@@ -227,7 +237,7 @@ public:
 	// ===================================
 
 	// Eventweight
-	float fEventweight;
+	float fLumiweight;
 
 	// Counters
 	int fCutflow_afterLepSel;

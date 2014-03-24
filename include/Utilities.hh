@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <dirent.h>
 
 #include "TROOT.h"
 #include "TCanvas.h"
@@ -34,6 +35,7 @@ namespace Util {
 		std::cout << " Processing " << std::setw(50) << std::left << header << std::setw(6) << std::right << progress << " %      \r" << std::flush;
 		if(entry+1 == nentries) std::cout << std::endl;
 	}
+
 	//__________________________________________________________________________
 	inline void useNiceColorPalette( Int_t NCont ) {
     	const Int_t NRGBs = 5;
@@ -45,6 +47,17 @@ namespace Util {
     	gStyle->SetNumberContours(NCont);
 	}
 
+	//__________________________________________________________________________
+	inline bool dirExists(const char* dirName){
+		if(dirName == NULL) return false;
+		DIR *pDir;
+		pDir = opendir(dirName);
+		if(pDir != NULL) {
+			closedir(pDir);
+			return true;
+		}
+		return false;
+	}
 
 	//__________________________________________________________________________
 	inline TString MakeOutputDir(TString dir){
