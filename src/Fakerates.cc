@@ -271,7 +271,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 
 	// require exactly one loose muon and no additional veto muons
 	if(nloose    != 1) return false;
-	if(nveto_add  > 0) return false;
+	// if(nveto_add  > 0) return false;
 	fCutflow_afterLepSel++;
 	// if(nveto_add != 0) return false; // don't require this for the synching
 
@@ -717,6 +717,7 @@ void Fakerates::fillFRPlots(){
 				h_muFLoose->Fill(MuPt->at(mu), fabs(MuEta->at(mu)), fEventweight);
 			}
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
+// cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), isTightMuon(mu), getMET(), getMT(0, mu)) << endl;
 		}
 
 		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(getMET()    , fEventweight);
