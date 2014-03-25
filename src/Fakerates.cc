@@ -271,7 +271,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 		if(isLooseMuon(i) && MuPt->at(i) > fMuPtCut){
 			nloose++;
 			mu = i;
-			loosemu_inds.push_back(i);
+			loosemu_inds.push_back(i);		
 		}
 		else if(isLooseMuon(i) && MuPt->at(i) < fMuPtCut){
 			nveto_add++;
@@ -494,7 +494,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	// if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
 
-	// if a tight muon with dR too small found then return false
+	// jet-lepton cleaning: if a tight muon with dR too small found then return false
 	for(int imu = 0; imu < MuPt->size(); ++imu){
 		if(!MuIsTight->at(imu)) continue;
 		if(Util::GetDeltaR(MuEta->at(imu), JetEta->at(j), MuPhi->at(imu), JetPhi->at(j)) > minDR ) continue;

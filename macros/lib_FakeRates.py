@@ -213,24 +213,30 @@ def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = 
 		histstoplot = []
 		histstoplot.append([FR_data, 'data'])
 		histstoplot.append([FR_bg[i], 'totbg'])
-		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + "_data")
+		make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + '_data')
 
 		if len(mcsubstract)>0:
 			histstoplot = []
 			histstoplot.append([FR_data_mcsub, 'datamcsub'])
 			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc[i][j], 'qcdMuEnriched'])
-			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + "_data-ew")
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + '_data-ew')
 
 		if len(mcsubstract)>0 and mcsubstractscales:
 			histstoplot = []
 			histstoplot.append([FR_data, 'data'])
 			histstoplot.append([FR_data_mcsub_c1, 'datamcsub_central1'])
-			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + "_data-ew_data-eth", True, 'Data/ETH')
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + '_data-ew_data-eth', True, 'Data/ETH')
 
 			histstoplot = []
 			histstoplot.append([FR_data_mcsub_c1, 'datamcsub_central1'])
 			histstoplot.append([FR_data_mcsub_c2, 'datamcsub_central2'])
-			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + "_data-ew_eth-ucsx", True, 'ETH/UCSx')
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + '_data-ew_eth-ucsx', True, 'ETH/UCSx')
+
+			histstoplot = []
+			histstoplot.append([FR_data, 'data'])
+			histstoplot.append([FR_data_mcsub_c1, 'datamcsub_central1'])
+			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc[i][j], 'qcdMuEnriched'])
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + '_data-ew_data-eth-qcd', True, 'Data/ETH')
 
 	return True
 
@@ -457,6 +463,12 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 			histstoplot.append([FR_data_px_mcsub_c2, 'datamcsub_central2'])
 			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew_eth-ucsx', True, 'ETH/UCSx')
 
+			histstoplot = []
+			histstoplot.append([FR_data_px, 'data'])
+			histstoplot.append([FR_data_px_mcsub_c1, 'datamcsub_central1'])
+			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_px[j], 'qcdMuEnriched'])
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew_data-eth-qcd', True, 'Data/ETH')
+
 
 		histstoplot = []
 		histstoplot.append([FR_data_py, 'data'])
@@ -465,6 +477,7 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 
 		if len(mcsubstract)>0:
 			histstoplot = []
+			histstoplot.append([FR_data_py, 'data'])
 			histstoplot.append([FR_data_py_mcsub, 'datamcsub'])
 			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_py[j], 'qcdMuEnriched'])
 			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta_data-ew')
@@ -479,6 +492,13 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 			histstoplot.append([FR_data_py_mcsub_c1, 'datamcsub_central1'])
 			histstoplot.append([FR_data_py_mcsub_c2, 'datamcsub_central2'])
 			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta_data-ew_eth-ucsx', True, 'ETH/UCSx')
+
+			histstoplot = []
+			histstoplot.append([FR_data_py, 'data'])
+			histstoplot.append([FR_data_py_mcsub_c1, 'datamcsub_central1'])
+			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_py[j], 'qcdMuEnriched'])
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta_data-ew_data-eth-qcd', True, 'Data/ETH')
+
 
 
 	return True
