@@ -1,4 +1,4 @@
-import ROOT
+import ROOT, copy
 
 
 
@@ -65,13 +65,13 @@ def getMCScaleFactorSimultaneously2(data, qcd, wjets, dyjets1, dyjets2):
 
 	data_hist    = data.hists[scind]
 	qcd_hist     = qcd.hists[scind]
-	ewk_hist = wjets.hists[scind]
+	ewk_hist     = copy.deepcopy(wjets.hists[scind])
 	ewk_hist.Add(dyjets1.hists[scind])
 	ewk_hist.Add(dyjets2.hists[scind])
 
-	x = ROOT.RooRealVar("x", "x", data_hist.GetXaxis().GetXmin(), data_hist.GetXaxis().GetXmax())
+	x    = ROOT.RooRealVar("x", "x", data_hist.GetXaxis().GetXmin(), data_hist.GetXaxis().GetXmax())
 	list = ROOT.RooArgList(x)
-	set = ROOT.RooArgSet(x)
+	set  = ROOT.RooArgSet(x)
 
 	data_RDH    = ROOT.RooDataHist("data"  , "data"   , list, data_hist  )
 	qcd_RDH     = ROOT.RooDataHist("qcd"   , "qcd"    , list, qcd_hist   )
@@ -84,7 +84,7 @@ def getMCScaleFactorSimultaneously2(data, qcd, wjets, dyjets1, dyjets2):
 	ewk_int     = ewk_hist.Integral()
 
 	qcd_n       = ROOT.RooRealVar("qcd_n", "number of qcd", qcd_int, qcd_int*0.5, qcd_int*2.0)
-	ewk_n       = ROOT.RooRealVar("ewk_n", "number of ewk", ewk_int, ewk_int*0.5, ewk_int*1.0)
+	ewk_n       = ROOT.RooRealVar("ewk_n", "number of ewk", ewk_int, ewk_int*0.5, ewk_int*1.5)
 
 	model = ROOT.RooAddPdf("model", "model", ROOT.RooArgList(qcd_pdf, ewk_pdf), ROOT.RooArgList(qcd_n, ewk_n))
 
@@ -159,31 +159,31 @@ def getMCScaleFactorSimultaneouslyWithErrors(data, qcd, wjets, dyjets1, dyjets2,
 	lower   = [1.0, 1.0, 1.0, 1.0]
 	upper   = [1.0, 1.0, 1.0, 1.0]
 
-	scalefactors = getMCScaleFactorSimultaneously(data, qcd, wjets, dyjets1, dyjets2)
+	scalefactors = getMCScaleFactorSimultaneously2(data, qcd, wjets, dyjets1, dyjets2)
 	central[0] = scalefactors[0]
 	qcd.Rescale(central[0])
-
+	
 	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], 'h_Tight_muMTMET20', [data], [qcd], hist_min, hist_max)
 	central[1] = scalefactors[0]
 	central[2] = scalefactors[1]
 	central[3] = scalefactors[2]
-
+	
 	qcd.Rescale(1.5/1.0)
 	upper[0] = 1.5*central[0]
-
+	
 	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], 'h_Tight_muMTMET20', [data], [qcd], hist_min, hist_max)
 	upper[1] = scalefactors[0]
 	upper[2] = scalefactors[1]
 	upper[3] = scalefactors[2]
-
+	
 	qcd.Rescale(0.5/1.5)
 	lower[0] = 0.5*central[0]
-
+	
 	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], 'h_Tight_muMTMET20', [data], [qcd], hist_min, hist_max)
 	lower[1] = scalefactors[0]
 	lower[2] = scalefactors[1]
 	lower[3] = scalefactors[2]
-
+	
 	qcd.Rescale(1.0/(0.5*central[0]))
 
 

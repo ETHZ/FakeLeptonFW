@@ -18,6 +18,9 @@ def make1dPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_nam
 	hists[0][0] = helper.set1dPlotStyle(hists[0][0], helper.getColor(hists[0][1]), '', title_hist)
 	#for i in range(len(hists)):
 	#	hists[i][0] = helper.set1dPlotStyle(hists[i][0], helper.getColor(hists[i][1]), '', title_hist)
+	if "Tight_muMTMET20" in hists[0][0].GetName():
+		for i in range(1,hists[0][0].GetXaxis().GetNbins()):
+			print hists[1][0].GetStack().Last().GetBinContent(i)
 
 	hists[0][0].Draw("p x0 e")
 	hists[0][0].SetMinimum(0.001)

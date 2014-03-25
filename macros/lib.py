@@ -31,10 +31,10 @@ def getLegendName(name):
 	elif name == 'totbg'              : return 'QCD + EW'
 	elif name == 'data'               : return 'Data'
 	elif name == 'datamcsub'          : return 'Data - EW'
-	elif name == 'datamcsub_central1' : return 'Data - EW (central 1)'
-	elif name == 'datamcsub_lower1'   : return 'Data - EW (lower 1)'
-	elif name == 'datamcsub_upper1'   : return 'Data - EW (upper 1)'
-	elif name == 'datamcsub_central2' : return 'Data - EW (central 2)'
+	elif name == 'datamcsub_central1' : return 'Data - EW (ETH)'
+	elif name == 'datamcsub_lower1'   : return 'Data - EW (ETH lower)'
+	elif name == 'datamcsub_upper1'   : return 'Data - EW (ETH upper)'
+	elif name == 'datamcsub_central2' : return 'Data - EW (UCSx)'
 	elif name == 'data30'             : return 'Data (30GeV)'
 	elif name == 'data40'             : return 'Data (40GeV)'
 	elif name == 'data50'             : return 'Data (50GeV)'
@@ -127,10 +127,10 @@ def setFRPlotStyle(hist, color, title = '', title_hist = ''):
 	hist.SetTitle(title)
 	return hist
 
-def setRatioStyle(hist, title_hist=''):
+def setRatioStyle(hist, title_hist='', title='Data/MC'):
 	hist.SetTitle('')
 	hist.GetYaxis().SetNdivisions(505)
-	hist.GetYaxis().SetTitle('Data/MC')
+	hist.GetYaxis().SetTitle(title)
 	hist.GetYaxis().SetLabelSize(0.18)
 	hist.GetYaxis().SetTitleSize(0.18)
 	hist.GetYaxis().SetTitleOffset(0.3)
