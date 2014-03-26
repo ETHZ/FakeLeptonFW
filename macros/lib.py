@@ -9,7 +9,7 @@ def getColor(name):
 	elif name == 'totbg'              : return mycolor.GetColor(172,   0,   0)
 	elif name == 'data'               : return ROOT.kBlack
 	elif name == 'datamcsub'          : return ROOT.kOrange
-	elif name == 'datamcsub_central1' : return ROOT.kBlue
+	elif name == 'datamcsub_central1' : return mycolor.GetColor( 51, 153,  51)
 	elif name == 'datamcsub_lower1'   : return mycolor.GetColor(106,  90, 205)
 	elif name == 'datamcsub_upper1'   : return mycolor.GetColor(  0,   0, 128)
 	elif name == 'datamcsub_central2' : return ROOT.kRed
@@ -127,9 +127,11 @@ def setFRPlotStyle(hist, color, title = '', title_hist = ''):
 	hist.SetTitle(title)
 	return hist
 
-def setRatioStyle(hist, title_hist='', title='Data/MC'):
+def setRatioStyle(hist, title_hist='', title='Data/MC', max = 1.99, min = 0.0):
+	hist.SetMaximum(max)
+	hist.SetMinimum(min)
 	hist.SetTitle('')
-	hist.GetYaxis().SetNdivisions(505)
+	hist.GetYaxis().SetNdivisions(502)
 	hist.GetYaxis().SetTitle(title)
 	hist.GetYaxis().SetLabelSize(0.18)
 	hist.GetYaxis().SetTitleSize(0.18)
@@ -139,8 +141,6 @@ def setRatioStyle(hist, title_hist='', title='Data/MC'):
 	hist.GetXaxis().SetTitleSize(0.2)
 	hist.GetXaxis().SetTitleOffset(1.0)
 	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
-	hist.SetMaximum(1.99)
-	hist.SetMinimum(0.0)
 	return hist
 
 def getXTitle(hist):

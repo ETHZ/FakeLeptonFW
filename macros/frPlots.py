@@ -11,7 +11,7 @@ import lib_Plot as Plot
 ROOT.gROOT.SetBatch(1)
 ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetPaintTextFormat("4.3f")
-ROOT.TGaxis.SetMaxDigits(3)
+ROOT.TGaxis.SetMaxDigits(2)
 
 class sample:
 	def __init__(self, name, infile):

@@ -5,7 +5,7 @@ import lib as helper
 import lib_FitScale as fit
 
 
-def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_name, usemarkers = False, ratio_title = ''):
+def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_name, usemarkers = False, ratio_title = '', ratio_max = 1.99, ratio_min = 0.0):
 	# calling this function make sure that
 	# (1) the first histogram in hists is the total data, and the second is the total bg
 	# this function wants to be improved
@@ -56,7 +56,7 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 	data_bg_ratio = copy.deepcopy(hists[0][0])
 	data_bg_ratio.Divide(hists[1][0])
 	data_bg_ratio.Draw("p e")
-	data_bg_ratio = helper.setRatioStyle(data_bg_ratio, title_hist, ratio_title)
+	data_bg_ratio = helper.setRatioStyle(data_bg_ratio, title_hist, ratio_title, ratio_max, ratio_min)
 	line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
 	
@@ -97,19 +97,35 @@ def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = 
 
 	# this part needs adjustment
 	if mcsubstractscales:
+		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(dataset, mcsetsplot[0], mcsubstract[0], mcsubstract[1], mcsubstract[2], 50, 120, 'h_Tight_muMTMET30')
+		qcd2     = scfirst[0][0]
+		central12= scfirst[0][1]
+		lower2   = scfirst[1][1]
+		upper2   = scfirst[2][1]
 		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(dataset, mcsetsplot[0], mcsubstract[0], mcsubstract[1], mcsubstract[2])
 		central1 = scfirst[0][1]
 		lower    = scfirst[1][1]
 		upper    = scfirst[2][1]
 		scsecond = fit.getMCScaleFactorMutually(mcsubstract, 'h_Tight_muMTMET30', [dataset], mcsetsplot, 60, 100)
 		central2 = scsecond[0]
+		scsecond = fit.getMCScaleFactorMutually(mcsubstract, 'h_Tight_muMTMET20', [dataset], mcsetsplot, 60, 100)
+		central22= scsecond[0]
+
 
 	print "------**------"
+	print "MET30:"
+	print "qcd       = " + str(qcd2)
+	print "central 1 = " + str(central12)
+	print "lower   1 = " + str(lower2)
+	print "upper   1 = " + str(upper2)
+	print "central 2 = " + str(central2)
+	print "------**------"
+	print "MET20:"
 	print "qcd       = " + str(scfirst[0][0])
 	print "central 1 = " + str(central1)
 	print "lower   1 = " + str(lower)
 	print "upper   1 = " + str(upper)
-	print "central 2 = " + str(central2)
+	print "central 2 = " + str(central22)
 	print "------++------"
 
 
@@ -230,13 +246,15 @@ def PlotFR(outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = 
 			histstoplot = []
 			histstoplot.append([FR_data_mcsub_c1, 'datamcsub_central1'])
 			histstoplot.append([FR_data_mcsub_c2, 'datamcsub_central2'])
-			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + '_data-ew_eth-ucsx', True, 'ETH/UCSx')
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + '_data-ew_eth-ucsx', True, 'ETH/UCSx', 1.01, 0.99)
 
 			histstoplot = []
-			histstoplot.append([FR_data, 'data'])
 			histstoplot.append([FR_data_mcsub_c1, 'datamcsub_central1'])
 			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc[i][j], 'qcdMuEnriched'])
-			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + '_data-ew_data-eth-qcd', True, 'Data/ETH')
+			histstoplot.append([FR_data, 'data'])
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'muFR_' + FR_data.GetName().lstrip('h_Tight_mu') + '_data-ew_data-eth-qcd', True, 'ETH/QCD')
+
+			
 
 	return True
 
@@ -254,6 +272,7 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 	# this part needs adjustment
 	if mcsubstractscales:
 		scfirst = fit.getMCScaleFactorSimultaneouslyWithErrors(dataset, mcsetsplot[0], mcsubstract[0], mcsubstract[1], mcsubstract[2])
+		print scfirst
 		central1 = scfirst[0][1]
 		lower    = scfirst[1][1]
 		upper    = scfirst[2][1]
@@ -390,7 +409,7 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 		make2dFRPlot(canv, outputDir, dataset, FR_data_mcsub_u1, title_indeces, 'data-EW upper1')
 		make2dFRPlot(canv, outputDir, dataset, FR_data_mcsub_c2, title_indeces, 'data-EW central2')
 
-	make2dFRPlot(canv, outputDir, dataset, FR_bg, title_indeces, 'bg')
+	make2dFRPlot(canv, outputDir, dataset, FR_bg, title_indeces, 'MC')
 	for j in range(len(mcsetsplot)): make2dFRPlot(canv, outputDir, dataset, FR_mc[j], title_indeces, 'qcdMuEnriched')
 
 
@@ -458,16 +477,32 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 			histstoplot.append([FR_data_px_mcsub_c1, 'datamcsub_central1'])
 			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew_data-eth', True, 'Data/ETH')
 
+			print "---------"
+			print "data-ETH:"
+			for k in range(1,FR_data_px.GetXaxis().GetNbins()+1):
+				print str(FR_data_px.GetBinContent(k)) + "-" + str(FR_data_px_mcsub_c1.GetBinContent(k))
+
 			histstoplot = []
 			histstoplot.append([FR_data_px_mcsub_c1, 'datamcsub_central1'])
 			histstoplot.append([FR_data_px_mcsub_c2, 'datamcsub_central2'])
-			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew_eth-ucsx', True, 'ETH/UCSx')
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew_eth-ucsx', True, 'ETH/UCSx', 1.01, 0.99)
+
+			print "---------"
+			print "ETH-UCSx:"
+			for k in range(1,FR_data_px.GetXaxis().GetNbins()+1):
+				print str(FR_data_px_mcsub_c1.GetBinContent(k)) + "-" + str(FR_data_px_mcsub_c2.GetBinContent(k))
 
 			histstoplot = []
-			histstoplot.append([FR_data_px, 'data'])
 			histstoplot.append([FR_data_px_mcsub_c1, 'datamcsub_central1'])
 			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_px[j], 'qcdMuEnriched'])
-			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew_data-eth-qcd', True, 'Data/ETH')
+			histstoplot.append([FR_data_px, 'data'])
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew_data-eth-qcd', True, 'ETH/QCD')
+
+			print "---------"
+			print "ETH-QCD:"
+			for k in range(1,FR_data_px.GetXaxis().GetNbins()+1):
+				print str(FR_data_px_mcsub_c1.GetBinContent(k)) + "-" + str(FR_mc_px[0].GetBinContent(k))
+
 
 
 		histstoplot = []
@@ -491,13 +526,13 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 			histstoplot = []
 			histstoplot.append([FR_data_py_mcsub_c1, 'datamcsub_central1'])
 			histstoplot.append([FR_data_py_mcsub_c2, 'datamcsub_central2'])
-			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta_data-ew_eth-ucsx', True, 'ETH/UCSx')
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta_data-ew_eth-ucsx', True, 'ETH/UCSx', 1.01, 0.99)
 
 			histstoplot = []
-			histstoplot.append([FR_data_py, 'data'])
 			histstoplot.append([FR_data_py_mcsub_c1, 'datamcsub_central1'])
 			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_py[j], 'qcdMuEnriched'])
-			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta_data-ew_data-eth-qcd', True, 'Data/ETH')
+			histstoplot.append([FR_data_py, 'data'])
+			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'muFR_proj_Eta_data-ew_data-eth-qcd', True, 'ETH/QCD')
 
 
 

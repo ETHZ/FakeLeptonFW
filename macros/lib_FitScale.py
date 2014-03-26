@@ -54,13 +54,13 @@ def getMCScaleFactorMutually(mcdatasets, histforscale, datalist, mclist = [], mi
 
 
 
-def getMCScaleFactorSimultaneously2(data, qcd, wjets, dyjets1, dyjets2):
+def getMCScaleFactorSimultaneously2(data, qcd, wjets, dyjets1, dyjets2, hist_name = 'h_Tight_muMTMET20'):
 
 	scalefactors = [1.0, 1.0, 1.0, 1.0]
 	
 	scind = 0
  	for i, hist in enumerate(data.hists): 
- 		if hist.GetName() == 'h_Tight_muMTMET20':
+ 		if hist.GetName() == hist_name:
 			scind = i
 
 	data_hist    = data.hists[scind]
@@ -153,17 +153,17 @@ def getMCScaleFactorSimultaneously(data, qcd, wjets, dyjets1, dyjets2):
 
 
 
-def getMCScaleFactorSimultaneouslyWithErrors(data, qcd, wjets, dyjets1, dyjets2, hist_min = 50, hist_max = 120):
+def getMCScaleFactorSimultaneouslyWithErrors(data, qcd, wjets, dyjets1, dyjets2, hist_min = 50, hist_max = 120, hist_name = 'h_Tight_muMTMET20'):
 
 	central = [1.0, 1.0, 1.0, 1.0]
 	lower   = [1.0, 1.0, 1.0, 1.0]
 	upper   = [1.0, 1.0, 1.0, 1.0]
 
-	scalefactors = getMCScaleFactorSimultaneously2(data, qcd, wjets, dyjets1, dyjets2)
+	scalefactors = getMCScaleFactorSimultaneously2(data, qcd, wjets, dyjets1, dyjets2, hist_name)
 	central[0] = scalefactors[0]
 	qcd.Rescale(central[0])
 	
-	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], 'h_Tight_muMTMET20', [data], [qcd], hist_min, hist_max)
+	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], hist_name, [data], [qcd], hist_min, hist_max)
 	central[1] = scalefactors[0]
 	central[2] = scalefactors[1]
 	central[3] = scalefactors[2]
@@ -171,7 +171,7 @@ def getMCScaleFactorSimultaneouslyWithErrors(data, qcd, wjets, dyjets1, dyjets2,
 	qcd.Rescale(1.5/1.0)
 	upper[0] = 1.5*central[0]
 	
-	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], 'h_Tight_muMTMET20', [data], [qcd], hist_min, hist_max)
+	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], hist_name, [data], [qcd], hist_min, hist_max)
 	upper[1] = scalefactors[0]
 	upper[2] = scalefactors[1]
 	upper[3] = scalefactors[2]
@@ -179,7 +179,7 @@ def getMCScaleFactorSimultaneouslyWithErrors(data, qcd, wjets, dyjets1, dyjets2,
 	qcd.Rescale(0.5/1.5)
 	lower[0] = 0.5*central[0]
 	
-	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], 'h_Tight_muMTMET20', [data], [qcd], hist_min, hist_max)
+	scalefactors = getMCScaleFactorMutually([wjets, dyjets1, dyjets2], hist_name, [data], [qcd], hist_min, hist_max)
 	lower[1] = scalefactors[0]
 	lower[2] = scalefactors[1]
 	lower[3] = scalefactors[2]
