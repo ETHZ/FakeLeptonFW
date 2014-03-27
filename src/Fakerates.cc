@@ -70,7 +70,7 @@ void Fakerates::init(bool verbose){
 	fFRbinspt.push_back(35.);
 	fFRbinspt.push_back(45.);
 	fFRbinspt.push_back(46.);
-	fFRn_binspt   = fFRbinspt .size();
+	fFRn_binspt   = fFRbinspt.size();
 
 
 	// Binning for Difference/Fraction in JetPt Projection Plots
@@ -210,7 +210,7 @@ void Fakerates::loop(TFile* pFile){
 	tree_->ResetBranchAddresses();
 	Init(tree_);
 	Long64_t tot_events = tree_->GetEntriesFast();
-    
+   
 	// calculate the eventweight
 	TH1F * EventCount = (TH1F*) file_->Get("EventCount");
 	Double_t Ngen = EventCount->GetEntries();
@@ -753,6 +753,16 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 		if(passesMETCut(30,1)) h_Loose_muMTMET30   ->Fill(getMT(0, mu), fEventweight);
 		if(passesMETCut(20,1)) h_Loose_muNVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
 
+		if(passesMTCut(0, mu) && fFRbinseta[0]<=fabs(MuEta->at(mu)) && fabs(MuEta->at(mu))<fFRbinseta[fFRn_binseta-1]){
+			if(fFRbinspt[0]<=MuPt->at(mu) && MuPt->at(mu)<fFRbinspt[fFRn_binspt-1]){
+				int i = h_Loose_muFRZoomEta ->FindBin(fabs(MuEta->at(mu)));
+				int j = h_Loose_muFRZoomPt  ->FindBin(MuPt->at(mu));
+				h_Loose_muMETZoomC[(i-1)*(fFRn_binspt-1) + j - 1] ->Fill((getMET()), fEventweight);
+			}
+		}
+
+
+
 		// tight muons
 		if(isTightMuon(mu)) {
 
@@ -826,6 +836,13 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 			if(passesMETCut(30,1)) h_Tight_muMTMET30    -> Fill(getMT(0, mu), fEventweight);
 			if(passesMETCut(20,1)) h_Tight_muNVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
 
+			if(passesMTCut(0, mu) && fFRbinseta[0]<=fabs(MuEta->at(mu)) && fabs(MuEta->at(mu))<fFRbinseta[fFRn_binseta-1]){
+				if(fFRbinspt[0]<=MuPt->at(mu) && MuPt->at(mu)<fFRbinspt[fFRn_binspt-1]){
+					int i = h_Tight_muFRZoomEta ->FindBin(fabs(MuEta->at(mu)));
+					int j = h_Tight_muFRZoomPt  ->FindBin(MuPt->at(mu));
+					h_Tight_muMETZoomC[(i-1)*(fFRn_binspt-1) + j - 1] ->Fill((getMET()), fEventweight);
+				}
+			}
 		}
 	}
 	h_muFRatio->Divide(h_muFTight, h_muFLoose);
@@ -875,6 +892,11 @@ void Fakerates::bookHistos(){
 	h_muFLoose = new TH2F("h_muFLoose", "muFLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_muFLoose->Sumw2(); 
 	h_elPLoose = new TH2F("h_elPLoose", "elPLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_elPLoose->Sumw2(); 
 	h_muPLoose = new TH2F("h_muPLoose", "muPLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_muPLoose->Sumw2(); 
+
+	h_Loose_muFRZoomEta  = new TH1F("h_Loose_muFRZoomEta"  , "Loose_muFRZoomEta" , fFRn_binseta-1, &fFRbinseta[0]); // empty, just to use binning
+	h_Loose_muFRZoomPt   = new TH1F("h_Loose_muFRZoomPt"   , "Loose_muFRZoomPt"  , fFRn_binspt-1 , &fFRbinspt[0] ); // empty, just to use binning
+	h_Tight_muFRZoomEta  = new TH1F("h_Tight_muFRZoomEta"  , "Tight_muFRZoomEta" , fFRn_binseta-1, &fFRbinseta[0]); // empty, just to use binning
+	h_Tight_muFRZoomPt   = new TH1F("h_Tight_muFRZoomPt"   , "Tight_muFRZoomPt"  , fFRn_binspt-1 , &fFRbinspt[0] ); // empty, just to use binning
 
 	float eta_min = 0., eta_max = 2.4;
 	float pt_min = 10., pt_max = 70.;
@@ -960,6 +982,18 @@ void Fakerates::bookHistos(){
 			++n;
 		}
 	}
+	n = 0;
+	for(int i=0; i<fFRn_binseta-1; ++i) {
+		for(int j=0; j<fFRn_binspt-1; ++j) {
+			if(n<10) sprintf(nn, "0%d", n);
+			else sprintf(nn, "%d", n);
+			sprintf(name, "h_Loose_muMETZoomC_%s", nn);
+			sprintf(title, "Loose_muMETZoomC_%s", nn);
+			h_Loose_muMETZoomC[n] = new TH1F(name, title, 20, 0, 100);
+			h_Loose_muMETZoomC[n]->Sumw2();
+			++n;
+		}
+	}
 	
 	h_Tight_muLepPt      = new TH1F("h_Tight_muLepPt"      , "Tight_muLepPt"     , pt_bin  , pt_min  , pt_max ); h_Tight_muLepPt     -> Sumw2();
 	h_Tight_muLepEta     = new TH1F("h_Tight_muLepEta"     , "Tight_muLepEta"    , eta_bin , eta_min , eta_max); h_Tight_muLepEta    -> Sumw2();
@@ -1036,6 +1070,18 @@ void Fakerates::bookHistos(){
 			sprintf(title, "Tight_muFJPtZoomR_%s", nn);
 			h_Tight_muFJPtZoomR[n] = new TH1F(name, title, 50, -1., 1.);
 			h_Tight_muFJPtZoomR[n]->Sumw2();
+			++n;
+		}
+	}
+	n = 0;
+	for(int i=0; i<fFRn_binseta-1; ++i) {
+		for(int j=0; j<fFRn_binspt-1; ++j) {
+			if(n<10) sprintf(nn, "0%d", n);
+			else sprintf(nn, "%d", n);
+			sprintf(name, "h_Tight_muMETZoomC_%s", nn);
+			sprintf(title, "Tight_muMETZoomC_%s", nn);
+			h_Tight_muMETZoomC[n] = new TH1F(name, title, 20, 0, 100);
+			h_Tight_muMETZoomC[n]->Sumw2();
 			++n;
 		}
 	}
@@ -1131,6 +1177,9 @@ void Fakerates::writeHistos(TFile* pFile){
 		h_Loose_muDJPtZoomR[n] ->Write(fName + "_" + h_Loose_muDJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
 		h_Loose_muFJPtZoomR[n] ->Write(fName + "_" + h_Loose_muFJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
 	}
+	for(int n = 0; n < (fFRn_binseta-1)*(fFRn_binspt-1); ++n) {
+		h_Loose_muMETZoomC[n]  ->Write(fName + "_" + h_Loose_muMETZoomC[n]  ->GetName(), TObject::kWriteDelete);
+	}
 
 
 	// tight histograms
@@ -1191,7 +1240,9 @@ void Fakerates::writeHistos(TFile* pFile){
 		h_Tight_muDJPtZoomR[n] ->Write(fName + "_" + h_Tight_muDJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
 		h_Tight_muFJPtZoomR[n] ->Write(fName + "_" + h_Tight_muFJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
 	}
-
+	for(int n = 0; n < (fFRn_binseta-1)*(fFRn_binspt-1); ++n) {
+		h_Tight_muMETZoomC[n]  ->Write(fName + "_" + h_Tight_muMETZoomC[n]  ->GetName(), TObject::kWriteDelete);
+	}
 
 }
 

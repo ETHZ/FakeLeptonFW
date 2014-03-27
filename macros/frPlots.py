@@ -11,7 +11,7 @@ import lib_Plot as Plot
 ROOT.gROOT.SetBatch(1)
 ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetPaintTextFormat("4.3f")
-ROOT.TGaxis.SetMaxDigits(2)
+ROOT.TGaxis.SetMaxDigits(3)
 
 class sample:
 	def __init__(self, name, infile):
@@ -136,15 +136,20 @@ Plot.Plot1d(outputDir, data, mc_samples, plot1dHists, leg)
 Plot.Plot2d(outputDir, data, mc_samples, plot2dHists)
 
 
+# Plot all MET Zooms
 
-# Plot all Zooms with Data, MC to compare
+Plot.PlotMETZooms(outputDir, data, [qcd, wjets, dyjets1], leg)
+
+
+
+# Plot all JPt Zooms
 
 leg0 = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
 leg0.AddEntry(data   .hists[0], helper.getLegendName(data.GetName())    , 'l')
 leg0.AddEntry(wjets  .hists[0], helper.getLegendName(wjets.GetName())   , 'l')
 leg0.AddEntry(dyjets1.hists[0], helper.getLegendName(dyjets1.GetName()) , 'l')
 leg0.AddEntry(qcd    .hists[0], helper.getLegendName(qcd.GetName())     , 'l')
-Plot.PlotZooms(outputDir, data, [qcd, wjets, dyjets1], leg0)
+Plot.PlotJPtZooms(outputDir, data, [qcd, wjets, dyjets1], leg0)
 
 
 

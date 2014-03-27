@@ -110,7 +110,110 @@ def Plot1d(outputDir, dataset, mcsets, histlist, leg):
 		make1dPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, hist, prepend + helper.getSaveName(hist) + postpend, leg)
 
 
-def PlotZooms(outputDir, dataset, mcsets, leg):
+
+def PlotMETZooms(outputDir, dataset, mcsets, leg):
+
+	canv = helper.makeCanvas(900, 675, 'c1dM')
+	pad_plot = helper.makePad('plot')
+	pad_ratio = helper.makePad('ratio')
+	pad_plot.SetTicks(1,1)
+	pad_ratio.SetTicks(1,1)
+
+	t_eta = ROOT.TLatex()
+	t_eta.SetNDC()
+	t_eta.SetTextSize(0.05)
+	t_eta.SetTextAlign(11)
+	t_eta.SetTextColor(ROOT.kBlack)
+
+	t_pt = ROOT.TLatex()
+	t_pt.SetNDC()
+	t_pt.SetTextSize(0.05)
+	t_pt.SetTextAlign(11)
+	t_pt.SetTextColor(ROOT.kBlack)
+
+	bins_eta = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
+	bins_pt  = [20.0, 25.0, 30.0, 35.0, 45.0, 46.0]
+	bins_tot = (len(bins_eta)-1)*(len(bins_pt)-1)
+
+	for hist in dataset.hists:
+
+		i = dataset.hists.index(hist)
+		pad_plot.cd()
+
+
+		# Plot Histogram
+		if not "METZoom" in hist.GetName(): continue
+
+		prepend = ''
+		postpend = ''
+		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
+		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
+
+		id = hist.GetName().split('_')[-1]
+
+
+		# Sum BG Contributions in Stack
+		stack = ROOT.THStack()
+		stackint = 0.
+		for j,mc in enumerate(mcsets):
+			stackint += mc.hists[i].Integral()
+			stack.Add(mc.hists[i])
+
+		stack.Draw('hist')
+
+		hists = []
+		hists.append([hist, 'data'])
+		hists.append([stack, 'totbg'])
+		#make1dPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, hist, prepend + helper.getSaveName(hist, '-2:') + postpend, leg)
+
+		max = hists[0][0].GetMaximum()
+		for i in range(1,len(hists)):
+			if max < hists[i][0].GetMaximum():
+				max = hists[i][0].GetMaximum()
+
+		hists[0][0] = helper.set1dPlotStyle(hists[0][0], helper.getColor(hists[0][1]), '', hist)
+		hists[0][0].Draw("p x0 e")
+		hists[0][0].SetMinimum(0.001)
+		hists[0][0].SetMaximum(1.5*max)
+		for i in range(1,len(hists)):
+			hists[i][0].Draw("hist same")
+			hists[i][0].SetMinimum(0.001)
+			hists[i][0].SetMaximum(1.5*max)
+	
+		hists[0][0].Draw("p x0 e same")
+		leg.Draw()
+
+		m = int(id)//(len(bins_pt)-1)
+		n = int(id)%(len(bins_pt)-1)
+
+		if "ZoomC" in hist.GetName(): write = "corr."
+		else:                         write = "raw"
+	
+		text_eta = str(bins_eta[m]) + " #leq #mu-|#eta| < " + str(bins_eta[m+1])
+		text_pt  = str(bins_pt[n])  + " #leq #mu-p_{T} (" + write + ") < " + str(bins_pt[n+1])
+
+		t_eta.DrawLatex(0.22, 0.8, text_eta)
+		t_pt.DrawLatex(0.22, 0.73, text_pt)
+
+
+		# create RATIO PLOT
+		
+		pad_ratio.cd()
+		data_bg_ratio = copy.deepcopy(hists[0][0])
+		data_bg_ratio.Divide(hists[1][0].GetStack().Last())
+		data_bg_ratio.Draw("p e")
+		data_bg_ratio = helper.setRatioStyle(data_bg_ratio, hist)
+		line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
+		line.Draw()
+
+		ROOT.gPad.RedrawAxis()
+
+		helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist, '-2:') + postpend)
+
+
+
+
+def PlotJPtZooms(outputDir, dataset, mcsets, leg):
 
 	canv = helper.makeCanvas(900, 675, 'c1dZ')
 	pad_plot = helper.makePad('tot')
@@ -139,7 +242,7 @@ def PlotZooms(outputDir, dataset, mcsets, leg):
 		i = dataset.hists.index(hist)
 
 		# Plot Histogram
-		if not "Zoom" in hist.GetName(): continue
+		if not "JPtZoom" in hist.GetName(): continue
 
 		prepend = ''
 		postpend = ''

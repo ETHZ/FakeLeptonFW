@@ -182,6 +182,9 @@ public:
 	TH1F * h_Loose_muFJPtZoomC[30];
 	TH1F * h_Loose_muDJPtZoomR[30];
 	TH1F * h_Loose_muFJPtZoomR[30];
+	TH1F * h_Loose_muFRZoomEta;
+	TH1F * h_Loose_muFRZoomPt;
+	TH1F * h_Loose_muMETZoomC[30];
 
 	TH1F * h_Tight_muAwayJetDR;
 	TH1F * h_Tight_muAwayJetPt;
@@ -230,6 +233,9 @@ public:
 	TH1F * h_Tight_muFJPtZoomC[30];
 	TH1F * h_Tight_muDJPtZoomR[30];
 	TH1F * h_Tight_muFJPtZoomR[30];
+	TH1F * h_Tight_muFRZoomEta;
+	TH1F * h_Tight_muFRZoomPt;
+	TH1F * h_Tight_muMETZoomC[30];
 
 	void bookHistos();
 	void writeHistos(TFile *);
