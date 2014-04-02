@@ -184,7 +184,9 @@ public:
 	TH1F * h_Loose_muFJPtZoomR[30];
 	TH1F * h_Loose_muFRZoomEta;
 	TH1F * h_Loose_muFRZoomPt;
-	TH1F * h_Loose_muMETZoomC[30];
+	TH1F * h_Loose_muFRMETZoomEta;
+	TH1F * h_Loose_muFRMETZoomPt;
+	TH1F * h_Loose_muMETZoom[40];
 
 	TH1F * h_Tight_muAwayJetDR;
 	TH1F * h_Tight_muAwayJetPt;
@@ -235,7 +237,9 @@ public:
 	TH1F * h_Tight_muFJPtZoomR[30];
 	TH1F * h_Tight_muFRZoomEta;
 	TH1F * h_Tight_muFRZoomPt;
-	TH1F * h_Tight_muMETZoomC[30];
+	TH1F * h_Tight_muFRMETZoomEta;
+	TH1F * h_Tight_muFRMETZoomPt;
+	TH1F * h_Tight_muMETZoom[40];
 
 	void bookHistos();
 	void writeHistos(TFile *);
@@ -256,6 +260,12 @@ public:
 	std::vector<float> fFRbinspt;
 	int fFRn_binseta;
 	int fFRn_binspt ;
+
+	// Binning for FakeRate MET Projection Plots
+	std::vector<float> fFRMETbinseta;
+	std::vector<float> fFRMETbinspt;
+	int fFRMETn_binseta;
+	int fFRMETn_binspt ;
 
 	// Binning for Difference/Fraction in JetPt Projection Plots
 	std::vector<float> fDFbinseta;

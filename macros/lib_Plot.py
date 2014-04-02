@@ -19,9 +19,10 @@ def make1dPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_nam
 	hists[0][0] = helper.set1dPlotStyle(hists[0][0], helper.getColor(hists[0][1]), '', title_hist)
 	#for i in range(len(hists)):
 	#	hists[i][0] = helper.set1dPlotStyle(hists[i][0], helper.getColor(hists[i][1]), '', title_hist)
-	if "Tight_muMTMET20" in hists[0][0].GetName():
-		for i in range(1,hists[0][0].GetXaxis().GetNbins()):
-			print hists[1][0].GetStack().Last().GetBinContent(i)
+	
+	#if "Tight_muMTMET20" in hists[0][0].GetName():
+	#	for i in range(1,hists[0][0].GetXaxis().GetNbins()):
+	#		print hists[1][0].GetStack().Last().GetBinContent(i)
 
 	hists[0][0].Draw("p x0 e")
 	hists[0][0].SetMinimum(0.001)
@@ -132,7 +133,7 @@ def PlotMETZooms(outputDir, dataset, mcsets, leg):
 	t_pt.SetTextColor(ROOT.kBlack)
 
 	bins_eta = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
-	bins_pt  = [20.0, 25.0, 30.0, 35.0, 45.0, 46.0]
+	bins_pt  = [20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 46.0]
 	bins_tot = (len(bins_eta)-1)*(len(bins_pt)-1)
 
 	for hist in dataset.hists:
@@ -186,11 +187,8 @@ def PlotMETZooms(outputDir, dataset, mcsets, leg):
 		m = int(id)//(len(bins_pt)-1)
 		n = int(id)%(len(bins_pt)-1)
 
-		if "ZoomC" in hist.GetName(): write = "corr."
-		else:                         write = "raw"
-	
 		text_eta = str(bins_eta[m]) + " #leq #mu-|#eta| < " + str(bins_eta[m+1])
-		text_pt  = str(bins_pt[n])  + " #leq #mu-p_{T} (" + write + ") < " + str(bins_pt[n+1])
+		text_pt  = str(bins_pt[n])  + " #leq #mu-p_{T} < " + str(bins_pt[n+1])
 
 		t_eta.DrawLatex(0.22, 0.8, text_eta)
 		t_pt.DrawLatex(0.22, 0.73, text_pt)

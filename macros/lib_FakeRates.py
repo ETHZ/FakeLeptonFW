@@ -477,20 +477,20 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 			histstoplot.append([FR_data_px_mcsub_c1, 'datamcsub_central1'])
 			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew_data-eth', True, 'Data/ETH')
 
-			print "---------"
-			print "data-ETH:"
-			for k in range(1,FR_data_px.GetXaxis().GetNbins()+1):
-				print str(FR_data_px.GetBinContent(k)) + "-" + str(FR_data_px_mcsub_c1.GetBinContent(k))
+			#print "---------"
+			#print "data-ETH:"
+			#for k in range(1,FR_data_px.GetXaxis().GetNbins()+1):
+			#	print str(FR_data_px.GetBinContent(k)) + "-" + str(FR_data_px_mcsub_c1.GetBinContent(k))
 
 			histstoplot = []
 			histstoplot.append([FR_data_px_mcsub_c1, 'datamcsub_central1'])
 			histstoplot.append([FR_data_px_mcsub_c2, 'datamcsub_central2'])
 			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew_eth-ucsx', True, 'ETH/UCSx', 1.01, 0.99)
 
-			print "---------"
-			print "ETH-UCSx:"
-			for k in range(1,FR_data_px.GetXaxis().GetNbins()+1):
-				print str(FR_data_px_mcsub_c1.GetBinContent(k)) + "-" + str(FR_data_px_mcsub_c2.GetBinContent(k))
+			#print "---------"
+			#print "ETH-UCSx:"
+			#for k in range(1,FR_data_px.GetXaxis().GetNbins()+1):
+			#	print str(FR_data_px_mcsub_c1.GetBinContent(k)) + "-" + str(FR_data_px_mcsub_c2.GetBinContent(k))
 
 			histstoplot = []
 			histstoplot.append([FR_data_px_mcsub_c1, 'datamcsub_central1'])
@@ -498,10 +498,10 @@ def Plot2dFRMap(outputDir, dataset, mcsets, mcsetsplot = [], mcsubstract = [], d
 			histstoplot.append([FR_data_px, 'data'])
 			make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'muFR_proj_Pt_data-ew_data-eth-qcd', True, 'ETH/QCD')
 
-			print "---------"
-			print "ETH-QCD:"
-			for k in range(1,FR_data_px.GetXaxis().GetNbins()+1):
-				print str(FR_data_px_mcsub_c1.GetBinContent(k)) + "-" + str(FR_mc_px[0].GetBinContent(k))
+			#print "---------"
+			#print "ETH-QCD:"
+			#for k in range(1,FR_data_px.GetXaxis().GetNbins()+1):
+			#	print str(FR_data_px_mcsub_c1.GetBinContent(k)) + "-" + str(FR_mc_px[0].GetBinContent(k))
 
 
 
