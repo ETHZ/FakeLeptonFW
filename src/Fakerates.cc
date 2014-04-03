@@ -166,6 +166,8 @@ void Fakerates::loadConfigFile(TString configfile){
 				else if (type == "float"   && name == "fMuIsoCut")       fMuIsoCut       = value.Atof();
 				else if (type == "float"   && name == "fAwayJetBTagCut") fAwayJetBTagCut = value.Atof();
 				else if (type == "float"   && name == "fAwayJetDPhiCut") fAwayJetDPhiCut = value.Atof();
+				else if (type == "TString" && name == "fMuTrigger")      fMuTrigger      = value;
+				else if (type == "bool"    && name == "fMuTriggerMC")    fMuTriggerMC    = (bool) value.Atoi();		
 				else { cout << " ERROR in reading variable (" << name << ")!" << endl; exit(1); }
 			}
 			else {
@@ -188,6 +190,8 @@ void Fakerates::loadConfigFile(TString configfile){
 	cout << " fMuIsoCut:        " << fMuIsoCut       << endl;
 	cout << " fAwayJetBTagCut:  " << fAwayJetBTagCut << endl;
 	cout << " fAwayJetDPhiCut:  " << fAwayJetDPhiCut << endl;
+	cout << " fMuTrigger:       " << fMuTrigger      << endl;
+	cout << " fMuTriggerMC:     " << fMuTriggerMC    << endl;
 	cout << "=======================================================" << endl;
 	cout << "=======================================================" << endl;
 }
@@ -285,8 +289,11 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 
 
 	// Event fails HLT muon trigger (if data) then return false
-	//if(fIsData && !HLT_MU17) return false;
-	if(fIsData && !HLT_MU40) return false;
+	if(fMuTriggerMC || fIsData) {
+		if     (fMuTrigger == "Mu17" && !HLT_MU17) { return false; }
+		else if(fMuTrigger == "Mu40" && !HLT_MU40) { return false; }
+		else                                       {}
+	}
 
 	// muon Pt is not reasonable then return false
 	if(MuPt->size() < 1) return false;

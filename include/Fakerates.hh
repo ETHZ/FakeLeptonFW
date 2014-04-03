@@ -74,6 +74,8 @@ public:
 	float fMuIsoCut;
 	float fAwayJetBTagCut;
 	float fAwayJetDPhiCut;
+	TString fMuTrigger;
+	bool  fMuTriggerMC;
 	
 
     // FUNCTIONS
