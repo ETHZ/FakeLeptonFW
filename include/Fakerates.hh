@@ -13,6 +13,7 @@
 #include "TCanvas.h"
 #include "TTree.h"
 #include "TRandom.h"
+#include "TRandom3.h"
 #include "TROOT.h"
 #include "TVirtualPad.h"
 #include "TLorentzVector.h"
@@ -82,6 +83,9 @@ public:
 	void doStuff(); // this one gets called by the executable
 	void loop(TFile *);
 
+	float getSigmaMC(float, float);
+	void smearAllJets();	
+
 	//void fillRatios();
 	void fillFRPlots(float);
 
@@ -111,6 +115,8 @@ public:
 	int getNJets(int);
 
 		// MET
+	void setMET(float);
+	void setMETPhi(float);
 	float getMET();
 	float getMETPhi();
 
@@ -247,6 +253,9 @@ public:
 	void writeHistos(TFile *);
 
 	// ===================================
+
+	// TRandom3
+	TRandom3 *fRandom;
 
 	// Eventweight
 	float fLumiweight;

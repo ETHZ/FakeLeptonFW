@@ -42,13 +42,16 @@ void Fakerates::init(bool verbose){
 	cout << "=======================================================" << endl;
 	cout << "=======================================================" << endl;
 
+	fRandom = new TRandom3();
 	fLumiweight = 1.0;
+
 	fCutflow_afterLepSel = 0;
 	fCutflow_afterJetSel = 0;
 	fCutflow_afterMETCut = 0;
 	fCutflow_afterMTCut  = 0;
-	Util::SetStyle();
 
+	Util::SetStyle();
+	
 
 	// Binning for FakeRate Projection Plots
 
@@ -253,6 +256,8 @@ void Fakerates::loop(TFile* pFile){
 		tree_->GetEntry(jentry);
 		ntot++;
 
+		smearAllJets();
+
 		float fEventweight = fLumiweight;
 		if(!fIsData) fEventweight *= PUWeight;
 
@@ -270,6 +275,79 @@ void Fakerates::loop(TFile* pFile){
 	// write histograms in output file
 	writeHistos(pFile);
 	pFile->Close();
+}
+
+
+//____________________________________________________________________________
+float Fakerates::getSigmaMC(float Pt, float Eta) {
+  
+	float N, S, m;
+
+	if( fabs(Eta) < 0.5 ) {
+		N = 3.96859;
+		S = 0.18348;
+		m = 0.62627;
+	} 
+	else if( fabs(Eta) < 1. ) {
+		N = 3.55226;
+		S = 0.24026;
+		m = 0.52571;
+	} 
+	else if( fabs(Eta) < 1.5) {
+		N = 4.54826;
+		S = 0.22652;
+		m = 0.58963;
+	} 
+	else if( fabs(Eta) < 2. ) {
+		N = 4.62622;
+		S = 0.23664;
+		m = 0.48738;
+	} 
+	else if( fabs(Eta) < 2.5) {
+		N = 2.53324;
+		S = 0.34306;
+		m = 0.28662;
+	} 
+	else if( fabs(Eta) < 3. ) {
+		N = -3.33814;
+		S = 0.73360;
+		m = 0.08264;
+	} 
+	else if( fabs(Eta) < 5. ) {
+		N = 2.95397;
+		S = 0.11619;
+		m = 0.96086;
+	}
+
+	return sqrt((N * fabs(N) ) + (S * S) * pow(Pt, m + 1));
+}
+
+
+//____________________________________________________________________________
+void Fakerates::smearAllJets(){
+
+	TLorentzVector TLV_Jet_old, TLV_Jet_new, TLV_MET;
+
+	TLV_MET.SetPtEtaPhiM(getMET(),0,getMETPhi(),0);
+
+	for (int i=0; i<JetPt->size(); ++i){
+
+		float sigmaMC = getSigmaMC( JetPt->at(i), JetEta->at(i) ) / JetPt->at(i);
+		float factor  = fRandom -> Gaus( 1.0, sigmaMC );  
+
+		TLV_Jet_old.SetPtEtaPhiM(JetPt->at(i), JetEta->at(i), JetPhi->at(i), 0);
+
+		TLV_MET -= TLV_Jet_old;
+
+		JetPt->at(i) = JetPt->at(i) * factor;
+		TLV_Jet_new.SetPtEtaPhiM(JetPt->at(i), JetEta->at(i), JetPhi->at(i), 0);
+
+		TLV_MET += TLV_Jet_new;
+		
+	}
+
+	setMET(TLV_MET.Pt());
+	setMETPhi(TLV_MET.Phi());
 }
 
 
@@ -292,7 +370,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 	if(fMuTriggerMC || fIsData) {
 		if     (fMuTrigger == "Mu17" && !HLT_MU17) { return false; }
 		else if(fMuTrigger == "Mu40" && !HLT_MU40) { return false; }
-		else                                       {}
+		else                                       { }
 	}
 
 	// muon Pt is not reasonable then return false
@@ -388,6 +466,32 @@ float Fakerates::getJetPt(int index) {
 
 	if(fJetCorrection) return JetPt->at(index);
 	else return JetRawPt->at(index);
+}
+
+
+//____________________________________________________________________________
+void Fakerates::setMET(float newvalue){
+	/* 
+	set the right MET according to the level of correction
+	parameters: type (type of correction)
+	return: MET or MET1
+	*/
+
+	if(fJetCorrection) pfMET1 = newvalue;
+	else pfMET = newvalue;
+}
+
+
+//____________________________________________________________________________
+void Fakerates::setMETPhi(float newvalue){
+	/* 
+	set the right METPhi according to the level of correction
+	parameters: type (type of correction)
+	return: METPhi or MET1Phi
+	*/
+
+	if(fJetCorrection) pfMET1Phi = newvalue;
+	else pfMETPhi = newvalue;
 }
 
 
