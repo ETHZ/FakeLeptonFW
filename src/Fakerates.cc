@@ -251,7 +251,7 @@ void Fakerates::loop(TFile* pFile){
 	cout << " eventweight is " << fLumiweight << endl;
 
 	// loop on events in the tree
-	for (Long64_t jentry=0; jentry<tot_events;jentry++) {
+	for (Long64_t jentry=0; jentry<tot_events; jentry++) {
 		if(jentry > (fMaxSize>0?fMaxSize:Ngen)) break;
 		tree_->GetEntry(jentry);
 		ntot++;
@@ -326,28 +326,33 @@ float Fakerates::getSigmaMC(float Pt, float Eta) {
 //____________________________________________________________________________
 void Fakerates::smearAllJets(){
 
-	TLorentzVector TLV_Jet_old, TLV_Jet_new, TLV_MET;
+	if(!fIsData){
+	
+		TLorentzVector TLV_Jet_old, TLV_Jet_new, TLV_MET;
+		TLV_MET.SetPtEtaPhiM(getMET(),0,getMETPhi(),0);
 
-	TLV_MET.SetPtEtaPhiM(getMET(),0,getMETPhi(),0);
+		//cout << "---" << endl;
+		for(int i=0; i<JetPt->size(); ++i){
+		//	cout << JetEta->at(i) << endl;
 
-	for (int i=0; i<JetPt->size(); ++i){
+			float sigmaMC = getSigmaMC( JetPt->at(i), JetEta->at(i) ) / JetPt->at(i);
+			float factor  = fRandom -> Gaus( 1.0, sigmaMC );  
+		//	cout << JetEta->at(i) << endl;
+			TLV_Jet_old.SetPtEtaPhiM(JetPt->at(i), JetEta->at(i), JetPhi->at(i), 0);
+		//	cout << JetEta->at(i) << endl;
+		//	TLV_MET -= TLV_Jet_old;
 
-		float sigmaMC = getSigmaMC( JetPt->at(i), JetEta->at(i) ) / JetPt->at(i);
-		float factor  = fRandom -> Gaus( 1.0, sigmaMC );  
+			JetPt->at(i) = JetPt->at(i) * factor;
+		//	TLV_Jet_new.SetPtEtaPhiM(JetPt->at(i), JetEta->at(i), JetPhi->at(i), 0);
 
-		TLV_Jet_old.SetPtEtaPhiM(JetPt->at(i), JetEta->at(i), JetPhi->at(i), 0);
+		//	TLV_MET += TLV_Jet_new;
+		//	cout << JetEta->at(i) << endl;
+		}
 
-		TLV_MET -= TLV_Jet_old;
-
-		JetPt->at(i) = JetPt->at(i) * factor;
-		TLV_Jet_new.SetPtEtaPhiM(JetPt->at(i), JetEta->at(i), JetPhi->at(i), 0);
-
-		TLV_MET += TLV_Jet_new;
-		
+		setMET(TLV_MET.Pt());
+		setMETPhi(TLV_MET.Phi());
+		//for(int i=0; i<JetPt->size(); ++i) cout << JetEta->at(i) << endl;
 	}
-
-	setMET(TLV_MET.Pt());
-	setMETPhi(TLV_MET.Phi());
 }
 
 
