@@ -42,7 +42,8 @@ void Fakerates::init(bool verbose){
 	cout << "=======================================================" << endl;
 	cout << "=======================================================" << endl;
 
-	fRandom = new TRandom3();
+	int seed = 100000000;
+	fRandom = new TRandom3(seed);
 	fLumiweight = 1.0;
 
 	fCutflow_afterLepSel = 0;
@@ -250,21 +251,48 @@ void Fakerates::loop(TFile* pFile){
 	cout << " going to loop over " << (fMaxSize>0?fMaxSize:Ngen) << " events..." << endl;
 	cout << " eventweight is " << fLumiweight << endl;
 
+	float safer[20];
+	int n_detected = 0;
+
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events; jentry++) {
 		if(jentry > (fMaxSize>0?fMaxSize:Ngen)) break;
 		tree_->GetEntry(jentry);
 		ntot++;
 
+		for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
+
+
+		//cout << "======" << endl;
+		//cout << "before" << endl;
+		//for(int i=0; i<JetPt->size(); ++i) cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
+		//cout << "======" << endl;
+
 		smearAllJets();
+
+		for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) ++n_detected;
+
+		//cout << "======" << endl;
+		//cout << "after" << endl;
+		//for(int i=0; i<JetPt->size(); ++i) cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
+		//cout << "======" << endl;
 
 		float fEventweight = fLumiweight;
 		if(!fIsData) fEventweight *= PUWeight;
 
 		fillFRPlots(fEventweight);
 
+		for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) ++n_detected;
+
+		//cout << "======" << endl;
+		//cout << "in the end" << endl;
+		//for(int i=0; i<JetPt->size(); ++i) cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
+		//cout << "======" << endl;
+
+
 	}
 
+	cout << " detected " << n_detected << " JetEta conflicts" << endl;
 	cout << " mu: nevents passing lepton selection: " << fCutflow_afterLepSel << endl;
 	cout << " mu: nevents passing jet    selection: " << fCutflow_afterJetSel << endl;
 	cout << " mu: nevents passing MET    selection: " << fCutflow_afterMETCut << endl;
@@ -333,20 +361,20 @@ void Fakerates::smearAllJets(){
 
 		//cout << "---" << endl;
 		for(int i=0; i<JetPt->size(); ++i){
-		//	cout << JetEta->at(i) << endl;
+		//	cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
 
 			float sigmaMC = getSigmaMC( JetPt->at(i), JetEta->at(i) ) / JetPt->at(i);
 			float factor  = fRandom -> Gaus( 1.0, sigmaMC );  
 		//	cout << JetEta->at(i) << endl;
-			TLV_Jet_old.SetPtEtaPhiM(JetPt->at(i), JetEta->at(i), JetPhi->at(i), 0);
+			TLV_Jet_old.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
 		//	cout << JetEta->at(i) << endl;
 		//	TLV_MET -= TLV_Jet_old;
 
 			JetPt->at(i) = JetPt->at(i) * factor;
-		//	TLV_Jet_new.SetPtEtaPhiM(JetPt->at(i), JetEta->at(i), JetPhi->at(i), 0);
+		//	TLV_Jet_new.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
 
 		//	TLV_MET += TLV_Jet_new;
-		//	cout << JetEta->at(i) << endl;
+		//	cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
 		}
 
 		setMET(TLV_MET.Pt());
@@ -770,6 +798,11 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 	*/
 
 	int mu(-1), jet(-1);
+	float safer[20];
+	int n_detected = 0;
+
+
+	for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
 
 
 	if(isFRRegionMuEvent(mu, jet, 30.)) {
@@ -848,7 +881,10 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 			h_Loose_muJCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
 			h_Loose_muJRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
 
+			for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) ++n_detected;
+
 			for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
+
 				h_Loose_muAllJCPt   ->Fill(JetPt->at(thisjet)       , fEventweight);
 				h_Loose_muAllJRPt   ->Fill(JetRawPt->at(thisjet)    , fEventweight);
 				h_Loose_muAllJEta   ->Fill(fabs(JetEta->at(thisjet)), fEventweight);
@@ -989,6 +1025,8 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 	}
 	h_muFRatio->Divide(h_muFTight, h_muFLoose);
 
+
+	if(n_detected>0) cout << " detected " << n_detected << " JetEta conflicts in fillFRplots" << endl;
 
     // electrons
 	//int el(-1);
