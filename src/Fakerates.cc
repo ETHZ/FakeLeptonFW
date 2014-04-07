@@ -253,7 +253,7 @@ void Fakerates::loop(TFile* pFile){
 
 
 	int mu(-1), jet(-1);
-	float safer[20];	
+	float safer[30];	
 
 
 	// loop on events in the tree
@@ -285,6 +285,7 @@ void Fakerates::loop(TFile* pFile){
 
 
 		for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) cout << "DETECTED AN INCONSISTENCY!" << endl;
+
 
 
 		//cout << jentry;
@@ -376,19 +377,19 @@ void Fakerates::smearAllJets(){
 		for(int i=0; i<JetPt->size(); ++i){
 		//	cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
 
-			float sigmaMC = getSigmaMC( JetPt->at(i), JetEta->at(i) ) / JetPt->at(i);
-			float factor  = fRandom -> Gaus( 1.0, sigmaMC );  
+			//float sigmaMC = getSigmaMC( JetPt->at(i), JetEta->at(i) ) / JetPt->at(i);
+			float factor  = 1.0; //fRandom -> Gaus( 1.0, sigmaMC );  
 			//cout << JetEta->at(i) << endl;
 	//		TLV_Jet_old.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
 			//TLV_Jet_old.Print();
 			//cout << "i=" << i << ", " << TLV_Jet_old.Print() << endl;
 		//	cout << JetEta->at(i) << endl;
-		//	TLV_MET -= TLV_Jet_old;
+		//	TLV_MET += TLV_Jet_old;
 
-			JetPt->at(i) = JetPt->at(i) * factor;
+//			JetPt->at(i) = JetPt->at(i) * factor;
 		//	TLV_Jet_new.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
 
-		//	TLV_MET += TLV_Jet_new;
+		//	TLV_MET -= TLV_Jet_new;
 		//	cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
 		}
 
