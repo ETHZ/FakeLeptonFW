@@ -48,7 +48,7 @@ def make1dPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_nam
 
 	ROOT.gPad.RedrawAxis()
 
-	helper.saveCanvas(canv, pad_plot, outputDir, file_name)
+	helper.saveCanvas(canv, pad_plot, outputDir + "plots_1d/", file_name)
 
 
 
@@ -69,7 +69,7 @@ def make2dPlot(canv, pad_plot, outputDir, hist, postpend, file_name):
 	hist.SetMarkerColor(ROOT.kBlack)
 	hist.SetLineColor(ROOT.kBlack)
 	ROOT.gPad.RedrawAxis()
-	helper.saveCanvas(canv, pad_plot, outputDir, file_name + postpend, 0)
+	helper.saveCanvas(canv, pad_plot, outputDir + "plots_2d/", file_name + postpend, 0)
 
 
 
@@ -206,7 +206,7 @@ def PlotMETZooms(outputDir, dataset, mcsets, leg):
 
 		ROOT.gPad.RedrawAxis()
 
-		helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist, '-2:') + postpend)
+		helper.saveCanvas(canv, pad_plot, outputDir + "zoom_met/", prepend + helper.getSaveName(hist, '-2:') + postpend)
 
 
 
@@ -288,7 +288,7 @@ def PlotJPtZooms(outputDir, dataset, mcsets, leg):
 		t_eta.DrawLatex(0.22, 0.8, text_eta)
 		t_pt.DrawLatex(0.22, 0.73, text_pt)
 
-		helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist, '-2:') + postpend, 0)
+		helper.saveCanvas(canv, pad_plot, outputDir + "zoom_jpt/", prepend + helper.getSaveName(hist, '-2:') + postpend, 0)
 
 
 

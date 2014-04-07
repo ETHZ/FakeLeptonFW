@@ -60,7 +60,7 @@ def make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_n
 	line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
 	
-	helper.saveCanvas(canv, pad_plot, outputDir, file_name)
+	helper.saveCanvas(canv, pad_plot, outputDir + "fakerates_1d/", file_name)
 
 
 
@@ -81,7 +81,7 @@ def make2dFRPlot(canv, outputDir, dataset, hist, title_indeces, name=''):
 	hist.SetMinimum(0.0)
 	hist.SetMaximum(0.25)
 	hist.SetTitle("FR 2d Map (" + name + ")")
-	helper.saveCanvas(canv, pad_plot, outputDir, "muFR_2dmap_" + name.lower().replace(" ", "_"), 0)
+	helper.saveCanvas(canv, pad_plot, outputDir + "fakerates_2d/", "muFR_2dmap_" + name.lower().replace(" ", "_"), 0)
 	pad_plot.Close()
 
 

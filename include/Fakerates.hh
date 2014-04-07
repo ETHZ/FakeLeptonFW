@@ -170,6 +170,9 @@ public:
 	TH1F * h_Loose_muAllJCPt;
 	TH1F * h_Loose_muAllJRPt;
 	TH1F * h_Loose_muAllJEta;
+	TH1F * h_Loose_muAllJEta_test1;
+	TH1F * h_Loose_muAllJEta_test2;
+	TH1F * h_Loose_muAllJEta_test3;
 	TH1F * h_Loose_muNBJets;
 	TH1F * h_Loose_muNJets;
 	TH1F * h_Loose_muNVertices;

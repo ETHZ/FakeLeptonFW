@@ -50,8 +50,10 @@ wjets   = sample('wjets'        , inputDir + 'wjets_ratios.root')
 dyjets1 = sample('dyjets1'      , inputDir + 'dyjets1_ratios.root')
 dyjets2 = sample('dyjets2'      , inputDir + 'dyjets2_ratios.root')
 qcd     = sample('qcdMuEnriched', inputDir + 'qcdMuEnriched_ratios.root')
+
+helper.CreateOutputFolders(outputDir)
  
-if not os.path.exists(outputDir): os.mkdir(outputDir)
+#if not os.path.exists(outputDir): os.mkdir(outputDir)
 
 
 
@@ -75,7 +77,7 @@ canv = helper.makeCanvas(900, 675)
 
 ## LIST OF HISTOGRAMS TO PLOT
 
-plot1dHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET20', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muAllJCPt', 'h_Loose_muAllJRPt', 'h_Loose_muAllJEta', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muNVertices1', 'h_Loose_muNVerticesMET20', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET20', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muAllJCPt', 'h_Tight_muAllJRPt', 'h_Tight_muAllJEta', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muNVertices1', 'h_Tight_muNVerticesMET20', 'h_Tight_muD0']
+plot1dHists = ['h_Loose_muAwayJetDR', 'h_Loose_muAwayJetPt', 'h_Loose_muClosJetDR', 'h_Loose_muClosJetPt', 'h_Loose_muHT', 'h_Loose_muLepEta', 'h_Loose_muLepIso', 'h_Loose_muLepPt', 'h_Loose_muMET', 'h_Loose_muMETnoMTCut', 'h_Loose_muMT', 'h_Loose_muMTMET20', 'h_Loose_muMTMET30', 'h_Loose_muMaxJPt', 'h_Loose_muAllJCPt', 'h_Loose_muAllJRPt', 'h_Loose_muAllJEta', 'h_Loose_muAllJEta_test1', 'h_Loose_muAllJEta_test2', 'h_Loose_muAllJEta_test3', 'h_Loose_muNBJets', 'h_Loose_muNJets', 'h_Loose_muNVertices', 'h_Loose_muNVertices1', 'h_Loose_muNVerticesMET20', 'h_Loose_muD0', 'h_Tight_muAwayJetDR', 'h_Tight_muAwayJetPt', 'h_Tight_muClosJetDR', 'h_Tight_muClosJetPt', 'h_Tight_muHT', 'h_Tight_muLepEta', 'h_Tight_muLepIso', 'h_Tight_muLepPt', 'h_Tight_muMET', 'h_Tight_muMETnoMTCut', 'h_Tight_muMT', 'h_Tight_muMTMET20', 'h_Tight_muMTMET30', 'h_Tight_muMaxJPt', 'h_Tight_muAllJCPt', 'h_Tight_muAllJRPt', 'h_Tight_muAllJEta', 'h_Tight_muNBJets', 'h_Tight_muNJets', 'h_Tight_muNVertices', 'h_Tight_muNVertices1', 'h_Tight_muNVerticesMET20', 'h_Tight_muD0']
 
 plot2dHists = ['h_Loose_muDJPtJEta', 'h_Loose_muFJPtJEta', 'h_Loose_muDJPtJPt', 'h_Loose_muFJPtJPt', 'h_Tight_muDJPtJEta', 'h_Tight_muFJPtJEta', 'h_Tight_muDJPtJPt', 'h_Tight_muFJPtJPt'] 
 
@@ -134,6 +136,7 @@ Plot.Plot1d(outputDir, data, mc_samples, plot1dHists, leg)
 # produce 2d Plots
 
 Plot.Plot2d(outputDir, data, mc_samples, plot2dHists)
+
 
 
 # Plot all MET Zooms
@@ -202,7 +205,7 @@ for hist in wjets.hists:
 	hist_ratio = helper.setRatioStyle(hist_ratio, hist)
 	line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
-	helper.saveCanvas(canv, pad_plot, outputDir, prepend + helper.getSaveName(hist) + postpend)
+	helper.saveCanvas(canv, pad_plot, outputDir + "adhoc/", prepend + helper.getSaveName(hist) + postpend)
 
 
 

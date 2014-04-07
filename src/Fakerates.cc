@@ -251,8 +251,10 @@ void Fakerates::loop(TFile* pFile){
 	cout << " going to loop over " << (fMaxSize>0?fMaxSize:Ngen) << " events..." << endl;
 	cout << " eventweight is " << fLumiweight << endl;
 
-	float safer[20];
-	int n_detected = 0;
+
+	int mu(-1), jet(-1);
+	float safer[20];	
+
 
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events; jentry++) {
@@ -260,39 +262,49 @@ void Fakerates::loop(TFile* pFile){
 		tree_->GetEntry(jentry);
 		ntot++;
 
-		for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
-
-
-		//cout << "======" << endl;
-		//cout << "before" << endl;
-		//for(int i=0; i<JetPt->size(); ++i) cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
-		//cout << "======" << endl;
-
-		smearAllJets();
-
-		for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) ++n_detected;
-
-		//cout << "======" << endl;
-		//cout << "after" << endl;
-		//for(int i=0; i<JetPt->size(); ++i) cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
-		//cout << "======" << endl;
-
 		float fEventweight = fLumiweight;
 		if(!fIsData) fEventweight *= PUWeight;
 
+		//if(JetPt->size()>0) for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
+
+
+		if(isFRRegionMuEvent(mu, jet, fJetPtCut))
+			if(passesUpperMETMT(0,mu)) 
+				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+					h_Loose_muAllJEta_test1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+
+
+		for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
+
+		smearAllJets();
+
+		if(isFRRegionMuEvent(mu, jet, fJetPtCut))
+			if(passesUpperMETMT(0,mu)) 
+				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+					h_Loose_muAllJEta_test2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+
+
+		for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) cout << "DETECTED AN INCONSISTENCY!" << endl;
+
+
+		//cout << jentry;
 		fillFRPlots(fEventweight);
 
-		for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) ++n_detected;
+		//if(JetPt->size()>0) for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) ++n_detected;
+
 
 		//cout << "======" << endl;
 		//cout << "in the end" << endl;
 		//for(int i=0; i<JetPt->size(); ++i) cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
 		//cout << "======" << endl;
 
+		if(isFRRegionMuEvent(mu, jet, fJetPtCut))
+			if(passesUpperMETMT(0,mu)) 
+				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+					h_Loose_muAllJEta_test3 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 	}
 
-	cout << " detected " << n_detected << " JetEta conflicts" << endl;
 	cout << " mu: nevents passing lepton selection: " << fCutflow_afterLepSel << endl;
 	cout << " mu: nevents passing jet    selection: " << fCutflow_afterJetSel << endl;
 	cout << " mu: nevents passing MET    selection: " << fCutflow_afterMETCut << endl;
@@ -303,6 +315,7 @@ void Fakerates::loop(TFile* pFile){
 	// write histograms in output file
 	writeHistos(pFile);
 	pFile->Close();
+
 }
 
 
@@ -365,8 +378,10 @@ void Fakerates::smearAllJets(){
 
 			float sigmaMC = getSigmaMC( JetPt->at(i), JetEta->at(i) ) / JetPt->at(i);
 			float factor  = fRandom -> Gaus( 1.0, sigmaMC );  
-		//	cout << JetEta->at(i) << endl;
-			TLV_Jet_old.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
+			//cout << JetEta->at(i) << endl;
+	//		TLV_Jet_old.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
+			//TLV_Jet_old.Print();
+			//cout << "i=" << i << ", " << TLV_Jet_old.Print() << endl;
 		//	cout << JetEta->at(i) << endl;
 		//	TLV_MET -= TLV_Jet_old;
 
@@ -379,7 +394,9 @@ void Fakerates::smearAllJets(){
 
 		setMET(TLV_MET.Pt());
 		setMETPhi(TLV_MET.Phi());
+		//cout << "---" << endl;
 		//for(int i=0; i<JetPt->size(); ++i) cout << JetEta->at(i) << endl;
+		//cout << "===" << endl;
 	}
 }
 
@@ -398,29 +415,27 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 	int jetind(-1);
 	std::vector<int> awayjet_inds;
 
-
 	// Event fails HLT muon trigger (if data) then return false
 	if(fMuTriggerMC || fIsData) {
 		if     (fMuTrigger == "Mu17" && !HLT_MU17) { return false; }
 		else if(fMuTrigger == "Mu40" && !HLT_MU40) { return false; }
 		else                                       { }
 	}
-
+	
 	// muon Pt is not reasonable then return false
 	if(MuPt->size() < 1) return false;
 
 	// count numbers of loose and veto muons in the event
-	for(int i=0; i < MuPt->size(); ++i){
-		if(isLooseMuon(i) && MuPt->at(i) > fMuPtCut){
+	for(int j=0; j < MuPt->size(); ++j){
+		if(isLooseMuon(j) && MuPt->at(j) > fMuPtCut){
 			nloose++;
-			mu = i;
-			loosemu_inds.push_back(i);		
+			mu = j;
+			loosemu_inds.push_back(j);		
 		}
-		else if(isLooseMuon(i) && MuPt->at(i) < fMuPtCut){
+		else if(isLooseMuon(j) && MuPt->at(j) < fMuPtCut){
 			nveto_add++;
 		}
 	}
-
 
 	// require exactly one loose muon and no additional veto muons
 	if(nloose    != 1) return false;
@@ -454,7 +469,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 
 	// phi cut
 	if(fAwayJetDPhiCut > 0. && Util::DeltaPhi(JetPhi->at(jet), MuPhi->at(mu))<fAwayJetDPhiCut) return false;
-	
+
     return true;
 }
 
@@ -797,13 +812,11 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 	return: none
 	*/
 
+	//cout << " here" << endl;
+
 	int mu(-1), jet(-1);
 	float safer[20];
 	int n_detected = 0;
-
-
-	for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
-
 
 	if(isFRRegionMuEvent(mu, jet, 30.)) {
 		if(passesUpperMETMT(0,mu)) {
@@ -881,7 +894,6 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 			h_Loose_muJCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
 			h_Loose_muJRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
 
-			for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) ++n_detected;
 
 			for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
 
@@ -938,7 +950,6 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 				h_Loose_muMETZoom[(i-1)*(fFRMETn_binspt-1) + j - 1] ->Fill((getMET()), fEventweight);
 			}
 		}
-
 
 
 		// tight muons
@@ -1023,10 +1034,9 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 			}
 		}
 	}
+
 	h_muFRatio->Divide(h_muFTight, h_muFLoose);
 
-
-	if(n_detected>0) cout << " detected " << n_detected << " JetEta conflicts in fillFRplots" << endl;
 
     // electrons
 	//int el(-1);
@@ -1116,6 +1126,10 @@ void Fakerates::bookHistos(){
 	h_Loose_muAllJRPt    = new TH1F("h_Loose_muAllJRPt"    , "Loose_muAllJRPt"   , 15 ,   0 , 150); h_Loose_muAllJRPt    -> Sumw2();
 	h_Loose_muAllJCPt    = new TH1F("h_Loose_muAllJCPt"    , "Loose_muAllJCPt"   , 15 ,   0 , 150); h_Loose_muAllJCPt    -> Sumw2();
 	h_Loose_muAllJEta    = new TH1F("h_Loose_muAllJEta"    , "Loose_muAllJEta"   , 12 ,   0 , 2.4); h_Loose_muAllJEta    -> Sumw2();
+
+	h_Loose_muAllJEta_test1 = new TH1F("h_Loose_muAllJEta_test1", "Loose_muAllJEta_test1", 12,  0 , 2.4); h_Loose_muAllJEta_test1 -> Sumw2();
+	h_Loose_muAllJEta_test2 = new TH1F("h_Loose_muAllJEta_test2", "Loose_muAllJEta_test2", 12,  0 , 2.4); h_Loose_muAllJEta_test2 -> Sumw2();
+	h_Loose_muAllJEta_test3 = new TH1F("h_Loose_muAllJEta_test3", "Loose_muAllJEta_test3", 12,  0 , 2.4); h_Loose_muAllJEta_test3 -> Sumw2();
 
 	h_Loose_muNBJets     = new TH1F("h_Loose_muNBJets"     , "Loose_muNBJets"    , 3  ,  0  , 3  ); h_Loose_muNBJets     -> Sumw2();
 	h_Loose_muNJets      = new TH1F("h_Loose_muNJets"      , "Loose_muNJets"     , 5  ,  1  , 6  ); h_Loose_muNJets      -> Sumw2();
@@ -1334,6 +1348,10 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Loose_muAllJCPt   ->Write(fName + "_" + h_Loose_muAllJCPt->GetName(),   TObject::kWriteDelete);
 	h_Loose_muAllJRPt   ->Write(fName + "_" + h_Loose_muAllJRPt->GetName(),   TObject::kWriteDelete);
 	h_Loose_muAllJEta   ->Write(fName + "_" + h_Loose_muAllJEta->GetName(),   TObject::kWriteDelete);
+
+	h_Loose_muAllJEta_test1 ->Write(fName + "_" + h_Loose_muAllJEta_test1->GetName(), TObject::kWriteDelete);
+	h_Loose_muAllJEta_test2 ->Write(fName + "_" + h_Loose_muAllJEta_test2->GetName(), TObject::kWriteDelete);
+	h_Loose_muAllJEta_test3 ->Write(fName + "_" + h_Loose_muAllJEta_test3->GetName(), TObject::kWriteDelete);
 
 	h_Loose_muNBJets    ->Write(fName + "_" + h_Loose_muNBJets->GetName(),    TObject::kWriteDelete);
 	h_Loose_muNJets     ->Write(fName + "_" + h_Loose_muNJets->GetName(),     TObject::kWriteDelete);

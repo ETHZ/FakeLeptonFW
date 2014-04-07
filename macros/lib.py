@@ -1,4 +1,25 @@
-import ROOT, math
+import ROOT, math, os, shutil
+
+def CreateOutputFolders(outputDir):
+
+	afsfolder = "/afs/cern.ch/user/c/cheidegg/www/pdfs/"
+	folders = ['plots_1d', 'plots_2d', 'zoom_met', 'zoom_jpt', 'fakerates_1d', 'fakerates_2d', 'adhoc']
+	struct = outputDir.split('/')
+	
+	for i in range(1,len(struct)): 
+		if not os.path.exists('/'.join(struct[0:i])): 
+			os.mkdir('/'.join(struct[0:i]))
+	
+	for i in range(2,len(struct)): 
+		if not os.path.exists(afsfolder + '/'.join(struct[1:i])): 
+			os.mkdir(afsfolder + '/'.join(struct[1:i]))
+
+	for final in folders:
+		if not os.path.exists(outputDir + final): 
+			os.mkdir(outputDir + final)
+		if not os.path.exists(afsfolder + '/'.join(struct[1:]) + final): 
+			os.mkdir(afsfolder + '/'.join(struct[1:]) + final)
+			shutil.copyfile('index.php', afsfolder + '/'.join(struct[1:]) + final + '/index.php')
 
 def getColor(name):
 	mycolor = ROOT.TColor()
@@ -240,7 +261,7 @@ def PrintScale(canv, outputDir, datasets, lower = [], upper = []):
 		x = hists[0].GetXaxis().GetBinCenter(i+1) - 0.1
 		t.DrawText(x, y, getLegendName(datasets[i].GetName()))
 	
-	saveCanvas(canv, pad_plot, outputDir, 'scales', 0)
+	saveCanvas(canv, pad_plot, outputDir + 'plots_1d/', 'scales', 0)
 	pad_plot.Close()
 	return True
 
