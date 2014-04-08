@@ -30,8 +30,18 @@ public :
    Int_t           HLT_MU8_PS;
    Int_t           HLT_MU17;
    Int_t           HLT_MU17_PS;
+   Int_t           HLT_MU24;
+   Int_t           HLT_MU24_PS;
    Int_t           HLT_MU40;
    Int_t           HLT_MU40_PS;
+   Int_t           HLT_ELE8_TIGHT; 
+   Int_t           HLT_ELE8_TIGHT_PS; 
+   Int_t           HLT_ELE8_JET30_TIGHT; 
+   Int_t           HLT_ELE8_JET30_TIGHT_PS; 
+   Int_t           HLT_ELE17_TIGHT; 
+   Int_t           HLT_ELE17_TIGHT_PS; 
+   Int_t           HLT_ELE17_JET30_TIGHT; 
+   Int_t           HLT_ELE17_JET30_TIGHT_PS; 
    Int_t           NVrtx;
    Float_t         PUWeight;
    Float_t         PUWeightUp;
@@ -86,8 +96,18 @@ public :
    TBranch        *b_HLT_MU8_PS;   //!
    TBranch        *b_HLT_MU17;   //!
    TBranch        *b_HLT_MU17_PS;   //!
+   TBranch        *b_HLT_MU24; //!
+   TBranch        *b_HLT_MU24_PS; //!
    TBranch        *b_HLT_MU40; //!
    TBranch        *b_HLT_MU40_PS; //!
+   TBranch        *b_HLT_ELE8_TIGHT; //!
+   TBranch        *b_HLT_ELE8_TIGHT_PS; //!
+   TBranch        *b_HLT_ELE8_JET30_TIGHT; //!
+   TBranch        *b_HLT_ELE8_JET30_TIGHT_PS; //!
+   TBranch        *b_HLT_ELE17_TIGHT; //!
+   TBranch        *b_HLT_ELE17_TIGHT_PS; //!
+   TBranch        *b_HLT_ELE17_JET30_TIGHT; //!
+   TBranch        *b_HLT_ELE17_JET30_TIGHT_PS; //!
    TBranch        *b_NVrtx;   //!
    TBranch        *b_PUWeight;   //!
    TBranch        *b_PUWeightUp;   //!
@@ -244,8 +264,18 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_MU8_PS", &HLT_MU8_PS, &b_HLT_MU8_PS);
    fChain->SetBranchAddress("HLT_MU17", &HLT_MU17, &b_HLT_MU17);
    fChain->SetBranchAddress("HLT_MU17_PS", &HLT_MU17_PS, &b_HLT_MU17_PS);
+   fChain->SetBranchAddress("HLT_MU24", &HLT_MU24, &b_HLT_MU24);
+   fChain->SetBranchAddress("HLT_MU24_PS", &HLT_MU24_PS, &b_HLT_MU24_PS);
    fChain->SetBranchAddress("HLT_MU40", &HLT_MU40, &b_HLT_MU40);
    fChain->SetBranchAddress("HLT_MU40_PS", &HLT_MU40_PS, &b_HLT_MU40_PS);
+   fChain->SetBranchAddress("HLT_ELE8_TIGHT", &HLT_ELE8_TIGHT, &b_HLT_ELE8_TIGHT);
+   fChain->SetBranchAddress("HLT_ELE8_TIGHT_PS", &HLT_ELE8_TIGHT_PS, &b_HLT_ELE8_TIGHT_PS);
+   fChain->SetBranchAddress("HLT_ELE8_JET30_TIGHT", &HLT_ELE8_JET30_TIGHT, &b_HLT_ELE8_JET30_TIGHT);
+   fChain->SetBranchAddress("HLT_ELE8_JET30_TIGHT_PS", &HLT_ELE8_JET30_TIGHT_PS, &b_HLT_ELE8_JET30_TIGHT_PS);
+   fChain->SetBranchAddress("HLT_ELE17_TIGHT", &HLT_ELE17_TIGHT, &b_HLT_ELE17_TIGHT);
+   fChain->SetBranchAddress("HLT_ELE17_TIGHT_PS", &HLT_ELE17_TIGHT_PS, &b_HLT_ELE17_TIGHT_PS);
+   fChain->SetBranchAddress("HLT_ELE17_JET30_TIGHT", &HLT_ELE17_JET30_TIGHT, &b_HLT_ELE17_JET30_TIGHT);
+   fChain->SetBranchAddress("HLT_ELE17_JET30_TIGHT_PS", &HLT_ELE17_JET30_TIGHT_PS, &b_HLT_ELE17_JET30_TIGHT_PS);
    fChain->SetBranchAddress("NVrtx", &NVrtx, &b_NVrtx);
    fChain->SetBranchAddress("PUWeight", &PUWeight, &b_PUWeight);
    fChain->SetBranchAddress("PUWeightUp", &PUWeightUp, &b_PUWeightUp);

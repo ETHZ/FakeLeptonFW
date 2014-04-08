@@ -165,13 +165,14 @@ void Fakerates::loadConfigFile(TString configfile){
 				else if (type == "float"   && name == "fLuminosity")     fLuminosity     = value.Atof();
 				else if (type == "bool"    && name == "fJetCorrection")  fJetCorrection  = (bool) value.Atoi();
 				else if (type == "float"   && name == "fJetPtCut")       fJetPtCut       = value.Atof();
-				else if (type == "float"   && name == "fMuPtCut")        fMuPtCut        = value.Atof();
-				else if (type == "float"   && name == "fMuD0Cut")        fMuD0Cut        = value.Atof();
-				else if (type == "float"   && name == "fMuIsoCut")       fMuIsoCut       = value.Atof();
+				else if (type == "float"   && name == "fLepPtCut")       fLepPtCut       = value.Atof();
+				else if (type == "float"   && name == "fLepD0Cut")       fLepD0Cut       = value.Atof();
+				else if (type == "float"   && name == "fLepIsoCut")      fLepIsoCut      = value.Atof();
 				else if (type == "float"   && name == "fAwayJetBTagCut") fAwayJetBTagCut = value.Atof();
 				else if (type == "float"   && name == "fAwayJetDPhiCut") fAwayJetDPhiCut = value.Atof();
-				else if (type == "TString" && name == "fMuTrigger")      fMuTrigger      = value;
-				else if (type == "bool"    && name == "fMuTriggerMC")    fMuTriggerMC    = (bool) value.Atoi();		
+				else if (type == "bool"    && name == "fPUweight")       fPUweight       = (bool) value.Atoi();
+				else if (type == "TString" && name == "fLepTrigger")     fLepTrigger     = value;
+				else if (type == "bool"    && name == "fLepTriggerMC")   fLepTriggerMC   = (bool) value.Atoi();		
 				else { cout << " ERROR in reading variable (" << name << ")!" << endl; exit(1); }
 			}
 			else {
@@ -189,13 +190,14 @@ void Fakerates::loadConfigFile(TString configfile){
 	cout << " fLuminosity:      " << fLuminosity     << endl;
 	cout << " fJetCorrection:   " << fJetCorrection  << endl;
 	cout << " fJetPtCut:        " << fJetPtCut       << endl;
-	cout << " fMuPtCut:         " << fMuPtCut        << endl;
-	cout << " fMuD0Cut:         " << fMuD0Cut        << endl;
-	cout << " fMuIsoCut:        " << fMuIsoCut       << endl;
+	cout << " fLepPtCut:        " << fLepPtCut       << endl;
+	cout << " fLepD0Cut:        " << fLepD0Cut       << endl;
+	cout << " fLepIsoCut:       " << fLepIsoCut      << endl;
 	cout << " fAwayJetBTagCut:  " << fAwayJetBTagCut << endl;
 	cout << " fAwayJetDPhiCut:  " << fAwayJetDPhiCut << endl;
-	cout << " fMuTrigger:       " << fMuTrigger      << endl;
-	cout << " fMuTriggerMC:     " << fMuTriggerMC    << endl;
+	cout << " fPUweight:        " << fPUweight       << endl;
+	cout << " fLepTrigger:      " << fLepTrigger     << endl;
+	cout << " fLepTriggerMC:    " << fLepTriggerMC   << endl;
 	cout << "=======================================================" << endl;
 	cout << "=======================================================" << endl;
 }
@@ -212,7 +214,9 @@ void Fakerates::doStuff(){
 	if(!Util::dirExists(fOutputDir)) Util::MakeOutputDir(fOutputDir);
 	TFile *pFile = new TFile(OutputFilename, "RECREATE");
 	
-	loop(pFile);
+	if(fDataType == 1 || fDataType == 2) {
+		loop(pFile);
+	}
 }
 
 
@@ -263,25 +267,25 @@ void Fakerates::loop(TFile* pFile){
 		ntot++;
 
 		float fEventweight = fLumiweight;
-		if(!fIsData) fEventweight *= PUWeight;
+		if(!fIsData && fPUweight) fEventweight *= PUWeight;
 
 		//if(JetPt->size()>0) for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
 
 
-		if(isFRRegionMuEvent(mu, jet, fJetPtCut))
-			if(passesUpperMETMT(0,mu)) 
+		if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
+			if(passesUpperMETMT(mu)) 
 				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-					h_Loose_muAllJEta_test1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+					h_Loose_AllJEta_test1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 
 		for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
 
 		smearAllJets();
 
-		if(isFRRegionMuEvent(mu, jet, fJetPtCut))
-			if(passesUpperMETMT(0,mu)) 
+		if(fDataType !=2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
+			if(passesUpperMETMT(mu)) 
 				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-					h_Loose_muAllJEta_test2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+					h_Loose_AllJEta_test2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 
 		for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) cout << "DETECTED AN INCONSISTENCY!" << endl;
@@ -299,10 +303,10 @@ void Fakerates::loop(TFile* pFile){
 		//for(int i=0; i<JetPt->size(); ++i) cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
 		//cout << "======" << endl;
 
-		if(isFRRegionMuEvent(mu, jet, fJetPtCut))
-			if(passesUpperMETMT(0,mu)) 
+		if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
+			if(passesUpperMETMT(mu)) 
 				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-					h_Loose_muAllJEta_test3 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+					h_Loose_AllJEta_test3 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 	}
 
@@ -386,7 +390,7 @@ void Fakerates::smearAllJets(){
 		//	cout << JetEta->at(i) << endl;
 		//	TLV_MET += TLV_Jet_old;
 
-//			JetPt->at(i) = JetPt->at(i) * factor;
+			JetPt->at(i) = JetPt->at(i) * factor;
 		//	TLV_Jet_new.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
 
 		//	TLV_MET -= TLV_Jet_new;
@@ -403,37 +407,105 @@ void Fakerates::smearAllJets(){
 
 
 //____________________________________________________________________________
-bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
+std::vector<float, std::allocator<float> >* Fakerates::getLepPt() {
 	/*
-	checks, whether the event contains exactly one muon and at least one away-jet in the calibration region
-	parameters: &mu (address of muon index)
+	return Pt of the lepton
+	parameters: none
+	return: Pt
+	*/
+
+	if(fDataType == 2) return ElPt;
+	else               return MuPt;
+}
+
+
+//____________________________________________________________________________
+std::vector<float, std::allocator<float> >* Fakerates::getLepEta() {
+	/*
+	return Eta of the lepton
+	parameters: none
+	return: Eta
+	*/
+	if(fDataType == 2) return ElEta;
+	else               return MuEta;
+}
+
+
+//____________________________________________________________________________
+std::vector<float, std::allocator<float> >* Fakerates::getLepPhi() {
+	/*
+	return Phi of the lepton
+	parameters: none
+	return: Phi
+	*/
+	if(fDataType == 2) return ElPhi;
+	else               return MuPhi;
+}
+
+
+//____________________________________________________________________________
+std::vector<float, std::allocator<float> >* Fakerates::getLepPFIso() {
+	/*
+	return Iso of the lepton
+	parameters: none
+	return: Iso
+	*/
+	if(fDataType == 2) return ElPFIso;
+	else               return MuPFIso;
+}
+
+
+//____________________________________________________________________________
+std::vector<float, std::allocator<float> >* Fakerates::getLepD0() {
+	/*
+	return D0 of the lepton
+	parameters: none
+	return: D0
+	*/
+
+	if(fDataType == 2) return ElD0;
+	else               return MuD0;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
+	/*
+	checks, whether the event contains exactly one lepton and at least one away-jet in the calibration region
+	parameters: &lep (address of lepton index), &jet (address of away-jet index), jetcut
 	return: true (if muon is in calibration region), false (else)
 	*/ 
 
-	int nloose(0), nveto_add(0);
-	std::vector<int> loosemu_inds;
-	int nawayjets(0);
-	int jetind(-1);
+	std::vector<int> looselep_inds;
 	std::vector<int> awayjet_inds;
+	std::vector<float, std::allocator<float> >* LepPt  = getLepPt();
+	std::vector<float, std::allocator<float> >* LepEta = getLepEta();
+	std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
+	int nloose(0), nveto_add(0);
+	int nawayjets(0), jetind(-1);
+
 
 	// Event fails HLT muon trigger (if data) then return false
-	if(fMuTriggerMC || fIsData) {
-		if     (fMuTrigger == "Mu17" && !HLT_MU17) { return false; }
-		else if(fMuTrigger == "Mu40" && !HLT_MU40) { return false; }
-		else                                       { }
+	if(fLepTriggerMC || fIsData) {
+		if     (fLepTrigger == "Mu17" && !HLT_MU17             ) { return false; }
+		else if(fLepTrigger == "Mu40" && !HLT_MU40             ) { return false; }
+		else if(fLepTrigger == "El08" && !HLT_ELE8_TIGHT       ) { return false; }
+		else if(fLepTrigger == "El17" && !HLT_ELE17_JET30_TIGHT) { return false; }
+		else                                                     {               }
 	}
-	
+
 	// muon Pt is not reasonable then return false
-	if(MuPt->size() < 1) return false;
+	if(LepPt->size() < 1) return false;
+
 
 	// count numbers of loose and veto muons in the event
-	for(int j=0; j < MuPt->size(); ++j){
-		if(isLooseMuon(j) && MuPt->at(j) > fMuPtCut){
+	for(int j=0; j < LepPt->size(); ++j){
+		if(isLooseLepton(j) && LepPt->at(j) > fLepPtCut){
 			nloose++;
-			mu = j;
-			loosemu_inds.push_back(j);		
+			lep = j;
+			looselep_inds.push_back(j);		
 		}
-		else if(isLooseMuon(j) && MuPt->at(j) < fMuPtCut){
+		else if(isLooseLepton(j) && LepPt->at(j) < fLepPtCut){
 			nveto_add++;
 		}
 	}
@@ -450,7 +522,7 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 	// count the number of away jets
 	for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
 		if(!isGoodJet(thisjet, jetcut, fAwayJetBTagCut)) continue;
-		if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(mu), JetPhi->at(thisjet), MuPhi->at(mu)) < 1.0 ) continue;
+		if(Util::GetDeltaR(JetEta->at(thisjet), LepEta->at(lep), JetPhi->at(thisjet), LepPhi->at(lep)) < 1.0 ) continue;
 		nawayjets++;
 		awayjet_inds.push_back(thisjet);
 	}
@@ -466,10 +538,10 @@ bool Fakerates::isFRRegionMuEvent(int &mu, int &jet, float jetcut){
 			if(getJetPt(awayjet_inds[thisjet]) > getJetPt(jet) ) jet = awayjet_inds[thisjet];
 
 	// upper cuts on MT and MET
-	//if(!passesUpperMETMT(0, loosemu_inds[0]) ) return false;
+	//if(!passesUpperMETMT(0, looselep_inds[0]) ) return false;
 
 	// phi cut
-	if(fAwayJetDPhiCut > 0. && Util::DeltaPhi(JetPhi->at(jet), MuPhi->at(mu))<fAwayJetDPhiCut) return false;
+	if(fAwayJetDPhiCut > 0. && Util::DeltaPhi(JetPhi->at(jet), LepPhi->at(lep)) < fAwayJetDPhiCut) return false;
 
     return true;
 }
@@ -484,8 +556,37 @@ bool Fakerates::isLooseMuon(int index){
 	*/
 
 	if(!MuIsLoose->at(index)) return false;
-	if(fMuD0Cut > 0.0 && fabs(MuD0->at(index)) > fMuD0Cut) return false; // leave this commented for synching!!
+	if(fLepD0Cut > 0.0 && fabs(MuD0->at(index)) > fLepD0Cut) return false; // leave this commented for synching!!
 	return true;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isLooseElectron(int index){
+	/* 
+	checks, if the electron is loose
+	parameters: index (index of the particle)
+	return: true (if electron is loose), false (else)
+	*/
+
+	if(!ElIsLoose->at(index)) return false;
+	if(ElPFIso->at(index) > 0.6) return false;
+	if(fLepD0Cut > 0.0 && fabs(ElD0->at(index)) > fLepD0Cut) return false; // leave this commented for synching!!
+	return true;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isLooseLepton(int index){
+	/* 
+	checks, if the lepton is loose
+	parameters: index (index of the particle)
+	return: true (if lepton is loose), false (else)
+	*/
+
+	if(fDataType == 2) return isLooseElectron(index);
+	else isLooseMuon(index);
+
 }
 
 
@@ -499,9 +600,39 @@ bool Fakerates::isTightMuon(int index){
 
 	if(!isLooseMuon(index)) return false;
 	if(!MuIsTight->at(index)) return false;
-	if(fMuIsoCut > 0.0 && fabs(MuPFIso->at(index)) > fMuIsoCut) return false; // leave this commented for synching!!
+	if(fLepIsoCut > 0.0 && fabs(MuPFIso->at(index)) > fLepIsoCut) return false; // leave this commented for synching!!
 
 	return true;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isTightElectron(int index){
+	/* 
+	checks, if the electron is tight
+	parameters: index (index of the particle)
+	return: true (if electron is tight), false (else)
+	*/
+
+	if(!isLooseElectron(index)) return false;
+	if(!ElIsTight->at(index)) return false;
+	if(ELPFIso->at(index) > 0.15) return false;
+	if(fLepIsoCut > 0.0 && fabs(ElPFIso->at(index)) > fLepIsoCut) return false; // leave this commented for synching!!
+
+	return true;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isTightLepton(int index){
+	/* 
+	checks, if the lepton is tight
+	parameters: index (index of the particle)
+	return: true (if lepton is tight), false (else)
+	*/
+
+	if(fDataType == 2) return isTightElectron(index);
+	else return isTightMuon(index);
 }
 
 
@@ -571,35 +702,24 @@ float Fakerates::getMETPhi(){
 
 
 //____________________________________________________________________________
-float Fakerates::getMT(int type, int ind) {
+float Fakerates::getMT(int index) {
 	/*
 	computes MT of the event
-	parameters: type (0 = muon, 1 = electron), ind (index of the particle)
+	parameters: index (index of the lepton)
 	return: MT
 	*/
 
 	float pt   = -1;
 	float dphi = -1.;
+	std::vector<float, std::allocator<float> >* LepPt  = getLepPt();
+	std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
 
-
-	if(type == 0) {
-		dphi = Util::DeltaPhi(getMETPhi(), MuPhi->at(ind));
-		pt   = MuPt->at(ind);
-	}
-	else if(type == 1) {
-		dphi = Util::DeltaPhi(getMETPhi(), ElPhi->at(ind));
-		pt   = ElPt->at(ind);
-	}
-	else {
-		cout << "*******************************************************" << endl;
-		cout << " ERROR in getMT(): you are not calling it correctly!   " << endl;
-		cout << " exiting ...                                           " << endl;
-		cout << "*******************************************************" << endl;
-		exit(0);
-	}
+	dphi = Util::DeltaPhi(getMETPhi(), LepPhi->at(index));
+	pt   = LepPt->at(index);
 
 	return TMath::Sqrt( 2 * getMET() * pt * (1. - TMath::Cos(dphi)) );
 }
+
 
 //____________________________________________________________________________
 bool Fakerates::passesMETCut(float value_met = 20., int sign = 0){
@@ -616,46 +736,33 @@ bool Fakerates::passesMETCut(float value_met = 20., int sign = 0){
 
 
 //____________________________________________________________________________
-bool Fakerates::passesMTCut(int type, int index){
+bool Fakerates::passesMTCut(int index){
 	/* 
 	checks, if the event passes the 20GeV MT cut
-	parameters: type (0 = mu, 1 = el)
+	parameters: index (index of the lepton)
 	return: true (if event passes the cuts), false (else)
 	*/
 
 	float value_mt  = 20.;
 
-	// mu or el MT too large then return false
-	if(type == 0){
-		if(getMT(type, index) > value_mt) return false;
-	}
-	else if(type == 1){
-		if(getMT(type, index) > value_mt) return false;
-	}
-	else{
-		cout << "*******************************************************" << endl;
-		cout << " ERROR in passesUpperMETMT(): you re not calling it correctly!" << endl;
-		cout << " exiting ...                                           " << endl;
-		cout << "*******************************************************" << endl;
-		exit(0);
-	}
+	if(getMT(index) > value_mt) return false;
 
 	return true;
 }
 
 
 //____________________________________________________________________________
-bool Fakerates::passesUpperMETMT(int type, int index){
+bool Fakerates::passesUpperMETMT(int index){
 	/* 
 	checks, if the event passes upper MET and MT cuts
-	parameters: type (0 = mu, 1 = el), index (index of the particle)
+	parameters: index (index of the particle)
 	return: true (if event passes the cuts), false (else)
 	*/
 
     if(!passesMETCut()) return false;
     fCutflow_afterMETCut++;
 
-    if(!passesMTCut(type, index)) return false;
+    if(!passesMTCut(index)) return false;
     fCutflow_afterMTCut++;
 	
 	return true;
@@ -671,6 +778,8 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 	*/     
 
 	float minDR = 0.4;
+	std::vector<float, std::allocator<float> >* LepEta = getLepEta();
+	std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
 
 	// if pt too low, eta too large, jet beta star too large then return false
 	if(pt>0. && getJetPt(j) < pt) return false;
@@ -680,9 +789,9 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 	// if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
 
 	// jet-lepton cleaning: if a tight muon with dR too small found then return false
-	for(int imu = 0; imu < MuPt->size(); ++imu){
-		if(!MuIsTight->at(imu)) continue;
-		if(Util::GetDeltaR(MuEta->at(imu), JetEta->at(j), MuPhi->at(imu), JetPhi->at(j)) > minDR ) continue;
+	for(int lep = 0; lep < LepPhi->size(); ++lep){
+		if(!isTightLepton(lep)) continue;
+		if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(j), LepPhi->at(lep), JetPhi->at(j)) > minDR ) continue;
 		return false;
 	}
 
@@ -698,19 +807,21 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 
 //____________________________________________________________________________
-float Fakerates::getAwayJet(int info = 0, int mu = 0){
+float Fakerates::getAwayJet(int info = 0, int lep = 0){
 	/*
 	get information about the away jet with largest Pt
-	parameters: info (0 = Pt, 1 = dR), mu (muon index)
+	parameters: info (0 = Pt, 1 = dR), lep (lepton index)
 	return: info
 	*/
 
 	int nawayjets(0), jetind(0);
 	std::vector<int> awayjet_inds;
+	std::vector<float, std::allocator<float> >* LepEta = getLepEta();
+	std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
 	
 	for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
 		if(!isGoodJet(thisjet, fJetPtCut)) continue;
-		if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(mu), JetPhi->at(thisjet), MuPhi->at(mu)) < 1.0 ) continue;
+		if(Util::GetDeltaR(JetEta->at(thisjet), LepEta->at(lep), JetPhi->at(thisjet), LepPhi->at(lep)) < 1.0 ) continue;
 		nawayjets++;
 		awayjet_inds.push_back(thisjet);
     }
@@ -722,25 +833,27 @@ float Fakerates::getAwayJet(int info = 0, int mu = 0){
 		for(int thisjet=0; thisjet < nawayjets; ++thisjet)
 			if(getJetPt(awayjet_inds[thisjet]) > getJetPt(jetind) ) jetind = awayjet_inds[thisjet];
 
-	if(info==1) return Util::GetDeltaR(JetEta->at(jetind), MuEta->at(mu), JetPhi->at(jetind), MuPhi->at(mu));
+	if(info==1) return Util::GetDeltaR(JetEta->at(jetind), LepEta->at(lep), JetPhi->at(jetind), LepPhi->at(lep));
 	return getJetPt(jetind);
 }
 
 
 //____________________________________________________________________________
-float Fakerates::getClosestJet(int info = 0, int mu = 0){
+float Fakerates::getClosestJet(int info = 0, int lep = 0){
 	/*
 	get information about the closest jet (i.e. smallest dR)
-	parameters: info (0 = Pt, 1 = dR), mu (muon index)
+	parameters: info (0 = Pt, 1 = dR), lep (lepton index)
 	return: info
 	*/
 
 	int nclosjets(0), jetind(0);
 	std::vector<int> closjet_inds;
+	std::vector<float, std::allocator<float> >* LepEta = getLepEta();
+	std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
 	
 	for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
 		if(!isGoodJet(thisjet)) continue;
-		if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(mu), JetPhi->at(thisjet), MuPhi->at(mu)) > 1.0 ) continue;
+		if(Util::GetDeltaR(JetEta->at(thisjet), LepEta->at(lep), JetPhi->at(thisjet), LepPhi->at(lep)) > 1.0 ) continue;
 		nclosjets++;
 		closjet_inds.push_back(thisjet);
 	}
@@ -750,9 +863,9 @@ float Fakerates::getClosestJet(int info = 0, int mu = 0){
 	jetind = closjet_inds[0];
 	if(closjet_inds.size() > 1)
 		for(int thisjet=0; thisjet < nclosjets; ++thisjet)
-			if(Util::GetDeltaR(JetEta->at(closjet_inds[thisjet]), MuEta->at(mu), JetPhi->at(closjet_inds[thisjet]), MuPhi->at(mu)) < Util::GetDeltaR(JetEta->at(jetind), MuEta->at(mu), JetPhi->at(jetind), MuPhi->at(mu)) ) jetind = closjet_inds[thisjet];
+			if(Util::GetDeltaR(JetEta->at(closjet_inds[thisjet]), LepEta->at(lep), JetPhi->at(closjet_inds[thisjet]), LepPhi->at(lep)) < Util::GetDeltaR(JetEta->at(jetind), LepEta->at(lep), JetPhi->at(jetind), LepPhi->at(lep)) ) jetind = closjet_inds[thisjet];
 
-	if(info==1) return Util::GetDeltaR(JetEta->at(jetind), MuEta->at(mu), JetPhi->at(jetind), MuPhi->at(mu));
+	if(info==1) return Util::GetDeltaR(JetEta->at(jetind), LepEta->at(lep), JetPhi->at(jetind), LepPhi->at(lep));
 	return getJetPt(jetind);
 }
 
@@ -800,12 +913,6 @@ int Fakerates::getNJets(int btag = 0){
 
 
 //____________________________________________________________________________
-bool Fakerates::isFRRegionElEvent(int &el){
-	return false;	
-}
-
-
-//____________________________________________________________________________
 void Fakerates::fillFRPlots(float fEventweight = 1.0){
 	/* 
 	create plos for muons and electrons
@@ -815,235 +922,235 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 
 	//cout << " here" << endl;
 
-	int mu(-1), jet(-1);
+	int lep(-1), jet(-1);
+	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
+	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
+	std::vector<float, std::allocator<float> >* LepPhi   = getLepPhi();
+	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
+	std::vector<float, std::allocator<float> >* LepD0    = getLepD0();
+
 	float safer[20];
 	int n_detected = 0;
 
-	if(isFRRegionMuEvent(mu, jet, 30.)) {
-		if(passesUpperMETMT(0,mu)) {
-			h_Loose_muLepEta_30 ->Fill(fabs(MuEta->at(mu)), fEventweight);
-			h_Loose_muLepPt_30  ->Fill(MuPt->at(mu), fEventweight);
-			if(isTightMuon(mu)){
-				h_Tight_muLepEta_30 ->Fill(fabs(MuEta->at(mu)), fEventweight);
-				h_Tight_muLepEta_30 ->Fill(MuPt->at(mu), fEventweight);
+	if(isFRRegionLepEvent(lep, jet, 30.)) {
+		if(passesUpperMETMT(lep)) {
+			h_Loose_LepEta_30 ->Fill(fabs(LepEta->at(lep)), fEventweight);
+			h_Loose_LepPt_30  ->Fill(LepPt->at(lep)       , fEventweight);
+			if(isTightLepton(lep)){
+				h_Tight_LepEta_30 ->Fill(fabs(LepEta->at(lep)), fEventweight);
+				h_Tight_LepEta_30 ->Fill(LepPt->at(lep)       , fEventweight);
 			}
 		}
 	}
 
-	if(isFRRegionMuEvent(mu, jet, 40.)) {
-		if(passesUpperMETMT(0,mu)) {
-			h_Loose_muLepEta_40 ->Fill(fabs(MuEta->at(mu)), fEventweight);
-			h_Loose_muLepPt_40  ->Fill(MuPt->at(mu), fEventweight);
-			if(isTightMuon(mu)) {
-				h_Tight_muLepEta_40 ->Fill(fabs(MuEta->at(mu)), fEventweight);
-				h_Tight_muLepPt_40  ->Fill(MuPt->at(mu), fEventweight);
+	if(isFRRegionLepEvent(lep, jet, 40.)) {
+		if(passesUpperMETMT(lep)) {
+			h_Loose_LepEta_40 ->Fill(fabs(LepEta->at(lep)), fEventweight);
+			h_Loose_LepPt_40  ->Fill(LepPt->at(lep)       , fEventweight);
+			if(isTightLepton(lep)) {
+				h_Tight_LepEta_40 ->Fill(fabs(LepEta->at(lep)), fEventweight);
+				h_Tight_LepPt_40  ->Fill(LepPt->at(lep)       , fEventweight);
 			}
 		}
 	}
 
-	if(isFRRegionMuEvent(mu, jet, 50.)) {
-		if(passesUpperMETMT(0,mu)) {
-			h_Loose_muLepEta_50 ->Fill(fabs(MuEta->at(mu)), fEventweight);
-			h_Loose_muLepPt_50  ->Fill(MuPt->at(mu), fEventweight);
-			if(isTightMuon(mu)) {
-				h_Tight_muLepEta_50 ->Fill(fabs(MuEta->at(mu)), fEventweight);
-				h_Tight_muLepPt_50  ->Fill(MuPt->at(mu), fEventweight);
+	if(isFRRegionLepEvent(lep, jet, 50.)) {
+		if(passesUpperMETMT(lep)) {
+			h_Loose_LepEta_50 ->Fill(fabs(LepEta->at(lep)), fEventweight);
+			h_Loose_LepPt_50  ->Fill(LepPt->at(lep)       , fEventweight);
+			if(isTightLepton(lep)) {
+				h_Tight_LepEta_50 ->Fill(fabs(LepEta->at(lep)), fEventweight);
+				h_Tight_LepPt_50  ->Fill(LepPt->at(lep)       , fEventweight);
 			}
 		}
 	}
 
-	if(isFRRegionMuEvent(mu, jet, 60.)) {
-		if(passesUpperMETMT(0,mu)) {
-			h_Loose_muLepEta_60 ->Fill(fabs(MuEta->at(mu)), fEventweight);
-			h_Loose_muLepPt_60  ->Fill(MuPt->at(mu), fEventweight);
-			if(isTightMuon(mu)){
-				h_Tight_muLepEta_60 ->Fill(fabs(MuEta->at(mu)), fEventweight);
-				h_Tight_muLepPt_60  ->Fill(MuPt->at(mu), fEventweight);
+	if(isFRRegionLepEvent(lep, jet, 60.)) {
+		if(passesUpperMETMT(lep)) {
+			h_Loose_LepEta_60 ->Fill(fabs(LepEta->at(lep)), fEventweight);
+			h_Loose_LepPt_60  ->Fill(LepPt->at(lep)       , fEventweight);
+			if(isTightLepton(lep)){
+				h_Tight_LepEta_60 ->Fill(fabs(LepEta->at(lep)), fEventweight);
+				h_Tight_LepPt_60  ->Fill(LepPt->at(lep)       , fEventweight);
 			}
 		}
 	}
 
 
-	// muons, first loose, then tight
-	if(isFRRegionMuEvent(mu, jet, fJetPtCut)){
+	// leptons, first loose, then tight
+	if(isFRRegionLepEvent(lep, jet, fJetPtCut)){
 
-		if(passesUpperMETMT(0,mu)) {
+		if(passesUpperMETMT(lep)) {
  
-			h_Loose_muAwayJetDR ->Fill(getAwayJet(1,mu)    , fEventweight);
-			h_Loose_muAwayJetPt ->Fill(getAwayJet(0,mu)    , fEventweight);
-			h_Loose_muClosJetDR ->Fill(getClosestJet(1,mu) , fEventweight);
-			h_Loose_muClosJetPt ->Fill(getClosestJet(0,mu) , fEventweight);
+			h_Loose_AwayJetDR ->Fill(getAwayJet(1, lep)   , fEventweight);
+			h_Loose_AwayJetPt ->Fill(getAwayJet(0, lep)   , fEventweight);
+			h_Loose_ClosJetDR ->Fill(getClosestJet(1, lep), fEventweight);
+			h_Loose_ClosJetPt ->Fill(getClosestJet(0, lep), fEventweight);
 
-			h_Loose_muHT        ->Fill(getHT()             , fEventweight);
-			h_Loose_muLepEta    ->Fill(fabs(MuEta->at(mu)) , fEventweight);
-			h_Loose_muLepIso    ->Fill(MuPFIso->at(mu)     , fEventweight);
-			h_Loose_muLepPt     ->Fill(MuPt->at(mu)        , fEventweight);
+			h_Loose_HT        ->Fill(getHT()              , fEventweight);
+			h_Loose_LepEta    ->Fill(fabs(LepEta->at(lep)), fEventweight);
+			h_Loose_LepIso    ->Fill(LepPFIso->at(lep)    , fEventweight);
+			h_Loose_LepPt     ->Fill(LepPt->at(lep)       , fEventweight);
 
-			h_Loose_muMaxJPt    ->Fill(getJetPt(jet)       , fEventweight);
-			h_Loose_muNBJets    ->Fill(getNJets(1)         , fEventweight);
-			h_Loose_muNJets     ->Fill(getNJets()          , fEventweight);
+			h_Loose_MaxJPt    ->Fill(getJetPt(jet)        , fEventweight);
+			h_Loose_NBJets    ->Fill(getNJets(1)          , fEventweight);
+			h_Loose_NJets     ->Fill(getNJets()           , fEventweight);
 			
-			h_Loose_muNVertices ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
-			h_Loose_muNVertices1->Fill((NVrtx>30)?30:NVrtx , fEventweight);
+			h_Loose_NVertices ->Fill((NVrtx>40)?40:NVrtx  , fEventweight);
+			h_Loose_NVertices1->Fill((NVrtx>30)?30:NVrtx  , fEventweight);
 
-			h_Loose_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
-			h_Loose_muMaxJCPt   ->Fill(JetPt->at(jet)      , fEventweight); // always corrected Jet Pt!
-			h_Loose_muMaxJRPt   ->Fill(JetRawPt->at(jet)   , fEventweight); // always raw Jet Pt!
+			h_Loose_D0        ->Fill(LepD0->at(lep)       , fEventweight);
+			h_Loose_MaxJCPt   ->Fill(JetPt->at(jet)       , fEventweight); // always corrected Jet Pt!
+			h_Loose_MaxJRPt   ->Fill(JetRawPt->at(jet)    , fEventweight); // always raw Jet Pt!
 
-			h_Loose_muJCPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet), fEventweight);
-			h_Loose_muJRPtJEta  ->Fill(fabs(JetEta->at(jet)), JetRawPt->at(jet), fEventweight);
-			h_Loose_muJCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
-			h_Loose_muJRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
+			h_Loose_JCPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet), fEventweight);
+			h_Loose_JRPtJEta  ->Fill(fabs(JetEta->at(jet)), JetRawPt->at(jet), fEventweight);
+			h_Loose_JCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
+			h_Loose_JRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
 
 
 			for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
 
-				h_Loose_muAllJCPt   ->Fill(JetPt->at(thisjet)       , fEventweight);
-				h_Loose_muAllJRPt   ->Fill(JetRawPt->at(thisjet)    , fEventweight);
-				h_Loose_muAllJEta   ->Fill(fabs(JetEta->at(thisjet)), fEventweight);
+				h_Loose_AllJCPt   ->Fill(JetPt->at(thisjet)       , fEventweight);
+				h_Loose_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , fEventweight);
+				h_Loose_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
-				h_Loose_muDJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-				h_Loose_muFJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
-				h_Loose_muDJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-				h_Loose_muFJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+				h_Loose_DJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+				h_Loose_FJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+				h_Loose_DJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+				h_Loose_FJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
 
-				int i = h_Loose_muDFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
+				int i = h_Loose_DFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
 				if(fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1]){
 				
 					if(fDFbinspt[0]<=JetPt->at(thisjet) && JetPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
-						int j = h_Loose_muDFZoomPt  ->FindBin(JetPt->at(thisjet));
-						h_Loose_muDJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-						h_Loose_muFJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+						int j = h_Loose_DFZoomPt  ->FindBin(JetPt->at(thisjet));
+						h_Loose_DJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+						h_Loose_FJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
 					}
 
 					if(fDFbinspt[0]<=JetRawPt->at(thisjet) && JetRawPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
-						int k = h_Loose_muDFZoomPt  ->FindBin(JetRawPt->at(thisjet));
-						h_Loose_muDJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-						h_Loose_muFJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+						int k = h_Loose_DFZoomPt  ->FindBin(JetRawPt->at(thisjet));
+						h_Loose_DJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+						h_Loose_FJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
 					}
 				}
 			}
 
 
-			if( MuPt->at(mu) >  fFRbinspt.back() ){
-				int fillbin = h_muFLoose->FindBin(fFRbinspt.back()-0.5, fabs(MuEta->at(mu)));
-				h_muFLoose->AddBinContent(fillbin, fEventweight);
+			if( LepPt->at(lep) >  fFRbinspt.back() ){
+				int fillbin = h_FLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep)));
+				h_FLoose->AddBinContent(fillbin, fEventweight);
 			}
 			else{
-				h_muFLoose->Fill(MuPt->at(mu), fabs(MuEta->at(mu)), fEventweight);
+				h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 			}
-// cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
-// cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, MuPt->at(mu), isTightMuon(mu), getMET(), getMT(0, mu)) << endl;
+// cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
+// cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), isTightMuon(mu), getMET(), getMT(0, mu)) << endl;
 		}
 
-		if(passesMTCut(0, mu)) h_Loose_muMET       ->Fill(getMET()    , fEventweight);
-		                       h_Loose_muMETnoMTCut->Fill(getMET()    , fEventweight);
-		if(passesMETCut())     h_Loose_muMT        ->Fill(getMT(0, mu), fEventweight);
-		if(passesMETCut(20,1)) h_Loose_muMTMET20   ->Fill(getMT(0, mu), fEventweight);
-		if(passesMETCut(30,1)) h_Loose_muMTMET30   ->Fill(getMT(0, mu), fEventweight);
-		if(passesMETCut(20,1)) h_Loose_muNVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
+		if(passesMTCut(lep))    h_Loose_MET            ->Fill(getMET()            , fEventweight);
+		                        h_Loose_METnoMTCut     ->Fill(getMET()            , fEventweight);
+		if(passesMETCut())      h_Loose_MT             ->Fill(getMT(lep)          , fEventweight);
+		if(passesMETCut(20,1))  h_Loose_MTMET20        ->Fill(getMT(lep)          , fEventweight);
+		if(passesMETCut(30,1))  h_Loose_MTMET30        ->Fill(getMT(lep)          , fEventweight);
+		if(passesMETCut(20,1))  h_Loose_NVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
 
-		if(passesMTCut(0, mu) && fFRMETbinseta[0]<=fabs(MuEta->at(mu)) && fabs(MuEta->at(mu))<fFRMETbinseta[fFRMETn_binseta-1]){
-			if(fFRMETbinspt[0]<=MuPt->at(mu) && MuPt->at(mu)<fFRMETbinspt[fFRMETn_binspt-1]){
-				int i = h_Loose_muFRMETZoomEta ->FindBin(fabs(MuEta->at(mu)));
-				int j = h_Loose_muFRMETZoomPt  ->FindBin(MuPt->at(mu));
+		if(passesMTCut(lep) && fFRMETbinseta[0]<=fabs(LepEta->at(lep)) && fabs(LepEta->at(lep))<fFRMETbinseta[fFRMETn_binseta-1]){
+			if(fFRMETbinspt[0]<=LepPt->at(lep) && LepPt->at(lep)<fFRMETbinspt[fFRMETn_binspt-1]){
+				int i = h_Loose_FRMETZoomEta ->FindBin(fabs(LepEta->at(lep)));
+				int j = h_Loose_FRMETZoomPt  ->FindBin(LepPt->at(lep));
 				//cout << "i = " << i < ", j = " << j << ", " << (i-1)*(fFRMETn_binspt-1) + j - 1 << endl;
-				h_Loose_muMETZoom[(i-1)*(fFRMETn_binspt-1) + j - 1] ->Fill((getMET()), fEventweight);
+				h_Loose_METZoom[(i-1)*(fFRMETn_binspt-1) + j - 1] ->Fill((getMET()), fEventweight);
 			}
 		}
 
 
-		// tight muons
-		if(isTightMuon(mu)) {
+		// tight leptons
+		if(isTightLepton(lep)) {
 
-			if(passesUpperMETMT(0,mu)) {
+			if(passesUpperMETMT(lep)) {
   
-				h_Tight_muAwayJetDR ->Fill(getAwayJet(1,mu)    , fEventweight);
-				h_Tight_muAwayJetPt ->Fill(getAwayJet(0,mu)    , fEventweight);
-				h_Tight_muClosJetDR ->Fill(getClosestJet(1,mu) , fEventweight);
-				h_Tight_muClosJetPt ->Fill(getClosestJet(0,mu) , fEventweight);
+				h_Tight_AwayJetDR ->Fill(getAwayJet(1, lep)    , fEventweight);
+				h_Tight_AwayJetPt ->Fill(getAwayJet(0, lep)    , fEventweight);
+				h_Tight_ClosJetDR ->Fill(getClosestJet(1, lep) , fEventweight);
+				h_Tight_ClosJetPt ->Fill(getClosestJet(0, lep) , fEventweight);
 
-				h_Tight_muHT        ->Fill(getHT()             , fEventweight);
-				h_Tight_muLepEta    ->Fill(fabs(MuEta->at(mu)) , fEventweight);
-				h_Tight_muLepIso    ->Fill(MuPFIso->at(mu)     , fEventweight);
-				h_Tight_muLepPt     ->Fill(MuPt->at(mu)        , fEventweight);
+				h_Tight_HT        ->Fill(getHT()               , fEventweight);
+				h_Tight_LepEta    ->Fill(fabs(LepEta->at(lep)) , fEventweight);
+				h_Tight_LepIso    ->Fill(LepPFIso->at(lep)     , fEventweight);
+				h_Tight_LepPt     ->Fill(LepPt->at(lep)        , fEventweight);
 
-				h_Tight_muMaxJPt    ->Fill(getJetPt(jet)       , fEventweight);
-				h_Tight_muNBJets    ->Fill(getNJets(1)         , fEventweight);
-				h_Tight_muNJets     ->Fill(getNJets()          , fEventweight);
-				h_Tight_muNVertices ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
-				h_Tight_muNVertices1->Fill((NVrtx>30)?30:NVrtx , fEventweight);
+				h_Tight_MaxJPt    ->Fill(getJetPt(jet)         , fEventweight);
+				h_Tight_NBJets    ->Fill(getNJets(1)           , fEventweight);
+				h_Tight_NJets     ->Fill(getNJets()            , fEventweight);
+				h_Tight_NVertices ->Fill((NVrtx>40)?40:NVrtx   , fEventweight);
+				h_Tight_NVertices1->Fill((NVrtx>30)?30:NVrtx   , fEventweight);
 
-				h_Tight_muD0        ->Fill(MuD0->at(mu)        , fEventweight);
-				h_Tight_muMaxJCPt   ->Fill(JetPt->at(jet)      , fEventweight); // always corrected Jet Pt!
-				h_Tight_muMaxJRPt   ->Fill(JetRawPt->at(jet)   , fEventweight); // always raw Jet Pt!
+				h_Tight_D0        ->Fill(LepD0->at(lep)        , fEventweight);
+				h_Tight_MaxJCPt   ->Fill(JetPt->at(jet)        , fEventweight); // always corrected Jet Pt!
+				h_Tight_MaxJRPt   ->Fill(JetRawPt->at(jet)     , fEventweight); // always raw Jet Pt!
 
-				h_Tight_muJCPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet), fEventweight);
-				h_Tight_muJRPtJEta  ->Fill(fabs(JetEta->at(jet)), JetRawPt->at(jet), fEventweight);
-				h_Tight_muJCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
-				h_Tight_muJRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
+				h_Tight_JCPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetPt->at(jet), fEventweight);
+				h_Tight_JRPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetRawPt->at(jet), fEventweight);
+				h_Tight_JCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
+				h_Tight_JRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
 
 				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
-					h_Tight_muAllJCPt   ->Fill(JetPt->at(thisjet)       , fEventweight);
-					h_Tight_muAllJRPt   ->Fill(JetRawPt->at(thisjet)    , fEventweight);
-					h_Tight_muAllJEta   ->Fill(fabs(JetEta->at(thisjet)), fEventweight);
+					h_Tight_AllJCPt   ->Fill(JetPt->at(thisjet)       , fEventweight);
+					h_Tight_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , fEventweight);
+					h_Tight_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
-					h_Tight_muDJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-					h_Tight_muFJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
-					h_Tight_muDJPtJPt  ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-					h_Tight_muFJPtJPt  ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+					h_Tight_DJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+					h_Tight_FJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+					h_Tight_DJPtJPt  ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+					h_Tight_FJPtJPt  ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
 				
-					int i = h_Tight_muDFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
+					int i = h_Tight_DFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
 					if(fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1]){
 				
 						if(fDFbinspt[0]<=JetPt->at(thisjet) && JetPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
-							int j = h_Tight_muDFZoomPt  ->FindBin(JetPt->at(thisjet));
-							h_Tight_muDJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-							h_Tight_muFJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+							int j = h_Tight_DFZoomPt  ->FindBin(JetPt->at(thisjet));
+							h_Tight_DJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+							h_Tight_FJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
 						}
 
 						if(fDFbinspt[0]<=JetRawPt->at(thisjet) && JetRawPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
-							int k = h_Tight_muDFZoomPt  ->FindBin(JetRawPt->at(thisjet));
-							h_Tight_muDJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-							h_Tight_muFJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+							int k = h_Tight_DFZoomPt  ->FindBin(JetRawPt->at(thisjet));
+							h_Tight_DJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+							h_Tight_FJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
 						}
 					}
 				}
 
-				if( MuPt->at(mu) >  fFRbinspt.back() ){
-					int fillbin = h_muFTight->FindBin(fFRbinspt.back()-0.5, fabs(MuEta->at(mu)));
-					h_muFTight->AddBinContent(fillbin, fEventweight);
+				if( LepPt->at(lep) >  fFRbinspt.back()){
+					int fillbin = h_FTight->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep)));
+					h_FTight->AddBinContent(fillbin, fEventweight);
 				}
 				else{
-					h_muFTight->Fill(MuPt->at(mu), fabs(MuEta->at(mu)), fEventweight);
+					h_FTight->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 				}
 			}
 
-			if(passesMTCut(0, mu)) h_Tight_muMET        -> Fill(getMET()    , fEventweight);
-			                       h_Tight_muMETnoMTCut -> Fill(getMET()    , fEventweight);
-			if(passesMETCut())     h_Tight_muMT         -> Fill(getMT(0, mu), fEventweight);
-			if(passesMETCut(20,1)) h_Tight_muMTMET20    -> Fill(getMT(0, mu), fEventweight);
-			if(passesMETCut(30,1)) h_Tight_muMTMET30    -> Fill(getMT(0, mu), fEventweight);
-			if(passesMETCut(20,1)) h_Tight_muNVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
+			if(passesMTCut(lep))    h_Tight_MET        -> Fill(getMET()               , fEventweight);
+			                        h_Tight_METnoMTCut -> Fill(getMET()               , fEventweight);
+			if(passesMETCut())      h_Tight_MT         -> Fill(getMT(lep)             , fEventweight);
+			if(passesMETCut(20,1))  h_Tight_MTMET20    -> Fill(getMT(lep)             , fEventweight);
+			if(passesMETCut(30,1))  h_Tight_MTMET30    -> Fill(getMT(lep)             , fEventweight);
+			if(passesMETCut(20,1))  h_Tight_NVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
 
-			if(passesMTCut(0, mu) && fFRMETbinseta[0]<=fabs(MuEta->at(mu)) && fabs(MuEta->at(mu))<fFRMETbinseta[fFRMETn_binseta-1]){
-				if(fFRMETbinspt[0]<=MuPt->at(mu) && MuPt->at(mu)<fFRMETbinspt[fFRMETn_binspt-1]){
-					int i = h_Tight_muFRMETZoomEta ->FindBin(fabs(MuEta->at(mu)));
-					int j = h_Tight_muFRMETZoomPt  ->FindBin(MuPt->at(mu));
-					h_Tight_muMETZoom[(i-1)*(fFRMETn_binspt-1) + j - 1] ->Fill((getMET()), fEventweight);
+			if(passesMTCut(lep) && fFRMETbinseta[0]<=fabs(LepEta->at(lep)) && fabs(LepEta->at(lep))<fFRMETbinseta[fFRMETn_binseta-1]){
+				if(fFRMETbinspt[0]<=LepPt->at(lep) && LepPt->at(lep)<fFRMETbinspt[fFRMETn_binspt-1]){
+					int i = h_Tight_FRMETZoomEta ->FindBin(fabs(LepEta->at(lep)));
+					int j = h_Tight_FRMETZoomPt  ->FindBin(LepPt->at(lep));
+					h_Tight_METZoom[(i-1)*(fFRMETn_binspt-1) + j - 1] ->Fill((getMET()), fEventweight);
 				}
 			}
 		}
 	}
 
-	h_muFRatio->Divide(h_muFTight, h_muFLoose);
+	h_FRatio->Divide(h_FTight, h_FLoose);
 
-
-    // electrons
-	//int el(-1);
-	//if(isFRRegionElEvent(el)) {
-	//	h_elIsoPlot->Fill(ElPFIso->at(el), fEventweight);
-	//}
 }
 
 
@@ -1066,95 +1173,81 @@ void Fakerates::bookHistos(){
 	nvrtx_bins.push_back(31.);
 	int nvrtx_nbins = nvrtx_bins.size();
 
-	// the ratio histograms, those are just divided versions of the following
-	h_elFRatio = new TH2F("h_elFRatio", "elFRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_elFRatio->Sumw2(); 
-	h_muFRatio = new TH2F("h_muFRatio", "muFRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_muFRatio->Sumw2(); 
-	h_elPRatio = new TH2F("h_elPRatio", "elPRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_elPRatio->Sumw2(); 
-	h_muPRatio = new TH2F("h_muPRatio", "muPRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_muPRatio->Sumw2(); 
-	
-	// passing histograms for electrons and muons, f and p rate
-	h_elFTight = new TH2F("h_elFTight", "elFTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_elFTight->Sumw2(); 
-	h_muFTight = new TH2F("h_muFTight", "muFTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_muFTight->Sumw2(); 
-	h_elPTight = new TH2F("h_elPTight", "elPTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_elPTight->Sumw2(); 
-	h_muPTight = new TH2F("h_muPTight", "muPTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_muPTight->Sumw2(); 
+	h_FRatio             = new TH2F("h_FRatio"            , "FRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FRatio->Sumw2(); 
+	h_FTight             = new TH2F("h_FTight"            , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight->Sumw2(); 
+	h_FLoose             = new TH2F("h_FLoose"            , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose->Sumw2(); 
 
-	// failing histograms for electrons and muons, f and p rate
-	h_elFLoose = new TH2F("h_elFLoose", "elFLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_elFLoose->Sumw2(); 
-	h_muFLoose = new TH2F("h_muFLoose", "muFLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_muFLoose->Sumw2(); 
-	h_elPLoose = new TH2F("h_elPLoose", "elPLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_elPLoose->Sumw2(); 
-	h_muPLoose = new TH2F("h_muPLoose", "muPLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_muPLoose->Sumw2(); 
+	h_Loose_FRZoomEta    = new TH1F("h_Loose_FRZoomEta"   , "Loose_FRZoomEta"   , fFRn_binseta-1   , &fFRbinseta[0]   ); // empty, just to use binning
+	h_Loose_FRZoomPt     = new TH1F("h_Loose_FRZoomPt"    , "Loose_FRZoomPt"    , fFRn_binspt-1    , &fFRbinspt[0]    ); // empty, just to use binning
+	h_Tight_FRZoomEta    = new TH1F("h_Tight_FRZoomEta"   , "Tight_FRZoomEta"   , fFRn_binseta-1   , &fFRbinseta[0]   ); // empty, just to use binning
+	h_Tight_FRZoomPt     = new TH1F("h_Tight_FRZoomPt"    , "Tight_FRZoomPt"    , fFRn_binspt-1    , &fFRbinspt[0]    ); // empty, just to use binning
 
-	h_Loose_muFRZoomEta  = new TH1F("h_Loose_muFRZoomEta"  , "Loose_muFRZoomEta" , fFRn_binseta-1, &fFRbinseta[0]); // empty, just to use binning
-	h_Loose_muFRZoomPt   = new TH1F("h_Loose_muFRZoomPt"   , "Loose_muFRZoomPt"  , fFRn_binspt-1 , &fFRbinspt[0] ); // empty, just to use binning
-	h_Tight_muFRZoomEta  = new TH1F("h_Tight_muFRZoomEta"  , "Tight_muFRZoomEta" , fFRn_binseta-1, &fFRbinseta[0]); // empty, just to use binning
-	h_Tight_muFRZoomPt   = new TH1F("h_Tight_muFRZoomPt"   , "Tight_muFRZoomPt"  , fFRn_binspt-1 , &fFRbinspt[0] ); // empty, just to use binning
-
-	h_Loose_muFRMETZoomEta = new TH1F("h_Loose_muFRMETZoomEta", "Loose_muFRMETZoomEta", fFRMETn_binseta-1, &fFRMETbinseta[0]); // empty, just to use binning
-	h_Loose_muFRMETZoomPt  = new TH1F("h_Loose_muFRMETZoomPt" , "Loose_muFRMETZoomPt" , fFRMETn_binspt-1 , &fFRMETbinspt[0] ); // empty, just to use binning
-	h_Tight_muFRMETZoomEta = new TH1F("h_Tight_muFRMETZoomEta", "Tight_muFRMETZoomEta", fFRMETn_binseta-1, &fFRMETbinseta[0]); // empty, just to use binning
-	h_Tight_muFRMETZoomPt  = new TH1F("h_Tight_muFRMETZoomPt" , "Tight_muFRMETZoomPt" , fFRMETn_binspt-1 , &fFRMETbinspt[0] ); // empty, just to use binning
+	h_Loose_FRMETZoomEta = new TH1F("h_Loose_FRMETZoomEta", "Loose_FRMETZoomEta", fFRMETn_binseta-1, &fFRMETbinseta[0]); // empty, just to use binning
+	h_Loose_FRMETZoomPt  = new TH1F("h_Loose_FRMETZoomPt" , "Loose_FRMETZoomPt" , fFRMETn_binspt-1 , &fFRMETbinspt[0] ); // empty, just to use binning
+	h_Tight_FRMETZoomEta = new TH1F("h_Tight_FRMETZoomEta", "Tight_FRMETZoomEta", fFRMETn_binseta-1, &fFRMETbinseta[0]); // empty, just to use binning
+	h_Tight_FRMETZoomPt  = new TH1F("h_Tight_FRMETZoomPt" , "Tight_FRMETZoomPt" , fFRMETn_binspt-1 , &fFRMETbinspt[0] ); // empty, just to use binning
 
 	float eta_min = 0., eta_max = 2.4;
 	float pt_min = 10., pt_max = 70.;
 	int eta_bin = 12, pt_bin = 20;
 
-	h_Loose_muLepPt      = new TH1F("h_Loose_muLepPt"      , "Loose_muLepPt"     , pt_bin  , pt_min  , pt_max);  h_Loose_muLepPt  -> Sumw2();
-	h_Loose_muLepEta     = new TH1F("h_Loose_muLepEta"     , "Loose_muLepEta"    , eta_bin , eta_min , eta_max); h_Loose_muLepEta -> Sumw2();
- 	h_Loose_muLepIso     = new TH1F("h_Loose_muLepIso"     , "Loose_muLepIso"    , 20 ,   0 , 1  ); h_Loose_muLepIso     -> Sumw2();
-	h_Loose_muD0         = new TH1F("h_Loose_muD0"         , "Loose_muD0"        , 20 ,   0., 0.2); h_Loose_muD0         -> Sumw2();
+	h_Loose_LepPt         = new TH1F("h_Loose_LepPt"        , "Loose_LepPt"     , pt_bin  , pt_min  , pt_max ); h_Loose_LepPt     -> Sumw2();
+	h_Loose_LepEta        = new TH1F("h_Loose_LepEta"       , "Loose_LepEta"    , eta_bin , eta_min , eta_max); h_Loose_LepEta    -> Sumw2();
+ 	h_Loose_LepIso        = new TH1F("h_Loose_LepIso"       , "Loose_LepIso"    , 20      ,   0     , 1.0    ); h_Loose_LepIso    -> Sumw2();
+	h_Loose_D0            = new TH1F("h_Loose_D0"           , "Loose_D0"        , 20      ,   0     , 0.2    ); h_Loose_D0        -> Sumw2();
 
-	h_Loose_muLepEta_30  = new TH1F("h_Loose_muLepEta_30"  , "Loose_muLepEta_30" , eta_bin , eta_min , eta_max); h_Loose_muLepEta_30 -> Sumw2();
-	h_Loose_muLepEta_40  = new TH1F("h_Loose_muLepEta_40"  , "Loose_muLepEta_40" , eta_bin , eta_min , eta_max); h_Loose_muLepEta_40 -> Sumw2();
-	h_Loose_muLepEta_50  = new TH1F("h_Loose_muLepEta_50"  , "Loose_muLepEta_50" , eta_bin , eta_min , eta_max); h_Loose_muLepEta_50 -> Sumw2();
-	h_Loose_muLepEta_60  = new TH1F("h_Loose_muLepEta_60"  , "Loose_muLepEta_60" , eta_bin , eta_min , eta_max); h_Loose_muLepEta_60 -> Sumw2();
+	h_Loose_LepEta_30     = new TH1F("h_Loose_LepEta_30"    , "Loose_LepEta_30" , eta_bin , eta_min , eta_max); h_Loose_LepEta_30 -> Sumw2();
+	h_Loose_LepEta_40     = new TH1F("h_Loose_LepEta_40"    , "Loose_LepEta_40" , eta_bin , eta_min , eta_max); h_Loose_LepEta_40 -> Sumw2();
+	h_Loose_LepEta_50     = new TH1F("h_Loose_LepEta_50"    , "Loose_LepEta_50" , eta_bin , eta_min , eta_max); h_Loose_LepEta_50 -> Sumw2();
+	h_Loose_LepEta_60     = new TH1F("h_Loose_LepEta_60"    , "Loose_LepEta_60" , eta_bin , eta_min , eta_max); h_Loose_LepEta_60 -> Sumw2();
 
-	h_Loose_muLepPt_30   = new TH1F("h_Loose_muLepPt_30"   , "Loose_muLepPt_30"  , pt_bin  , pt_min  , pt_max);  h_Loose_muLepPt_30  -> Sumw2();
-	h_Loose_muLepPt_40   = new TH1F("h_Loose_muLepPt_40"   , "Loose_muLepPt_40"  , pt_bin  , pt_min  , pt_max);  h_Loose_muLepPt_40  -> Sumw2();
-	h_Loose_muLepPt_50   = new TH1F("h_Loose_muLepPt_50"   , "Loose_muLepPt_50"  , pt_bin  , pt_min  , pt_max);  h_Loose_muLepPt_50  -> Sumw2();
-	h_Loose_muLepPt_60   = new TH1F("h_Loose_muLepPt_60"   , "Loose_muLepPt_60"  , pt_bin  , pt_min  , pt_max);  h_Loose_muLepPt_60  -> Sumw2();
+	h_Loose_LepPt_30      = new TH1F("h_Loose_LepPt_30"     , "Loose_LepPt_30"  , pt_bin  , pt_min  , pt_max ); h_Loose_LepPt_30  -> Sumw2();
+	h_Loose_LepPt_40      = new TH1F("h_Loose_LepPt_40"     , "Loose_LepPt_40"  , pt_bin  , pt_min  , pt_max ); h_Loose_LepPt_40  -> Sumw2();
+	h_Loose_LepPt_50      = new TH1F("h_Loose_LepPt_50"     , "Loose_LepPt_50"  , pt_bin  , pt_min  , pt_max ); h_Loose_LepPt_50  -> Sumw2();
+	h_Loose_LepPt_60      = new TH1F("h_Loose_LepPt_60"     , "Loose_LepPt_60"  , pt_bin  , pt_min  , pt_max ); h_Loose_LepPt_60  -> Sumw2();
 
-	h_Loose_muHT         = new TH1F("h_Loose_muHT"         , "Loose_muHT"        , 10 ,  0  , 400); h_Loose_muHT         -> Sumw2();
-	h_Loose_muMET        = new TH1F("h_Loose_muMET"        , "Loose_muMET"       , 10 ,  0  , 100); h_Loose_muMET        -> Sumw2();
-	h_Loose_muMETnoMTCut = new TH1F("h_Loose_muMETnoMTCut" , "Loose_muMETnoMTCut", 10 ,  0  , 100); h_Loose_muMETnoMTCut -> Sumw2();
-	h_Loose_muMT         = new TH1F("h_Loose_muMT"         , "Loose_muMT"        , 10 ,  0  , 100); h_Loose_muMT         -> Sumw2();
-	h_Loose_muMTMET20    = new TH1F("h_Loose_muMTMET20"    , "Loose_muMTMET20"   , 20 ,  0  , 200); h_Loose_muMTMET20    -> Sumw2();
-	h_Loose_muMTMET30    = new TH1F("h_Loose_muMTMET30"    , "Loose_muMTMET30"   , 20 ,  0  , 200); h_Loose_muMTMET30    -> Sumw2();
+	h_Loose_HT            = new TH1F("h_Loose_HT"           , "Loose_HT"        , 10      ,  0      , 400    ); h_Loose_HT        -> Sumw2();
+	h_Loose_MET           = new TH1F("h_Loose_MET"          , "Loose_MET"       , 10      ,  0      , 100    ); h_Loose_MET       -> Sumw2();
+	h_Loose_METnoMTCut    = new TH1F("h_Loose_METnoMTCut"   , "Loose_METnoMTCut", 10      ,  0      , 100    ); h_Loose_METnoMTCut-> Sumw2();
+	h_Loose_MT            = new TH1F("h_Loose_MT"           , "Loose_MT"        , 10      ,  0      , 100    ); h_Loose_MT        -> Sumw2();
+	h_Loose_MTMET20       = new TH1F("h_Loose_MTMET20"      , "Loose_MTMET20"   , 20      ,  0      , 200    ); h_Loose_MTMET20   -> Sumw2();
+	h_Loose_MTMET30       = new TH1F("h_Loose_MTMET30"      , "Loose_MTMET30"   , 20      ,  0      , 200    ); h_Loose_MTMET30   -> Sumw2();
 
-	h_Loose_muMaxJPt     = new TH1F("h_Loose_muMaxJPt"     , "Loose_muMaxJPt"    , 10 ,  20 , 120); h_Loose_muMaxJPt     -> Sumw2();
-	h_Loose_muMaxJCPt    = new TH1F("h_Loose_muMaxJCPt"    , "Loose_muMaxJCPt"   , 10 ,  20 , 120); h_Loose_muMaxJCPt    -> Sumw2();
-	h_Loose_muMaxJRPt    = new TH1F("h_Loose_muMaxJRPt"    , "Loose_muMaxJRPt"   , 10 ,  20 , 120); h_Loose_muMaxJRPt    -> Sumw2();
+	h_Loose_MaxJPt        = new TH1F("h_Loose_MaxJPt"       , "Loose_MaxJPt"    , 10      ,  20     , 120    ); h_Loose_MaxJPt    -> Sumw2();
+	h_Loose_MaxJCPt       = new TH1F("h_Loose_MaxJCPt"      , "Loose_MaxJCPt"   , 10      ,  20     , 120    ); h_Loose_MaxJCPt   -> Sumw2();
+	h_Loose_MaxJRPt       = new TH1F("h_Loose_MaxJRPt"      , "Loose_MaxJRPt"   , 10      ,  20     , 120    ); h_Loose_MaxJRPt   -> Sumw2();
 
-	h_Loose_muAllJRPt    = new TH1F("h_Loose_muAllJRPt"    , "Loose_muAllJRPt"   , 15 ,   0 , 150); h_Loose_muAllJRPt    -> Sumw2();
-	h_Loose_muAllJCPt    = new TH1F("h_Loose_muAllJCPt"    , "Loose_muAllJCPt"   , 15 ,   0 , 150); h_Loose_muAllJCPt    -> Sumw2();
-	h_Loose_muAllJEta    = new TH1F("h_Loose_muAllJEta"    , "Loose_muAllJEta"   , 12 ,   0 , 2.4); h_Loose_muAllJEta    -> Sumw2();
+	h_Loose_AllJRPt       = new TH1F("h_Loose_AllJRPt"      , "Loose_AllJRPt"   , 15      ,  0      , 150    ); h_Loose_AllJRPt   -> Sumw2();
+	h_Loose_AllJCPt       = new TH1F("h_Loose_AllJCPt"      , "Loose_AllJCPt"   , 15      ,  0      , 150    ); h_Loose_AllJCPt   -> Sumw2();
+	h_Loose_AllJEta       = new TH1F("h_Loose_AllJEta"      , "Loose_AllJEta"   , 12      ,  0      , 2.4    ); h_Loose_AllJEta   -> Sumw2();
 
-	h_Loose_muAllJEta_test1 = new TH1F("h_Loose_muAllJEta_test1", "Loose_muAllJEta_test1", 12,  0 , 2.4); h_Loose_muAllJEta_test1 -> Sumw2();
-	h_Loose_muAllJEta_test2 = new TH1F("h_Loose_muAllJEta_test2", "Loose_muAllJEta_test2", 12,  0 , 2.4); h_Loose_muAllJEta_test2 -> Sumw2();
-	h_Loose_muAllJEta_test3 = new TH1F("h_Loose_muAllJEta_test3", "Loose_muAllJEta_test3", 12,  0 , 2.4); h_Loose_muAllJEta_test3 -> Sumw2();
+	h_Loose_AllJEta_test1 = new TH1F("h_Loose_AllJEta_test1", "Loose_AllJEta_test1", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test1 -> Sumw2();
+	h_Loose_AllJEta_test2 = new TH1F("h_Loose_AllJEta_test2", "Loose_AllJEta_test2", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test2 -> Sumw2();
+	h_Loose_AllJEta_test3 = new TH1F("h_Loose_AllJEta_test3", "Loose_AllJEta_test3", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test3 -> Sumw2();
 
-	h_Loose_muNBJets     = new TH1F("h_Loose_muNBJets"     , "Loose_muNBJets"    , 3  ,  0  , 3  ); h_Loose_muNBJets     -> Sumw2();
-	h_Loose_muNJets      = new TH1F("h_Loose_muNJets"      , "Loose_muNJets"     , 5  ,  1  , 6  ); h_Loose_muNJets      -> Sumw2();
-	h_Loose_muNVertices  = new TH1F("h_Loose_muNVertices"  , "Loose_muNVertices" , 40 ,  0  , 40 ); h_Loose_muNVertices  -> Sumw2();
-	h_Loose_muNVertices1 = new TH1F("h_Loose_muNVertices1" , "Loose_muNVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Loose_muNVertices1 -> Sumw2();
-	h_Loose_muNVerticesMET20 = new TH1F("h_Loose_muNVerticesMET20", "Loose_muNVerticesMET20", 40, 0, 40); h_Loose_muNVerticesMET20 -> Sumw2();
+	h_Loose_NBJets        = new TH1F("h_Loose_NBJets"       , "Loose_NBJets"    , 3       ,  0      , 3      ); h_Loose_NBJets     -> Sumw2();
+	h_Loose_NJets         = new TH1F("h_Loose_NJets"        , "Loose_NJets"     , 5       ,  1      , 6      ); h_Loose_NJets      -> Sumw2();
+	h_Loose_NVertices     = new TH1F("h_Loose_NVertices"    , "Loose_NVertices" , 40      ,  0      , 40     ); h_Loose_NVertices  -> Sumw2();
+	h_Loose_NVertices1    = new TH1F("h_Loose_NVertices1"   , "Loose_NVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Loose_NVertices1 -> Sumw2();
+	h_Loose_NVerticesMET20= new TH1F("h_Loose_NVerticesMET20", "Loose_NVerticesMET20", 40 , 0       , 40     ); h_Loose_NVerticesMET20 -> Sumw2();
 
-	h_Loose_muAwayJetDR  = new TH1F("h_Loose_muAwayJetDR"  , "Loose_muAwayJetDR" , 15 ,  0  , 6  ); h_Loose_muAwayJetDR  -> Sumw2();
-	h_Loose_muAwayJetPt  = new TH1F("h_Loose_muAwayJetPt"  , "Loose_muAwayJetPt" , 10 ,  20 , 120); h_Loose_muAwayJetPt  -> Sumw2();
-	h_Loose_muClosJetDR  = new TH1F("h_Loose_muClosJetDR"  , "Loose_muClosJetDR" , 15 ,  0  , 1  ); h_Loose_muClosJetDR  -> Sumw2();
-	h_Loose_muClosJetPt  = new TH1F("h_Loose_muClosJetPt"  , "Loose_muClosJetPt" , 10 ,  20 , 120); h_Loose_muClosJetPt  -> Sumw2();
+	h_Loose_AwayJetDR     = new TH1F("h_Loose_AwayJetDR"    , "Loose_AwayJetDR" , 15      ,  0      , 6      ); h_Loose_AwayJetDR  -> Sumw2();
+	h_Loose_AwayJetPt     = new TH1F("h_Loose_AwayJetPt"    , "Loose_AwayJetPt" , 10      ,  20     , 120    ); h_Loose_AwayJetPt  -> Sumw2();
+	h_Loose_ClosJetDR     = new TH1F("h_Loose_ClosJetDR"    , "Loose_ClosJetDR" , 15      ,  0      , 1      ); h_Loose_ClosJetDR  -> Sumw2();
+	h_Loose_ClosJetPt     = new TH1F("h_Loose_ClosJetPt"    , "Loose_ClosJetPt" , 10      ,  20     , 120    ); h_Loose_ClosJetPt  -> Sumw2();
 
-	h_Loose_muJCPtJEta   = new TH2F("h_Loose_muJCPtJEta"   , "Loose_muJCPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Loose_muJCPtJEta->Sumw2();
-	h_Loose_muJRPtJEta   = new TH2F("h_Loose_muJRPtJEta"   , "Loose_muJRPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Loose_muJRPtJEta->Sumw2();
-	h_Loose_muJCPtJPt    = new TH2F("h_Loose_muJCPtJPt"    , "Loose_muJCPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Loose_muJCPtJPt ->Sumw2();
-	h_Loose_muJRPtJPt    = new TH2F("h_Loose_muJRPtJPt"    , "Loose_muJRPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Loose_muJRPtJPt ->Sumw2();
+	h_Loose_JCPtJEta      = new TH2F("h_Loose_JCPtJEta"     , "Loose_JCPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Loose_JCPtJEta->Sumw2();
+	h_Loose_JRPtJEta      = new TH2F("h_Loose_JRPtJEta"     , "Loose_JRPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Loose_JRPtJEta->Sumw2();
+	h_Loose_JCPtJPt       = new TH2F("h_Loose_JCPtJPt"      , "Loose_JCPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Loose_JCPtJPt ->Sumw2();
+	h_Loose_JRPtJPt       = new TH2F("h_Loose_JRPtJPt"      , "Loose_JRPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Loose_JRPtJPt ->Sumw2();
 
-	h_Loose_muDJPtJEta   = new TH2F("h_Loose_muDJPtJEta"   , "Loose_muDJPtJEta"  , eta_bin, eta_min, eta_max, 30, -30, 30); h_Loose_muDJPtJEta->Sumw2();
-	h_Loose_muFJPtJEta   = new TH2F("h_Loose_muFJPtJEta"   , "Loose_muFJPtJEta"  , eta_bin, eta_min, eta_max, 30, -1, 1);   h_Loose_muFJPtJEta->Sumw2();
-	h_Loose_muDJPtJPt    = new TH2F("h_Loose_muDJPtJPt"    , "Loose_muDJPtJPt"   , pt_bin,  pt_min,  pt_max,  30, -30, 30); h_Loose_muDJPtJPt ->Sumw2();
-	h_Loose_muFJPtJPt    = new TH2F("h_Loose_muFJPtJPt"    , "Loose_muFJPtJPt"   , pt_bin,  pt_min,  pt_max,  30, -1, 1);   h_Loose_muFJPtJPt ->Sumw2();
+	h_Loose_DJPtJEta      = new TH2F("h_Loose_DJPtJEta"     , "Loose_DJPtJEta"  , eta_bin, eta_min, eta_max, 30, -30, 30); h_Loose_DJPtJEta->Sumw2();
+	h_Loose_FJPtJEta      = new TH2F("h_Loose_FJPtJEta"     , "Loose_FJPtJEta"  , eta_bin, eta_min, eta_max, 30, -1, 1);   h_Loose_FJPtJEta->Sumw2();
+	h_Loose_DJPtJPt       = new TH2F("h_Loose_DJPtJPt"      , "Loose_DJPtJPt"   , pt_bin,  pt_min,  pt_max,  30, -30, 30); h_Loose_DJPtJPt ->Sumw2();
+	h_Loose_FJPtJPt       = new TH2F("h_Loose_FJPtJPt"      , "Loose_FJPtJPt"   , pt_bin,  pt_min,  pt_max,  30, -1, 1);   h_Loose_FJPtJPt ->Sumw2();
 
-	h_Loose_muDFZoomEta  = new TH1F("h_Loose_muDFZoomEta"  , "Loose_muDFZoomEta" , fDFn_binseta-1, &fDFbinseta[0]); // empty, just to use binning
-	h_Loose_muDFZoomPt   = new TH1F("h_Loose_muDFZoomPt"   , "Loose_muDFZoomPt"  , fDFn_binspt-1 , &fDFbinspt[0] ); // empty, just to use binning
+	h_Loose_DFZoomEta     = new TH1F("h_Loose_DFZoomEta"    , "Loose_DFZoomEta" , fDFn_binseta-1, &fDFbinseta[0]); // empty, just to use binning
+	h_Loose_DFZoomPt      = new TH1F("h_Loose_DFZoomPt"     , "Loose_DFZoomPt"  , fDFn_binspt-1 , &fDFbinspt[0] ); // empty, just to use binning
 
 	int n = 0;
 	char nn[2];
@@ -1163,22 +1256,22 @@ void Fakerates::bookHistos(){
 		for(int j=0; j<fDFn_binspt-1; ++j) {
 			if(n<10) sprintf(nn, "0%d", n);
 			else sprintf(nn, "%d", n);
-			sprintf(name, "h_Loose_muDJPtZoomC_%s", nn);
-			sprintf(title, "Loose_muDJPtZoomC_%s", nn);
-			h_Loose_muDJPtZoomC[n] = new TH1F(name, title, 80, -30., 10.); 
-			h_Loose_muDJPtZoomC[n]->Sumw2();
-			sprintf(name, "h_Loose_muDJPtZoomR_%s", nn);
-			sprintf(title, "Loose_muDJPtZoomR_%s", nn);
-			h_Loose_muDJPtZoomR[n] = new TH1F(name, title, 80, -30., 10.); 
-			h_Loose_muDJPtZoomR[n]->Sumw2();
-			sprintf(name, "h_Loose_muFJPtZoomC_%s", nn);
-			sprintf(title, "Loose_muFJPtZoomC_%s", nn);
-			h_Loose_muFJPtZoomC[n] = new TH1F(name, title, 50, -1., 1.);
-			h_Loose_muFJPtZoomC[n]->Sumw2();
-			sprintf(name, "h_Loose_muFJPtZoomR_%s", nn);
-			sprintf(title, "Loose_muFJPtZoomR_%s", nn);
-			h_Loose_muFJPtZoomR[n] = new TH1F(name, title, 50, -1., 1.);
-			h_Loose_muFJPtZoomR[n]->Sumw2();
+			sprintf(name, "h_Loose_DJPtZoomC_%s", nn);
+			sprintf(title, "Loose_DJPtZoomC_%s", nn);
+			h_Loose_DJPtZoomC[n] = new TH1F(name, title, 80, -30., 10.); 
+			h_Loose_DJPtZoomC[n]->Sumw2();
+			sprintf(name, "h_Loose_DJPtZoomR_%s", nn);
+			sprintf(title, "Loose_DJPtZoomR_%s", nn);
+			h_Loose_DJPtZoomR[n] = new TH1F(name, title, 80, -30., 10.); 
+			h_Loose_DJPtZoomR[n]->Sumw2();
+			sprintf(name, "h_Loose_FJPtZoomC_%s", nn);
+			sprintf(title, "Loose_FJPtZoomC_%s", nn);
+			h_Loose_FJPtZoomC[n] = new TH1F(name, title, 50, -1., 1.);
+			h_Loose_FJPtZoomC[n]->Sumw2();
+			sprintf(name, "h_Loose_FJPtZoomR_%s", nn);
+			sprintf(title, "Loose_FJPtZoomR_%s", nn);
+			h_Loose_FJPtZoomR[n] = new TH1F(name, title, 50, -1., 1.);
+			h_Loose_FJPtZoomR[n]->Sumw2();
 			++n;
 		}
 	}
@@ -1187,89 +1280,89 @@ void Fakerates::bookHistos(){
 		for(int j=0; j<fFRMETn_binspt-1; ++j) {
 			if(n<10) sprintf(nn, "0%d", n);
 			else sprintf(nn, "%d", n);
-			sprintf(name, "h_Loose_muMETZoom_%s", nn);
-			sprintf(title, "Loose_muMETZoom_%s", nn);
-			h_Loose_muMETZoom[n] = new TH1F(name, title, 20, 0, 100);
-			h_Loose_muMETZoom[n]->Sumw2();
+			sprintf(name, "h_Loose_METZoom_%s", nn);
+			sprintf(title, "Loose_METZoom_%s", nn);
+			h_Loose_METZoom[n] = new TH1F(name, title, 20, 0, 100);
+			h_Loose_METZoom[n]->Sumw2();
 			++n;
 		}
 	}
 	
-	h_Tight_muLepPt      = new TH1F("h_Tight_muLepPt"      , "Tight_muLepPt"     , pt_bin  , pt_min  , pt_max ); h_Tight_muLepPt     -> Sumw2();
-	h_Tight_muLepEta     = new TH1F("h_Tight_muLepEta"     , "Tight_muLepEta"    , eta_bin , eta_min , eta_max); h_Tight_muLepEta    -> Sumw2();
-	h_Tight_muLepIso     = new TH1F("h_Tight_muLepIso"     , "Tight_muLepIso"    , 20,       0.,       1.0    ); h_Tight_muLepIso    -> Sumw2();
- 	h_Tight_muD0         = new TH1F("h_Tight_muD0"         , "Tight_muD0"        , 20,       0.,       0.2    ); h_Tight_muD0        -> Sumw2();
+	h_Tight_LepPt         = new TH1F("h_Tight_LepPt"        , "Tight_LepPt"     , pt_bin  , pt_min  , pt_max ); h_Tight_LepPt     -> Sumw2();
+	h_Tight_LepEta        = new TH1F("h_Tight_LepEta"       , "Tight_LepEta"    , eta_bin , eta_min , eta_max); h_Tight_LepEta    -> Sumw2();
+	h_Tight_LepIso        = new TH1F("h_Tight_LepIso"       , "Tight_LepIso"    , 20      , 0.      , 1.0    ); h_Tight_LepIso    -> Sumw2();
+ 	h_Tight_D0            = new TH1F("h_Tight_D0"           , "Tight_D0"        , 20      , 0.      , 0.2    ); h_Tight_D0        -> Sumw2();
     
-	h_Tight_muLepEta_30  = new TH1F("h_Tight_muLepEta_30"  , "Tight_muLepEta_30" , eta_bin , eta_min , eta_max); h_Tight_muLepEta_30 -> Sumw2();
-	h_Tight_muLepEta_40  = new TH1F("h_Tight_muLepEta_40"  , "Tight_muLepEta_40" , eta_bin , eta_min , eta_max); h_Tight_muLepEta_40 -> Sumw2();
-	h_Tight_muLepEta_50  = new TH1F("h_Tight_muLepEta_50"  , "Tight_muLepEta_50" , eta_bin , eta_min , eta_max); h_Tight_muLepEta_50 -> Sumw2();
-	h_Tight_muLepEta_60  = new TH1F("h_Tight_muLepEta_60"  , "Tight_muLepEta_60" , eta_bin , eta_min , eta_max); h_Tight_muLepEta_60 -> Sumw2();
+	h_Tight_LepEta_30     = new TH1F("h_Tight_LepEta_30"    , "Tight_LepEta_30" , eta_bin , eta_min , eta_max); h_Tight_LepEta_30 -> Sumw2();
+	h_Tight_LepEta_40     = new TH1F("h_Tight_LepEta_40"    , "Tight_LepEta_40" , eta_bin , eta_min , eta_max); h_Tight_LepEta_40 -> Sumw2();
+	h_Tight_LepEta_50     = new TH1F("h_Tight_LepEta_50"    , "Tight_LepEta_50" , eta_bin , eta_min , eta_max); h_Tight_LepEta_50 -> Sumw2();
+	h_Tight_LepEta_60     = new TH1F("h_Tight_LepEta_60"    , "Tight_LepEta_60" , eta_bin , eta_min , eta_max); h_Tight_LepEta_60 -> Sumw2();
     
-	h_Tight_muLepPt_30   = new TH1F("h_Tight_muLepPt_30"   , "Tight_muLepPt_30"  , pt_bin  , pt_min  , pt_max);  h_Tight_muLepPt_30  -> Sumw2();
-	h_Tight_muLepPt_40   = new TH1F("h_Tight_muLepPt_40"   , "Tight_muLepPt_40"  , pt_bin  , pt_min  , pt_max);  h_Tight_muLepPt_40  -> Sumw2();
-	h_Tight_muLepPt_50   = new TH1F("h_Tight_muLepPt_50"   , "Tight_muLepPt_50"  , pt_bin  , pt_min  , pt_max);  h_Tight_muLepPt_50  -> Sumw2();
-	h_Tight_muLepPt_60   = new TH1F("h_Tight_muLepPt_60"   , "Tight_muLepPt_60"  , pt_bin  , pt_min  , pt_max);  h_Tight_muLepPt_60  -> Sumw2();
+	h_Tight_LepPt_30      = new TH1F("h_Tight_LepPt_30"     , "Tight_LepPt_30"  , pt_bin  , pt_min  , pt_max );  h_Tight_LepPt_30  -> Sumw2();
+	h_Tight_LepPt_40      = new TH1F("h_Tight_LepPt_40"     , "Tight_LepPt_40"  , pt_bin  , pt_min  , pt_max );  h_Tight_LepPt_40  -> Sumw2();
+	h_Tight_LepPt_50      = new TH1F("h_Tight_LepPt_50"     , "Tight_LepPt_50"  , pt_bin  , pt_min  , pt_max );  h_Tight_LepPt_50  -> Sumw2();
+	h_Tight_LepPt_60      = new TH1F("h_Tight_LepPt_60"     , "Tight_LepPt_60"  , pt_bin  , pt_min  , pt_max );  h_Tight_LepPt_60  -> Sumw2();
                                                                                          
-	h_Tight_muHT         = new TH1F("h_Tight_muHT"         , "Tight_muHT"        , 10 ,  0  , 400); h_Tight_muHT         -> Sumw2();
-	h_Tight_muMET        = new TH1F("h_Tight_muMET"        , "Tight_muMET"       , 10 ,  0  , 100); h_Tight_muMET        -> Sumw2();
-	h_Tight_muMETnoMTCut = new TH1F("h_Tight_muMETnoMTCut" , "Tight_muMETnoMTCut", 10 ,  0  , 100); h_Tight_muMETnoMTCut -> Sumw2();
-	h_Tight_muMT         = new TH1F("h_Tight_muMT"         , "Tight_muMT"        , 10 ,  0  , 100); h_Tight_muMT         -> Sumw2();
-	h_Tight_muMTMET20    = new TH1F("h_Tight_muMTMET20"    , "Tight_muMTMET20"   , 20 ,  0  , 200); h_Tight_muMTMET20    -> Sumw2();
-	h_Tight_muMTMET30    = new TH1F("h_Tight_muMTMET30"    , "Tight_muMTMET30"   , 20 ,  0  , 200); h_Tight_muMTMET30    -> Sumw2();
+	h_Tight_HT            = new TH1F("h_Tight_HT"           , "Tight_HT"        , 10      , 0       , 400    ); h_Tight_HT         -> Sumw2();
+	h_Tight_MET           = new TH1F("h_Tight_MET"          , "Tight_MET"       , 10      , 0       , 100    ); h_Tight_MET        -> Sumw2();
+	h_Tight_METnoMTCut    = new TH1F("h_Tight_METnoMTCut"   , "Tight_METnoMTCut", 10      , 0       , 100    ); h_Tight_METnoMTCut -> Sumw2();
+	h_Tight_MT            = new TH1F("h_Tight_MT"           , "Tight_MT"        , 10      , 0       , 100    ); h_Tight_MT         -> Sumw2();
+	h_Tight_MTMET20       = new TH1F("h_Tight_MTMET20"      , "Tight_MTMET20"   , 20      , 0       , 200    ); h_Tight_MTMET20    -> Sumw2();
+	h_Tight_MTMET30       = new TH1F("h_Tight_MTMET30"      , "Tight_MTMET30"   , 20      , 0       , 200    ); h_Tight_MTMET30    -> Sumw2();
                                                                                                  
-	h_Tight_muMaxJPt     = new TH1F("h_Tight_muMaxJPt"     , "Tight_muMaxJPt"    , 10 ,  20 , 120); h_Tight_muMaxJPt     -> Sumw2();
-	h_Tight_muMaxJCPt    = new TH1F("h_Tight_muMaxJCPt"    , "Tight_muMaxJCPt"   , 10 ,  20 , 120); h_Tight_muMaxJCPt    -> Sumw2();
-	h_Tight_muMaxJRPt    = new TH1F("h_Tight_muMaxJRPt"    , "Tight_muMaxJRPt"   , 10 ,  20 , 120); h_Tight_muMaxJRPt    -> Sumw2();
+	h_Tight_MaxJPt        = new TH1F("h_Tight_MaxJPt"       , "Tight_MaxJPt"    , 10      , 20      , 120    ); h_Tight_MaxJPt     -> Sumw2();
+	h_Tight_MaxJCPt       = new TH1F("h_Tight_MaxJCPt"      , "Tight_MaxJCPt"   , 10      , 20      , 120    ); h_Tight_MaxJCPt    -> Sumw2();
+	h_Tight_MaxJRPt       = new TH1F("h_Tight_MaxJRPt"      , "Tight_MaxJRPt"   , 10      , 20      , 120    ); h_Tight_MaxJRPt    -> Sumw2();
 
-	h_Tight_muAllJCPt    = new TH1F("h_Tight_muAllJCPt"    , "Tight_muAllJCPt"   , 15 ,   0 , 150); h_Tight_muAllJCPt    -> Sumw2();
-	h_Tight_muAllJRPt    = new TH1F("h_Tight_muAllJRPt"    , "Tight_muAllJRPt"   , 15 ,   0 , 150); h_Tight_muAllJRPt    -> Sumw2();
-	h_Tight_muAllJEta    = new TH1F("h_Tight_muAllJEta"    , "Tight_muAllJEta"   , 12 ,   0 , 2.4); h_Tight_muAllJEta    -> Sumw2();
+	h_Tight_AllJCPt       = new TH1F("h_Tight_AllJCPt"      , "Tight_AllJCPt"   , 15      , 0       , 150    ); h_Tight_AllJCPt    -> Sumw2();
+	h_Tight_AllJRPt       = new TH1F("h_Tight_AllJRPt"      , "Tight_AllJRPt"   , 15      , 0       , 150    ); h_Tight_AllJRPt    -> Sumw2();
+	h_Tight_AllJEta       = new TH1F("h_Tight_AllJEta"      , "Tight_AllJEta"   , 12      , 0       , 2.4    ); h_Tight_AllJEta    -> Sumw2();
 
-	h_Tight_muNBJets     = new TH1F("h_Tight_muNBJets"     , "Tight_muNBJets"    , 3  ,  0  , 3  ); h_Tight_muNBJets     -> Sumw2();
-	h_Tight_muNJets      = new TH1F("h_Tight_muNJets"      , "Tight_muNJets"     , 5  ,  1  , 6  ); h_Tight_muNJets      -> Sumw2();
-	h_Tight_muNVertices  = new TH1F("h_Tight_muNVertices"  , "Tight_muNVertices" , 40 ,  0  , 40 ); h_Tight_muNVertices  -> Sumw2();
-	h_Tight_muNVertices1 = new TH1F("h_Tight_muNVertices1" , "Tight_muNVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Tight_muNVertices1  -> Sumw2();
-	h_Tight_muNVerticesMET20 = new TH1F("h_Tight_muNVerticesMET20", "Tight_muNVerticesMET20", 40, 0, 40); h_Tight_muNVerticesMET20 -> Sumw2();
+	h_Tight_NBJets        = new TH1F("h_Tight_NBJets"       , "Tight_NBJets"    , 3       , 0       , 3      ); h_Tight_NBJets     -> Sumw2();
+	h_Tight_NJets         = new TH1F("h_Tight_NJets"        , "Tight_NJets"     , 5       , 1       , 6      ); h_Tight_NJets      -> Sumw2();
+	h_Tight_NVertices     = new TH1F("h_Tight_NVertices"    , "Tight_NVertices" , 40      , 0       , 40     ); h_Tight_NVertices  -> Sumw2();
+	h_Tight_NVertices1    = new TH1F("h_Tight_NVertices1"   , "Tight_NVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Tight_NVertices1  -> Sumw2();
+	h_Tight_NVerticesMET20= new TH1F("h_Tight_NVerticesMET20", "Tight_NVerticesMET20", 40 , 0       , 40     ); h_Tight_NVerticesMET20 -> Sumw2();
                                                                                                  
-	h_Tight_muAwayJetDR  = new TH1F("h_Tight_muAwayJetDR"  , "Tight_muAwayJetDR" , 15 ,  0  , 6  ); h_Tight_muAwayJetDR  -> Sumw2();
-	h_Tight_muAwayJetPt  = new TH1F("h_Tight_muAwayJetPt"  , "Tight_muAwayJetPt" , 10 ,  20 , 120); h_Tight_muAwayJetPt  -> Sumw2();
-	h_Tight_muClosJetDR  = new TH1F("h_Tight_muClosJetDR"  , "Tight_muClosJetDR" , 15 ,  0  , 1  ); h_Tight_muClosJetDR  -> Sumw2();
-	h_Tight_muClosJetPt  = new TH1F("h_Tight_muClosJetPt"  , "Tight_muClosJetPt" , 10 ,  20 , 120); h_Tight_muClosJetPt  -> Sumw2();
+	h_Tight_AwayJetDR     = new TH1F("h_Tight_AwayJetDR"    , "Tight_AwayJetDR" , 15      ,  0      , 6      ); h_Tight_AwayJetDR  -> Sumw2();
+	h_Tight_AwayJetPt     = new TH1F("h_Tight_AwayJetPt"    , "Tight_AwayJetPt" , 10      ,  20     , 120    ); h_Tight_AwayJetPt  -> Sumw2();
+	h_Tight_ClosJetDR     = new TH1F("h_Tight_ClosJetDR"    , "Tight_ClosJetDR" , 15      ,  0      , 1      ); h_Tight_ClosJetDR  -> Sumw2();
+	h_Tight_ClosJetPt     = new TH1F("h_Tight_ClosJetPt"    , "Tight_ClosJetPt" , 10      ,  20     , 120    ); h_Tight_ClosJetPt  -> Sumw2();
 
-	h_Tight_muJCPtJEta   = new TH2F("h_Tight_muJCPtJEta"   , "Tight_muJCPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Tight_muJCPtJEta->Sumw2();
-	h_Tight_muJRPtJEta   = new TH2F("h_Tight_muJRPtJEta"   , "Tight_muJRPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Tight_muJRPtJEta->Sumw2();
-	h_Tight_muJCPtJPt    = new TH2F("h_Tight_muJCPtJPt"    , "Tight_muJCPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Tight_muJCPtJPt ->Sumw2();
-	h_Tight_muJRPtJPt    = new TH2F("h_Tight_muJRPtJPt"    , "Tight_muJRPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Tight_muJRPtJPt ->Sumw2();
+	h_Tight_JCPtJEta      = new TH2F("h_Tight_JCPtJEta"     , "Tight_JCPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Tight_JCPtJEta->Sumw2();
+	h_Tight_JRPtJEta      = new TH2F("h_Tight_JRPtJEta"     , "Tight_JRPtJEta"  , eta_bin, eta_min, eta_max, 10, 20, 120); h_Tight_JRPtJEta->Sumw2();
+	h_Tight_JCPtJPt       = new TH2F("h_Tight_JCPtJPt"      , "Tight_JCPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Tight_JCPtJPt ->Sumw2();
+	h_Tight_JRPtJPt       = new TH2F("h_Tight_JRPtJPt"      , "Tight_JRPtJPt"   , pt_bin,  pt_min,  pt_max,  10, 20, 120); h_Tight_JRPtJPt ->Sumw2();
 
-	h_Tight_muDJPtJEta   = new TH2F("h_Tight_muDJPtJEta"   , "Tight_muDJPtJEta"  , eta_bin, eta_min, eta_max, 30, -30, 30); h_Tight_muDJPtJEta->Sumw2();
-	h_Tight_muFJPtJEta   = new TH2F("h_Tight_muFJPtJEta"   , "Tight_muFJPtJEta"  , eta_bin, eta_min, eta_max, 30, -1, 1);   h_Tight_muFJPtJEta->Sumw2();
-	h_Tight_muDJPtJPt    = new TH2F("h_Tight_muDJPtJPt"    , "Tight_muDJPtJPt"   , pt_bin,  pt_min,  pt_max,  30, -30, 30); h_Tight_muDJPtJPt ->Sumw2();
-	h_Tight_muFJPtJPt    = new TH2F("h_Tight_muFJPtJPt"    , "Tight_muFJPtJPt"   , pt_bin,  pt_min,  pt_max,  30, -1, 1);   h_Tight_muFJPtJPt ->Sumw2();
+	h_Tight_DJPtJEta      = new TH2F("h_Tight_DJPtJEta"     , "Tight_DJPtJEta"  , eta_bin, eta_min, eta_max, 30, -30, 30); h_Tight_DJPtJEta->Sumw2();
+	h_Tight_FJPtJEta      = new TH2F("h_Tight_FJPtJEta"     , "Tight_FJPtJEta"  , eta_bin, eta_min, eta_max, 30, -1, 1);   h_Tight_FJPtJEta->Sumw2();
+	h_Tight_DJPtJPt       = new TH2F("h_Tight_DJPtJPt"      , "Tight_DJPtJPt"   , pt_bin,  pt_min,  pt_max,  30, -30, 30); h_Tight_DJPtJPt ->Sumw2();
+	h_Tight_FJPtJPt       = new TH2F("h_Tight_FJPtJPt"      , "Tight_FJPtJPt"   , pt_bin,  pt_min,  pt_max,  30, -1, 1);   h_Tight_FJPtJPt ->Sumw2();
 
-	h_Tight_muDFZoomEta  = new TH1F("h_Tight_muDFZoomEta"  , "Tight_muDFZoomEta", fDFn_binseta-1, &fDFbinseta[0]); // empty, just to use binning
-	h_Tight_muDFZoomPt   = new TH1F("h_Tight_muDFZoomPt"   , "Tight_muDFZoomPt" , fDFn_binspt-1 , &fDFbinspt[0] ); // empty, just to use binning
+	h_Tight_DFZoomEta     = new TH1F("h_Tight_DFZoomEta"    , "Tight_DFZoomEta" , fDFn_binseta-1, &fDFbinseta[0]); // empty, just to use binning
+	h_Tight_DFZoomPt      = new TH1F("h_Tight_DFZoomPt"     , "Tight_DFZoomPt"  , fDFn_binspt-1 , &fDFbinspt[0] ); // empty, just to use binning
 
 	n = 0;
 	for(int i=0; i<fDFn_binseta-1; ++i) {
 		for(int j=0; j<fDFn_binspt-1; ++j) {
 			if(n<10) sprintf(nn, "0%d", n);
 			else sprintf(nn, "%d", n);
-			sprintf(name, "h_Tight_muDJPtZoomC_%s", nn);
-			sprintf(title, "Tight_muDJPtZoomC_%s", nn);
-			h_Tight_muDJPtZoomC[n] = new TH1F(name, title, 80, -30., 10.);
-			h_Tight_muDJPtZoomC[n]->Sumw2();
-			sprintf(name, "h_Tight_muDJPtZoomR_%s", nn);
-			sprintf(title, "Tight_muDJPtZoomR_%s", nn);
-			h_Tight_muDJPtZoomR[n] = new TH1F(name, title, 80, -30., 10.);
-			h_Tight_muDJPtZoomR[n]->Sumw2();
-			sprintf(name, "h_Tight_muFJPtZoomC_%s", nn);
-			sprintf(title, "Tight_muFJPtZoomC_%s", nn);
-			h_Tight_muFJPtZoomC[n] = new TH1F(name, title, 50, -1., 1.);
-			h_Tight_muFJPtZoomC[n]->Sumw2();
-			sprintf(name, "h_Tight_muFJPtZoomR_%s", nn);
-			sprintf(title, "Tight_muFJPtZoomR_%s", nn);
-			h_Tight_muFJPtZoomR[n] = new TH1F(name, title, 50, -1., 1.);
-			h_Tight_muFJPtZoomR[n]->Sumw2();
+			sprintf(name, "h_Tight_DJPtZoomC_%s", nn);
+			sprintf(title, "Tight_DJPtZoomC_%s", nn);
+			h_Tight_DJPtZoomC[n] = new TH1F(name, title, 80, -30., 10.);
+			h_Tight_DJPtZoomC[n]->Sumw2();
+			sprintf(name, "h_Tight_DJPtZoomR_%s", nn);
+			sprintf(title, "Tight_DJPtZoomR_%s", nn);
+			h_Tight_DJPtZoomR[n] = new TH1F(name, title, 80, -30., 10.);
+			h_Tight_DJPtZoomR[n]->Sumw2();
+			sprintf(name, "h_Tight_FJPtZoomC_%s", nn);
+			sprintf(title, "Tight_FJPtZoomC_%s", nn);
+			h_Tight_FJPtZoomC[n] = new TH1F(name, title, 50, -1., 1.);
+			h_Tight_FJPtZoomC[n]->Sumw2();
+			sprintf(name, "h_Tight_FJPtZoomR_%s", nn);
+			sprintf(title, "Tight_FJPtZoomR_%s", nn);
+			h_Tight_FJPtZoomR[n] = new TH1F(name, title, 50, -1., 1.);
+			h_Tight_FJPtZoomR[n]->Sumw2();
 			++n;
 		}
 	}
@@ -1278,10 +1371,10 @@ void Fakerates::bookHistos(){
 		for(int j=0; j<fFRMETn_binspt-1; ++j) {
 			if(n<10) sprintf(nn, "0%d", n);
 			else sprintf(nn, "%d", n);
-			sprintf(name, "h_Tight_muMETZoom_%s", nn);
-			sprintf(title, "Tight_muMETZoom_%s", nn);
-			h_Tight_muMETZoom[n] = new TH1F(name, title, 20, 0, 100);
-			h_Tight_muMETZoom[n]->Sumw2();
+			sprintf(name, "h_Tight_METZoom_%s", nn);
+			sprintf(title, "Tight_METZoom_%s", nn);
+			h_Tight_METZoom[n] = new TH1F(name, title, 20, 0, 100);
+			h_Tight_METZoom[n]->Sumw2();
 			++n;
 		}
 	}
@@ -1300,152 +1393,137 @@ void Fakerates::writeHistos(TFile* pFile){
 	TDirectory* sdir = Util::FindOrCreate(fName, pFile);
 	sdir->cd();
 
-
-	// the ratio histograms, those are just divided versions of the following
-	h_elFRatio          ->Write(fName + "_" + h_elFRatio->GetName(),          TObject::kWriteDelete);
-	h_muFRatio          ->Write(fName + "_" + h_muFRatio->GetName(),          TObject::kWriteDelete);
-	h_elPRatio          ->Write(fName + "_" + h_elPRatio->GetName(),          TObject::kWriteDelete);
-	h_muPRatio          ->Write(fName + "_" + h_muPRatio->GetName(),          TObject::kWriteDelete);
-	
-	// tight histograms for electrons and muons, f and p rate
-	h_elFTight          ->Write(fName + "_" + h_elFTight->GetName(),          TObject::kWriteDelete);
-	h_muFTight          ->Write(fName + "_" + h_muFTight->GetName(),          TObject::kWriteDelete);
-	h_elPTight          ->Write(fName + "_" + h_elPTight->GetName(),          TObject::kWriteDelete);
-	h_muPTight          ->Write(fName + "_" + h_muPTight->GetName(),          TObject::kWriteDelete);
-
-	// loose histograms for electrons and muons, f and p rate
-	h_elFLoose          ->Write(fName + "_" + h_elFLoose->GetName(),          TObject::kWriteDelete);
-	h_muFLoose          ->Write(fName + "_" + h_muFLoose->GetName(),          TObject::kWriteDelete);
-	h_elPLoose          ->Write(fName + "_" + h_elPLoose->GetName(),          TObject::kWriteDelete);
-	h_muPLoose          ->Write(fName + "_" + h_muPLoose->GetName(),          TObject::kWriteDelete);
+	h_FRatio          ->Write(fName + "_" + h_FRatio->GetName(),          TObject::kWriteDelete);
+	h_FTight          ->Write(fName + "_" + h_FTight->GetName(),          TObject::kWriteDelete);
+	h_FLoose          ->Write(fName + "_" + h_FLoose->GetName(),          TObject::kWriteDelete);
  
 	// loose histograms
-	h_Loose_muLepPt     ->Write(fName + "_" + h_Loose_muLepPt->GetName(),     TObject::kWriteDelete);
-	h_Loose_muLepEta    ->Write(fName + "_" + h_Loose_muLepEta->GetName(),    TObject::kWriteDelete);
-	h_Loose_muLepIso    ->Write(fName + "_" + h_Loose_muLepIso->GetName(),    TObject::kWriteDelete);
-	h_Loose_muD0        ->Write(fName + "_" + h_Loose_muD0->GetName(),        TObject::kWriteDelete);
+	h_Loose_LepPt     ->Write(fName + "_" + h_Loose_LepPt->GetName(),     TObject::kWriteDelete);
+	h_Loose_LepEta    ->Write(fName + "_" + h_Loose_LepEta->GetName(),    TObject::kWriteDelete);
+	h_Loose_LepIso    ->Write(fName + "_" + h_Loose_LepIso->GetName(),    TObject::kWriteDelete);
+	h_Loose_D0        ->Write(fName + "_" + h_Loose_D0->GetName(),        TObject::kWriteDelete);
 
-	h_Loose_muLepEta_30 ->Write(fName + "_" + h_Loose_muLepEta_30->GetName(), TObject::kWriteDelete);
-	h_Loose_muLepEta_40 ->Write(fName + "_" + h_Loose_muLepEta_40->GetName(), TObject::kWriteDelete);
-	h_Loose_muLepEta_50 ->Write(fName + "_" + h_Loose_muLepEta_50->GetName(), TObject::kWriteDelete);
-	h_Loose_muLepEta_60 ->Write(fName + "_" + h_Loose_muLepEta_60->GetName(), TObject::kWriteDelete);
+	h_Loose_LepEta_30 ->Write(fName + "_" + h_Loose_LepEta_30->GetName(), TObject::kWriteDelete);
+	h_Loose_LepEta_40 ->Write(fName + "_" + h_Loose_LepEta_40->GetName(), TObject::kWriteDelete);
+	h_Loose_LepEta_50 ->Write(fName + "_" + h_Loose_LepEta_50->GetName(), TObject::kWriteDelete);
+	h_Loose_LepEta_60 ->Write(fName + "_" + h_Loose_LepEta_60->GetName(), TObject::kWriteDelete);
 
-	h_Loose_muLepPt_30  ->Write(fName + "_" + h_Loose_muLepPt_30->GetName(),  TObject::kWriteDelete);
-	h_Loose_muLepPt_40  ->Write(fName + "_" + h_Loose_muLepPt_40->GetName(),  TObject::kWriteDelete);
-	h_Loose_muLepPt_50  ->Write(fName + "_" + h_Loose_muLepPt_50->GetName(),  TObject::kWriteDelete);
-	h_Loose_muLepPt_60  ->Write(fName + "_" + h_Loose_muLepPt_60->GetName(),  TObject::kWriteDelete);
+	h_Loose_LepPt_30  ->Write(fName + "_" + h_Loose_LepPt_30->GetName(),  TObject::kWriteDelete);
+	h_Loose_LepPt_40  ->Write(fName + "_" + h_Loose_LepPt_40->GetName(),  TObject::kWriteDelete);
+	h_Loose_LepPt_50  ->Write(fName + "_" + h_Loose_LepPt_50->GetName(),  TObject::kWriteDelete);
+	h_Loose_LepPt_60  ->Write(fName + "_" + h_Loose_LepPt_60->GetName(),  TObject::kWriteDelete);
 
-	h_Loose_muHT        ->Write(fName + "_" + h_Loose_muHT->GetName(),        TObject::kWriteDelete);
-	h_Loose_muMET       ->Write(fName + "_" + h_Loose_muMET->GetName(),       TObject::kWriteDelete);
-	h_Loose_muMETnoMTCut->Write(fName + "_" + h_Loose_muMETnoMTCut->GetName(),TObject::kWriteDelete);
-	h_Loose_muMT        ->Write(fName + "_" + h_Loose_muMT->GetName(),        TObject::kWriteDelete);
-	h_Loose_muMTMET20   ->Write(fName + "_" + h_Loose_muMTMET20->GetName(),   TObject::kWriteDelete);
-	h_Loose_muMTMET30   ->Write(fName + "_" + h_Loose_muMTMET30->GetName(),   TObject::kWriteDelete);
+	h_Loose_HT        ->Write(fName + "_" + h_Loose_HT->GetName(),        TObject::kWriteDelete);
+	h_Loose_MET       ->Write(fName + "_" + h_Loose_MET->GetName(),       TObject::kWriteDelete);
+	h_Loose_METnoMTCut->Write(fName + "_" + h_Loose_METnoMTCut->GetName(),TObject::kWriteDelete);
+	h_Loose_MT        ->Write(fName + "_" + h_Loose_MT->GetName(),        TObject::kWriteDelete);
+	h_Loose_MTMET20   ->Write(fName + "_" + h_Loose_MTMET20->GetName(),   TObject::kWriteDelete);
+	h_Loose_MTMET30   ->Write(fName + "_" + h_Loose_MTMET30->GetName(),   TObject::kWriteDelete);
 
-	h_Loose_muMaxJPt    ->Write(fName + "_" + h_Loose_muMaxJPt->GetName(),    TObject::kWriteDelete);
-	h_Loose_muMaxJCPt   ->Write(fName + "_" + h_Loose_muMaxJCPt->GetName(),   TObject::kWriteDelete);
-	h_Loose_muMaxJRPt   ->Write(fName + "_" + h_Loose_muMaxJRPt->GetName(),   TObject::kWriteDelete);
+	h_Loose_MaxJPt    ->Write(fName + "_" + h_Loose_MaxJPt->GetName(),    TObject::kWriteDelete);
+	h_Loose_MaxJCPt   ->Write(fName + "_" + h_Loose_MaxJCPt->GetName(),   TObject::kWriteDelete);
+	h_Loose_MaxJRPt   ->Write(fName + "_" + h_Loose_MaxJRPt->GetName(),   TObject::kWriteDelete);
 
-	h_Loose_muAllJCPt   ->Write(fName + "_" + h_Loose_muAllJCPt->GetName(),   TObject::kWriteDelete);
-	h_Loose_muAllJRPt   ->Write(fName + "_" + h_Loose_muAllJRPt->GetName(),   TObject::kWriteDelete);
-	h_Loose_muAllJEta   ->Write(fName + "_" + h_Loose_muAllJEta->GetName(),   TObject::kWriteDelete);
+	h_Loose_AllJCPt   ->Write(fName + "_" + h_Loose_AllJCPt->GetName(),   TObject::kWriteDelete);
+	h_Loose_AllJRPt   ->Write(fName + "_" + h_Loose_AllJRPt->GetName(),   TObject::kWriteDelete);
+	h_Loose_AllJEta   ->Write(fName + "_" + h_Loose_AllJEta->GetName(),   TObject::kWriteDelete);
 
-	h_Loose_muAllJEta_test1 ->Write(fName + "_" + h_Loose_muAllJEta_test1->GetName(), TObject::kWriteDelete);
-	h_Loose_muAllJEta_test2 ->Write(fName + "_" + h_Loose_muAllJEta_test2->GetName(), TObject::kWriteDelete);
-	h_Loose_muAllJEta_test3 ->Write(fName + "_" + h_Loose_muAllJEta_test3->GetName(), TObject::kWriteDelete);
+	h_Loose_AllJEta_test1 ->Write(fName + "_" + h_Loose_AllJEta_test1->GetName(), TObject::kWriteDelete);
+	h_Loose_AllJEta_test2 ->Write(fName + "_" + h_Loose_AllJEta_test2->GetName(), TObject::kWriteDelete);
+	h_Loose_AllJEta_test3 ->Write(fName + "_" + h_Loose_AllJEta_test3->GetName(), TObject::kWriteDelete);
 
-	h_Loose_muNBJets    ->Write(fName + "_" + h_Loose_muNBJets->GetName(),    TObject::kWriteDelete);
-	h_Loose_muNJets     ->Write(fName + "_" + h_Loose_muNJets->GetName(),     TObject::kWriteDelete);
-	h_Loose_muNVertices ->Write(fName + "_" + h_Loose_muNVertices->GetName(), TObject::kWriteDelete);
-	h_Loose_muNVertices1->Write(fName + "_" + h_Loose_muNVertices1->GetName(),TObject::kWriteDelete);
-	h_Loose_muNVerticesMET20 ->Write(fName + "_" + h_Loose_muNVerticesMET20->GetName(), TObject::kWriteDelete);
+	h_Loose_NBJets    ->Write(fName + "_" + h_Loose_NBJets->GetName(),    TObject::kWriteDelete);
+	h_Loose_NJets     ->Write(fName + "_" + h_Loose_NJets->GetName(),     TObject::kWriteDelete);
+	h_Loose_NVertices ->Write(fName + "_" + h_Loose_NVertices->GetName(), TObject::kWriteDelete);
+	h_Loose_NVertices1->Write(fName + "_" + h_Loose_NVertices1->GetName(),TObject::kWriteDelete);
+	h_Loose_NVerticesMET20 ->Write(fName + "_" + h_Loose_NVerticesMET20->GetName(), TObject::kWriteDelete);
 
-	h_Loose_muAwayJetDR ->Write(fName + "_" + h_Loose_muAwayJetDR->GetName(), TObject::kWriteDelete);
-	h_Loose_muAwayJetPt ->Write(fName + "_" + h_Loose_muAwayJetPt->GetName(), TObject::kWriteDelete);
-	h_Loose_muClosJetDR ->Write(fName + "_" + h_Loose_muClosJetDR->GetName(), TObject::kWriteDelete);
-	h_Loose_muClosJetPt ->Write(fName + "_" + h_Loose_muClosJetPt->GetName(), TObject::kWriteDelete);
+	h_Loose_AwayJetDR ->Write(fName + "_" + h_Loose_AwayJetDR->GetName(), TObject::kWriteDelete);
+	h_Loose_AwayJetPt ->Write(fName + "_" + h_Loose_AwayJetPt->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetDR ->Write(fName + "_" + h_Loose_ClosJetDR->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPt ->Write(fName + "_" + h_Loose_ClosJetPt->GetName(), TObject::kWriteDelete);
 
-	h_Loose_muJCPtJEta  ->Write(fName + "_" + h_Loose_muJCPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Loose_muJRPtJEta  ->Write(fName + "_" + h_Loose_muJRPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Loose_muJCPtJPt   ->Write(fName + "_" + h_Loose_muJCPtJPt  ->GetName(), TObject::kWriteDelete);
-	h_Loose_muJRPtJPt   ->Write(fName + "_" + h_Loose_muJRPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Loose_JCPtJEta  ->Write(fName + "_" + h_Loose_JCPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Loose_JRPtJEta  ->Write(fName + "_" + h_Loose_JRPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Loose_JCPtJPt   ->Write(fName + "_" + h_Loose_JCPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Loose_JRPtJPt   ->Write(fName + "_" + h_Loose_JRPtJPt  ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_muDJPtJEta  ->Write(fName + "_" + h_Loose_muDJPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Loose_muFJPtJEta  ->Write(fName + "_" + h_Loose_muFJPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Loose_muDJPtJPt   ->Write(fName + "_" + h_Loose_muDJPtJPt  ->GetName(), TObject::kWriteDelete);
-	h_Loose_muFJPtJPt   ->Write(fName + "_" + h_Loose_muFJPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Loose_DJPtJEta  ->Write(fName + "_" + h_Loose_DJPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Loose_FJPtJEta  ->Write(fName + "_" + h_Loose_FJPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Loose_DJPtJPt   ->Write(fName + "_" + h_Loose_DJPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Loose_FJPtJPt   ->Write(fName + "_" + h_Loose_FJPtJPt  ->GetName(), TObject::kWriteDelete);
 
 	for(int n = 0; n < (fDFn_binseta-1)*(fDFn_binspt-1); ++n) {
-		h_Loose_muDJPtZoomC[n] ->Write(fName + "_" + h_Loose_muDJPtZoomC[n] ->GetName(), TObject::kWriteDelete);
-		h_Loose_muFJPtZoomC[n] ->Write(fName + "_" + h_Loose_muFJPtZoomC[n] ->GetName(), TObject::kWriteDelete);
-		h_Loose_muDJPtZoomR[n] ->Write(fName + "_" + h_Loose_muDJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
-		h_Loose_muFJPtZoomR[n] ->Write(fName + "_" + h_Loose_muFJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
+		h_Loose_DJPtZoomC[n] ->Write(fName + "_" + h_Loose_DJPtZoomC[n] ->GetName(), TObject::kWriteDelete);
+		h_Loose_FJPtZoomC[n] ->Write(fName + "_" + h_Loose_FJPtZoomC[n] ->GetName(), TObject::kWriteDelete);
+		h_Loose_DJPtZoomR[n] ->Write(fName + "_" + h_Loose_DJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
+		h_Loose_FJPtZoomR[n] ->Write(fName + "_" + h_Loose_FJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
 	}
 	for(int n = 0; n < (fFRMETn_binseta-1)*(fFRMETn_binspt-1); ++n) {
-		h_Loose_muMETZoom[n]   ->Write(fName + "_" + h_Loose_muMETZoom[n]   ->GetName(), TObject::kWriteDelete);
+		h_Loose_METZoom[n]   ->Write(fName + "_" + h_Loose_METZoom[n]   ->GetName(), TObject::kWriteDelete);
 	}
 
 
 	// tight histograms
-	h_Tight_muLepPt     ->Write(fName + "_" + h_Tight_muLepPt->GetName(),     TObject::kWriteDelete);
-	h_Tight_muLepEta    ->Write(fName + "_" + h_Tight_muLepEta->GetName(),    TObject::kWriteDelete);
-	h_Tight_muLepIso    ->Write(fName + "_" + h_Tight_muLepIso->GetName(),    TObject::kWriteDelete);
-	h_Tight_muD0        ->Write(fName + "_" + h_Tight_muD0->GetName(),        TObject::kWriteDelete);
+	h_Tight_LepPt     ->Write(fName + "_" + h_Tight_LepPt->GetName(),     TObject::kWriteDelete);
+	h_Tight_LepEta    ->Write(fName + "_" + h_Tight_LepEta->GetName(),    TObject::kWriteDelete);
+	h_Tight_LepIso    ->Write(fName + "_" + h_Tight_LepIso->GetName(),    TObject::kWriteDelete);
+	h_Tight_D0        ->Write(fName + "_" + h_Tight_D0->GetName(),        TObject::kWriteDelete);
 
-	h_Tight_muLepEta_30 ->Write(fName + "_" + h_Tight_muLepEta_30->GetName(), TObject::kWriteDelete);
-	h_Tight_muLepEta_40 ->Write(fName + "_" + h_Tight_muLepEta_40->GetName(), TObject::kWriteDelete);
-	h_Tight_muLepEta_50 ->Write(fName + "_" + h_Tight_muLepEta_50->GetName(), TObject::kWriteDelete);
-	h_Tight_muLepEta_60 ->Write(fName + "_" + h_Tight_muLepEta_60->GetName(), TObject::kWriteDelete);
+	h_Tight_LepEta_30 ->Write(fName + "_" + h_Tight_LepEta_30->GetName(), TObject::kWriteDelete);
+	h_Tight_LepEta_40 ->Write(fName + "_" + h_Tight_LepEta_40->GetName(), TObject::kWriteDelete);
+	h_Tight_LepEta_50 ->Write(fName + "_" + h_Tight_LepEta_50->GetName(), TObject::kWriteDelete);
+	h_Tight_LepEta_60 ->Write(fName + "_" + h_Tight_LepEta_60->GetName(), TObject::kWriteDelete);
 
-	h_Tight_muLepPt_30  ->Write(fName + "_" + h_Tight_muLepPt_30->GetName(),  TObject::kWriteDelete);
-	h_Tight_muLepPt_40  ->Write(fName + "_" + h_Tight_muLepPt_40->GetName(),  TObject::kWriteDelete);
-	h_Tight_muLepPt_50  ->Write(fName + "_" + h_Tight_muLepPt_50->GetName(),  TObject::kWriteDelete);
-	h_Tight_muLepPt_60  ->Write(fName + "_" + h_Tight_muLepPt_60->GetName(),  TObject::kWriteDelete);
+	h_Tight_LepPt_30  ->Write(fName + "_" + h_Tight_LepPt_30->GetName(),  TObject::kWriteDelete);
+	h_Tight_LepPt_40  ->Write(fName + "_" + h_Tight_LepPt_40->GetName(),  TObject::kWriteDelete);
+	h_Tight_LepPt_50  ->Write(fName + "_" + h_Tight_LepPt_50->GetName(),  TObject::kWriteDelete);
+	h_Tight_LepPt_60  ->Write(fName + "_" + h_Tight_LepPt_60->GetName(),  TObject::kWriteDelete);
 
-	h_Tight_muHT        ->Write(fName + "_" + h_Tight_muHT->GetName(),        TObject::kWriteDelete);
-	h_Tight_muMET       ->Write(fName + "_" + h_Tight_muMET->GetName(),       TObject::kWriteDelete);
-	h_Tight_muMETnoMTCut->Write(fName + "_" + h_Tight_muMETnoMTCut->GetName(),TObject::kWriteDelete);
-	h_Tight_muMT        ->Write(fName + "_" + h_Tight_muMT->GetName(),        TObject::kWriteDelete);
-	h_Tight_muMTMET20   ->Write(fName + "_" + h_Tight_muMTMET20->GetName(),   TObject::kWriteDelete);
-	h_Tight_muMTMET30   ->Write(fName + "_" + h_Tight_muMTMET30->GetName(),   TObject::kWriteDelete);
+	h_Tight_HT        ->Write(fName + "_" + h_Tight_HT->GetName(),        TObject::kWriteDelete);
+	h_Tight_MET       ->Write(fName + "_" + h_Tight_MET->GetName(),       TObject::kWriteDelete);
+	h_Tight_METnoMTCut->Write(fName + "_" + h_Tight_METnoMTCut->GetName(),TObject::kWriteDelete);
+	h_Tight_MT        ->Write(fName + "_" + h_Tight_MT->GetName(),        TObject::kWriteDelete);
+	h_Tight_MTMET20   ->Write(fName + "_" + h_Tight_MTMET20->GetName(),   TObject::kWriteDelete);
+	h_Tight_MTMET30   ->Write(fName + "_" + h_Tight_MTMET30->GetName(),   TObject::kWriteDelete);
 
-	h_Tight_muMaxJPt    ->Write(fName + "_" + h_Tight_muMaxJPt->GetName(),    TObject::kWriteDelete);
-	h_Tight_muMaxJCPt   ->Write(fName + "_" + h_Tight_muMaxJCPt->GetName(),   TObject::kWriteDelete);
-	h_Tight_muMaxJRPt   ->Write(fName + "_" + h_Tight_muMaxJRPt->GetName(),   TObject::kWriteDelete);
+	h_Tight_MaxJPt    ->Write(fName + "_" + h_Tight_MaxJPt->GetName(),    TObject::kWriteDelete);
+	h_Tight_MaxJCPt   ->Write(fName + "_" + h_Tight_MaxJCPt->GetName(),   TObject::kWriteDelete);
+	h_Tight_MaxJRPt   ->Write(fName + "_" + h_Tight_MaxJRPt->GetName(),   TObject::kWriteDelete);
 
-	h_Tight_muAllJCPt   ->Write(fName + "_" + h_Tight_muAllJCPt->GetName(),   TObject::kWriteDelete);
-	h_Tight_muAllJRPt   ->Write(fName + "_" + h_Tight_muAllJRPt->GetName(),   TObject::kWriteDelete);
-	h_Tight_muAllJEta   ->Write(fName + "_" + h_Tight_muAllJEta->GetName(),   TObject::kWriteDelete);
+	h_Tight_AllJCPt   ->Write(fName + "_" + h_Tight_AllJCPt->GetName(),   TObject::kWriteDelete);
+	h_Tight_AllJRPt   ->Write(fName + "_" + h_Tight_AllJRPt->GetName(),   TObject::kWriteDelete);
+	h_Tight_AllJEta   ->Write(fName + "_" + h_Tight_AllJEta->GetName(),   TObject::kWriteDelete);
 
-	h_Tight_muNBJets    ->Write(fName + "_" + h_Tight_muNBJets->GetName(),    TObject::kWriteDelete);
-	h_Tight_muNJets     ->Write(fName + "_" + h_Tight_muNJets->GetName(),     TObject::kWriteDelete);
-	h_Tight_muNVertices ->Write(fName + "_" + h_Tight_muNVertices->GetName(), TObject::kWriteDelete);
-	h_Tight_muNVertices1->Write(fName + "_" + h_Tight_muNVertices1->GetName(),TObject::kWriteDelete);
-	h_Tight_muNVerticesMET20 ->Write(fName + "_" + h_Tight_muNVerticesMET20->GetName(), TObject::kWriteDelete);
+	h_Tight_NBJets    ->Write(fName + "_" + h_Tight_NBJets->GetName(),    TObject::kWriteDelete);
+	h_Tight_NJets     ->Write(fName + "_" + h_Tight_NJets->GetName(),     TObject::kWriteDelete);
+	h_Tight_NVertices ->Write(fName + "_" + h_Tight_NVertices->GetName(), TObject::kWriteDelete);
+	h_Tight_NVertices1->Write(fName + "_" + h_Tight_NVertices1->GetName(),TObject::kWriteDelete);
+	h_Tight_NVerticesMET20 ->Write(fName + "_" + h_Tight_NVerticesMET20->GetName(), TObject::kWriteDelete);
 
-	h_Tight_muAwayJetDR ->Write(fName + "_" + h_Tight_muAwayJetDR->GetName(), TObject::kWriteDelete);
-	h_Tight_muAwayJetPt ->Write(fName + "_" + h_Tight_muAwayJetPt->GetName(), TObject::kWriteDelete);
-	h_Tight_muClosJetDR ->Write(fName + "_" + h_Tight_muClosJetDR->GetName(), TObject::kWriteDelete);
-	h_Tight_muClosJetPt ->Write(fName + "_" + h_Tight_muClosJetPt->GetName(), TObject::kWriteDelete);
+	h_Tight_AwayJetDR ->Write(fName + "_" + h_Tight_AwayJetDR->GetName(), TObject::kWriteDelete);
+	h_Tight_AwayJetPt ->Write(fName + "_" + h_Tight_AwayJetPt->GetName(), TObject::kWriteDelete);
+	h_Tight_ClosJetDR ->Write(fName + "_" + h_Tight_ClosJetDR->GetName(), TObject::kWriteDelete);
+	h_Tight_ClosJetPt ->Write(fName + "_" + h_Tight_ClosJetPt->GetName(), TObject::kWriteDelete);
 
-	h_Tight_muJCPtJEta  ->Write(fName + "_" + h_Tight_muJCPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Tight_muJRPtJEta  ->Write(fName + "_" + h_Tight_muJRPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Tight_muJCPtJPt   ->Write(fName + "_" + h_Tight_muJCPtJPt  ->GetName(), TObject::kWriteDelete);
-	h_Tight_muJRPtJPt   ->Write(fName + "_" + h_Tight_muJRPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Tight_JCPtJEta  ->Write(fName + "_" + h_Tight_JCPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Tight_JRPtJEta  ->Write(fName + "_" + h_Tight_JRPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Tight_JCPtJPt   ->Write(fName + "_" + h_Tight_JCPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Tight_JRPtJPt   ->Write(fName + "_" + h_Tight_JRPtJPt  ->GetName(), TObject::kWriteDelete);
 
-	h_Tight_muDJPtJEta  ->Write(fName + "_" + h_Tight_muDJPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Tight_muFJPtJEta  ->Write(fName + "_" + h_Tight_muFJPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Tight_muDJPtJPt   ->Write(fName + "_" + h_Tight_muDJPtJPt  ->GetName(), TObject::kWriteDelete);
-	h_Tight_muFJPtJPt   ->Write(fName + "_" + h_Tight_muFJPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Tight_DJPtJEta  ->Write(fName + "_" + h_Tight_DJPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Tight_FJPtJEta  ->Write(fName + "_" + h_Tight_FJPtJEta ->GetName(), TObject::kWriteDelete);
+	h_Tight_DJPtJPt   ->Write(fName + "_" + h_Tight_DJPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Tight_FJPtJPt   ->Write(fName + "_" + h_Tight_FJPtJPt  ->GetName(), TObject::kWriteDelete);
 
 	for(int n = 0; n < (fDFn_binseta-1)*(fDFn_binspt-1); ++n) {
-		h_Tight_muDJPtZoomC[n] ->Write(fName + "_" + h_Tight_muDJPtZoomC[n] ->GetName(), TObject::kWriteDelete);
-		h_Tight_muFJPtZoomC[n] ->Write(fName + "_" + h_Tight_muFJPtZoomC[n] ->GetName(), TObject::kWriteDelete);
-		h_Tight_muDJPtZoomR[n] ->Write(fName + "_" + h_Tight_muDJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
-		h_Tight_muFJPtZoomR[n] ->Write(fName + "_" + h_Tight_muFJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
+		h_Tight_DJPtZoomC[n] ->Write(fName + "_" + h_Tight_DJPtZoomC[n] ->GetName(), TObject::kWriteDelete);
+		h_Tight_FJPtZoomC[n] ->Write(fName + "_" + h_Tight_FJPtZoomC[n] ->GetName(), TObject::kWriteDelete);
+		h_Tight_DJPtZoomR[n] ->Write(fName + "_" + h_Tight_DJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
+		h_Tight_FJPtZoomR[n] ->Write(fName + "_" + h_Tight_FJPtZoomR[n] ->GetName(), TObject::kWriteDelete);
 	}
 	for(int n = 0; n < (fFRMETn_binseta-1)*(fFRMETn_binspt-1); ++n) {
-		h_Tight_muMETZoom[n]   ->Write(fName + "_" + h_Tight_muMETZoom[n]   ->GetName(), TObject::kWriteDelete);
+		h_Tight_METZoom[n]   ->Write(fName + "_" + h_Tight_METZoom[n]   ->GetName(), TObject::kWriteDelete);
 	}
 
 }

@@ -1,32 +1,97 @@
 import ROOT, math, os, shutil
 
+
+def getScaling(outputDir, printall = 0):
+
+	list = ['unweighted', 'fit_weighted', 'qcd_weighted', 'qcdwjets_weighted']	
+	struct = outputDir.split('/')
+	result = ''
+
+	if printall: return list
+
+	for scaling in list:
+		if scaling == struct[-3]:
+			result = scaling
+
+	return result
+
+
+def getModule(outputDir, printall = 0):
+
+	list   = ['plots_1d', 'plots_2d', 'zoom_met', 'zoom_jpt', 'fakerates_1d', 'fakerates_2d', 'adhoc']
+	struct = outputDir.split('/')
+	result = ''
+
+	if printall: return list
+
+	for module in list:
+		if module == struct[-2]:
+			result = module
+	
+	return result
+
+
 def CreateOutputFolders(outputDir):
 
-	afsfolder = "/afs/cern.ch/user/c/cheidegg/www/pdfs/"
-	folders = ['plots_1d', 'plots_2d', 'zoom_met', 'zoom_jpt', 'fakerates_1d', 'fakerates_2d', 'adhoc']
+	afsfolder = "/afs/cern.ch/user/c/cheidegg/www/workinggroup/"
 	struct = outputDir.split('/')
-	
+	stripoff = False
+
+	if getScaling(outputDir) == '': second_folder = getScaling(outputDir,1)
+	else: second_folder = []
+
+	if getModule(outputDir) == '':  final_folder = getModule(outputDir,1)
+	else: final_folder = []
+
 	for i in range(1,len(struct)): 
 		if not os.path.exists('/'.join(struct[0:i])): 
 			os.mkdir('/'.join(struct[0:i]))
-	
+
 	for i in range(2,len(struct)): 
 		if not os.path.exists(afsfolder + '/'.join(struct[1:i])): 
 			os.mkdir(afsfolder + '/'.join(struct[1:i]))
+		if not struct[i] in getModule(outputDir,1): 
+			shutil.copyfile('README.html', afsfolder + '/'.join(struct[1:i]) + '/README.html')
 
-	for final in folders:
-		if not os.path.exists(outputDir + final): 
-			os.mkdir(outputDir + final)
-		if not os.path.exists(afsfolder + '/'.join(struct[1:]) + final): 
-			os.mkdir(afsfolder + '/'.join(struct[1:]) + final)
-			shutil.copyfile('index.php', afsfolder + '/'.join(struct[1:]) + final + '/index.php')
+	if not second_folder == []:
+		for folder in second_folder:
+			if not os.path.exists(outputDir + folder):
+				os.mkdir(outputDir + folder)
+			if not os.path.exists(afsfolder + '/'.join(struct[1:]) + folder): 
+				os.mkdir(afsfolder + '/'.join(struct[1:]) + folder)
+
+	if not final_folder == []:
+		for folder in final_folder:
+			if not os.path.exists(outputDir + folder): 
+				os.mkdir(outputDir + folder)
+			if not os.path.exists(afsfolder + '/'.join(struct[1:]) + folder): 
+				os.mkdir(afsfolder + '/'.join(struct[1:]) + folder)
+				shutil.copyfile('index.php', afsfolder + '/'.join(struct[1:]) + folder + '/index.php')
+	else:
+		stripoff = True
+		shutil.copyfile('index.php', afsfolder + '/'.join(struct[1:]) + 'index.php')
+
+	if stripoff == True: outputDir = '/'.join(struct[:-2]) + '/'
+
+	return outputDir
+	
+
 
 def getColor(name):
 	mycolor = ROOT.TColor()
-	if   name == 'wjets'              : return mycolor.GetColor(102,   0,   0)
-	elif name == 'dyjets1'            : return mycolor.GetColor(255, 204,   0)
-	elif name == 'dyjets2'            : return mycolor.GetColor(255, 204,   0)
-	elif name == 'qcdMuEnriched'      : return mycolor.GetColor( 51, 102, 153)
+	if   name == 'el_data'            : return ROOT.kBlack
+	elif name == 'mu_data'            : return ROOT.kBlack
+	elif name == 'el_wjets'           : return mycolor.GetColor(102,   0,   0)
+	elif name == 'mu_wjets'           : return mycolor.GetColor(102,   0,   0)
+	elif name == 'el_dyjets50'        : return mycolor.GetColor(255, 204,   0)
+	elif name == 'mu_dyjets50'        : return mycolor.GetColor(255, 204,   0)
+	elif name == 'el_dyjets10'        : return mycolor.GetColor(255, 204,   0)
+	elif name == 'mu_dyjets10'        : return mycolor.GetColor(255, 204,   0)
+	elif name == 'mu_qcdmuenr'        : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdelenr30'      : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdelenr80'      : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdelenr250'     : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdelenr350'     : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'totbg'              : return mycolor.GetColor(172,   0,   0)
 	elif name == 'data'               : return ROOT.kBlack
 	elif name == 'datamcsub'          : return ROOT.kOrange
@@ -45,10 +110,19 @@ def getSampleColor(self):
 	return getColor(self.name)
 
 def getLegendName(name):
-	if   name == 'wjets'              : return 'W + Jets'
-	elif name == 'dyjets1'            : return 'DY + Jets'
-	elif name == 'dyjets2'            : return 'DY + Jets'
-	elif name == 'qcdMuEnriched'      : return 'QCD'
+	if   name == 'el_data'            : return 'Data'
+	elif name == 'mu_data'            : return 'Data'
+	elif name == 'el_wjets'           : return 'W + Jets'
+	elif name == 'mu_wjets'           : return 'W + Jets'
+	elif name == 'el_dyjets50'        : return 'DY + Jets'
+	elif name == 'mu_dyjets50'        : return 'DY + Jets'
+	elif name == 'el_dyjets10'        : return 'DY + Jets'
+	elif name == 'mu_dyjets10'        : return 'DY + Jets'
+	elif name == 'mu_qcdmuenr'        : return 'QCD'
+	elif name == 'el_qcdelenr30'      : return 'QCD'
+	elif name == 'el_qcdelenr80'      : return 'QCD'
+	elif name == 'el_qcdelenr250'     : return 'QCD'
+	elif name == 'el_qcdelenr350'     : return 'QCD'
 	elif name == 'totbg'              : return 'QCD + EW'
 	elif name == 'data'               : return 'Data'
 	elif name == 'datamcsub'          : return 'Data - EW'
@@ -176,8 +250,8 @@ def getXTitle(hist):
 	elif 'LepEta'     in name: return '#mu-|#eta|' #'|#eta|_{lep}'
 	elif 'LepIso'     in name: return '#mu-pfIso'# 'pfIso_{lep}'
 	elif 'LepPt'      in name: return '#mu-pT' #'p_{T}^{lep}'
-	elif 'muMET'      in name: return 'MET'
-	elif 'muMT'       in name: return 'm_{T}'
+	elif '_MET'       in name: return 'MET'
+	elif '_MT'        in name: return 'm_{T}'
 	elif 'MTMET30'    in name: return 'm_{T}'
 	elif 'MaxJPt'     in name: return 'max. jet-p_{T}'
 	elif 'MaxJCPt'    in name: return 'max. jet-p_{T} (corr.)'

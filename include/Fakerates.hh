@@ -54,6 +54,7 @@ public:
 
 	inline virtual void setVerbose      (int     v) {fVerbose      = v;};
 	inline virtual void setData         (bool    d) {fIsData       = d;};
+	inline virtual void setDataType     (int     t) {fDataType     = t;};
 	inline virtual void setInputFile    (TString i) {fInputFile    = i;};
 	inline virtual void setName         (TString n) {fName         = n;};
 	inline virtual void setMaxSize      (int     m) {fMaxSize      = m;};
@@ -61,6 +62,7 @@ public:
 
 	int  fVerbose;
 	bool fIsData;
+	int fDataType;
 	TString fInputFile;
 	TString fName;
 	int fMaxSize;
@@ -70,13 +72,14 @@ public:
 	float fLuminosity;
 	bool  fJetCorrection;
 	float fJetPtCut;
-	float fMuPtCut;
-	float fMuD0Cut;
-	float fMuIsoCut;
+	float fLepPtCut;
+	float fLepD0Cut;
+	float fLepIsoCut;
 	float fAwayJetBTagCut;
 	float fAwayJetDPhiCut;
-	TString fMuTrigger;
-	bool  fMuTriggerMC;
+	bool  fPUweight;
+	TString fLepTrigger;
+	bool  fLepTriggerMC;
 	
 
     // FUNCTIONS
@@ -86,28 +89,36 @@ public:
 	float getSigmaMC(float, float);
 	void smearAllJets();	
 
-	//void fillRatios();
 	void fillFRPlots(float);
 
-	bool passesUpperMETMT(int, int);
+	// CUTS
+	bool passesUpperMETMT(int);
 	bool passesMETCut(float, int);
-	bool passesMTCut(int, int);
+	bool passesMTCut(int);
+	
+	std::vector<float, std::allocator<float> >* getLepPt();
+	std::vector<float, std::allocator<float> >* getLepEta();
+	std::vector<float, std::allocator<float> >* getLepPhi();
+	std::vector<float, std::allocator<float> >* getLepPFIso();
+	std::vector<float, std::allocator<float> >* getLepD0();
+	bool isFRRegionLepEvent(int&, int&, float);
 
-	bool isFRRegionMuEvent(int&, int&, float);
-	bool isFRRegionElEvent(int&);
+	// LEPTON 
+	bool isLooseMuon(int);	
+	bool isLooseElectron(int);
+	bool isLooseLepton(int);
 
-
-	// OBJECT FUNCTIONS
-		// MUONS
-	bool isLooseMuon(int);
 	bool isTightMuon(int);
+	bool isTightElectron(int);
+	bool isTightLepton(int);
 
-	float getJetPt(int);
-	float getMT(int, int);
+	// JETS
+	float getJetPt(int);	
+	float getMT(int);
 
-		// JETS
 	bool isGoodJet(int, float, float);
 	bool isGoodSynchJet(int, float);
+
 	float getAwayJet(int, int);
 	float getClosestJet(int, int);
 
@@ -125,132 +136,118 @@ public:
 	std::vector< int >::const_iterator fITInt;
 
 	// ===================================
-	// the ratio histograms, those are just divided versions of the following
-	TH2F * h_elFRatio;
-	TH2F * h_muFRatio;
-	TH2F * h_elPRatio;
-	TH2F * h_muPRatio;
-	
-	// passing histograms for electrons and muons, f and p rate
-	TH2F * h_elFTight;
-	TH2F * h_muFTight;
-	TH2F * h_elPTight;
-	TH2F * h_muPTight;
+	TH2F * h_FRatio;
+	TH2F * h_FTight;
+	TH2F * h_FLoose;
 
-	// failing histograms for electrons and muons, f and p rate
-	TH2F * h_elFLoose;
-	TH2F * h_muFLoose;
-	TH2F * h_elPLoose;
-	TH2F * h_muPLoose;
+	TH1F * h_Loose_AwayJetDR;
+	TH1F * h_Loose_AwayJetPt;
+ 	TH1F * h_Loose_ClosJetDR;
+	TH1F * h_Loose_ClosJetPt;
+	TH1F * h_Loose_HT;
+	TH1F * h_Loose_LepEta;
+	TH1F * h_Loose_LepEta_30;
+	TH1F * h_Loose_LepEta_40;
+	TH1F * h_Loose_LepEta_50;
+	TH1F * h_Loose_LepEta_60;
+	TH1F * h_Loose_LepPt_30;
+	TH1F * h_Loose_LepPt_40;
+	TH1F * h_Loose_LepPt_50;
+	TH1F * h_Loose_LepPt_60;
+	TH1F * h_Loose_LepIso;
+	TH1F * h_Loose_LepPt;
+	TH1F * h_Loose_MET;
+	TH1F * h_Loose_METnoMTCut;
+	TH1F * h_Loose_MT;
+	TH1F * h_Loose_MTMET20;
+	TH1F * h_Loose_MTMET30;
+	TH1F * h_Loose_MaxJPt;
+	TH1F * h_Loose_MaxJCPt;
+	TH1F * h_Loose_MaxJRPt;
+	TH1F * h_Loose_AllJCPt;
+	TH1F * h_Loose_AllJRPt;
+	TH1F * h_Loose_AllJEta;
+	TH1F * h_Loose_AllJEta_test1;
+	TH1F * h_Loose_AllJEta_test2;
+	TH1F * h_Loose_AllJEta_test3;
+	TH1F * h_Loose_NBJets;
+	TH1F * h_Loose_NJets;
+	TH1F * h_Loose_NVertices;
+	TH1F * h_Loose_NVertices1;
+	TH1F * h_Loose_NVerticesMET20;
+	TH1F * h_Loose_D0;
+	TH2F * h_Loose_JCPtJEta; 
+	TH2F * h_Loose_JRPtJEta;
+	TH2F * h_Loose_JCPtJPt;
+	TH2F * h_Loose_JRPtJPt;
+	TH2F * h_Loose_DJPtJEta;
+	TH2F * h_Loose_FJPtJEta;
+	TH2F * h_Loose_DJPtJPt;
+	TH2F * h_Loose_FJPtJPt;
+	TH1F * h_Loose_DFZoomEta;
+	TH1F * h_Loose_DFZoomPt;
+	TH1F * h_Loose_DJPtZoomC[30];
+	TH1F * h_Loose_FJPtZoomC[30];
+	TH1F * h_Loose_DJPtZoomR[30];
+	TH1F * h_Loose_FJPtZoomR[30];
+	TH1F * h_Loose_FRZoomEta;
+	TH1F * h_Loose_FRZoomPt;
+	TH1F * h_Loose_FRMETZoomEta;
+	TH1F * h_Loose_FRMETZoomPt;
+	TH1F * h_Loose_METZoom[40];
 
-	TH1F * h_Loose_muAwayJetDR;
-	TH1F * h_Loose_muAwayJetPt;
- 	TH1F * h_Loose_muClosJetDR;
-	TH1F * h_Loose_muClosJetPt;
-	TH1F * h_Loose_muHT;
-	TH1F * h_Loose_muLepEta;
-	TH1F * h_Loose_muLepEta_30;
-	TH1F * h_Loose_muLepEta_40;
-	TH1F * h_Loose_muLepEta_50;
-	TH1F * h_Loose_muLepEta_60;
-	TH1F * h_Loose_muLepPt_30;
-	TH1F * h_Loose_muLepPt_40;
-	TH1F * h_Loose_muLepPt_50;
-	TH1F * h_Loose_muLepPt_60;
-	TH1F * h_Loose_muLepIso;
-	TH1F * h_Loose_muLepPt;
-	TH1F * h_Loose_muMET;
-	TH1F * h_Loose_muMETnoMTCut;
-	TH1F * h_Loose_muMT;
-	TH1F * h_Loose_muMTMET20;
-	TH1F * h_Loose_muMTMET30;
-	TH1F * h_Loose_muMaxJPt;
-	TH1F * h_Loose_muMaxJCPt;
-	TH1F * h_Loose_muMaxJRPt;
-	TH1F * h_Loose_muAllJCPt;
-	TH1F * h_Loose_muAllJRPt;
-	TH1F * h_Loose_muAllJEta;
-	TH1F * h_Loose_muAllJEta_test1;
-	TH1F * h_Loose_muAllJEta_test2;
-	TH1F * h_Loose_muAllJEta_test3;
-	TH1F * h_Loose_muNBJets;
-	TH1F * h_Loose_muNJets;
-	TH1F * h_Loose_muNVertices;
-	TH1F * h_Loose_muNVertices1;
-	TH1F * h_Loose_muNVerticesMET20;
-	TH1F * h_Loose_muD0;
-	TH2F * h_Loose_muJCPtJEta; 
-	TH2F * h_Loose_muJRPtJEta;
-	TH2F * h_Loose_muJCPtJPt;
-	TH2F * h_Loose_muJRPtJPt;
-	TH2F * h_Loose_muDJPtJEta;
-	TH2F * h_Loose_muFJPtJEta;
-	TH2F * h_Loose_muDJPtJPt;
-	TH2F * h_Loose_muFJPtJPt;
-	TH1F * h_Loose_muDFZoomEta;
-	TH1F * h_Loose_muDFZoomPt;
-	TH1F * h_Loose_muDJPtZoomC[30];
-	TH1F * h_Loose_muFJPtZoomC[30];
-	TH1F * h_Loose_muDJPtZoomR[30];
-	TH1F * h_Loose_muFJPtZoomR[30];
-	TH1F * h_Loose_muFRZoomEta;
-	TH1F * h_Loose_muFRZoomPt;
-	TH1F * h_Loose_muFRMETZoomEta;
-	TH1F * h_Loose_muFRMETZoomPt;
-	TH1F * h_Loose_muMETZoom[40];
-
-	TH1F * h_Tight_muAwayJetDR;
-	TH1F * h_Tight_muAwayJetPt;
-	TH1F * h_Tight_muClosJetDR;
-	TH1F * h_Tight_muClosJetPt;
-	TH1F * h_Tight_muHT;
-	TH1F * h_Tight_muLepEta;
-	TH1F * h_Tight_muLepEta_30;
-	TH1F * h_Tight_muLepEta_40;
-	TH1F * h_Tight_muLepEta_50;
-	TH1F * h_Tight_muLepEta_60;
-	TH1F * h_Tight_muLepPt_30;
-	TH1F * h_Tight_muLepPt_40;
-	TH1F * h_Tight_muLepPt_50;
-	TH1F * h_Tight_muLepPt_60;
-	TH1F * h_Tight_muLepIso;
-	TH1F * h_Tight_muLepPt;
-	TH1F * h_Tight_muMET;
-	TH1F * h_Tight_muMETnoMTCut;
-	TH1F * h_Tight_muMT;
-	TH1F * h_Tight_muMTMET20;
-	TH1F * h_Tight_muMTMET30;
-	TH1F * h_Tight_muMaxJPt;
-	TH1F * h_Tight_muMaxJCPt;
-	TH1F * h_Tight_muMaxJRPt;
-	TH1F * h_Tight_muAllJCPt;
-	TH1F * h_Tight_muAllJRPt;
-	TH1F * h_Tight_muAllJEta;
-	TH1F * h_Tight_muNBJets;
-	TH1F * h_Tight_muNJets;
-	TH1F * h_Tight_muNVertices;   
-	TH1F * h_Tight_muNVertices1;
-	TH1F * h_Tight_muNVerticesMET20; 
-	TH1F * h_Tight_muD0;
-	TH2F * h_Tight_muJCPtJEta;
-	TH2F * h_Tight_muJRPtJEta;
-	TH2F * h_Tight_muJCPtJPt;
-	TH2F * h_Tight_muJRPtJPt;
-	TH2F * h_Tight_muDJPtJEta;
-	TH2F * h_Tight_muFJPtJEta;
-	TH2F * h_Tight_muDJPtJPt;
-	TH2F * h_Tight_muFJPtJPt;
-	TH1F * h_Tight_muDFZoomEta;
-	TH1F * h_Tight_muDFZoomPt;
-	TH1F * h_Tight_muDJPtZoomC[30];
-	TH1F * h_Tight_muFJPtZoomC[30];
-	TH1F * h_Tight_muDJPtZoomR[30];
-	TH1F * h_Tight_muFJPtZoomR[30];
-	TH1F * h_Tight_muFRZoomEta;
-	TH1F * h_Tight_muFRZoomPt;
-	TH1F * h_Tight_muFRMETZoomEta;
-	TH1F * h_Tight_muFRMETZoomPt;
-	TH1F * h_Tight_muMETZoom[40];
+	TH1F * h_Tight_AwayJetDR;
+	TH1F * h_Tight_AwayJetPt;
+	TH1F * h_Tight_ClosJetDR;
+	TH1F * h_Tight_ClosJetPt;
+	TH1F * h_Tight_HT;
+	TH1F * h_Tight_LepEta;
+	TH1F * h_Tight_LepEta_30;
+	TH1F * h_Tight_LepEta_40;
+	TH1F * h_Tight_LepEta_50;
+	TH1F * h_Tight_LepEta_60;
+	TH1F * h_Tight_LepPt_30;
+	TH1F * h_Tight_LepPt_40;
+	TH1F * h_Tight_LepPt_50;
+	TH1F * h_Tight_LepPt_60;
+	TH1F * h_Tight_LepIso;
+	TH1F * h_Tight_LepPt;
+	TH1F * h_Tight_MET;
+	TH1F * h_Tight_METnoMTCut;
+	TH1F * h_Tight_MT;
+	TH1F * h_Tight_MTMET20;
+	TH1F * h_Tight_MTMET30;
+	TH1F * h_Tight_MaxJPt;
+	TH1F * h_Tight_MaxJCPt;
+	TH1F * h_Tight_MaxJRPt;
+	TH1F * h_Tight_AllJCPt;
+	TH1F * h_Tight_AllJRPt;
+	TH1F * h_Tight_AllJEta;
+	TH1F * h_Tight_NBJets;
+	TH1F * h_Tight_NJets;
+	TH1F * h_Tight_NVertices;   
+	TH1F * h_Tight_NVertices1;
+	TH1F * h_Tight_NVerticesMET20; 
+	TH1F * h_Tight_D0;
+	TH2F * h_Tight_JCPtJEta;
+	TH2F * h_Tight_JRPtJEta;
+	TH2F * h_Tight_JCPtJPt;
+	TH2F * h_Tight_JRPtJPt;
+	TH2F * h_Tight_DJPtJEta;
+	TH2F * h_Tight_FJPtJEta;
+	TH2F * h_Tight_DJPtJPt;
+	TH2F * h_Tight_FJPtJPt;
+	TH1F * h_Tight_DFZoomEta;
+	TH1F * h_Tight_DFZoomPt;
+	TH1F * h_Tight_DJPtZoomC[30];
+	TH1F * h_Tight_FJPtZoomC[30];
+	TH1F * h_Tight_DJPtZoomR[30];
+	TH1F * h_Tight_FJPtZoomR[30];
+	TH1F * h_Tight_FRZoomEta;
+	TH1F * h_Tight_FRZoomPt;
+	TH1F * h_Tight_FRMETZoomEta;
+	TH1F * h_Tight_FRMETZoomPt;
+	TH1F * h_Tight_METZoom[40];
 
 	void bookHistos();
 	void writeHistos(TFile *);

@@ -34,18 +34,20 @@ int main(int argc, char* argv[]) {
 	TString configfile   = "";
 	TString name         = "";
 	int verbose          = 0;
+	int datatype         = 0;
 	bool isdata          = true;
 	float xsec           = 1.;
 	int maxsize          = 0;
 
 	// Parse options
 	char ch;
-	while ((ch = getopt(argc, argv, "i:n:v:x:m:sn:c:h:?")) != -1 ) {
+	while ((ch = getopt(argc, argv, "i:n:v:t:x:m:sn:c:h:?")) != -1 ) {
 		switch (ch) {
 			case 'i': inputfile    = TString(optarg)       ;  break;
 			case 'n': name         = TString(optarg)       ;  break;
 			case 'v': verbose      = atoi(optarg)          ;  break;
 			case 's': isdata       = false                 ;  break;
+			case 't': datatype     = atoi(optarg)          ;  break;
 			case 'c': configfile   = TString(optarg)       ;  break;
 			case 'x': xsec         = atof(optarg)          ;  break; //::atof( ((std::string) optarg).c_str());  break;
 			case 'm': maxsize      = atoi(optarg)          ;  break;
@@ -67,6 +69,7 @@ int main(int argc, char* argv[]) {
 	cout << " inputfile is:       " << inputfile   << endl;
 	cout << " name is:            " << name        << endl;
 	cout << " running on " << (isdata?"data":"mc") << endl;
+	cout << " particles are:      " << datatype    << endl;
 	cout << " xsec is:            " << xsec        << endl;
 	cout << " sample max size is: " << maxsize     << endl;
 	cout << "=======================================================" << endl;
@@ -75,6 +78,7 @@ int main(int argc, char* argv[]) {
 	Fakerates *frA = new Fakerates(configfile);
 	frA->setVerbose(verbose);
 	frA->setData(isdata);
+	frA->setDataType(datatype);
 	frA->setXS(xsec);
 	frA->setInputFile(inputfile);
 	frA->setName(name);
