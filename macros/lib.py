@@ -214,7 +214,7 @@ def setFRPlotStyle(hist, color, title = '', title_hist = ''):
 	hist.SetLineWidth(3)
 	hist.SetFillColor(color)
 	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
-	hist.GetYaxis().SetRangeUser(0., 0.25)
+	#hist.GetYaxis().SetRangeUser(0., 0.25)
 	hist.GetYaxis().SetTitle("FR")
 	hist.GetYaxis().SetTitleOffset(0.75)
 	hist.GetYaxis().SetTitleSize(0.08)
