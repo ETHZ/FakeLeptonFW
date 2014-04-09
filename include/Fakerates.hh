@@ -167,9 +167,9 @@ public:
 	TH1F * h_Loose_AllJCPt;
 	TH1F * h_Loose_AllJRPt;
 	TH1F * h_Loose_AllJEta;
-	TH1F * h_Loose_AllJEta_test1;
-	TH1F * h_Loose_AllJEta_test2;
-	TH1F * h_Loose_AllJEta_test3;
+	TH1F * h_Loose_AllJEtatest1;
+	TH1F * h_Loose_AllJEtatest2;
+	TH1F * h_Loose_AllJEtatest3;
 	TH1F * h_Loose_NBJets;
 	TH1F * h_Loose_NJets;
 	TH1F * h_Loose_NVertices;

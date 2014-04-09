@@ -272,20 +272,20 @@ void Fakerates::loop(TFile* pFile){
 		//if(JetPt->size()>0) for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
 
 
-		//if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
-		//	if(passesUpperMETMT(mu)) 
-		//		for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-		//			h_Loose_AllJEta_test1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+		if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
+			if(passesUpperMETMT(mu)) 
+				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+					h_Loose_AllJEtatest1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 
 		//for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
 
 		smearAllJets();
 
-		//if(fDataType !=2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
-		//	if(passesUpperMETMT(mu)) 
-		//		for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-		//			h_Loose_AllJEta_test2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+		if(fDataType !=2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
+			if(passesUpperMETMT(mu)) 
+				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+					h_Loose_AllJEtatest2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 
 		//for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) cout << "DETECTED AN INCONSISTENCY!" << endl;
@@ -303,10 +303,10 @@ void Fakerates::loop(TFile* pFile){
 		//for(int i=0; i<JetPt->size(); ++i) cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
 		//cout << "======" << endl;
 
-		//if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
-		//	if(passesUpperMETMT(mu)) 
-		//		for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-		//			h_Loose_AllJEta_test3 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+		if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
+			if(passesUpperMETMT(mu)) 
+				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+					h_Loose_AllJEtatest3 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 	}
 
@@ -514,7 +514,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 	if(nloose    != 1) return false;
 	// if(nveto_add  > 0) return false;
 	fCutflow_afterLepSel++;
-	// if(nveto_add != 0) return false; // don't require this for the synching
+	if(nveto_add != 0) return false; // don't require this for the synching
 
 	// Jet Pt is not reasonable then return false
 	if(JetRawPt->size() < 1) return false;
@@ -616,7 +616,6 @@ bool Fakerates::isTightElectron(int index){
 	if(!isLooseElectron(index)) return false;
 	if(!ElIsTight->at(index)) return false;
 	if(ElPFIso->at(index) > 0.15) return false;
-	if(ElD0->at(index) > 0.02) return false;
 	if(fLepIsoCut > 0.0 && fabs(ElPFIso->at(index)) > fLepIsoCut) return false; // leave this commented for synching!!
 
 	return true;
@@ -1043,11 +1042,11 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 				h_FLoose->AddBinContent(fillbin, fEventweight);
 			}
 			else{
-				//if(LepPt->at(lep) > 40) // put in only for HLT_Mu40
+				if(fLepTrigger != "Mu40" || (fLepTrigger == "Mu40" && LepPt->at(lep) > 40)) 
 					h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 			}
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
-// cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), isTightMuon(mu), getMET(), getMT(0, mu)) << endl;
+ cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
 		}
 
 		if(passesMTCut(lep))    h_Loose_MET            ->Fill(getMET()            , fEventweight);
@@ -1129,7 +1128,7 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 					h_FTight->AddBinContent(fillbin, fEventweight);
 				}
 				else{
-					//if(LepPt->at(lep)> 40.)  // only if u use Mu40 also on MC
+					if(fLepTrigger != "Mu40" || (fLepTrigger == "Mu40" && LepPt->at(lep) > 40)) 
 						h_FTight->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 				}
 			}
@@ -1223,9 +1222,9 @@ void Fakerates::bookHistos(){
 	h_Loose_AllJCPt       = new TH1F("h_Loose_AllJCPt"      , "Loose_AllJCPt"   , 15      ,  0      , 150    ); h_Loose_AllJCPt   -> Sumw2();
 	h_Loose_AllJEta       = new TH1F("h_Loose_AllJEta"      , "Loose_AllJEta"   , 12      ,  0      , 2.4    ); h_Loose_AllJEta   -> Sumw2();
 
-	//h_Loose_AllJEta_test1 = new TH1F("h_Loose_AllJEta_test1", "Loose_AllJEta_test1", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test1 -> Sumw2();
-	//h_Loose_AllJEta_test2 = new TH1F("h_Loose_AllJEta_test2", "Loose_AllJEta_test2", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test2 -> Sumw2();
-	//h_Loose_AllJEta_test3 = new TH1F("h_Loose_AllJEta_test3", "Loose_AllJEta_test3", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test3 -> Sumw2();
+	h_Loose_AllJEtatest1  = new TH1F("h_Loose_AllJEtatest1" , "Loose_AllJEtatest1", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest1 -> Sumw2();
+	h_Loose_AllJEtatest2  = new TH1F("h_Loose_AllJEtatest2" , "Loose_AllJEtatest2", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest2 -> Sumw2();
+	h_Loose_AllJEtatest3  = new TH1F("h_Loose_AllJEtatest3" , "Loose_AllJEtatest3", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest3 -> Sumw2();
 
 	h_Loose_NBJets        = new TH1F("h_Loose_NBJets"       , "Loose_NBJets"    , 3       ,  0      , 3      ); h_Loose_NBJets     -> Sumw2();
 	h_Loose_NJets         = new TH1F("h_Loose_NJets"        , "Loose_NJets"     , 5       ,  1      , 6      ); h_Loose_NJets      -> Sumw2();
@@ -1430,9 +1429,9 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Loose_AllJRPt        ->Write(fName + "_" + h_Loose_AllJRPt        ->GetName(), TObject::kWriteDelete);
 	h_Loose_AllJEta        ->Write(fName + "_" + h_Loose_AllJEta        ->GetName(), TObject::kWriteDelete);
 
-	//h_Loose_AllJEta_test1 ->Write(fName + "_" + h_Loose_AllJEta_test1->GetName(), TObject::kWriteDelete);
-	//h_Loose_AllJEta_test2 ->Write(fName + "_" + h_Loose_AllJEta_test2->GetName(), TObject::kWriteDelete);
-	//h_Loose_AllJEta_test3 ->Write(fName + "_" + h_Loose_AllJEta_test3->GetName(), TObject::kWriteDelete);
+	h_Loose_AllJEtatest1  ->Write(fName + "_" + h_Loose_AllJEtatest1    ->GetName(), TObject::kWriteDelete);
+	h_Loose_AllJEtatest2  ->Write(fName + "_" + h_Loose_AllJEtatest2    ->GetName(), TObject::kWriteDelete);
+	h_Loose_AllJEtatest3  ->Write(fName + "_" + h_Loose_AllJEtatest3    ->GetName(), TObject::kWriteDelete);
 
 	h_Loose_NBJets         ->Write(fName + "_" + h_Loose_NBJets         ->GetName(), TObject::kWriteDelete);
 	h_Loose_NJets          ->Write(fName + "_" + h_Loose_NJets          ->GetName(), TObject::kWriteDelete);
