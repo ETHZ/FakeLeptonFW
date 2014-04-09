@@ -10,7 +10,7 @@ def getScaling(outputDir, printall = 0):
 	if printall: return list
 
 	for scaling in list:
-		if scaling == struct[-3]:
+		if scaling == struct[-3] or scaling == struct[-2]:
 			result = scaling
 
 	return result
@@ -192,13 +192,13 @@ def makeLine(x1, y1, x2, y2):
 	line.SetLineStyle(7)
 	return line
 
-def set1dPlotStyle(hist, color, title = '', title_hist = ''):
+def set1dPlotStyle(dataType, hist, color, title = '', title_hist = ''):
 	hist.SetMarkerColor(color)
 	hist.SetMarkerSize(1.4)
 	hist.SetMarkerStyle(20)
 	hist.SetFillColor(color)
 	hist.SetLineColor(color)
-	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
+	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(dataType, title_hist))
 	hist.GetXaxis().SetNdivisions(505)
 	hist.GetYaxis().SetTitle("")
 	hist.GetYaxis().SetTitleSize(0.08)
@@ -207,13 +207,13 @@ def set1dPlotStyle(hist, color, title = '', title_hist = ''):
 	hist.SetTitle(title)
 	return hist
 
-def setFRPlotStyle(hist, color, title = '', title_hist = ''):
+def setFRPlotStyle(dataType, hist, color, title = '', title_hist = ''):
 	hist.SetMarkerColor(color)
 	hist.SetMarkerStyle(20)
 	hist.SetLineColor(color)
 	hist.SetLineWidth(3)
 	hist.SetFillColor(color)
-	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
+	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(dataType, title_hist))
 	#hist.GetYaxis().SetRangeUser(0., 0.25)
 	hist.GetYaxis().SetTitle("FR")
 	hist.GetYaxis().SetTitleOffset(0.75)
@@ -222,7 +222,7 @@ def setFRPlotStyle(hist, color, title = '', title_hist = ''):
 	hist.SetTitle(title)
 	return hist
 
-def setRatioStyle(hist, title_hist='', title='Data/MC', max = 1.99, min = 0.0):
+def setRatioStyle(dataType, hist, title_hist='', title='Data/MC', max = 1.99, min = 0.0):
 	hist.SetMaximum(max)
 	hist.SetMinimum(min)
 	hist.SetTitle('')
@@ -235,11 +235,13 @@ def setRatioStyle(hist, title_hist='', title='Data/MC', max = 1.99, min = 0.0):
 	hist.GetXaxis().SetLabelSize(0.18)
 	hist.GetXaxis().SetTitleSize(0.2)
 	hist.GetXaxis().SetTitleOffset(1.0)
-	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(title_hist))
+	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(dataType, title_hist))
 	return hist
 
-def getXTitle(hist):
+def getXTitle(dataType, hist):
 	name = hist.GetName()
+	if dataType == 'el': lepton = 'e'
+	else               : lepton = '#mu'
 	if   'NBJets'     in name: return 'N_{b-jets}'
 	elif 'NJets'      in name: return 'N_{jets}'
 	elif 'AwayJetDR'  in name: return 'dR^{away}'
@@ -247,9 +249,9 @@ def getXTitle(hist):
 	elif 'ClosJetDR'  in name: return 'dR^{close}'
 	elif 'ClosJetPt'  in name: return 'p_{T}^{close}'
 	elif 'HT'         in name: return 'H_{T}'
-	elif 'LepEta'     in name: return '#mu-|#eta|' #'|#eta|_{lep}'
-	elif 'LepIso'     in name: return '#mu-pfIso'# 'pfIso_{lep}'
-	elif 'LepPt'      in name: return '#mu-pT' #'p_{T}^{lep}'
+	elif 'LepEta'     in name: return lepton + '-|#eta|' #'|#eta|_{lep}'
+	elif 'LepIso'     in name: return lepton + '-pfIso'# 'pfIso_{lep}'
+	elif 'LepPt'      in name: return lepton + '-pT' #'p_{T}^{lep}'
 	elif '_MET'       in name: return 'MET'
 	elif '_MT'        in name: return 'm_{T}'
 	elif 'MTMET30'    in name: return 'm_{T}'

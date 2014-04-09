@@ -56,13 +56,13 @@ if dataType == 'el':
 	qcd350     = sample('el_qcdelenr350'  , inputDir + 'el_qcdelenr350_ratios.root')
 
 	mc_samples = []
-	mc_samples.append(wjets   )
-	mc_samples.append(dyjets50)
-	mc_samples.append(dyjets10)
 	mc_samples.append(qcd30   )
 	mc_samples.append(qcd80   )
 	mc_samples.append(qcd250  )
 	mc_samples.append(qcd350  )
+	mc_samples.append(wjets   )
+	mc_samples.append(dyjets50)
+	mc_samples.append(dyjets10)
 
 else:
 	data       = sample('mu_data'         , inputDir + 'mu_data_ratios.root')
@@ -72,20 +72,24 @@ else:
 	qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root')
 
 	mc_samples = []
+	mc_samples.append(qcd     )
 	mc_samples.append(wjets   )
 	mc_samples.append(dyjets50)
 	mc_samples.append(dyjets10)
-	mc_samples.append(qcd     )
 
 
 module = helper.getModule(outputDir)
 scaling = helper.getScaling(outputDir)
 outputDir = helper.CreateOutputFolders(outputDir)
 
-if scaling == '' or module == '': 
-	print 'MODULE AND/OR SCALING NOT DEFINED'
-	print 'PRODUCING ALL MODULES UNWEIGHTED'
+if scaling == '':
+	print 'SCALING NOT DEFINED'
+	print 'PRODUCING MODULES UNWEIGHTED'
 	scaling = 'unweighted'
+
+if module == '': 
+	print 'MODULE NOT DEFINED'
+	print 'PRODUCING ALL MODULES'
 	module = 'all'
 
 
@@ -159,14 +163,14 @@ if module == 'plots_1d' or module == 'all':
 	leg.AddEntry(wjets     .hists[0], helper.getLegendName(wjets     .GetName()), 'f' )
 	leg.AddEntry(dyjets10  .hists[0], helper.getLegendName(dyjets10  .GetName()), 'f' )
 	leg.AddEntry(qcdsample .hists[0], helper.getLegendName(qcdsample .GetName()), 'f' )
-	Plot.Plot1d(outputDir, data, mc_samples, plot1dHists, leg)
+	Plot.Plot1d(dataType, outputDir, data, mc_samples, plot1dHists, leg)
 
 
 
 # produce 2d Plots
 
 if module == 'plots_2d' or module == 'all':
-	Plot.Plot2d(outputDir, data, mc_samples, plot2dHists)
+	Plot.Plot2d(dataType, outputDir, data, mc_samples, plot2dHists)
 
 
 
@@ -175,7 +179,7 @@ if module == 'plots_2d' or module == 'all':
 if module == 'zoom_met' or module == 'all':
 	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350, wjets, dyjets50]
 	else:                mclist = [qcd, wjets, dyjets50] 
-	Plot.PlotMETZooms(outputDir, data, mclist, leg)
+	Plot.PlotMETZooms(dataType, outputDir, data, mclist, leg)
 
 
 
@@ -194,7 +198,7 @@ if module == 'zoom_jpt' or module == 'all':
 	leg0.AddEntry(wjets     .hists[0], helper.getLegendName(wjets     .GetName()), 'l')
 	leg0.AddEntry(dyjets10  .hists[0], helper.getLegendName(dyjets10  .GetName()), 'l')
 	leg0.AddEntry(qcdsample .hists[0], helper.getLegendName(qcdsample .GetName()), 'l')
-	Plot.PlotJPtZooms(outputDir, data, mclist, leg0)
+	Plot.PlotJPtZooms(dataType, outputDir, data, mclist, leg0)
 
 
 
@@ -203,7 +207,7 @@ if module == 'zoom_jpt' or module == 'all':
 if module == 'fakerates_1d' or module == 'all':
  	if dataType == 'el': qcdlist = [qcd30] #[qcd30, qcd80, qcd250, qcd350]
 	else:                qcdlist = [qcd] 
-	FR.PlotFR(outputDir, data, mc_samples, plot1dHists, qcdlist)#, [wjets, dyjets50, dyjets10], True)
+	FR.PlotFR(dataType, outputDir, data, mc_samples, plot1dHists, qcdlist)#, [wjets, dyjets50, dyjets10], True)
 
 
 
@@ -212,7 +216,7 @@ if module == 'fakerates_1d' or module == 'all':
 if module == 'fakerates_2d' or module == 'all':
 	if dataType == 'el': qcdlist = [qcd30, qcd80, qcd250, qcd350]
 	else:                qcdlist = [qcd] 
-	FR.Plot2dFRMap(outputDir, module, data, mc_samples, qcdlist, [], True)#[wjets, dyjets50, dyjets10], True, True)
+	FR.Plot2dFRMap(dataType, outputDir, module, data, mc_samples, qcdlist, [], True)#[wjets, dyjets50, dyjets10], True, True)
 
 
 
@@ -251,7 +255,7 @@ if module == 'adhoc' or module == 'all':
 		hist_ratio = hist.Clone()
 		hist_ratio.Divide(dyjets50.hists[i])
 		hist_ratio.Draw("p e1")
-		hist_ratio = helper.setRatioStyle(hist_ratio, hist)
+		hist_ratio = helper.setRatioStyle(dataType, hist_ratio, hist)
 		line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
 		line.Draw()
 		helper.saveCanvas(canv, pad_plot, outputDir + "adhoc/", prepend + helper.getSaveName(hist) + postpend)
@@ -348,7 +352,7 @@ if module == 'fakerates_1d' or module == 'all':
 	histstoplot.append([data_numerator_eta50, 'data50'])
 	histstoplot.append([data_numerator_eta60, 'data60'])
 
-	FR.make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_eta], 'FR_LepEta_compare')
+	FR.make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_eta], 'FR_LepEta_compare')
 
 	histstoplot = []
 	histstoplot.append([data_numerator_pt30, 'data30'])
@@ -356,13 +360,13 @@ if module == 'fakerates_1d' or module == 'all':
 	histstoplot.append([data_numerator_pt50, 'data50'])
 	histstoplot.append([data_numerator_pt60, 'data60'])
 
-	FR.make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_pt], 'FR_LepPt_compare')
+	FR.make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_pt], 'FR_LepPt_compare')
 
 	histstoplot = []
 	histstoplot.append([data_numerator_cpt, 'dataJCPt'])
 	histstoplot.append([data_numerator_rpt, 'dataJRPt'])
 
-	FR.make1dFRPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_cpt], 'FR_JetPt_compare')
+	FR.make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_cpt], 'FR_JetPt_compare')
 
 
 

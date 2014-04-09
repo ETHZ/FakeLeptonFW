@@ -5,7 +5,7 @@ import lib as helper
 
 
 
-def make1dPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_name, leg):
+def make1dPlot(dataType, canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_name, leg):
 
 	# create PLOT
 
@@ -16,7 +16,7 @@ def make1dPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_nam
 		if max < hists[i][0].GetMaximum():
 			max = hists[i][0].GetMaximum()
 
-	hists[0][0] = helper.set1dPlotStyle(hists[0][0], helper.getColor(hists[0][1]), '', title_hist)
+	hists[0][0] = helper.set1dPlotStyle(dataType, hists[0][0], helper.getColor(hists[0][1]), '', title_hist)
 	#for i in range(len(hists)):
 	#	hists[i][0] = helper.set1dPlotStyle(hists[i][0], helper.getColor(hists[i][1]), '', title_hist)
 	
@@ -42,7 +42,7 @@ def make1dPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_nam
 	data_bg_ratio = copy.deepcopy(hists[0][0])
 	data_bg_ratio.Divide(hists[1][0].GetStack().Last())
 	data_bg_ratio.Draw("p e")
-	data_bg_ratio = helper.setRatioStyle(data_bg_ratio, title_hist)
+	data_bg_ratio = helper.setRatioStyle(dataType, data_bg_ratio, title_hist)
 	line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
 
@@ -53,11 +53,11 @@ def make1dPlot(canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_nam
 
 
 
-def make2dPlot(canv, pad_plot, outputDir, hist, postpend, file_name):
+def make2dPlot(dataType, canv, pad_plot, outputDir, hist, postpend, file_name):
 
 	postpend = "_" + str(postpend.lower())
 	hist.Draw('colz')
-	hist.GetXaxis().SetTitle(helper.getXTitle(hist))
+	hist.GetXaxis().SetTitle(helper.getXTitle(dataType, hist))
 	hist.GetYaxis().SetTitle(helper.getYTitle(hist))	
 	hist.GetYaxis().SetTitleSize(0.055)
 	hist.GetYaxis().SetLabelSize(0.07)
@@ -73,7 +73,7 @@ def make2dPlot(canv, pad_plot, outputDir, hist, postpend, file_name):
 
 
 
-def Plot1d(outputDir, dataset, mcsets, histlist, leg):
+def Plot1d(dataType, outputDir, dataset, mcsets, histlist, leg):
 
 	canv = helper.makeCanvas(900, 675, 'c1d')
 	pad_plot = helper.makePad('plot')
@@ -108,11 +108,11 @@ def Plot1d(outputDir, dataset, mcsets, histlist, leg):
 		histstoplot = []
 		histstoplot.append([hist, 'data'])
 		histstoplot.append([stack, 'totbg'])
-		make1dPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, hist, prepend + helper.getSaveName(hist) + postpend, leg)
+		make1dPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, hist, prepend + helper.getSaveName(hist) + postpend, leg)
 
 
 
-def PlotMETZooms(outputDir, dataset, mcsets, leg):
+def PlotMETZooms(dataType, outputDir, dataset, mcsets, leg):
 
 	canv = helper.makeCanvas(900, 675, 'c1dM')
 	pad_plot = helper.makePad('plot')
@@ -133,7 +133,7 @@ def PlotMETZooms(outputDir, dataset, mcsets, leg):
 	t_pt.SetTextColor(ROOT.kBlack)
 
 	bins_eta = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
-	bins_pt  = [20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 46.0]
+	bins_pt  = [20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0]
 	bins_tot = (len(bins_eta)-1)*(len(bins_pt)-1)
 
 	for hist in dataset.hists:
@@ -172,7 +172,7 @@ def PlotMETZooms(outputDir, dataset, mcsets, leg):
 			if max < hists[i][0].GetMaximum():
 				max = hists[i][0].GetMaximum()
 
-		hists[0][0] = helper.set1dPlotStyle(hists[0][0], helper.getColor(hists[0][1]), '', hist)
+		hists[0][0] = helper.set1dPlotStyle(dataType, hists[0][0], helper.getColor(hists[0][1]), '', hist)
 		hists[0][0].Draw("p x0 e")
 		hists[0][0].SetMinimum(0.001)
 		hists[0][0].SetMaximum(1.5*max)
@@ -187,8 +187,11 @@ def PlotMETZooms(outputDir, dataset, mcsets, leg):
 		m = int(id)//(len(bins_pt)-1)
 		n = int(id)%(len(bins_pt)-1)
 
-		text_eta = str(bins_eta[m]) + " #leq #mu-|#eta| < " + str(bins_eta[m+1])
-		text_pt  = str(bins_pt[n])  + " #leq #mu-p_{T} < " + str(bins_pt[n+1])
+		if dataType == 'el': lepton = 'e'
+		else               : lepton = '#mu'
+
+		text_eta = str(bins_eta[m]) + " #leq " + lepton + "-|#eta| < " + str(bins_eta[m+1])
+		text_pt  = str(bins_pt[n])  + " #leq " + lepton + "-p_{T} < " + str(bins_pt[n+1])
 
 		t_eta.DrawLatex(0.22, 0.8, text_eta)
 		t_pt.DrawLatex(0.22, 0.73, text_pt)
@@ -200,7 +203,7 @@ def PlotMETZooms(outputDir, dataset, mcsets, leg):
 		data_bg_ratio = copy.deepcopy(hists[0][0])
 		data_bg_ratio.Divide(hists[1][0].GetStack().Last())
 		data_bg_ratio.Draw("p e")
-		data_bg_ratio = helper.setRatioStyle(data_bg_ratio, hist)
+		data_bg_ratio = helper.setRatioStyle(dataType, data_bg_ratio, hist)
 		line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 		line.Draw()
 
@@ -211,7 +214,7 @@ def PlotMETZooms(outputDir, dataset, mcsets, leg):
 
 
 
-def PlotJPtZooms(outputDir, dataset, mcsets, leg):
+def PlotJPtZooms(dataType, outputDir, dataset, mcsets, leg):
 
 	canv = helper.makeCanvas(900, 675, 'c1dZ')
 	pad_plot = helper.makePad('tot')
@@ -265,7 +268,7 @@ def PlotJPtZooms(outputDir, dataset, mcsets, leg):
 
 		# Cosmetics
 		hist.SetMaximum(1.5*max)
-		hist.GetXaxis().SetTitle(helper.getXTitle(hist))
+		hist.GetXaxis().SetTitle(helper.getXTitle(dataType, hist))
 		hist.GetYaxis().SetTitle("1/Integral")
 		hist.SetTitle("")
 		hist.GetXaxis().SetTitleSize(0.07)
@@ -293,7 +296,7 @@ def PlotJPtZooms(outputDir, dataset, mcsets, leg):
 
 
 
-def Plot2d(outputDir, dataset, mcsets, histlist):
+def Plot2d(dataType, outputDir, dataset, mcsets, histlist):
 
 	canv = helper.makeCanvas(900, 675, 'c2d')
 	pad_plot = helper.makePad('tot')
@@ -312,8 +315,8 @@ def Plot2d(outputDir, dataset, mcsets, histlist):
 		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
 		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
 
-		make2dPlot(canv, pad_plot, outputDir, hist, 'data', prepend + helper.getSaveName(hist) + postpend)
-		for mc in mcsets: make2dPlot(canv, pad_plot, outputDir, mc.hists[i], mc.GetName(), prepend + helper.getSaveName(hist) + postpend)
+		make2dPlot(dataType, canv, pad_plot, outputDir, hist, 'data', prepend + helper.getSaveName(hist) + postpend)
+		for mc in mcsets: make2dPlot(dataType, canv, pad_plot, outputDir, mc.hists[i], mc.GetName(), prepend + helper.getSaveName(hist) + postpend)
 
 
 

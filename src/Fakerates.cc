@@ -73,7 +73,7 @@ void Fakerates::init(bool verbose){
 	fFRbinspt.push_back(30.);
 	fFRbinspt.push_back(35.);
 	fFRbinspt.push_back(45.);
-	fFRbinspt.push_back(46.);
+	fFRbinspt.push_back(50.);
 	fFRn_binspt   = fFRbinspt.size();
 
 
@@ -97,7 +97,7 @@ void Fakerates::init(bool verbose){
 	fFRMETbinspt.push_back(35.);
 	fFRMETbinspt.push_back(40.);
 	fFRMETbinspt.push_back(45.);
-	fFRMETbinspt.push_back(46.);
+	fFRMETbinspt.push_back(50.);
 	fFRMETn_binspt   = fFRMETbinspt.size();
 
 
@@ -272,23 +272,23 @@ void Fakerates::loop(TFile* pFile){
 		//if(JetPt->size()>0) for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
 
 
-		if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
-			if(passesUpperMETMT(mu)) 
-				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-					h_Loose_AllJEta_test1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+		//if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
+		//	if(passesUpperMETMT(mu)) 
+		//		for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+		//			h_Loose_AllJEta_test1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 
-		for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
+		//for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
 
 		smearAllJets();
 
-		if(fDataType !=2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
-			if(passesUpperMETMT(mu)) 
-				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-					h_Loose_AllJEta_test2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+		//if(fDataType !=2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
+		//	if(passesUpperMETMT(mu)) 
+		//		for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+		//			h_Loose_AllJEta_test2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 
-		for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) cout << "DETECTED AN INCONSISTENCY!" << endl;
+		//for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) cout << "DETECTED AN INCONSISTENCY!" << endl;
 
 
 
@@ -303,10 +303,10 @@ void Fakerates::loop(TFile* pFile){
 		//for(int i=0; i<JetPt->size(); ++i) cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
 		//cout << "======" << endl;
 
-		if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
-			if(passesUpperMETMT(mu)) 
-				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-					h_Loose_AllJEta_test3 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+		//if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
+		//	if(passesUpperMETMT(mu)) 
+		//		for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+		//			h_Loose_AllJEta_test3 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 	}
 
@@ -571,7 +571,6 @@ bool Fakerates::isLooseElectron(int index){
 
 	if(!ElIsLoose->at(index)) return false;
 	if(ElPFIso->at(index) > 0.6) return false;
-	if(fLepD0Cut > 0.0 && fabs(ElD0->at(index)) > fLepD0Cut) return false; // leave this commented for synching!!
 	return true;
 }
 
@@ -616,7 +615,8 @@ bool Fakerates::isTightElectron(int index){
 
 	if(!isLooseElectron(index)) return false;
 	if(!ElIsTight->at(index)) return false;
-	if(ELPFIso->at(index) > 0.15) return false;
+	if(ElPFIso->at(index) > 0.15) return false;
+	if(ElD0->at(index) > 0.02) return false;
 	if(fLepIsoCut > 0.0 && fabs(ElPFIso->at(index)) > fLepIsoCut) return false; // leave this commented for synching!!
 
 	return true;
@@ -1043,7 +1043,8 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 				h_FLoose->AddBinContent(fillbin, fEventweight);
 			}
 			else{
-				h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+				//if(LepPt->at(lep) > 40) // put in only for HLT_Mu40
+					h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 			}
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
 // cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), isTightMuon(mu), getMET(), getMT(0, mu)) << endl;
@@ -1091,20 +1092,20 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 				h_Tight_MaxJCPt   ->Fill(JetPt->at(jet)        , fEventweight); // always corrected Jet Pt!
 				h_Tight_MaxJRPt   ->Fill(JetRawPt->at(jet)     , fEventweight); // always raw Jet Pt!
 
-				h_Tight_JCPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetPt->at(jet), fEventweight);
-				h_Tight_JRPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetRawPt->at(jet), fEventweight);
-				h_Tight_JCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
-				h_Tight_JRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
+				h_Tight_JCPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetPt->at(jet)    , fEventweight);
+				h_Tight_JRPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetRawPt->at(jet) , fEventweight);
+				h_Tight_JCPtJPt   ->Fill(JetPt->at(jet)        , JetPt->at(jet)    , fEventweight);
+				h_Tight_JRPtJPt   ->Fill(JetPt->at(jet)        , JetRawPt->at(jet) , fEventweight);
 
 				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
 					h_Tight_AllJCPt   ->Fill(JetPt->at(thisjet)       , fEventweight);
 					h_Tight_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , fEventweight);
 					h_Tight_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
-					h_Tight_DJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
+					h_Tight_DJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))                      , fEventweight);
 					h_Tight_FJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
-					h_Tight_DJPtJPt  ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-					h_Tight_FJPtJPt  ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+					h_Tight_DJPtJPt  ->Fill(JetPt->at(thisjet)       , (JetPt->at(thisjet)-JetRawPt->at(thisjet))                      , fEventweight);
+					h_Tight_FJPtJPt  ->Fill(JetPt->at(thisjet)       , (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
 				
 					int i = h_Tight_DFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
 					if(fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1]){
@@ -1128,7 +1129,8 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 					h_FTight->AddBinContent(fillbin, fEventweight);
 				}
 				else{
-					h_FTight->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+					//if(LepPt->at(lep)> 40.)  // only if u use Mu40 also on MC
+						h_FTight->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 				}
 			}
 
@@ -1221,14 +1223,14 @@ void Fakerates::bookHistos(){
 	h_Loose_AllJCPt       = new TH1F("h_Loose_AllJCPt"      , "Loose_AllJCPt"   , 15      ,  0      , 150    ); h_Loose_AllJCPt   -> Sumw2();
 	h_Loose_AllJEta       = new TH1F("h_Loose_AllJEta"      , "Loose_AllJEta"   , 12      ,  0      , 2.4    ); h_Loose_AllJEta   -> Sumw2();
 
-	h_Loose_AllJEta_test1 = new TH1F("h_Loose_AllJEta_test1", "Loose_AllJEta_test1", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test1 -> Sumw2();
-	h_Loose_AllJEta_test2 = new TH1F("h_Loose_AllJEta_test2", "Loose_AllJEta_test2", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test2 -> Sumw2();
-	h_Loose_AllJEta_test3 = new TH1F("h_Loose_AllJEta_test3", "Loose_AllJEta_test3", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test3 -> Sumw2();
+	//h_Loose_AllJEta_test1 = new TH1F("h_Loose_AllJEta_test1", "Loose_AllJEta_test1", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test1 -> Sumw2();
+	//h_Loose_AllJEta_test2 = new TH1F("h_Loose_AllJEta_test2", "Loose_AllJEta_test2", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test2 -> Sumw2();
+	//h_Loose_AllJEta_test3 = new TH1F("h_Loose_AllJEta_test3", "Loose_AllJEta_test3", 12   ,  0      , 2.4    ); h_Loose_AllJEta_test3 -> Sumw2();
 
 	h_Loose_NBJets        = new TH1F("h_Loose_NBJets"       , "Loose_NBJets"    , 3       ,  0      , 3      ); h_Loose_NBJets     -> Sumw2();
 	h_Loose_NJets         = new TH1F("h_Loose_NJets"        , "Loose_NJets"     , 5       ,  1      , 6      ); h_Loose_NJets      -> Sumw2();
 	h_Loose_NVertices     = new TH1F("h_Loose_NVertices"    , "Loose_NVertices" , 40      ,  0      , 40     ); h_Loose_NVertices  -> Sumw2();
-	h_Loose_NVertices1    = new TH1F("h_Loose_NVertices1"   , "Loose_NVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Loose_NVertices1 -> Sumw2();
+	h_Loose_NVertices1    = new TH1F("h_Loose_NVertices1"   , "Loose_NVertices1", nvrtx_nbins-1, &nvrtx_bins[0]); h_Loose_NVertices1 -> Sumw2();
 	h_Loose_NVerticesMET20= new TH1F("h_Loose_NVerticesMET20", "Loose_NVerticesMET20", 40 , 0       , 40     ); h_Loose_NVerticesMET20 -> Sumw2();
 
 	h_Loose_AwayJetDR     = new TH1F("h_Loose_AwayJetDR"    , "Loose_AwayJetDR" , 15      ,  0      , 6      ); h_Loose_AwayJetDR  -> Sumw2();
@@ -1321,7 +1323,7 @@ void Fakerates::bookHistos(){
 	h_Tight_NBJets        = new TH1F("h_Tight_NBJets"       , "Tight_NBJets"    , 3       , 0       , 3      ); h_Tight_NBJets     -> Sumw2();
 	h_Tight_NJets         = new TH1F("h_Tight_NJets"        , "Tight_NJets"     , 5       , 1       , 6      ); h_Tight_NJets      -> Sumw2();
 	h_Tight_NVertices     = new TH1F("h_Tight_NVertices"    , "Tight_NVertices" , 40      , 0       , 40     ); h_Tight_NVertices  -> Sumw2();
-	h_Tight_NVertices1    = new TH1F("h_Tight_NVertices1"   , "Tight_NVertices" , nvrtx_nbins-1, &nvrtx_bins[0]); h_Tight_NVertices1  -> Sumw2();
+	h_Tight_NVertices1    = new TH1F("h_Tight_NVertices1"   , "Tight_NVertices1", nvrtx_nbins-1, &nvrtx_bins[0]); h_Tight_NVertices1  -> Sumw2();
 	h_Tight_NVerticesMET20= new TH1F("h_Tight_NVerticesMET20", "Tight_NVerticesMET20", 40 , 0       , 40     ); h_Tight_NVerticesMET20 -> Sumw2();
                                                                                                  
 	h_Tight_AwayJetDR     = new TH1F("h_Tight_AwayJetDR"    , "Tight_AwayJetDR" , 15      ,  0      , 6      ); h_Tight_AwayJetDR  -> Sumw2();
@@ -1393,65 +1395,65 @@ void Fakerates::writeHistos(TFile* pFile){
 	TDirectory* sdir = Util::FindOrCreate(fName, pFile);
 	sdir->cd();
 
-	h_FRatio          ->Write(fName + "_" + h_FRatio->GetName(),          TObject::kWriteDelete);
-	h_FTight          ->Write(fName + "_" + h_FTight->GetName(),          TObject::kWriteDelete);
-	h_FLoose          ->Write(fName + "_" + h_FLoose->GetName(),          TObject::kWriteDelete);
+	h_FRatio               ->Write(fName + "_" + h_FRatio               ->GetName(), TObject::kWriteDelete);
+	h_FTight               ->Write(fName + "_" + h_FTight               ->GetName(), TObject::kWriteDelete);
+	h_FLoose               ->Write(fName + "_" + h_FLoose               ->GetName(), TObject::kWriteDelete);
  
 	// loose histograms
-	h_Loose_LepPt     ->Write(fName + "_" + h_Loose_LepPt->GetName(),     TObject::kWriteDelete);
-	h_Loose_LepEta    ->Write(fName + "_" + h_Loose_LepEta->GetName(),    TObject::kWriteDelete);
-	h_Loose_LepIso    ->Write(fName + "_" + h_Loose_LepIso->GetName(),    TObject::kWriteDelete);
-	h_Loose_D0        ->Write(fName + "_" + h_Loose_D0->GetName(),        TObject::kWriteDelete);
+	h_Loose_LepPt          ->Write(fName + "_" + h_Loose_LepPt          ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepEta         ->Write(fName + "_" + h_Loose_LepEta         ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepIso         ->Write(fName + "_" + h_Loose_LepIso         ->GetName(), TObject::kWriteDelete);
+	h_Loose_D0             ->Write(fName + "_" + h_Loose_D0             ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_LepEta_30 ->Write(fName + "_" + h_Loose_LepEta_30->GetName(), TObject::kWriteDelete);
-	h_Loose_LepEta_40 ->Write(fName + "_" + h_Loose_LepEta_40->GetName(), TObject::kWriteDelete);
-	h_Loose_LepEta_50 ->Write(fName + "_" + h_Loose_LepEta_50->GetName(), TObject::kWriteDelete);
-	h_Loose_LepEta_60 ->Write(fName + "_" + h_Loose_LepEta_60->GetName(), TObject::kWriteDelete);
+	h_Loose_LepEta_30      ->Write(fName + "_" + h_Loose_LepEta_30      ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepEta_40      ->Write(fName + "_" + h_Loose_LepEta_40      ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepEta_50      ->Write(fName + "_" + h_Loose_LepEta_50      ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepEta_60      ->Write(fName + "_" + h_Loose_LepEta_60      ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_LepPt_30  ->Write(fName + "_" + h_Loose_LepPt_30->GetName(),  TObject::kWriteDelete);
-	h_Loose_LepPt_40  ->Write(fName + "_" + h_Loose_LepPt_40->GetName(),  TObject::kWriteDelete);
-	h_Loose_LepPt_50  ->Write(fName + "_" + h_Loose_LepPt_50->GetName(),  TObject::kWriteDelete);
-	h_Loose_LepPt_60  ->Write(fName + "_" + h_Loose_LepPt_60->GetName(),  TObject::kWriteDelete);
+	h_Loose_LepPt_30       ->Write(fName + "_" + h_Loose_LepPt_30       ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepPt_40       ->Write(fName + "_" + h_Loose_LepPt_40       ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepPt_50       ->Write(fName + "_" + h_Loose_LepPt_50       ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepPt_60       ->Write(fName + "_" + h_Loose_LepPt_60       ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_HT        ->Write(fName + "_" + h_Loose_HT->GetName(),        TObject::kWriteDelete);
-	h_Loose_MET       ->Write(fName + "_" + h_Loose_MET->GetName(),       TObject::kWriteDelete);
-	h_Loose_METnoMTCut->Write(fName + "_" + h_Loose_METnoMTCut->GetName(),TObject::kWriteDelete);
-	h_Loose_MT        ->Write(fName + "_" + h_Loose_MT->GetName(),        TObject::kWriteDelete);
-	h_Loose_MTMET20   ->Write(fName + "_" + h_Loose_MTMET20->GetName(),   TObject::kWriteDelete);
-	h_Loose_MTMET30   ->Write(fName + "_" + h_Loose_MTMET30->GetName(),   TObject::kWriteDelete);
+	h_Loose_HT             ->Write(fName + "_" + h_Loose_HT             ->GetName(), TObject::kWriteDelete);
+	h_Loose_MET            ->Write(fName + "_" + h_Loose_MET            ->GetName(), TObject::kWriteDelete);
+	h_Loose_METnoMTCut     ->Write(fName + "_" + h_Loose_METnoMTCut     ->GetName(), TObject::kWriteDelete);
+	h_Loose_MT             ->Write(fName + "_" + h_Loose_MT             ->GetName(), TObject::kWriteDelete);
+	h_Loose_MTMET20        ->Write(fName + "_" + h_Loose_MTMET20        ->GetName(), TObject::kWriteDelete);
+	h_Loose_MTMET30        ->Write(fName + "_" + h_Loose_MTMET30        ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_MaxJPt    ->Write(fName + "_" + h_Loose_MaxJPt->GetName(),    TObject::kWriteDelete);
-	h_Loose_MaxJCPt   ->Write(fName + "_" + h_Loose_MaxJCPt->GetName(),   TObject::kWriteDelete);
-	h_Loose_MaxJRPt   ->Write(fName + "_" + h_Loose_MaxJRPt->GetName(),   TObject::kWriteDelete);
+	h_Loose_MaxJPt         ->Write(fName + "_" + h_Loose_MaxJPt         ->GetName(), TObject::kWriteDelete);
+	h_Loose_MaxJCPt        ->Write(fName + "_" + h_Loose_MaxJCPt        ->GetName(), TObject::kWriteDelete);
+	h_Loose_MaxJRPt        ->Write(fName + "_" + h_Loose_MaxJRPt        ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_AllJCPt   ->Write(fName + "_" + h_Loose_AllJCPt->GetName(),   TObject::kWriteDelete);
-	h_Loose_AllJRPt   ->Write(fName + "_" + h_Loose_AllJRPt->GetName(),   TObject::kWriteDelete);
-	h_Loose_AllJEta   ->Write(fName + "_" + h_Loose_AllJEta->GetName(),   TObject::kWriteDelete);
+	h_Loose_AllJCPt        ->Write(fName + "_" + h_Loose_AllJCPt        ->GetName(), TObject::kWriteDelete);
+	h_Loose_AllJRPt        ->Write(fName + "_" + h_Loose_AllJRPt        ->GetName(), TObject::kWriteDelete);
+	h_Loose_AllJEta        ->Write(fName + "_" + h_Loose_AllJEta        ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_AllJEta_test1 ->Write(fName + "_" + h_Loose_AllJEta_test1->GetName(), TObject::kWriteDelete);
-	h_Loose_AllJEta_test2 ->Write(fName + "_" + h_Loose_AllJEta_test2->GetName(), TObject::kWriteDelete);
-	h_Loose_AllJEta_test3 ->Write(fName + "_" + h_Loose_AllJEta_test3->GetName(), TObject::kWriteDelete);
+	//h_Loose_AllJEta_test1 ->Write(fName + "_" + h_Loose_AllJEta_test1->GetName(), TObject::kWriteDelete);
+	//h_Loose_AllJEta_test2 ->Write(fName + "_" + h_Loose_AllJEta_test2->GetName(), TObject::kWriteDelete);
+	//h_Loose_AllJEta_test3 ->Write(fName + "_" + h_Loose_AllJEta_test3->GetName(), TObject::kWriteDelete);
 
-	h_Loose_NBJets    ->Write(fName + "_" + h_Loose_NBJets->GetName(),    TObject::kWriteDelete);
-	h_Loose_NJets     ->Write(fName + "_" + h_Loose_NJets->GetName(),     TObject::kWriteDelete);
-	h_Loose_NVertices ->Write(fName + "_" + h_Loose_NVertices->GetName(), TObject::kWriteDelete);
-	h_Loose_NVertices1->Write(fName + "_" + h_Loose_NVertices1->GetName(),TObject::kWriteDelete);
-	h_Loose_NVerticesMET20 ->Write(fName + "_" + h_Loose_NVerticesMET20->GetName(), TObject::kWriteDelete);
+	h_Loose_NBJets         ->Write(fName + "_" + h_Loose_NBJets         ->GetName(), TObject::kWriteDelete);
+	h_Loose_NJets          ->Write(fName + "_" + h_Loose_NJets          ->GetName(), TObject::kWriteDelete);
+	h_Loose_NVertices      ->Write(fName + "_" + h_Loose_NVertices      ->GetName(), TObject::kWriteDelete);
+	h_Loose_NVertices1     ->Write(fName + "_" + h_Loose_NVertices1     ->GetName(), TObject::kWriteDelete);
+	h_Loose_NVerticesMET20 ->Write(fName + "_" + h_Loose_NVerticesMET20 ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_AwayJetDR ->Write(fName + "_" + h_Loose_AwayJetDR->GetName(), TObject::kWriteDelete);
-	h_Loose_AwayJetPt ->Write(fName + "_" + h_Loose_AwayJetPt->GetName(), TObject::kWriteDelete);
-	h_Loose_ClosJetDR ->Write(fName + "_" + h_Loose_ClosJetDR->GetName(), TObject::kWriteDelete);
-	h_Loose_ClosJetPt ->Write(fName + "_" + h_Loose_ClosJetPt->GetName(), TObject::kWriteDelete);
+	h_Loose_AwayJetDR      ->Write(fName + "_" + h_Loose_AwayJetDR      ->GetName(), TObject::kWriteDelete);
+	h_Loose_AwayJetPt      ->Write(fName + "_" + h_Loose_AwayJetPt      ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetDR      ->Write(fName + "_" + h_Loose_ClosJetDR      ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPt      ->Write(fName + "_" + h_Loose_ClosJetPt      ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_JCPtJEta  ->Write(fName + "_" + h_Loose_JCPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Loose_JRPtJEta  ->Write(fName + "_" + h_Loose_JRPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Loose_JCPtJPt   ->Write(fName + "_" + h_Loose_JCPtJPt  ->GetName(), TObject::kWriteDelete);
-	h_Loose_JRPtJPt   ->Write(fName + "_" + h_Loose_JRPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Loose_JCPtJEta       ->Write(fName + "_" + h_Loose_JCPtJEta       ->GetName(), TObject::kWriteDelete);
+	h_Loose_JRPtJEta       ->Write(fName + "_" + h_Loose_JRPtJEta       ->GetName(), TObject::kWriteDelete);
+	h_Loose_JCPtJPt        ->Write(fName + "_" + h_Loose_JCPtJPt        ->GetName(), TObject::kWriteDelete);
+	h_Loose_JRPtJPt        ->Write(fName + "_" + h_Loose_JRPtJPt        ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_DJPtJEta  ->Write(fName + "_" + h_Loose_DJPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Loose_FJPtJEta  ->Write(fName + "_" + h_Loose_FJPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Loose_DJPtJPt   ->Write(fName + "_" + h_Loose_DJPtJPt  ->GetName(), TObject::kWriteDelete);
-	h_Loose_FJPtJPt   ->Write(fName + "_" + h_Loose_FJPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Loose_DJPtJEta       ->Write(fName + "_" + h_Loose_DJPtJEta       ->GetName(), TObject::kWriteDelete);
+	h_Loose_FJPtJEta       ->Write(fName + "_" + h_Loose_FJPtJEta       ->GetName(), TObject::kWriteDelete);
+	h_Loose_DJPtJPt        ->Write(fName + "_" + h_Loose_DJPtJPt        ->GetName(), TObject::kWriteDelete);
+	h_Loose_FJPtJPt        ->Write(fName + "_" + h_Loose_FJPtJPt        ->GetName(), TObject::kWriteDelete);
 
 	for(int n = 0; n < (fDFn_binseta-1)*(fDFn_binspt-1); ++n) {
 		h_Loose_DJPtZoomC[n] ->Write(fName + "_" + h_Loose_DJPtZoomC[n] ->GetName(), TObject::kWriteDelete);
@@ -1465,56 +1467,56 @@ void Fakerates::writeHistos(TFile* pFile){
 
 
 	// tight histograms
-	h_Tight_LepPt     ->Write(fName + "_" + h_Tight_LepPt->GetName(),     TObject::kWriteDelete);
-	h_Tight_LepEta    ->Write(fName + "_" + h_Tight_LepEta->GetName(),    TObject::kWriteDelete);
-	h_Tight_LepIso    ->Write(fName + "_" + h_Tight_LepIso->GetName(),    TObject::kWriteDelete);
-	h_Tight_D0        ->Write(fName + "_" + h_Tight_D0->GetName(),        TObject::kWriteDelete);
+	h_Tight_LepPt          ->Write(fName + "_" + h_Tight_LepPt          ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepEta         ->Write(fName + "_" + h_Tight_LepEta         ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepIso         ->Write(fName + "_" + h_Tight_LepIso         ->GetName(), TObject::kWriteDelete);
+	h_Tight_D0             ->Write(fName + "_" + h_Tight_D0             ->GetName(), TObject::kWriteDelete);
 
-	h_Tight_LepEta_30 ->Write(fName + "_" + h_Tight_LepEta_30->GetName(), TObject::kWriteDelete);
-	h_Tight_LepEta_40 ->Write(fName + "_" + h_Tight_LepEta_40->GetName(), TObject::kWriteDelete);
-	h_Tight_LepEta_50 ->Write(fName + "_" + h_Tight_LepEta_50->GetName(), TObject::kWriteDelete);
-	h_Tight_LepEta_60 ->Write(fName + "_" + h_Tight_LepEta_60->GetName(), TObject::kWriteDelete);
+	h_Tight_LepEta_30      ->Write(fName + "_" + h_Tight_LepEta_30      ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepEta_40      ->Write(fName + "_" + h_Tight_LepEta_40      ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepEta_50      ->Write(fName + "_" + h_Tight_LepEta_50      ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepEta_60      ->Write(fName + "_" + h_Tight_LepEta_60      ->GetName(), TObject::kWriteDelete);
 
-	h_Tight_LepPt_30  ->Write(fName + "_" + h_Tight_LepPt_30->GetName(),  TObject::kWriteDelete);
-	h_Tight_LepPt_40  ->Write(fName + "_" + h_Tight_LepPt_40->GetName(),  TObject::kWriteDelete);
-	h_Tight_LepPt_50  ->Write(fName + "_" + h_Tight_LepPt_50->GetName(),  TObject::kWriteDelete);
-	h_Tight_LepPt_60  ->Write(fName + "_" + h_Tight_LepPt_60->GetName(),  TObject::kWriteDelete);
+	h_Tight_LepPt_30       ->Write(fName + "_" + h_Tight_LepPt_30       ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepPt_40       ->Write(fName + "_" + h_Tight_LepPt_40       ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepPt_50       ->Write(fName + "_" + h_Tight_LepPt_50       ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepPt_60       ->Write(fName + "_" + h_Tight_LepPt_60       ->GetName(), TObject::kWriteDelete);
 
-	h_Tight_HT        ->Write(fName + "_" + h_Tight_HT->GetName(),        TObject::kWriteDelete);
-	h_Tight_MET       ->Write(fName + "_" + h_Tight_MET->GetName(),       TObject::kWriteDelete);
-	h_Tight_METnoMTCut->Write(fName + "_" + h_Tight_METnoMTCut->GetName(),TObject::kWriteDelete);
-	h_Tight_MT        ->Write(fName + "_" + h_Tight_MT->GetName(),        TObject::kWriteDelete);
-	h_Tight_MTMET20   ->Write(fName + "_" + h_Tight_MTMET20->GetName(),   TObject::kWriteDelete);
-	h_Tight_MTMET30   ->Write(fName + "_" + h_Tight_MTMET30->GetName(),   TObject::kWriteDelete);
+	h_Tight_HT             ->Write(fName + "_" + h_Tight_HT             ->GetName(), TObject::kWriteDelete);
+	h_Tight_MET            ->Write(fName + "_" + h_Tight_MET            ->GetName(), TObject::kWriteDelete);
+	h_Tight_METnoMTCut     ->Write(fName + "_" + h_Tight_METnoMTCut     ->GetName(), TObject::kWriteDelete);
+	h_Tight_MT             ->Write(fName + "_" + h_Tight_MT             ->GetName(), TObject::kWriteDelete);
+	h_Tight_MTMET20        ->Write(fName + "_" + h_Tight_MTMET20        ->GetName(), TObject::kWriteDelete);
+	h_Tight_MTMET30        ->Write(fName + "_" + h_Tight_MTMET30        ->GetName(), TObject::kWriteDelete);
 
-	h_Tight_MaxJPt    ->Write(fName + "_" + h_Tight_MaxJPt->GetName(),    TObject::kWriteDelete);
-	h_Tight_MaxJCPt   ->Write(fName + "_" + h_Tight_MaxJCPt->GetName(),   TObject::kWriteDelete);
-	h_Tight_MaxJRPt   ->Write(fName + "_" + h_Tight_MaxJRPt->GetName(),   TObject::kWriteDelete);
+	h_Tight_MaxJPt         ->Write(fName + "_" + h_Tight_MaxJPt         ->GetName(), TObject::kWriteDelete);
+	h_Tight_MaxJCPt        ->Write(fName + "_" + h_Tight_MaxJCPt        ->GetName(), TObject::kWriteDelete);
+	h_Tight_MaxJRPt        ->Write(fName + "_" + h_Tight_MaxJRPt        ->GetName(), TObject::kWriteDelete);
 
-	h_Tight_AllJCPt   ->Write(fName + "_" + h_Tight_AllJCPt->GetName(),   TObject::kWriteDelete);
-	h_Tight_AllJRPt   ->Write(fName + "_" + h_Tight_AllJRPt->GetName(),   TObject::kWriteDelete);
-	h_Tight_AllJEta   ->Write(fName + "_" + h_Tight_AllJEta->GetName(),   TObject::kWriteDelete);
+	h_Tight_AllJCPt        ->Write(fName + "_" + h_Tight_AllJCPt        ->GetName(), TObject::kWriteDelete);
+	h_Tight_AllJRPt        ->Write(fName + "_" + h_Tight_AllJRPt        ->GetName(), TObject::kWriteDelete);
+	h_Tight_AllJEta        ->Write(fName + "_" + h_Tight_AllJEta        ->GetName(), TObject::kWriteDelete);
 
-	h_Tight_NBJets    ->Write(fName + "_" + h_Tight_NBJets->GetName(),    TObject::kWriteDelete);
-	h_Tight_NJets     ->Write(fName + "_" + h_Tight_NJets->GetName(),     TObject::kWriteDelete);
-	h_Tight_NVertices ->Write(fName + "_" + h_Tight_NVertices->GetName(), TObject::kWriteDelete);
-	h_Tight_NVertices1->Write(fName + "_" + h_Tight_NVertices1->GetName(),TObject::kWriteDelete);
-	h_Tight_NVerticesMET20 ->Write(fName + "_" + h_Tight_NVerticesMET20->GetName(), TObject::kWriteDelete);
+	h_Tight_NBJets         ->Write(fName + "_" + h_Tight_NBJets         ->GetName(), TObject::kWriteDelete);
+	h_Tight_NJets          ->Write(fName + "_" + h_Tight_NJets          ->GetName(), TObject::kWriteDelete);
+	h_Tight_NVertices      ->Write(fName + "_" + h_Tight_NVertices      ->GetName(), TObject::kWriteDelete);
+	h_Tight_NVertices1     ->Write(fName + "_" + h_Tight_NVertices1     ->GetName(), TObject::kWriteDelete);
+	h_Tight_NVerticesMET20 ->Write(fName + "_" + h_Tight_NVerticesMET20 ->GetName(), TObject::kWriteDelete);
 
-	h_Tight_AwayJetDR ->Write(fName + "_" + h_Tight_AwayJetDR->GetName(), TObject::kWriteDelete);
-	h_Tight_AwayJetPt ->Write(fName + "_" + h_Tight_AwayJetPt->GetName(), TObject::kWriteDelete);
-	h_Tight_ClosJetDR ->Write(fName + "_" + h_Tight_ClosJetDR->GetName(), TObject::kWriteDelete);
-	h_Tight_ClosJetPt ->Write(fName + "_" + h_Tight_ClosJetPt->GetName(), TObject::kWriteDelete);
+	h_Tight_AwayJetDR      ->Write(fName + "_" + h_Tight_AwayJetDR      ->GetName(), TObject::kWriteDelete);
+	h_Tight_AwayJetPt      ->Write(fName + "_" + h_Tight_AwayJetPt      ->GetName(), TObject::kWriteDelete);
+	h_Tight_ClosJetDR      ->Write(fName + "_" + h_Tight_ClosJetDR      ->GetName(), TObject::kWriteDelete);
+	h_Tight_ClosJetPt      ->Write(fName + "_" + h_Tight_ClosJetPt      ->GetName(), TObject::kWriteDelete);
 
-	h_Tight_JCPtJEta  ->Write(fName + "_" + h_Tight_JCPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Tight_JRPtJEta  ->Write(fName + "_" + h_Tight_JRPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Tight_JCPtJPt   ->Write(fName + "_" + h_Tight_JCPtJPt  ->GetName(), TObject::kWriteDelete);
-	h_Tight_JRPtJPt   ->Write(fName + "_" + h_Tight_JRPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Tight_JCPtJEta       ->Write(fName + "_" + h_Tight_JCPtJEta       ->GetName(), TObject::kWriteDelete);
+	h_Tight_JRPtJEta       ->Write(fName + "_" + h_Tight_JRPtJEta       ->GetName(), TObject::kWriteDelete);
+	h_Tight_JCPtJPt        ->Write(fName + "_" + h_Tight_JCPtJPt        ->GetName(), TObject::kWriteDelete);
+	h_Tight_JRPtJPt        ->Write(fName + "_" + h_Tight_JRPtJPt        ->GetName(), TObject::kWriteDelete);
 
-	h_Tight_DJPtJEta  ->Write(fName + "_" + h_Tight_DJPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Tight_FJPtJEta  ->Write(fName + "_" + h_Tight_FJPtJEta ->GetName(), TObject::kWriteDelete);
-	h_Tight_DJPtJPt   ->Write(fName + "_" + h_Tight_DJPtJPt  ->GetName(), TObject::kWriteDelete);
-	h_Tight_FJPtJPt   ->Write(fName + "_" + h_Tight_FJPtJPt  ->GetName(), TObject::kWriteDelete);
+	h_Tight_DJPtJEta       ->Write(fName + "_" + h_Tight_DJPtJEta       ->GetName(), TObject::kWriteDelete);
+	h_Tight_FJPtJEta       ->Write(fName + "_" + h_Tight_FJPtJEta       ->GetName(), TObject::kWriteDelete);
+	h_Tight_DJPtJPt        ->Write(fName + "_" + h_Tight_DJPtJPt        ->GetName(), TObject::kWriteDelete);
+	h_Tight_FJPtJPt        ->Write(fName + "_" + h_Tight_FJPtJPt        ->GetName(), TObject::kWriteDelete);
 
 	for(int n = 0; n < (fDFn_binseta-1)*(fDFn_binspt-1); ++n) {
 		h_Tight_DJPtZoomC[n] ->Write(fName + "_" + h_Tight_DJPtZoomC[n] ->GetName(), TObject::kWriteDelete);
