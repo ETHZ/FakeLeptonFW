@@ -26,27 +26,22 @@ def make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, hists, title_hi
 		drawoption_data = "p e1 x0"
 		drawoption_mc = "e2 same"
 		legendoption_mc = "f"
+
+	hists[0][0].Draw(drawoption_data)
+	hists[0][0].SetMarkerSize(1.4)
+	for i in range(1,len(hists)):
+		hists[i][0].SetMarkerSize(markersize_mc)
+		hists[i][0].Draw(drawoption_mc)
+	hists[0][0].Draw(drawoption_data + " same")
 	
 	for i in range(len(hists)):
 		hists[i][0] = helper.setFRPlotStyle(dataType, hists[i][0], helper.getColor(hists[i][1]))
 		if i+1 == len(hists): 
 			hists[i][0] = helper.setFRPlotStyle(dataType, hists[i][0], helper.getColor(hists[i][1]), 'FR as function of ' + helper.getXTitle(dataType, title_hist), title_hist)
-	
-	hists[0][0].Draw(drawoption_data)
-	hists[0][0].SetMarkerSize(1.4)
-	hists[0][0].SetMinimum(0.0001)
-	hists[0][0].SetMaximum(0.5)
-	#hists[0][0].SetMaximum(0.4) #1.5*hists[0][0].GetMaximum())
-	for i in range(1,len(hists)):
-		hists[i][0].SetMinimum(0.0001)
-		hists[i][0].SetMaximum(0.5)
-		#hists[i][0].SetMaximum(0.4)
-		hists[i][0].SetMarkerSize(markersize_mc)
-		hists[i][0].Draw(drawoption_mc)
-	hists[0][0].Draw(drawoption_data + " same")
 
-	leg1 = helper.makeLegend(0.62, 0.08, 0.87, 0.33)
-	#leg1 = helper.makeLegend(0.22, 0.6, 0.47, 0.85)
+	if dataType == 'el': leg1 = helper.makeLegend(0.62, 0.08, 0.87, 0.33)
+	else               : leg1 = helper.makeLegend(0.22, 0.6, 0.47, 0.85)
+
 	leg1.AddEntry(hists[0][0], helper.getLegendName(hists[0][1]), 'pe')
 	for i in range(1,len(hists)):
 		leg1.AddEntry(hists[i][0], helper.getLegendName(hists[i][1]), legendoption_mc)
@@ -82,8 +77,8 @@ def make2dFRPlot(dataType, canv, outputDir, dataset, hist, title_indeces, name='
 	hist.GetYaxis().SetTitleSize(0.07)
 	hist.GetYaxis().SetLabelSize(0.07)
 	hist.SetMinimum(0.0)
-	hist.SetMaximum(0.65)
-	#hist.SetMaximum(0.4)
+	if dataType == 'el': hist.SetMaximum(0.6)
+	else               : hist.SetMaximum(0.4)
 	hist.SetTitle("FR 2d Map (" + name + ")")
 	helper.saveCanvas(canv, pad_plot, outputDir + "fakerates_2d/", "FR_2dmap_" + name.lower().replace(" ", "_"), 0)
 	pad_plot.Close()

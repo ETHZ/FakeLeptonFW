@@ -179,7 +179,7 @@ if module == 'plots_2d' or module == 'all':
 if module == 'zoom_met' or module == 'all':
 	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350, wjets, dyjets50]
 	else:                mclist = [qcd, wjets, dyjets50] 
-	Plot.PlotMETZooms(dataType, outputDir, data, mclist, leg)
+	#Plot.PlotMETZooms(dataType, outputDir, data, mclist, leg)
 
 
 
@@ -198,7 +198,7 @@ if module == 'zoom_jpt' or module == 'all':
 	leg0.AddEntry(wjets     .hists[0], helper.getLegendName(wjets     .GetName()), 'l')
 	leg0.AddEntry(dyjets10  .hists[0], helper.getLegendName(dyjets10  .GetName()), 'l')
 	leg0.AddEntry(qcdsample .hists[0], helper.getLegendName(qcdsample .GetName()), 'l')
-	Plot.PlotJPtZooms(dataType, outputDir, data, mclist, leg0)
+	#Plot.PlotJPtZooms(dataType, outputDir, data, mclist, leg0)
 
 
 
@@ -217,51 +217,6 @@ if module == 'fakerates_2d' or module == 'all':
 	if dataType == 'el': qcdlist = [qcd30, qcd80, qcd250, qcd350]
 	else:                qcdlist = [qcd] 
 	FR.Plot2dFRMap(dataType, outputDir, module, data, mc_samples, qcdlist, [], True)#[wjets, dyjets50, dyjets10], True, True)
-
-
-
-# hard-coded to produce wjets and dyjets All-Jet comparisons
-
-if module == 'adhoc' or module == 'all':
-
-	canv = helper.makeCanvas(900, 675)
-	pad_plot = helper.makePad('plot')
-	pad_ratio = helper.makePad('ratio')
-	pad_ratio.cd()
-
-	for hist in wjets.hists:
-
-		i = wjets.hists.index(hist)
-		pad_plot.cd()
-
-
-		# Plot Histogram	
-		if not "AllJ" in hist.GetName(): continue
-
-		prepend = ''
-		postpend = '_closer'
-		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
-		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
-
-		hist.Draw()
-		hist.Scale(1.0/hist.Integral())
-		dyjets50.hists[i].Draw("same")
-		dyjets50.hists[i].Scale(1.0/dyjets50.hists[i].Integral())
-		hist.SetMaximum(1.5*max(hist.GetMaximum(), dyjets50.hists[i].GetMaximum()))
-		hist.GetYaxis().SetTitle("1/Integral")
-		leg.Draw()
-
-		pad_ratio.cd()
-		hist_ratio = hist.Clone()
-		hist_ratio.Divide(dyjets50.hists[i])
-		hist_ratio.Draw("p e1")
-		hist_ratio = helper.setRatioStyle(dataType, hist_ratio, hist)
-		line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
-		line.Draw()
-		helper.saveCanvas(canv, pad_plot, outputDir + "adhoc/", prepend + helper.getSaveName(hist) + postpend)
-
-
-
 
 
 
@@ -369,6 +324,47 @@ if module == 'fakerates_1d' or module == 'all':
 	FR.make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_cpt], 'FR_JetPt_compare')
 
 
+
+
+# hard-coded to produce wjets and dyjets All-Jet comparisons
+
+if module == 'adhoc' or module == 'all':
+
+	canv = helper.makeCanvas(900, 675)
+	pad_plot = helper.makePad('plot')
+	pad_ratio = helper.makePad('ratio')
+	pad_ratio.cd()
+
+	for hist in wjets.hists:
+
+		i = wjets.hists.index(hist)
+		pad_plot.cd()
+
+
+		# Plot Histogram	
+		if not "AllJ" in hist.GetName(): continue
+
+		prepend = ''
+		postpend = '_closer'
+		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
+		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
+
+		hist.Draw()
+		hist.Scale(1.0/hist.Integral())
+		dyjets50.hists[i].Draw("same")
+		dyjets50.hists[i].Scale(1.0/dyjets50.hists[i].Integral())
+		hist.SetMaximum(1.5*max(hist.GetMaximum(), dyjets50.hists[i].GetMaximum()))
+		hist.GetYaxis().SetTitle("1/Integral")
+		leg.Draw()
+
+		pad_ratio.cd()
+		hist_ratio = hist.Clone()
+		hist_ratio.Divide(dyjets50.hists[i])
+		hist_ratio.Draw("p e1")
+		hist_ratio = helper.setRatioStyle(dataType, hist_ratio, hist)
+		line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
+		line.Draw()
+		helper.saveCanvas(canv, pad_plot, outputDir + "adhoc/", prepend + helper.getSaveName(hist) + postpend)
 
 
 
