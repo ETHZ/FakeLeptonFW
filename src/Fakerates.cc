@@ -269,44 +269,15 @@ void Fakerates::loop(TFile* pFile){
 		float fEventweight = fLumiweight;
 		if(!fIsData && fPUweight) fEventweight *= PUWeight;
 
-		//if(JetPt->size()>0) for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
+		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+		//	h_Loose_AllJEtatest1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
+		//smearAllJets();
 
-		if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
-			if(passesUpperMETMT(mu)) 
-				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-					h_Loose_AllJEtatest1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
+		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
+		//	h_Loose_AllJEtatest2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
-
-		//for(int i=0; i<JetPt->size(); ++i) safer[i] = JetEta->at(i);
-
-		smearAllJets();
-
-		if(fDataType !=2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
-			if(passesUpperMETMT(mu)) 
-				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-					h_Loose_AllJEtatest2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
-
-
-		//for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) cout << "DETECTED AN INCONSISTENCY!" << endl;
-
-
-
-		//cout << jentry;
 		fillFRPlots(fEventweight);
-
-		//if(JetPt->size()>0) for(int i=0; i<JetPt->size(); ++i) if(safer[i] != JetEta->at(i)) ++n_detected;
-
-
-		//cout << "======" << endl;
-		//cout << "in the end" << endl;
-		//for(int i=0; i<JetPt->size(); ++i) cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
-		//cout << "======" << endl;
-
-		if(fDataType != 2 && isFRRegionLepEvent(mu, jet, fJetPtCut))
-			if(passesUpperMETMT(mu)) 
-				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
-					h_Loose_AllJEtatest3 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
 	}
 
@@ -377,31 +348,22 @@ void Fakerates::smearAllJets(){
 		TLorentzVector TLV_Jet_old, TLV_Jet_new, TLV_MET;
 		TLV_MET.SetPtEtaPhiM(getMET(),0,getMETPhi(),0);
 
-		//cout << "---" << endl;
 		for(int i=0; i<JetPt->size(); ++i){
-		//	cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
 
-			//float sigmaMC = getSigmaMC( JetPt->at(i), JetEta->at(i) ) / JetPt->at(i);
-			float factor  = 1.0; //fRandom -> Gaus( 1.0, sigmaMC );  
-			//cout << JetEta->at(i) << endl;
-	//		TLV_Jet_old.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
-			//TLV_Jet_old.Print();
-			//cout << "i=" << i << ", " << TLV_Jet_old.Print() << endl;
-		//	cout << JetEta->at(i) << endl;
-		//	TLV_MET += TLV_Jet_old;
+			float sigmaMC = getSigmaMC( JetPt->at(i), JetEta->at(i) ) / JetPt->at(i);
+			float factor  = fRandom -> Gaus( 1.0, sigmaMC );  
+		
+			TLV_Jet_old.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
+			TLV_MET += TLV_Jet_old;
 
 			JetPt->at(i) = JetPt->at(i) * factor;
-		//	TLV_Jet_new.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
-
-		//	TLV_MET -= TLV_Jet_new;
-		//	cout << JetPt->at(i) << "; " << JetEta->at(i) << endl;
+	
+			TLV_Jet_new.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
+			TLV_MET -= TLV_Jet_new;
 		}
 
 		setMET(TLV_MET.Pt());
 		setMETPhi(TLV_MET.Phi());
-		//cout << "---" << endl;
-		//for(int i=0; i<JetPt->size(); ++i) cout << JetEta->at(i) << endl;
-		//cout << "===" << endl;
 	}
 }
 
@@ -484,6 +446,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 	int nloose(0), nveto_add(0);
 	int nawayjets(0), jetind(-1);
 
+	//cout << "start FRRegionLepEvent" << endl;
 
 	// Event fails HLT muon trigger (if data) then return false
 	if(fLepTriggerMC || fIsData) {
@@ -494,10 +457,13 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 		else                                                     {               }
 	}
 
+	//cout << "check 1" << endl;
+
 	// muon Pt is not reasonable then return false
 	if(LepPt->size() < 1) return false;
 
 
+	//cout << "check 2" << endl;
 	// count numbers of loose and veto muons in the event
 	for(int j=0; j < LepPt->size(); ++j){
 		if(isLooseLepton(j) && LepPt->at(j) > fLepPtCut){
@@ -510,15 +476,19 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 		}
 	}
 
+	//cout << "check 3" << endl;
 	// require exactly one loose muon and no additional veto muons
 	if(nloose    != 1) return false;
-	// if(nveto_add  > 0) return false;
+	
+	//cout << "check 4" << endl;
 	fCutflow_afterLepSel++;
-	if(nveto_add != 0) return false; // don't require this for the synching
+	if(nveto_add != 0) return false;
 
+	//cout << "check 5" << endl;
 	// Jet Pt is not reasonable then return false
 	if(JetRawPt->size() < 1) return false;
 
+	//cout << "check 6" << endl;
 	// count the number of away jets
 	for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
 		if(!isGoodJet(thisjet, jetcut, fAwayJetBTagCut)) continue;
@@ -531,6 +501,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 	if(awayjet_inds.size() < 1) return false;
 	fCutflow_afterJetSel++;
 
+	//cout << "check 7" << endl;
 	// set jet index on the hardest jet
 	jet = awayjet_inds[0];
 	if(awayjet_inds.size() > 1)
@@ -543,6 +514,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 	// phi cut
 	if(fAwayJetDPhiCut > 0. && Util::DeltaPhi(JetPhi->at(jet), LepPhi->at(lep)) < fAwayJetDPhiCut) return false;
 
+	//cout << "check 8" << endl;
     return true;
 }
 
@@ -758,11 +730,16 @@ bool Fakerates::passesUpperMETMT(int index){
 	return: true (if event passes the cuts), false (else)
 	*/
 
+	//cout << "start passesUpperMETMT" << endl;
+	//cout << "check 9" << endl;
     if(!passesMETCut()) return false;
     fCutflow_afterMETCut++;
 
+	//cout << "check 10" << endl;
     if(!passesMTCut(index)) return false;
     fCutflow_afterMTCut++;
+
+	//cout << "check 11" << endl;
 	
 	return true;
 }
@@ -893,8 +870,8 @@ float Fakerates::getHT(){
 int Fakerates::getNJets(int btag = 0){
 	/*
 	counts the number of jets and b-tagged jets
-	parameters: btag (0 any jet, 1 b tagged jet)
-	return: anzahl jets
+	parameters: btag (0 = any jet, 1 = b tagged jet)
+	return: number of jets
 	*/
 
 	int njets(0), nbjets(0);
@@ -908,6 +885,22 @@ int Fakerates::getNJets(int btag = 0){
 
 	if(btag==1) return nbjets;
 	return njets;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::fillFHist(float LepPt){
+	/*
+	checks, if the bins below 40GeV of h_FLoose and h_FTight shall be filled or 
+	not, depending on the choice of trigger used
+	parameters: LepPt (pt of the lepton)
+	return: true (if entry to be filled), false (else)
+	*/
+
+	if(fLepTrigger == "Mu40" && ((fLepTriggerMC && !fIsData) || fIsData) && LepPt <= 40) return false;
+	
+	return true;
+
 }
 
 
@@ -928,8 +921,6 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
 	std::vector<float, std::allocator<float> >* LepD0    = getLepD0();
 
-	float safer[20];
-	int n_detected = 0;
 
 	if(isFRRegionLepEvent(lep, jet, 30.)) {
 		if(passesUpperMETMT(lep)) {
@@ -1010,6 +1001,7 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 
 			for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
 
+//			cout << "after2: " << JetPt->at(thisjet) << "; " << JetEta->at(thisjet) << endl;
 				h_Loose_AllJCPt   ->Fill(JetPt->at(thisjet)       , fEventweight);
 				h_Loose_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , fEventweight);
 				h_Loose_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), fEventweight);
@@ -1037,16 +1029,18 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 			}
 
 
+
+
 			if( LepPt->at(lep) >  fFRbinspt.back() ){
 				int fillbin = h_FLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep)));
 				h_FLoose->AddBinContent(fillbin, fEventweight);
 			}
 			else{
-				if(fLepTrigger != "Mu40" || (fLepTrigger == "Mu40" && LepPt->at(lep) > 40)) 
+				//if(fillFHist(LepPt->at(lep)))
 					h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 			}
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
- cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
+//	cout << Form("%d\t%d\t%d\t%.2f\tistight%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
 		}
 
 		if(passesMTCut(lep))    h_Loose_MET            ->Fill(getMET()            , fEventweight);
@@ -1128,7 +1122,7 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 					h_FTight->AddBinContent(fillbin, fEventweight);
 				}
 				else{
-					if(fLepTrigger != "Mu40" || (fLepTrigger == "Mu40" && LepPt->at(lep) > 40)) 
+					//if(fillFHist(LepPt->at(lep)))
 						h_FTight->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 				}
 			}
@@ -1222,9 +1216,9 @@ void Fakerates::bookHistos(){
 	h_Loose_AllJCPt       = new TH1F("h_Loose_AllJCPt"      , "Loose_AllJCPt"   , 15      ,  0      , 150    ); h_Loose_AllJCPt   -> Sumw2();
 	h_Loose_AllJEta       = new TH1F("h_Loose_AllJEta"      , "Loose_AllJEta"   , 12      ,  0      , 2.4    ); h_Loose_AllJEta   -> Sumw2();
 
-	h_Loose_AllJEtatest1  = new TH1F("h_Loose_AllJEtatest1" , "Loose_AllJEtatest1", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest1 -> Sumw2();
-	h_Loose_AllJEtatest2  = new TH1F("h_Loose_AllJEtatest2" , "Loose_AllJEtatest2", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest2 -> Sumw2();
-	h_Loose_AllJEtatest3  = new TH1F("h_Loose_AllJEtatest3" , "Loose_AllJEtatest3", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest3 -> Sumw2();
+	//h_Loose_AllJEtatest1  = new TH1F("h_Loose_AllJEtatest1" , "Loose_AllJEtatest1", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest1 -> Sumw2();
+	//h_Loose_AllJEtatest2  = new TH1F("h_Loose_AllJEtatest2" , "Loose_AllJEtatest2", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest2 -> Sumw2();
+	//h_Loose_AllJEtatest3  = new TH1F("h_Loose_AllJEtatest3" , "Loose_AllJEtatest3", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest3 -> Sumw2();
 
 	h_Loose_NBJets        = new TH1F("h_Loose_NBJets"       , "Loose_NBJets"    , 3       ,  0      , 3      ); h_Loose_NBJets     -> Sumw2();
 	h_Loose_NJets         = new TH1F("h_Loose_NJets"        , "Loose_NJets"     , 5       ,  1      , 6      ); h_Loose_NJets      -> Sumw2();
@@ -1429,9 +1423,9 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Loose_AllJRPt        ->Write(fName + "_" + h_Loose_AllJRPt        ->GetName(), TObject::kWriteDelete);
 	h_Loose_AllJEta        ->Write(fName + "_" + h_Loose_AllJEta        ->GetName(), TObject::kWriteDelete);
 
-	h_Loose_AllJEtatest1  ->Write(fName + "_" + h_Loose_AllJEtatest1    ->GetName(), TObject::kWriteDelete);
-	h_Loose_AllJEtatest2  ->Write(fName + "_" + h_Loose_AllJEtatest2    ->GetName(), TObject::kWriteDelete);
-	h_Loose_AllJEtatest3  ->Write(fName + "_" + h_Loose_AllJEtatest3    ->GetName(), TObject::kWriteDelete);
+	//h_Loose_AllJEtatest1  ->Write(fName + "_" + h_Loose_AllJEtatest1    ->GetName(), TObject::kWriteDelete);
+	//h_Loose_AllJEtatest2  ->Write(fName + "_" + h_Loose_AllJEtatest2    ->GetName(), TObject::kWriteDelete);
+	//h_Loose_AllJEtatest3  ->Write(fName + "_" + h_Loose_AllJEtatest3    ->GetName(), TObject::kWriteDelete);
 
 	h_Loose_NBJets         ->Write(fName + "_" + h_Loose_NBJets         ->GetName(), TObject::kWriteDelete);
 	h_Loose_NJets          ->Write(fName + "_" + h_Loose_NJets          ->GetName(), TObject::kWriteDelete);

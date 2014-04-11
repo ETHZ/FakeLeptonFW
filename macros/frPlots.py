@@ -22,9 +22,9 @@ class sample:
 			h.SetMarkerColor(helper.getSampleColor(self))
 			h.SetLineColor(helper.getSampleColor(self))
 			h.SetFillColor(helper.getSampleColor(self))
-		self.isdata = (self.name == 'data')
+		self.isdata = ('data' in self.name)
 		if self.isdata: 
-			for h in self.hists: 
+			for h in self.hists:
 				h.SetMarkerStyle(20)
 	color  = helper.getSampleColor
 	scale  = 1.0
@@ -77,7 +77,6 @@ else:
 	mc_samples.append(dyjets50)
 	mc_samples.append(dyjets10)
 
-
 module = helper.getModule(outputDir)
 scaling = helper.getScaling(outputDir)
 outputDir = helper.CreateOutputFolders(outputDir)
@@ -105,7 +104,7 @@ canv = helper.makeCanvas(900, 675)
 
 ## LIST OF HISTOGRAMS TO PLOT
 
-plot1dHists = ['h_Loose_AwayJetDR', 'h_Loose_AwayJetPt', 'h_Loose_ClosJetDR', 'h_Loose_ClosJetPt', 'h_Loose_HT', 'h_Loose_LepEta', 'h_Loose_LepIso', 'h_Loose_LepPt', 'h_Loose_MET', 'h_Loose_METnoMTCut', 'h_Loose_MT', 'h_Loose_MTMET20', 'h_Loose_MTMET30', 'h_Loose_MaxJPt', 'h_Loose_AllJCPt', 'h_Loose_AllJRPt', 'h_Loose_AllJEta', 'h_Loose_AllJEta_test1', 'h_Loose_AllJEta_test2', 'h_Loose_AllJEta_test3', 'h_Loose_NBJets', 'h_Loose_NJets', 'h_Loose_NVertices', 'h_Loose_NVertices1', 'h_Loose_NVerticesMET20', 'h_Loose_D0', 'h_Tight_AwayJetDR', 'h_Tight_AwayJetPt', 'h_Tight_ClosJetDR', 'h_Tight_ClosJetPt', 'h_Tight_HT', 'h_Tight_LepEta', 'h_Tight_LepIso', 'h_Tight_LepPt', 'h_Tight_MET', 'h_Tight_METnoMTCut', 'h_Tight_MT', 'h_Tight_MTMET20', 'h_Tight_MTMET30', 'h_Tight_MaxJPt', 'h_Tight_AllJCPt', 'h_Tight_AllJRPt', 'h_Tight_AllJEta', 'h_Tight_NBJets', 'h_Tight_NJets', 'h_Tight_NVertices', 'h_Tight_NVertices1', 'h_Tight_NVerticesMET20', 'h_Tight_D0']
+plot1dHists = ['h_Loose_AwayJetDR', 'h_Loose_AwayJetPt', 'h_Loose_ClosJetDR', 'h_Loose_ClosJetPt', 'h_Loose_HT', 'h_Loose_LepEta', 'h_Loose_LepIso', 'h_Loose_LepPt', 'h_Loose_MET', 'h_Loose_METnoMTCut', 'h_Loose_MT', 'h_Loose_MTMET20', 'h_Loose_MTMET30', 'h_Loose_MaxJPt', 'h_Loose_AllJCPt', 'h_Loose_AllJRPt', 'h_Loose_AllJEta', 'h_Loose_AllJEtatest1', 'h_Loose_AllJEtatest2', 'h_Loose_AllJEtatest3', 'h_Loose_NBJets', 'h_Loose_NJets', 'h_Loose_NVertices', 'h_Loose_NVertices1', 'h_Loose_NVerticesMET20', 'h_Loose_D0', 'h_Tight_AwayJetDR', 'h_Tight_AwayJetPt', 'h_Tight_ClosJetDR', 'h_Tight_ClosJetPt', 'h_Tight_HT', 'h_Tight_LepEta', 'h_Tight_LepIso', 'h_Tight_LepPt', 'h_Tight_MET', 'h_Tight_METnoMTCut', 'h_Tight_MT', 'h_Tight_MTMET20', 'h_Tight_MTMET30', 'h_Tight_MaxJPt', 'h_Tight_AllJCPt', 'h_Tight_AllJRPt', 'h_Tight_AllJEta', 'h_Tight_NBJets', 'h_Tight_NJets', 'h_Tight_NVertices', 'h_Tight_NVertices1', 'h_Tight_NVerticesMET20', 'h_Tight_D0']
 
 plot2dHists = ['h_Loose_DJPtJEta', 'h_Loose_FJPtJEta', 'h_Loose_DJPtJPt', 'h_Loose_FJPtJPt', 'h_Tight_DJPtJEta', 'h_Tight_FJPtJEta', 'h_Tight_DJPtJPt', 'h_Tight_FJPtJPt'] 
 
@@ -116,32 +115,42 @@ plot2dHists = ['h_Loose_DJPtJEta', 'h_Loose_FJPtJEta', 'h_Loose_DJPtJPt', 'h_Loo
 lower = []
 upper = []
 
-if 'qcd' in scaling:
-	qcd.Rescale(fit.getMCScaleFactor(qcd, 'h_Loose_LepIso', [data], [], 0.2))
+if scaling == 'qcd_weighted':
+	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350]
+	else:                mclist = [qcd]
+	qcd.Rescale(fit.getMCScaleFactorMutually(mclist, 'h_Loose_LepIso', [data], [], 0.2))
 
-if 'wjets' in scaling and not scaling == 'wjetsdyjets':
-	wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_MTMET20', [data], [qcd, dyjets50, dyjets10], 60, 90))
+if scaling == 'qcdwjets_weighted' or scaling == 'wjets_weighted':
+	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350, dyjets50, dyjets10]
+	else:                mclist = [qcd, dyjets50, dyjets10]
+	wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_MTMET20', [data], mclist, 60, 90))
 
-if 'wjetsdyjets' in scaling:
-	scalefactors = fit.getMCScaleFactorMutually([wjets, dyjets50, dyjets10], 'h_Tight_MTMET20', [data], [qcd], 60, 90)
+if scaling == 'wjetsdyjets_weighted':
+	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350]
+	else:                mclist = [qcd]
+	scalefactors = fit.getMCScaleFactorMutually([wjets, dyjets50, dyjets10], 'h_Tight_MTMET20', [data], mclist, 60, 90)
 	wjets.Rescale(scalefactors[0])
 	dyjets50.Rescale(scalefactors[1])
 	dyjets10.Rescale(scalefactors[2])
 
-if scaling == 'fit':
+if scaling == 'fit_weighted':
+	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350]
+	else:                mclist = [qcd]
 	#scalefactors = fit.getMCScaleFactorSimultaneously(data, qcd, wjets, dyjets50, dyjets10)
-	scalefactors = fit.getMCScaleFactorSimultaneously2(data, qcd, wjets, dyjets50, dyjets10)
+	scalefactors = fit.getMCScaleFactorSimultaneouslyQCDEWK(data, mclist, [wjets, dyjets50, dyjets10])
 	qcd.Rescale(scalefactors[0])
 	wjets.Rescale(scalefactors[1])
 	dyjets50.Rescale(scalefactors[2])
 	dyjets10.Rescale(scalefactors[3])
 
-if scaling == 'fiterror':
-	scalefactors = fit.getMCScaleFactorSimultaneouslyWithErrors(data, qcd, wjets, dyjets50, dyjets10)
+if scaling == 'fiterror_weighted':
+	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350]
+	else:                mclist = [qcd]
+	scalefactors = fit.getMCScaleFactorSimultaneouslyWithErrors(data, mclist, [wjets, dyjets50, dyjets10])
 	qcd.Rescale(scalefactors[0][0])
 	wjets.Rescale(scalefactors[0][1])
-	dyjets50.Rescale(scalefactors[0][2])
-	dyjets10.Rescale(scalefactors[0][3])
+	dyjets50.Rescale(scalefactors[0][1])
+	dyjets10.Rescale(scalefactors[0][1])
 	lower = scalefactors[1]
 	upper = scalefactors[2]
 
@@ -207,7 +216,7 @@ if module == 'zoom_jpt' or module == 'all':
 if module == 'fakerates_1d' or module == 'all':
  	if dataType == 'el': qcdlist = [qcd30] #[qcd30, qcd80, qcd250, qcd350]
 	else:                qcdlist = [qcd] 
-	FR.PlotFR(dataType, outputDir, data, mc_samples, plot1dHists, qcdlist)#, [wjets, dyjets50, dyjets10], True)
+	FR.PlotFR(dataType, outputDir, data, mc_samples, plot1dHists, qcdlist, [wjets, dyjets50, dyjets10], True)
 
 
 
@@ -216,7 +225,7 @@ if module == 'fakerates_1d' or module == 'all':
 if module == 'fakerates_2d' or module == 'all':
 	if dataType == 'el': qcdlist = [qcd30, qcd80, qcd250, qcd350]
 	else:                qcdlist = [qcd] 
-	FR.Plot2dFRMap(dataType, outputDir, module, data, mc_samples, qcdlist, [], True)#[wjets, dyjets50, dyjets10], True, True)
+	FR.Plot2dFRMap(dataType, outputDir, module, data, mc_samples, qcdlist, [wjets, dyjets50, dyjets10], True, True)
 
 
 

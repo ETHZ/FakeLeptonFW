@@ -1,2 +1,2 @@
 #!/bin/bash
-runFR el ETH/corrected_jet/PUweight_runD/none/ unweighted/
+runFR mu ETH/corrected_jet/PUweight_runD/none/ unweighted/

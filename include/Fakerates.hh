@@ -89,6 +89,7 @@ public:
 	float getSigmaMC(float, float);
 	void smearAllJets();	
 
+	bool fillFHist(float);
 	void fillFRPlots(float);
 
 	// CUTS

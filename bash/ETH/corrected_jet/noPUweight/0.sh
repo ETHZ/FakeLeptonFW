@@ -1,17 +1,9 @@
 #!/bin/bash
-runFR ETH/corrected_jet/noPUweight/Mu17/ unweighted/
-runFR ETH/corrected_jet/noPUweight/Mu17/ fit_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu17/ qcd_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu17/ qcdwjets_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu17MC/ unweighted/
-runFR ETH/corrected_jet/noPUweight/Mu17MC/ fit_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu17MC/ qcd_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu17MC/ qcdwjets_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu40/ unweighted/
-runFR ETH/corrected_jet/noPUweight/Mu40/ fit_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu40/ qcd_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu40/ qcdwjets_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu40MC/ unweighted/
-runFR ETH/corrected_jet/noPUweight/Mu40MC/ fit_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu40MC/ qcd_weighted/
-runFR ETH/corrected_jet/noPUweight/Mu40MC/ qcdwjets_weighted/
+bash bash/ETH/corrected_jet/PUweight_runD/Ele8J/0.sh
+bash bash/ETH/corrected_jet/PUweight_runD/Ele8JMC/0.sh
+bash bash/ETH/corrected_jet/PUweight_runD/Ele17J/0.sh
+bash bash/ETH/corrected_jet/PUweight_runD/Ele17JMC/0.sh
+bash bash/ETH/corrected_jet/PUweight_runD/Mu17/0.sh
+bash bash/ETH/corrected_jet/PUweight_runD/Mu17MC/0.sh
+bash bash/ETH/corrected_jet/PUweight_runD/Mu40/0.sh
+bash bash/ETH/corrected_jet/PUweight_runD/Mu40MC/0.sh

@@ -289,6 +289,44 @@ def getYTitle(hist):
 	elif 'FJPtJPt'    in name: return '(jet-p_{T} (corr.) - jet-p_{T} (raw))/jet-p_{T} (raw)'
 	else: return name
 
+def doErrorPropagation(value_x, error_x, value_y, error_y, operation = 1):
+
+	if   operation == 1: # addition
+		derivative_x =  1.0
+		derivative_y =  1.0
+	elif operation == 2: # subtraction
+		derivative_x =  1.0
+		derivative_y = -1.0
+	elif operation == 3: # multiplication
+		derivative_x = value_y
+		derivative_y = value_x
+	elif operation == 4: # division
+		if value_y != 0:
+			derivative_x = 1.0/value_y
+			derivative_y = -value_x / value_y**2
+		else:
+			derivative_x = 0.0
+			derivative_y = 0.0
+	else:
+		return False
+		
+	return math.sqrt(derivative_x**2 * error_x**2 + derivative_y**2 * error_y**2)
+
+
+def doTH1ErrorPropagation(hist, hist1, hist2, operation):
+
+	for i in range(1,hist.GetNbinsX()+1):
+		hist.SetBinError(i, doErrorPropagation(hist1.GetBinContent(i), hist1.GetBinError(i), hist2.GetBinContent(i), hist2.GetBinError(i), operation))
+	return hist
+
+def doTH2ErrorPropagation(hist, hist1, hist2, operation):
+
+	for i in range(hist.GetNbinsX()+2, (hist.GetNbinsX()+2)*(hist.GetNbinsY()+1)):
+		print "bin " + str(i) + " has value " + str(hist.GetBinContent(i)) + " and error " + str(hist.GetBinError(i))
+		hist.SetBinError(i, doErrorPropagation(hist1.GetBinContent(i), hist1.GetBinError(i), hist2.GetBinContent(i), hist2.GetBinError(i), operation))
+		print "bin " + str(i) + " has value " + str(hist.GetBinContent(i)) + " and error " + str(hist.GetBinError(i))
+	return hist
+
 def getSaveName(hist, el = -1):
 	name = hist.GetName()
 	if isinstance(el, str) and ':' in el: exec("savename = '_'.join(name.split('_')[" + el + "])")
@@ -304,7 +342,6 @@ def saveCanvas(canv, pad_plot, outputDir, name, plotlog = 1):
 		canv.SaveAs(outputDir + name + '_log.pdf')
 		canv.SaveAs(outputDir + name + '_log.png')
 		pad_plot.SetLogy(0)
-
 
 def PrintScale(canv, outputDir, datasets, lower = [], upper = []):
 
