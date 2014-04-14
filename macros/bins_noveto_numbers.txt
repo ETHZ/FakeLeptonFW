@@ -1,0 +1,109 @@
+numerator bin 7 has value 0.0 and error 0.0
+numerator bin 8 has value 62.0 and error 7.87400787401
+numerator bin 9 has value 25.0 and error 5.0
+numerator bin 10 has value 21.0 and error 4.58257569496
+numerator bin 11 has value 35.0 and error 5.9160797831
+numerator bin 12 has value 47.0 and error 3.0
+numerator bin 13 has value 0.0 and error 0.0
+numerator bin 14 has value 0.0 and error 0.0
+numerator bin 15 has value 68.0 and error 8.24621125124
+numerator bin 16 has value 31.0 and error 5.56776436283
+numerator bin 17 has value 17.0 and error 4.12310562562
+numerator bin 18 has value 38.0 and error 6.16441400297
+numerator bin 19 has value 33.0 and error 3.0
+numerator bin 20 has value 0.0 and error 0.0
+numerator bin 21 has value 0.0 and error 0.0
+numerator bin 22 has value 90.0 and error 9.48683298051
+numerator bin 23 has value 31.0 and error 5.56776436283
+numerator bin 24 has value 19.0 and error 4.35889894354
+numerator bin 25 has value 33.0 and error 5.74456264654
+numerator bin 26 has value 31.0 and error 2.2360679775
+numerator bin 27 has value 0.0 and error 0.0
+numerator bin 28 has value 0.0 and error 0.0
+numerator bin 29 has value 78.0 and error 8.83176086633
+numerator bin 30 has value 39.0 and error 6.2449979984
+numerator bin 31 has value 21.0 and error 4.58257569496
+numerator bin 32 has value 33.0 and error 5.74456264654
+numerator bin 33 has value 26.0 and error 2.82842712475
+numerator bin 34 has value 0.0 and error 0.0
+numerator bin 35 has value 0.0 and error 0.0
+numerator bin 36 has value 40.0 and error 6.32455532034
+numerator bin 37 has value 27.0 and error 5.19615242271
+numerator bin 38 has value 16.0 and error 4.0
+numerator bin 39 has value 15.0 and error 3.87298334621
+numerator bin 40 has value 16.0 and error 2.44948974278
+numerator bin 41 has value 0.0 and error 0.0
+numerator has sum 892.0
+---
+denominator bin 7 has value 0.0 and error 0.0
+denominator bin 8 has value 1855.0 and error 43.0697109347
+denominator bin 9 has value 860.0 and error 29.3257565972
+denominator bin 10 has value 385.0 and error 19.6214168703
+denominator bin 11 has value 318.0 and error 17.8325545001
+denominator bin 12 has value 163.0 and error 8.36660026534
+denominator bin 13 has value 0.0 and error 0.0
+denominator bin 14 has value 0.0 and error 0.0
+denominator bin 15 has value 1785.0 and error 42.2492603486
+denominator bin 16 has value 773.0 and error 27.8028775489
+denominator bin 17 has value 347.0 and error 18.6279360102
+denominator bin 18 has value 278.0 and error 16.6733320005
+denominator bin 19 has value 143.0 and error 7.21110255093
+denominator bin 20 has value 0.0 and error 0.0
+denominator bin 21 has value 0.0 and error 0.0
+denominator bin 22 has value 1438.0 and error 37.9209704517
+denominator bin 23 has value 561.0 and error 23.6854385647
+denominator bin 24 has value 255.0 and error 15.9687194227
+denominator bin 25 has value 227.0 and error 15.0665191733
+denominator bin 26 has value 99.0 and error 5.29150262213
+denominator bin 27 has value 0.0 and error 0.0
+denominator bin 28 has value 0.0 and error 0.0
+denominator bin 29 has value 1069.0 and error 32.6955654485
+denominator bin 30 has value 455.0 and error 21.3307290077
+denominator bin 31 has value 188.0 and error 13.7113092008
+denominator bin 32 has value 183.0 and error 13.5277492585
+denominator bin 33 has value 66.0 and error 5.38516480713
+denominator bin 34 has value 0.0 and error 0.0
+denominator bin 35 has value 0.0 and error 0.0
+denominator bin 36 has value 455.0 and error 21.3307290077
+denominator bin 37 has value 200.0 and error 14.1421356237
+denominator bin 38 has value 99.0 and error 9.94987437107
+denominator bin 39 has value 57.0 and error 7.54983443527
+denominator bin 40 has value 37.0 and error 4.12310562562
+denominator bin 41 has value 0.0 and error 0.0
+denominator has sum 12296.0
+---
+bin 7 has value 0.0 and error 0.0
+bin 8 has value 0.0334231816232 and error 0.0041732088394
+bin 9 has value 0.0290697682649 and error 0.00572882512233
+bin 10 has value 0.0545454546809 and error 0.0115736206924
+bin 11 has value 0.110062889755 and error 0.017550381444
+bin 12 has value 0.288343548775 and error 0.0190379441318
+bin 13 has value 0.0 and error 0.0
+bin 14 has value 0.0 and error 0.0
+bin 15 has value 0.0380952395499 and error 0.00453087700773
+bin 16 has value 0.0401034913957 and error 0.00705689342535
+bin 17 has value 0.048991356045 and error 0.0115874325311
+bin 18 has value 0.13669064641 and error 0.020602988745
+bin 19 has value 0.230769231915 and error 0.0192978925386
+bin 20 has value 0.0 and error 0.0
+bin 21 has value 0.0 and error 0.0
+bin 22 has value 0.0625869259238 and error 0.00638745526806
+bin 23 has value 0.0552584677935 and error 0.00964660486722
+bin 24 has value 0.074509806931 and error 0.0164445703586
+bin 25 has value 0.145374447107 and error 0.0233947845028
+bin 26 has value 0.313131302595 and error 0.0216974799332
+bin 27 has value 0.0 and error 0.0
+bin 28 has value 0.0 and error 0.0
+bin 29 has value 0.0729653909802 and error 0.0079545858032
+bin 30 has value 0.0857142880559 and error 0.0131238686117
+bin 31 has value 0.111702129245 and error 0.0229737086475
+bin 32 has value 0.180327862501 and error 0.0284201237646
+bin 33 has value 0.39393940568 and error 0.0377191449009
+bin 34 has value 0.0 and error 0.0
+bin 35 has value 0.0 and error 0.0
+bin 36 has value 0.0879120901227 and error 0.0132750739499
+bin 37 has value 0.135000005364 and error 0.0241635055404
+bin 38 has value 0.161616161466 and error 0.0369952737796
+bin 39 has value 0.263157904148 and error 0.058325435632
+bin 40 has value 0.432432442904 and error 0.0539849122481
+bin 41 has value 0.0 and error 0.0

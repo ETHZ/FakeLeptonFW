@@ -358,6 +358,21 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 				mcplot_denominator[j] = copy.deepcopy(mc.hists[index_denominator])
 
 	FR_data      = data_numerator
+
+	#sum = 0 
+	#for i in range(FR_data.GetNbinsX()+2, (FR_data.GetNbinsX()+2)*(FR_data.GetNbinsY()+1)):
+	#	print "numerator bin " + str(i) + " has value " + str(FR_data.GetBinContent(i)) + " and error " + str(FR_data.GetBinError(i))
+	#	sum += FR_data.GetBinContent(i)
+	#print "numerator has sum " + str(sum)
+	#print "---"
+
+	#sum = 0
+	#for i in range(FR_data.GetNbinsX()+2, (FR_data.GetNbinsX()+2)*(FR_data.GetNbinsY()+1)):
+	#	print "denominator bin " + str(i) + " has value " + str(data_denominator.GetBinContent(i)) + " and error " + str(data_denominator.GetBinError(i))
+	#	sum += data_denominator.GetBinContent(i)
+	#print "denominator has sum " + str(sum)
+	#print "---"
+
 	FR_data_copy = copy.deepcopy(FR_data)
 	FR_data_mcsub    = copy.deepcopy(FR_data)
 	FR_data_mcsub_c1 = copy.deepcopy(FR_data)
@@ -410,11 +425,24 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 	data_numerator_mcsub_u1 = copy.deepcopy(FR_data_mcsub_u1)
 	data_numerator_mcsub_c2 = copy.deepcopy(FR_data_mcsub_c2)
 
+
+	FR_data_mcsub_c1t=copy.deepcopy(FR_data_mcsub_c1)
+	FR_data_mcsub_c1t .Divide(FR_data_mcsub_c1t, data_denominator_mcsub_c1, 1, 1, 'B')
+
+	print "correlated:"
+	for i in range(FR_data_mcsub_c1t.GetNbinsX()+2, (FR_data_mcsub_c1t.GetNbinsX()+2)*(FR_data_mcsub_c1t.GetNbinsY()+1)):
+		print "bin " + str(i) + " has value " + str(FR_data_mcsub_c1t.GetBinContent(i)) + " and error " + str(FR_data_mcsub_c1t.GetBinError(i))
+	print "---"
+	print "uncorrelated:"
+
 	FR_data_mcsub   .Divide(FR_data_mcsub   , data_denominator_mcsub   , 1, 1, '')
 	FR_data_mcsub_c1.Divide(FR_data_mcsub_c1, data_denominator_mcsub_c1, 1, 1, '')
 	FR_data_mcsub_l1.Divide(FR_data_mcsub_l1, data_denominator_mcsub_l1, 1, 1, '')
 	FR_data_mcsub_u1.Divide(FR_data_mcsub_u1, data_denominator_mcsub_u1, 1, 1, '')
 	FR_data_mcsub_c2.Divide(FR_data_mcsub_c2, data_denominator_mcsub_c2, 1, 1, '')
+
+	for i in range(FR_data_mcsub_c1.GetNbinsX()+2, (FR_data_mcsub_c1.GetNbinsX()+2)*(FR_data_mcsub_c1.GetNbinsY()+1)):
+		print "bin " + str(i) + " has value " + str(FR_data_mcsub_c1.GetBinContent(i)) + " and error " + str(FR_data_mcsub_c1.GetBinError(i))
 
 	#FR_data_mcsub   .Divide(data_denominator_mcsub   )
 	#FR_data_mcsub_c1.Divide(data_denominator_mcsub_c1)
@@ -429,6 +457,10 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 	#FR_data_mcsub_c2 = helper.doTH2ErrorPropagation(FR_data_mcsub_c2, data_numerator_mcsub_c2, data_denominator_mcsub_c2, 4)
 	
 	FR_data.Divide(FR_data, data_denominator, 1, 1, 'B')
+
+	#for i in range(FR_data.GetNbinsX()+2, (FR_data.GetNbinsX()+2)*(FR_data.GetNbinsY()+1)):
+	#	print "bin " + str(i) + " has value " + str(FR_data.GetBinContent(i)) + " and error " + str(FR_data.GetBinError(i))
+
 	FR_bg = copy.deepcopy(mc_numerator.GetStack().Last())
 	FR_bg_copy = copy.deepcopy(FR_bg)
 	FR_bg.Divide(FR_bg, copy.deepcopy(mc_denominator.GetStack().Last()), 1, 1, 'B')

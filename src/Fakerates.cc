@@ -272,7 +272,7 @@ void Fakerates::loop(TFile* pFile){
 		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
 		//	h_Loose_AllJEtatest1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
-		//smearAllJets();
+		smearAllJets();
 
 		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
 		//	h_Loose_AllJEtatest2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
@@ -1040,7 +1040,8 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 					h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 			}
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
-//	cout << Form("%d\t%d\t%d\t%.2f\tistight%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
+//	if(LepPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
+//	cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
 		}
 
 		if(passesMTCut(lep))    h_Loose_MET            ->Fill(getMET()            , fEventweight);
@@ -1125,6 +1126,10 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 					//if(fillFHist(LepPt->at(lep)))
 						h_FTight->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 				}
+
+//	if(LepPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
+//	cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
+
 			}
 
 			if(passesMTCut(lep))    h_Tight_MET        -> Fill(getMET()               , fEventweight);
