@@ -1,73 +1,35 @@
-correlated:
-bin 7 has value 0.0 and error 0.0
-bin 8 has value 0.027855457738 and error 0.00410517629331
-bin 9 has value 0.0165539570153 and error 0.00543218901844
-bin 10 has value 0.0341226570308 and error 0.0117395355995
-bin 11 has value 0.0607815794647 and error 0.018642017882
-bin 12 has value 0.115063376725 and error 0.021799028683
-bin 13 has value 0.0 and error 0.0
-bin 14 has value 0.0 and error 0.0
-bin 15 has value 0.0340985618532 and error 0.0045451324674
-bin 16 has value 0.0292866416276 and error 0.00695561898964
-bin 17 has value 0.0228720661253 and error 0.0113630197057
-bin 18 has value 0.0806884542108 and error 0.0217870875633
-bin 19 has value 0.00714990217239 and error 0.0244459281081
-bin 20 has value 0.0 and error 0.0
-bin 21 has value 0.0 and error 0.0
-bin 22 has value 0.057056773454 and error 0.00637421212428
-bin 23 has value 0.0428995601833 and error 0.00969739417527
-bin 24 has value 0.0427657589316 and error 0.0164422016016
-bin 25 has value 0.0859085693955 and error 0.0258059932538
-bin 26 has value 0.0559432953596 and error 0.0300892838753
-bin 27 has value 0.0 and error 0.0
-bin 28 has value 0.0 and error 0.0
-bin 29 has value 0.0671204924583 and error 0.00800925527145
-bin 30 has value 0.0727122053504 and error 0.0131970709317
-bin 31 has value 0.0808554962277 and error 0.0234492831218
-bin 32 has value 0.102092653513 and error 0.0307772920337
-bin 33 has value 0.0451768264174 and error 0.067493795225
-bin 34 has value 0.0 and error 0.0
-bin 35 has value 0.0 and error 0.0
-bin 36 has value 0.0814693123102 and error 0.0134685756201
-bin 37 has value 0.119790226221 and error 0.0246924811186
-bin 38 has value 0.131083011627 and error 0.0392360078533
-bin 39 has value 0.131688266993 and error 0.0729235880736
-bin 40 has value -0.0105205317959 and error 0.121951188868
-bin 41 has value 0.0 and error 0.0
----
-uncorrelated:
-bin 7 has value 0.0 and error 0.0
-bin 8 has value 0.027855457738 and error 0.00422155838668
-bin 9 has value 0.0165539570153 and error 0.00552338335896
-bin 10 has value 0.0341226570308 and error 0.0121522451761
-bin 11 has value 0.0607815794647 and error 0.0198441677449
-bin 12 has value 0.115063376725 and error 0.024510802682
-bin 13 has value 0.0 and error 0.0
-bin 14 has value 0.0 and error 0.0
-bin 15 has value 0.0340985618532 and error 0.00470338316626
-bin 16 has value 0.0292866416276 and error 0.00716379243033
-bin 17 has value 0.0228720661253 and error 0.0116288989308
-bin 18 has value 0.0806884542108 and error 0.0236834240122
-bin 19 has value 0.00714990217239 and error 0.0246225491397
-bin 20 has value 0.0 and error 0.0
-bin 21 has value 0.0 and error 0.0
-bin 22 has value 0.057056773454 and error 0.00675034745059
-bin 23 has value 0.0428995601833 and error 0.0101265683536
-bin 24 has value 0.0427657589316 and error 0.0171729249798
-bin 25 has value 0.0859085693955 and error 0.0282174206223
-bin 26 has value 0.0559432953596 and error 0.0318941888387
-bin 27 has value 0.0 and error 0.0
-bin 28 has value 0.0 and error 0.0
-bin 29 has value 0.0671204924583 and error 0.00856905058767
-bin 30 has value 0.0727122053504 and error 0.0142043390961
-bin 31 has value 0.0808554962277 and error 0.02547059325
-bin 32 has value 0.102092653513 and error 0.0342450140412
-bin 33 has value 0.0451768264174 and error 0.0707407975623
-bin 34 has value 0.0 and error 0.0
-bin 35 has value 0.0 and error 0.0
-bin 36 has value 0.0814693123102 and error 0.0146221157898
-bin 37 has value 0.119790226221 and error 0.0278977899171
-bin 38 has value 0.131083011627 and error 0.0449256513853
-bin 39 has value 0.131688266993 and error 0.0840457887105
-bin 40 has value -0.0105205317959 and error 0.120688483962
-bin 41 has value 0.0 and error 0.0
+bin  7 has value 0.0 and error 0.0 (uncorrelated) 0.0 (correlated) which is a 0 difference
+bin  8 has value 0.0278554596007 and error 0.00422155839404 (uncorrelated) 0.00410517629205 (correlated) which is a 1.02835008626 difference
+bin  9 has value 0.0165539570153 and error 0.00552338335813 (uncorrelated) 0.00543218901762 (correlated) which is a 1.01678777013 difference
+bin 10 has value 0.0341226570308 and error 0.0121522451742 (uncorrelated) 0.0117395355978 (correlated) which is a 1.03515552835 difference
+bin 11 has value 0.0607815869153 and error 0.0198441678122 (uncorrelated) 0.0186420178221 (correlated) which is a 1.06448604446 difference
+bin 12 has value 0.115063391626 and error 0.0245108029651 (uncorrelated) 0.0217990286323 (correlated) which is a 1.124398861 difference
+bin 13 has value 0.0 and error 0.0 (uncorrelated) 0.0 (correlated) which is a 0 difference
+bin 14 has value 0.0 and error 0.0 (uncorrelated) 0.0 (correlated) which is a 0 difference
+bin 15 has value 0.0340985618532 and error 0.00470338316605 (uncorrelated) 0.0045451324672 (correlated) which is a 1.03481762083 difference
+bin 16 has value 0.0292866416276 and error 0.00716379242964 (uncorrelated) 0.00695561898896 (correlated) which is a 1.02992881597 difference
+bin 17 has value 0.0228720679879 and error 0.0116288989369 (uncorrelated) 0.0113630196953 (correlated) which is a 1.02339864302 difference
+bin 18 has value 0.0806884542108 and error 0.0236834240088 (uncorrelated) 0.0217870875601 (correlated) which is a 1.08703946516 difference
+bin 19 has value 0.00714992452413 and error 0.024622549158 (uncorrelated) 0.024445927579 (correlated) which is a 1.00722498987 difference
+bin 20 has value 0.0 and error 0.0 (uncorrelated) 0.0 (correlated) which is a 0 difference
+bin 21 has value 0.0 and error 0.0 (uncorrelated) 0.0 (correlated) which is a 0 difference
+bin 22 has value 0.057056773454 and error 0.00675034745039 (uncorrelated) 0.00637421212409 (correlated) which is a 1.05900891263 difference
+bin 23 has value 0.0428995601833 and error 0.0101265683526 (uncorrelated) 0.00969739417434 (correlated) which is a 1.04425664984 difference
+bin 24 has value 0.0427657589316 and error 0.017172924977 (uncorrelated) 0.0164422015989 (correlated) which is a 1.04444194251 difference
+bin 25 has value 0.0859085693955 and error 0.0282174206177 (uncorrelated) 0.0258059932496 (correlated) which is a 1.09344447023 difference
+bin 26 has value 0.0559433214366 and error 0.0318941856711 (uncorrelated) 0.030089280004 (correlated) which is a 1.05998500685 difference
+bin 27 has value 0.0 and error 0.0 (uncorrelated) 0.0 (correlated) which is a 0 difference
+bin 28 has value 0.0 and error 0.0 (uncorrelated) 0.0 (correlated) which is a 0 difference
+bin 29 has value 0.0671204924583 and error 0.00856905058736 (uncorrelated) 0.00800925527115 (correlated) which is a 1.06989355405 difference
+bin 30 has value 0.072712212801 and error 0.0142043391939 (uncorrelated) 0.0131970709146 (correlated) which is a 1.07632513956 difference
+bin 31 has value 0.0808554962277 and error 0.0254705932471 (uncorrelated) 0.0234492831191 (correlated) which is a 1.08619922911 difference
+bin 32 has value 0.102092668414 and error 0.0342450142617 (uncorrelated) 0.030777291866 (correlated) which is a 1.11267145955 difference
+bin 33 has value 0.0451768375933 and error 0.0707407976796 (uncorrelated) 0.0674937944779 (correlated) which is a 1.0481081739 difference
+bin 34 has value 0.0 and error 0.0 (uncorrelated) 0.0 (correlated) which is a 0 difference
+bin 35 has value 0.0 and error 0.0 (uncorrelated) 0.0 (correlated) which is a 0 difference
+bin 36 has value 0.0814693123102 and error 0.0146221157892 (uncorrelated) 0.0134685756196 (correlated) which is a 1.08564678272 difference
+bin 37 has value 0.119790226221 and error 0.0278977899155 (uncorrelated) 0.0246924811172 (correlated) which is a 1.12980910193 difference
+bin 38 has value 0.131083011627 and error 0.0449256513808 (uncorrelated) 0.0392360078494 (correlated) which is a 1.14501076545 difference
+bin 39 has value 0.131688266993 and error 0.084045788692 (uncorrelated) 0.0729235880578 (correlated) which is a 1.15251855991 difference
+bin 40 has value -0.0105204842985 and error 0.120688483765 (uncorrelated) 0.121951182991 (correlated) which is a 0.989645863246 difference
+bin 41 has value 0.0 and error 0.0 (uncorrelated) 0.0 (correlated) which is a 0 difference

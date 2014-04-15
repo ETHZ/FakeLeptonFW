@@ -429,11 +429,11 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 	FR_data_mcsub_c1t=copy.deepcopy(FR_data_mcsub_c1)
 	FR_data_mcsub_c1t .Divide(FR_data_mcsub_c1t, data_denominator_mcsub_c1, 1, 1, 'B')
 
-	print "correlated:"
-	for i in range(FR_data_mcsub_c1t.GetNbinsX()+2, (FR_data_mcsub_c1t.GetNbinsX()+2)*(FR_data_mcsub_c1t.GetNbinsY()+1)):
-		print "bin " + str(i) + " has value " + str(FR_data_mcsub_c1t.GetBinContent(i)) + " and error " + str(FR_data_mcsub_c1t.GetBinError(i))
-	print "---"
-	print "uncorrelated:"
+	#print "correlated:"
+	#for i in range(FR_data_mcsub_c1t.GetNbinsX()+2, (FR_data_mcsub_c1t.GetNbinsX()+2)*(FR_data_mcsub_c1t.GetNbinsY()+1)):
+	#	print "bin " + str(i) + " has value " + str(FR_data_mcsub_c1t.GetBinContent(i)) + " and error " + str(FR_data_mcsub_c1t.GetBinError(i))
+	#print "---"
+	#print "uncorrelated:"
 
 	FR_data_mcsub   .Divide(FR_data_mcsub   , data_denominator_mcsub   , 1, 1, '')
 	FR_data_mcsub_c1.Divide(FR_data_mcsub_c1, data_denominator_mcsub_c1, 1, 1, '')
@@ -441,8 +441,10 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 	FR_data_mcsub_u1.Divide(FR_data_mcsub_u1, data_denominator_mcsub_u1, 1, 1, '')
 	FR_data_mcsub_c2.Divide(FR_data_mcsub_c2, data_denominator_mcsub_c2, 1, 1, '')
 
-	for i in range(FR_data_mcsub_c1.GetNbinsX()+2, (FR_data_mcsub_c1.GetNbinsX()+2)*(FR_data_mcsub_c1.GetNbinsY()+1)):
-		print "bin " + str(i) + " has value " + str(FR_data_mcsub_c1.GetBinContent(i)) + " and error " + str(FR_data_mcsub_c1.GetBinError(i))
+	#for i in range(FR_data_mcsub_c1.GetNbinsX()+2, (FR_data_mcsub_c1.GetNbinsX()+2)*(FR_data_mcsub_c1.GetNbinsY()+1)):
+	#	if FR_data_mcsub_c1t.GetBinError(i)>0: frac = FR_data_mcsub_c1.GetBinError(i) / FR_data_mcsub_c1t.GetBinError(i)
+	#	else: frac = 0
+	#	print "bin " + str(i) + " has value " + str(FR_data_mcsub_c1.GetBinContent(i)) + " and error " + str(FR_data_mcsub_c1.GetBinError(i)) + " (uncorrelated) " + str(FR_data_mcsub_c1t.GetBinError(i)) + " (correlated) which is a " + str(frac) + " difference"
 
 	#FR_data_mcsub   .Divide(data_denominator_mcsub   )
 	#FR_data_mcsub_c1.Divide(data_denominator_mcsub_c1)

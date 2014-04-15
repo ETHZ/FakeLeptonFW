@@ -272,7 +272,7 @@ void Fakerates::loop(TFile* pFile){
 		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
 		//	h_Loose_AllJEtatest1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
-		smearAllJets();
+		//smearAllJets();
 
 		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
 		//	h_Loose_AllJEtatest2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
@@ -450,11 +450,12 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 
 	// Event fails HLT muon trigger (if data) then return false
 	if(fLepTriggerMC || fIsData) {
-		if     (fLepTrigger == "Mu17" && !HLT_MU17             ) { return false; }
-		else if(fLepTrigger == "Mu40" && !HLT_MU40             ) { return false; }
-		else if(fLepTrigger == "El08" && !HLT_ELE8_TIGHT       ) { return false; }
-		else if(fLepTrigger == "El17" && !HLT_ELE17_JET30_TIGHT) { return false; }
-		else                                                     {               }
+		if     (fLepTrigger == "Mu17"   && !HLT_MU17              ) { return false; }
+		else if(fLepTrigger == "Mu40"   && !HLT_MU40              ) { return false; }
+		else if(fLepTrigger == "Ele8"   && !HLT_ELE8_TIGHT        ) { return false; }
+		else if(fLepTrigger == "Ele17"  && !HLT_ELE17_TIGHT       ) { return false; }
+		else if(fLepTrigger == "Ele17J" && !HLT_ELE17_JET30_TIGHT ) { return false; }
+		else                                                        {               }
 	}
 
 	//cout << "check 1" << endl;
