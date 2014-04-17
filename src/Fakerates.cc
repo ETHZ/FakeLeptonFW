@@ -483,7 +483,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 	
 	//cout << "check 4" << endl;
 	fCutflow_afterLepSel++;
-	//if(nveto_add != 0) return false;
+	if(nveto_add != 0) return false;
 
 	//cout << "check 5" << endl;
 	// Jet Pt is not reasonable then return false
@@ -765,19 +765,12 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	// if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
 
-	// jet-lepton cleaning: if a tight muon with dR too small found then return false
+	// jet-lepton cleaning: if a tight lepton with dR too small found then return false
 	for(int lep = 0; lep < LepPhi->size(); ++lep){
 		if(!isTightLepton(lep)) continue;
 		if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(j), LepPhi->at(lep), JetPhi->at(j)) > minDR ) continue;
 		return false;
 	}
-
-    // // if a tight electron with dR too small found then return false
-	// for(int iel = 0; iel < ElPt->size(); ++iel){
-	//     if(!ElIsTight->at(iel)) continue;
-	//     if(Util::GetDeltaR(ElEta->at(iel), JetEta->at(j), ElPhi->at(iel), JetPhi->at(j)) > minDR ) continue;
-	//     return false;
-	// }
 
 	return true;
 }
@@ -890,19 +883,19 @@ int Fakerates::getNJets(int btag = 0){
 
 
 //____________________________________________________________________________
-bool Fakerates::fillFHist(float LepPt){
-	/*
-	checks, if the bins below 40GeV of h_FLoose and h_FTight shall be filled or 
-	not, depending on the choice of trigger used
-	parameters: LepPt (pt of the lepton)
-	return: true (if entry to be filled), false (else)
-	*/
-
-	if(fLepTrigger == "Mu40" && ((fLepTriggerMC && !fIsData) || fIsData) && LepPt <= 40) return false;
-	
-	return true;
-
-}
+//bool Fakerates::fillFHist(float LepPt){
+//	/*
+//	checks, if the bins below 40GeV of h_FLoose and h_FTight shall be filled or 
+//	not, depending on the choice of trigger used
+//	parameters: LepPt (pt of the lepton)
+//	return: true (if entry to be filled), false (else)
+//	*/
+//
+//	if(fLepTrigger == "Mu40" && ((fLepTriggerMC && !fIsData) || fIsData) && LepPt <= 40) return false;
+//	
+//	return true;
+//
+//}
 
 
 //____________________________________________________________________________
@@ -913,7 +906,6 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 	return: none
 	*/
 
-	//cout << " here" << endl;
 
 	int lep(-1), jet(-1);
 	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
@@ -1002,7 +994,6 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 
 			for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
 
-//			cout << "after2: " << JetPt->at(thisjet) << "; " << JetEta->at(thisjet) << endl;
 				h_Loose_AllJCPt   ->Fill(JetPt->at(thisjet)       , fEventweight);
 				h_Loose_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , fEventweight);
 				h_Loose_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), fEventweight);
@@ -1056,7 +1047,6 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 			if(fFRMETbinspt[0]<=LepPt->at(lep) && LepPt->at(lep)<fFRMETbinspt[fFRMETn_binspt-1]){
 				int i = h_Loose_FRMETZoomEta ->FindBin(fabs(LepEta->at(lep)));
 				int j = h_Loose_FRMETZoomPt  ->FindBin(LepPt->at(lep));
-				//cout << "i = " << i < ", j = " << j << ", " << (i-1)*(fFRMETn_binspt-1) + j - 1 << endl;
 				h_Loose_METZoom[(i-1)*(fFRMETn_binspt-1) + j - 1] ->Fill((getMET()), fEventweight);
 			}
 		}
@@ -1188,9 +1178,9 @@ void Fakerates::bookHistos(){
 	h_Tight_FRMETZoomEta = new TH1F("h_Tight_FRMETZoomEta", "Tight_FRMETZoomEta", fFRMETn_binseta-1, &fFRMETbinseta[0]); // empty, just to use binning
 	h_Tight_FRMETZoomPt  = new TH1F("h_Tight_FRMETZoomPt" , "Tight_FRMETZoomPt" , fFRMETn_binspt-1 , &fFRMETbinspt[0] ); // empty, just to use binning
 
-	float eta_min = 0., eta_max = 2.4;
-	float pt_min = 10., pt_max = 70.;
-	int eta_bin = 12, pt_bin = 20;
+	float eta_min = 0. , eta_max = 2.4;
+	float pt_min  = 10., pt_max  = 70.;
+	int   eta_bin = 12 , pt_bin  = 20 ;
 
 	h_Loose_LepPt         = new TH1F("h_Loose_LepPt"        , "Loose_LepPt"     , pt_bin  , pt_min  , pt_max ); h_Loose_LepPt     -> Sumw2();
 	h_Loose_LepEta        = new TH1F("h_Loose_LepEta"       , "Loose_LepEta"    , eta_bin , eta_min , eta_max); h_Loose_LepEta    -> Sumw2();

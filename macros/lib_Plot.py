@@ -239,6 +239,7 @@ def PlotJPtZooms(dataType, outputDir, dataset, mcsets, leg):
 	bins_pt  = [10.0, 20.0, 22.5, 25.0, 27.5, 30.0, 32.5, 35.0, 40.0, 50.0, 60.0, 70.0] # new
 	bins_tot = (len(bins_eta)-1)*(len(bins_pt)-1)
 
+
 	for hist in dataset.hists:
 
 		i = dataset.hists.index(hist)

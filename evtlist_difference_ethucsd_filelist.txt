@@ -1,0 +1,4 @@
+205515	116	109186733	dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat/store/user/mdunser/DoubleMu/V03-09-01_DoubleMu-Run2012D-PromptReco-v1-RETRY/87eb78fbd8f3b8706be023253eaf999d/NTupleProducer_53X_data_530_2_ecC.root
+206596	650	712854997	dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat/store/user/mdunser/DoubleMu/V03-09-01_DoubleMu-Run2012D-PromptReco-v1-RETRY/87eb78fbd8f3b8706be023253eaf999d/NTupleProducer_53X_data_1140_1_Noy.root	
+207099	573	818539469	dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat/store/user/mdunser/DoubleMu/V03-09-01_DoubleMu-Run2012D-PromptReco-v1-RETRY/87eb78fbd8f3b8706be023253eaf999d/NTupleProducer_53X_data_1324_1_i4X.root
+207889	624	636865756	dcap://t3se01.psi.ch:22125/pnfs/psi.ch/cms/trivcat/store/user/mdunser/DoubleMu/V03-09-01_DoubleMu-Run2012D-PromptReco-v1-RETRY/87eb78fbd8f3b8706be023253eaf999d/NTupleProducer_53X_data_1706_1_QBU.root	
