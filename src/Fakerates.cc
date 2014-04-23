@@ -123,6 +123,7 @@ void Fakerates::init(bool verbose){
 	fDFbinspt.push_back(60.0);
 	fDFbinspt.push_back(70.0);
 	fDFn_binspt    = fDFbinspt.size();
+
 }
 
 
@@ -200,6 +201,27 @@ void Fakerates::loadConfigFile(TString configfile){
 	cout << " fLepTriggerMC:    " << fLepTriggerMC   << endl;
 	cout << "=======================================================" << endl;
 	cout << "=======================================================" << endl;
+
+
+
+	// set Plot Threshold
+	float limit = 0.0;
+	if     (fLepTrigger == "Mu17") limit = 17.0;
+	else if(fLepTrigger == "Mu24") limit = 24.0;
+	else if(fLepTrigger == "Mu40") limit = 40.0;
+	else                           limit = 0.0;
+
+	int binid = 0;
+	for(int i = 0; i < fFRn_binspt; ++i) {
+		if(fFRbinspt[i] >= limit) {
+			binid = i;
+			break;
+		}
+	}
+
+	fPlotThreshold = fFRbinspt[binid];
+
+
 }
 
 
@@ -885,19 +907,19 @@ int Fakerates::getNJets(int btag = 0){
 
 
 //____________________________________________________________________________
-//bool Fakerates::fillFHist(float LepPt){
-//	/*
-//	checks, if the bins below 40GeV of h_FLoose and h_FTight shall be filled or 
-//	not, depending on the choice of trigger used
-//	parameters: LepPt (pt of the lepton)
-//	return: true (if entry to be filled), false (else)
-//	*/
-//
-//	if(fLepTrigger == "Mu40" && ((fLepTriggerMC && !fIsData) || fIsData) && LepPt <= 40) return false;
-//	
-//	return true;
-//
-//}
+bool Fakerates::fillFHist(float LepPt){
+	/*
+	checks, if the bins below 40GeV of h_FLoose and h_FTight shall be filled or 
+	not, depending on the choice of trigger used
+	parameters: LepPt (pt of the lepton)
+	return: true (if entry to be filled), false (else)
+	*/
+
+	if(fLepTrigger != "none" && ((fLepTriggerMC && !fIsData) || fIsData) && LepPt <= fPlotThreshold) return false;
+
+	return true;
+
+}
 
 
 //____________________________________________________________________________
@@ -1030,7 +1052,7 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 				h_FLoose->AddBinContent(fillbin, fEventweight);
 			}
 			else{
-				//if(fillFHist(LepPt->at(lep)))
+				if(fillFHist(LepPt->at(lep)))
 					h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 			}
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
@@ -1116,7 +1138,7 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 					h_FTight->AddBinContent(fillbin, fEventweight);
 				}
 				else{
-					//if(fillFHist(LepPt->at(lep)))
+					if(fillFHist(LepPt->at(lep)))
 						h_FTight->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 				}
 

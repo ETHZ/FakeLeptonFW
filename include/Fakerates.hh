@@ -260,6 +260,7 @@ public:
 
 	// Eventweight
 	float fLumiweight;
+	float fPlotThreshold;
 
 	// Counters
 	int fCutflow_afterLepSel;
