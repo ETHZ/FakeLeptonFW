@@ -70,7 +70,7 @@ def make2dPlot(dataType, canv, pad_plot, outputDir, hist, postpend, file_name):
 	hist.SetMarkerColor(ROOT.kBlack)
 	hist.SetLineColor(ROOT.kBlack)
 	ROOT.gPad.RedrawAxis()
-	helper.saveCanvas(canv, pad_plot, outputDir + "plots_2d/", file_name + postpend, 0)
+	helper.saveCanvas(canv, pad_plot, outputDir + "plots_2d/", file_name + postpend, False)
 
 
 
@@ -293,7 +293,7 @@ def PlotJPtZooms(dataType, outputDir, dataset, mcsets, leg):
 		t_eta.DrawLatex(0.22, 0.8, text_eta)
 		t_pt.DrawLatex(0.22, 0.73, text_pt)
 
-		helper.saveCanvas(canv, pad_plot, outputDir + "zoom_jpt/", prepend + helper.getSaveName(hist, '-2:') + postpend, 0)
+		helper.saveCanvas(canv, pad_plot, outputDir + "zoom_jpt/", prepend + helper.getSaveName(hist, '-2:') + postpend, False)
 
 
 

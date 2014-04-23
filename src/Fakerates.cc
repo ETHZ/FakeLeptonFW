@@ -450,11 +450,12 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 
 	// Event fails HLT muon trigger (if data) then return false
 	if(fLepTriggerMC || fIsData) {
-		if     (fLepTrigger == "Mu17"   && !HLT_MU17              ) { return false; }
-		else if(fLepTrigger == "Mu40"   && !HLT_MU40              ) { return false; }
-		else if(fLepTrigger == "Ele8"   && !HLT_ELE8_TIGHT        ) { return false; }
-		else if(fLepTrigger == "Ele17"  && !HLT_ELE17_TIGHT       ) { return false; }
-		else if(fLepTrigger == "Ele17J" && !HLT_ELE17_JET30_TIGHT ) { return false; }
+		if      (fLepTrigger == "Mu17"   && !HLT_MU17              ) { return false; }
+		else if (fLepTrigger == "Mu24"   && !HLT_MU24              ) { return false; }
+		else if (fLepTrigger == "Mu40"   && !HLT_MU40              ) { return false; }
+		else if (fLepTrigger == "Ele8"   && !HLT_ELE8_TIGHT        ) { return false; }
+		else if (fLepTrigger == "Ele17"  && !HLT_ELE17_TIGHT       ) { return false; }
+		else if (fLepTrigger == "Ele17J" && !HLT_ELE17_JET30_TIGHT ) { return false; }
 		else                                                        {               }
 	}
 
@@ -529,6 +530,7 @@ bool Fakerates::isLooseMuon(int index){
 	*/
 
 	if(!MuIsLoose->at(index)) return false;
+	//if(fabs(MuD0->at(index)) > 0.1) return false;
 	if(fLepD0Cut > 0.0 && fabs(MuD0->at(index)) > fLepD0Cut) return false; // leave this commented for synching!!
 	return true;
 }

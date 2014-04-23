@@ -62,7 +62,7 @@ def make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, hists, title_hi
 
 
 
-def make2dFRPlot(dataType, canv, outputDir, dataset, hist, title_indeces, name=''):
+def make2dFRPlot(dataType, canv, outputDir, dataset, hist, title_indeces, name='', exportinroot = False):
 
 	pad_plot = helper.makePad('tot')
 	pad_plot.cd()
@@ -80,12 +80,12 @@ def make2dFRPlot(dataType, canv, outputDir, dataset, hist, title_indeces, name='
 	if dataType == 'el': hist.SetMaximum(0.6)
 	else               : hist.SetMaximum(0.4)
 	hist.SetTitle("FR 2d Map (" + name + ")")
-	helper.saveCanvas(canv, pad_plot, outputDir + "fakerates_2d/", "FR_2dmap_" + name.lower().replace(" ", "_"), 0)
+	helper.saveCanvas(canv, pad_plot, outputDir + "fakerates_2d/", "FR_2dmap_" + name.lower().replace(" ", "_"), False, exportinroot)
 	pad_plot.Close()
 
 
 
-def PlotFR(dataType, outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = [], mcsubstractscales = False):
+def PlotFR(dataType, outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsubstract = [], mcsubstractscales = False, bgestimation = False):
 
 	canv = helper.makeCanvas(900, 675, 'c1dFR')
 	pad_plot = helper.makePad('plot')
@@ -276,7 +276,9 @@ def PlotFR(dataType, outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsu
 			histstoplot.append([FR_data, 'data'])
 			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, FR_data, 'FR_' + FR_data.GetName().lstrip('h_Tight_') + '_data-ew_data-eth-qcd', True, 'ETH/QCD')
 
-			
+		if bgestimation:
+			print "here"	
+		
 
 	return True
 
@@ -471,15 +473,15 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 		FR_mc_copy[j] = copy.deepcopy(FR_mc[j])
 		FR_mc[j].Divide(FR_mc[j], mcplot_denominator[j], 1, 1, 'B')
 
-	make2dFRPlot(dataType, canv, outputDir, dataset, FR_data, title_indeces, 'data')
+	make2dFRPlot(dataType, canv, outputDir, dataset, FR_data, title_indeces, 'data', True)
 	if len(mcsubstract)>0: make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub, title_indeces, 'data-EW')
 	if mcsubstractscales:
-		make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub_c1, title_indeces, 'data-EW central1')
+		make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub_c1, title_indeces, 'data-EW central1', True)
 		make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub_l1, title_indeces, 'data-EW lower1')
 		make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub_u1, title_indeces, 'data-EW upper1')
 		make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub_c2, title_indeces, 'data-EW central2')
 
-	make2dFRPlot(dataType, canv, outputDir, dataset, FR_bg, title_indeces, 'MC')
+	make2dFRPlot(dataType, canv, outputDir, dataset, FR_bg, title_indeces, 'MC', True)
 	for j in range(len(mcsetsplot)): make2dFRPlot(dataType, canv, outputDir, dataset, FR_mc[j], title_indeces, 'qcd')
 
 

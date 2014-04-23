@@ -333,15 +333,19 @@ def getSaveName(hist, el = -1):
 	else: savename = name.split('_')[el]
 	return savename
 
-def saveCanvas(canv, pad_plot, outputDir, name, plotlog = 1):
+def saveCanvas(canv, pad_plot, outputDir, name, plotlog = True, exportinroot = False):
+
 	canv.SaveAs(outputDir + name + '_lin.pdf')
 	canv.SaveAs(outputDir + name + '_lin.png')
 
-	if plotlog == 1:
+	if plotlog:
 		pad_plot.SetLogy(1)
 		canv.SaveAs(outputDir + name + '_log.pdf')
 		canv.SaveAs(outputDir + name + '_log.png')
 		pad_plot.SetLogy(0)
+
+	if exportinroot:
+		canv.SaveAs(outputDir + name + '.root')
 
 def PrintScale(canv, outputDir, datasets, lower = [], upper = []):
 
@@ -376,7 +380,7 @@ def PrintScale(canv, outputDir, datasets, lower = [], upper = []):
 		x = hists[0].GetXaxis().GetBinCenter(i+1) - 0.1
 		t.DrawText(x, y, getLegendName(datasets[i].GetName()))
 	
-	saveCanvas(canv, pad_plot, outputDir + 'plots_1d/', 'scales', 0)
+	saveCanvas(canv, pad_plot, outputDir + 'plots_1d/', 'scales', False)
 	pad_plot.Close()
 	return True
 
