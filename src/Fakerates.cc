@@ -66,12 +66,13 @@ void Fakerates::init(bool verbose){
 	fFRn_binseta  = fFRbinseta.size();
 
 	// Pt Binning
-	//fFRbinspt.push_back(10.);
-	//fFRbinspt.push_back(15.);
+	fFRbinspt.push_back(10.);
+	fFRbinspt.push_back(15.);
 	fFRbinspt.push_back(20.);
 	fFRbinspt.push_back(25.);
 	fFRbinspt.push_back(30.);
 	fFRbinspt.push_back(35.);
+	fFRbinspt.push_back(40.);
 	fFRbinspt.push_back(45.);
 	fFRbinspt.push_back(50.);
 	fFRn_binspt   = fFRbinspt.size();
@@ -915,7 +916,7 @@ bool Fakerates::fillFHist(float LepPt){
 	return: true (if entry to be filled), false (else)
 	*/
 
-	if(fLepTrigger != "none" && ((fLepTriggerMC && !fIsData) || fIsData) && LepPt <= fPlotThreshold) return false;
+	if(fLepTrigger != "none" && LepPt <= fPlotThreshold) return false;
 
 	return true;
 

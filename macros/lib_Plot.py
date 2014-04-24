@@ -74,7 +74,7 @@ def make2dPlot(dataType, canv, pad_plot, outputDir, hist, postpend, file_name):
 
 
 
-def Plot1d(dataType, outputDir, dataset, mcsets, histlist, leg):
+def Plot1d(dataType, outputDir, dataset, mcsets, histlist, leg, grouping = False):
 
 	canv = helper.makeCanvas(900, 675, 'c1d')
 	pad_plot = helper.makePad('plot')
@@ -97,12 +97,48 @@ def Plot1d(dataType, outputDir, dataset, mcsets, histlist, leg):
 		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
 		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
 
+
 		# Sum BG Contributions in Stack
 		stack = ROOT.THStack()
 		stackint = 0.
-		for j,mc in enumerate(mcsets):
-			stackint += mc.hists[i].Integral()
-			stack.Add(mc.hists[i])
+
+		if grouping:
+
+			mcgroups = []
+			mcnames  = []
+
+			for mc in mcsets:
+				label = ''.join([j for j in mc.GetName() if not j.isdigit()])
+				
+				foundat = -1
+				for j, mcname in enumerate(mcnames): 
+					if label == mcname: foundat = j
+
+				if foundat == -1:
+					#print "--- did not find anything ---"
+					mcgroups.append(ROOT.THStack())
+					#print mc.hists[i]
+					#print mc.hists[i].GetXaxis().GetNbins()
+					mcgroups[len(mcgroups)-1].Add(mc.hists[i])
+					mcnames.append(label)
+				else:
+					#print "--- found " + str(foundat) + " ---"
+					#print mc.hists[i]
+					#print mc.hists[i].GetXaxis().GetNbins()
+					mcgroups[foundat].Add(mc.hists[i])
+		
+			#print mcgroups
+
+			for j, group in enumerate(mcgroups):
+				group.Draw('hist')
+				histogram = group.GetStack().Last()
+				stackint += histogram.Integral()
+				stack.Add(histogram)
+		
+		else:
+			for j,mc in enumerate(mcsets):
+				stackint += mc.hists[i].Integral()
+				stack.Add(mc.hists[i])
 
 		stack.Draw('hist')
 

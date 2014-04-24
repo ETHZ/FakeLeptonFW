@@ -50,19 +50,29 @@ if dataType == 'el':
 	wjets      = sample('el_wjets'        , inputDir + 'el_wjets_ratios.root')
 	dyjets50   = sample('el_dyjets50'     , inputDir + 'el_dyjets50_ratios.root')
 	dyjets10   = sample('el_dyjets10'     , inputDir + 'el_dyjets10_ratios.root')
-	qcd30      = sample('el_qcdelenr30'   , inputDir + 'el_qcdelenr30_ratios.root')
-	qcd80      = sample('el_qcdelenr80'   , inputDir + 'el_qcdelenr80_ratios.root')
-	qcd250     = sample('el_qcdelenr250'  , inputDir + 'el_qcdelenr250_ratios.root')
-	qcd350     = sample('el_qcdelenr350'  , inputDir + 'el_qcdelenr350_ratios.root')
+	qcdem20    = sample('el_qcdemenr20'   , inputDir + 'el_qcdemenr80_ratios.root')
+	qcdem30    = sample('el_qcdemenr30'   , inputDir + 'el_qcdemenr30_ratios.root')
+	qcdem80    = sample('el_qcdemenr80'   , inputDir + 'el_qcdemenr80_ratios.root')
+	qcdem170   = sample('el_qcdemenr170'  , inputDir + 'el_qcdemenr170_ratios.root')
+	qcdem250   = sample('el_qcdemenr250'  , inputDir + 'el_qcdemenr250_ratios.root')
+	qcdem350   = sample('el_qcdemenr350'  , inputDir + 'el_qcdemenr350_ratios.root')
+	qcdbc20    = sample('el_qcdbctoe20'   , inputDir + 'el_qcdbctoe20_ratios.root')
+	qcdbc30    = sample('el_qcdbctoe30'   , inputDir + 'el_qcdbctoe30_ratios.root')
+	qcdbc80    = sample('el_qcdbctoe80'   , inputDir + 'el_qcdbctoe80_ratios.root')
 
 	mc_samples = []
-	mc_samples.append(qcd30   )
-	mc_samples.append(qcd80   )
-	mc_samples.append(qcd250  )
-	mc_samples.append(qcd350  )
-	mc_samples.append(wjets   )
-	mc_samples.append(dyjets50)
-	mc_samples.append(dyjets10)
+	mc_samples.append(qcdem20  )
+	mc_samples.append(qcdem30  )
+	mc_samples.append(qcdem80  )
+	mc_samples.append(qcdem170 )
+	mc_samples.append(qcdem250 )
+	mc_samples.append(qcdem350 )
+	mc_samples.append(qcdbc20  )
+	mc_samples.append(qcdbc30  )
+	mc_samples.append(qcdbc80  )
+	mc_samples.append(wjets    )
+	mc_samples.append(dyjets50 )
+	mc_samples.append(dyjets10 )
 
 else:
 	data       = sample('mu_data'         , inputDir + 'mu_data_ratios.root')
@@ -134,7 +144,7 @@ if scaling == 'wjetsdyjets_weighted':
 	dyjets10.Rescale(scalefactors[2])
 
 if scaling == 'fit_weighted':
-	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350]
+	if dataType == 'el': mclist = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80]
 	else:                mclist = [qcd]
 	#scalefactors = fit.getMCScaleFactorSimultaneously(data, qcd, wjets, dyjets50, dyjets10)
 	scalefactors = fit.getMCScaleFactorSimultaneouslyQCDEWK(data, mclist, [wjets, dyjets50, dyjets10])
@@ -144,7 +154,7 @@ if scaling == 'fit_weighted':
 	dyjets10.Rescale(scalefactors[3])
 
 if scaling == 'fiterror_weighted':
-	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350]
+	if dataType == 'el': mclist = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80]
 	else:                mclist = [qcd]
 	scalefactors = fit.getMCScaleFactorSimultaneouslyWithErrors(data, mclist, [wjets, dyjets50, dyjets10])
 	qcd.Rescale(scalefactors[0][0])
@@ -155,7 +165,7 @@ if scaling == 'fiterror_weighted':
 	upper = scalefactors[2]
 
 if module == 'plots_1d' or module == 'all':
-	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350, wjets, dyjets50, dyjets10]
+	if dataType == 'el': mclist = [qcdem20, qcdbc20, wjets, dyjets50, dyjets10]
 	else:                mclist = [qcd, wjets, dyjets50, dyjets10]
 	helper.PrintScale(canv, outputDir, mclist, lower, upper)
 
@@ -165,14 +175,15 @@ if module == 'plots_1d' or module == 'all':
 # produce 1d Plots
 
 if module == 'plots_1d' or module == 'all':
-	if dataType == 'el': qcdsample = qcd30
+	if dataType == 'el': qcdsample = qcdem20
 	else:                qcdsample = qcd
 	leg = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
 	leg.AddEntry(data      .hists[0], helper.getLegendName(data      .GetName()), 'pe')
 	leg.AddEntry(wjets     .hists[0], helper.getLegendName(wjets     .GetName()), 'f' )
 	leg.AddEntry(dyjets10  .hists[0], helper.getLegendName(dyjets10  .GetName()), 'f' )
 	leg.AddEntry(qcdsample .hists[0], helper.getLegendName(qcdsample .GetName()), 'f' )
-	Plot.Plot1d(dataType, outputDir, data, mc_samples, plot1dHists, leg)
+	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
+	Plot.Plot1d(dataType, outputDir, data, mc_samples, plot1dHists, leg, True)
 
 
 
@@ -196,10 +207,10 @@ if module == 'zoom_met' or module == 'all':
 
 if module == 'zoom_jpt' or module == 'all':
 	if dataType == 'el': 
-		mclist    = [qcd30, qcd80, qcd250, qcd350, wjets, dyjets50]
-		qcdsample = qcd30
+		mclist    = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80, wjets, dyjets50, dyjets10]
+		qcdsample = qcdem20
 	else:
-		mclist    = [qcd, wjets, dyjets50] 
+		mclist    = [qcd, wjets, dyjets50, dyjets10] 
 		qcdsample = qcd
 	
 	leg0 = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
@@ -207,6 +218,7 @@ if module == 'zoom_jpt' or module == 'all':
 	leg0.AddEntry(wjets     .hists[0], helper.getLegendName(wjets     .GetName()), 'l')
 	leg0.AddEntry(dyjets10  .hists[0], helper.getLegendName(dyjets10  .GetName()), 'l')
 	leg0.AddEntry(qcdsample .hists[0], helper.getLegendName(qcdsample .GetName()), 'l')
+	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
 	#Plot.PlotJPtZooms(dataType, outputDir, data, mclist, leg0)
 
 
@@ -214,7 +226,7 @@ if module == 'zoom_jpt' or module == 'all':
 # compute and plot FR for every variable
 
 if module == 'fakerates_1d' or module == 'all':
- 	if dataType == 'el': qcdlist = [qcd30] #[qcd30, qcd80, qcd250, qcd350]
+ 	if dataType == 'el': qcdlist = [qcdem20]
 	else:                qcdlist = [qcd] 
 	FR.PlotFR(dataType, outputDir, data, mc_samples, plot1dHists, qcdlist, [wjets, dyjets50, dyjets10], True)
 
@@ -223,7 +235,7 @@ if module == 'fakerates_1d' or module == 'all':
 # compute and plot FR 2d Map (+ Projections)
 
 if module == 'fakerates_2d' or module == 'all':
-	if dataType == 'el': qcdlist = [qcd30, qcd80, qcd250, qcd350]
+	if dataType == 'el': qcdlist = [qcdem30]
 	else:                qcdlist = [qcd] 
 	FR.Plot2dFRMap(dataType, outputDir, module, data, mc_samples, qcdlist, [wjets, dyjets50, dyjets10], True, True)
 

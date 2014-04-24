@@ -92,6 +92,15 @@ def getColor(name):
 	elif name == 'el_qcdelenr80'      : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdelenr250'     : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdelenr350'     : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdemenr20'      : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdemenr30'      : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdemenr80'      : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdemenr170'     : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdemenr250'     : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdemenr350'     : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdbctoe20'      : return mycolor.GetColor( 12,  57, 102)
+	elif name == 'el_qcdbctoe30'      : return mycolor.GetColor( 12,  57, 102)
+	elif name == 'el_qcdbctoe80'      : return mycolor.GetColor( 12,  57, 102)
 	elif name == 'totbg'              : return mycolor.GetColor(172,   0,   0)
 	elif name == 'data'               : return ROOT.kBlack
 	elif name == 'datamcsub'          : return ROOT.kOrange
