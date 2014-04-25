@@ -93,7 +93,7 @@ public:
 	void fillFRPlots(float);
 
 	// CUTS
-	bool passesUpperMETMT(int);
+	bool passesUpperMETMT(int, bool);
 	bool passesMETCut(float, int);
 	bool passesMTCut(int);
 	
@@ -102,7 +102,7 @@ public:
 	std::vector<float, std::allocator<float> >* getLepPhi();
 	std::vector<float, std::allocator<float> >* getLepPFIso();
 	std::vector<float, std::allocator<float> >* getLepD0();
-	bool isFRRegionLepEvent(int&, int&, float);
+	bool isFRRegionLepEvent(int&, int&, float, bool);
 
 	// LEPTON 
 	bool isLooseMuon(int);	
@@ -267,6 +267,15 @@ public:
 	int fCutflow_afterJetSel;
 	int fCutflow_afterMETCut;
 	int fCutflow_afterMTCut;
+
+	int fCounter_all;
+	int fCounter_trigger;
+	int fCounter_loose;
+	int fCounter_veto;
+	int fCounter_jet;
+	int fCounter_jet30;
+	int fCounter_met;
+	int fCounter_mt;
 
 	// Binning for FakeRate Projection Plots
 	std::vector<float> fFRbinseta;

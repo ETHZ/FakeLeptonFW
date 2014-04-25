@@ -50,7 +50,7 @@ if dataType == 'el':
 	wjets      = sample('el_wjets'        , inputDir + 'el_wjets_ratios.root')
 	dyjets50   = sample('el_dyjets50'     , inputDir + 'el_dyjets50_ratios.root')
 	dyjets10   = sample('el_dyjets10'     , inputDir + 'el_dyjets10_ratios.root')
-	qcdem20    = sample('el_qcdemenr20'   , inputDir + 'el_qcdemenr80_ratios.root')
+	qcdem20    = sample('el_qcdemenr20'   , inputDir + 'el_qcdemenr20_ratios.root')
 	qcdem30    = sample('el_qcdemenr30'   , inputDir + 'el_qcdemenr30_ratios.root')
 	qcdem80    = sample('el_qcdemenr80'   , inputDir + 'el_qcdemenr80_ratios.root')
 	qcdem170   = sample('el_qcdemenr170'  , inputDir + 'el_qcdemenr170_ratios.root')
@@ -126,17 +126,18 @@ lower = []
 upper = []
 
 if scaling == 'qcd_weighted':
-	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350]
+	if dataType == 'el': mclist = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80]
 	else:                mclist = [qcd]
-	qcd.Rescale(fit.getMCScaleFactorMutually(mclist, 'h_Loose_LepIso', [data], [], 0.2))
+	scalefactors = fit.getMCScaleFactorMutually(mclist, 'h_Loose_LepIso', [data], [], 0.1) 
+	for i, mc in enumerate(mclist): mc.Rescale(scalefactors[i])
 
 if scaling == 'qcdwjets_weighted' or scaling == 'wjets_weighted':
-	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350, dyjets50, dyjets10]
+	if dataType == 'el': mclist = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80, dyjets50, dyjets10]
 	else:                mclist = [qcd, dyjets50, dyjets10]
-	wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_MTMET20', [data], mclist, 60, 90))
+	wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_MTMET20', [data], mclist, 60, 90)[0])
 
 if scaling == 'wjetsdyjets_weighted':
-	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350]
+	if dataType == 'el': mclist = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80]
 	else:                mclist = [qcd]
 	scalefactors = fit.getMCScaleFactorMutually([wjets, dyjets50, dyjets10], 'h_Tight_MTMET20', [data], mclist, 60, 90)
 	wjets.Rescale(scalefactors[0])
@@ -196,10 +197,10 @@ if module == 'plots_2d' or module == 'all':
 
 # Plot all MET Zooms
 
-if module == 'zoom_met' or module == 'all':
-	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350, wjets, dyjets50]
-	else:                mclist = [qcd, wjets, dyjets50] 
-	#Plot.PlotMETZooms(dataType, outputDir, data, mclist, leg)
+#if module == 'zoom_met' or module == 'all':
+#	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350, wjets, dyjets50]
+#	else:                mclist = [qcd, wjets, dyjets50] 
+#	#Plot.PlotMETZooms(dataType, outputDir, data, mclist, leg)
 
 
 
@@ -235,6 +236,7 @@ if module == 'fakerates_1d' or module == 'all':
 # compute and plot FR 2d Map (+ Projections)
 
 if module == 'fakerates_2d' or module == 'all':
+	print mc_samples[0]
 	if dataType == 'el': qcdlist = [qcdem30]
 	else:                qcdlist = [qcd] 
 	FR.Plot2dFRMap(dataType, outputDir, module, data, mc_samples, qcdlist, [wjets, dyjets50, dyjets10], True, True)

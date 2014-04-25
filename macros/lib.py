@@ -128,10 +128,15 @@ def getLegendName(name):
 	elif name == 'el_dyjets10'        : return 'DY + Jets'
 	elif name == 'mu_dyjets10'        : return 'DY + Jets'
 	elif name == 'mu_qcdmuenr'        : return 'QCD'
-	elif name == 'el_qcdelenr30'      : return 'QCD'
-	elif name == 'el_qcdelenr80'      : return 'QCD'
-	elif name == 'el_qcdelenr250'     : return 'QCD'
-	elif name == 'el_qcdelenr350'     : return 'QCD'
+	elif name == 'el_qcdemenr20'      : return 'QCD (EMenr)'
+	elif name == 'el_qcdemenr30'      : return 'QCD (EMenr)'
+	elif name == 'el_qcdemenr80'      : return 'QCD (EMenr)'
+	elif name == 'el_qcdemenr170'     : return 'QCD (EMenr)'
+	elif name == 'el_qcdemenr250'     : return 'QCD (EMenr)'
+	elif name == 'el_qcdemenr350'     : return 'QCD (EMenr)'
+	elif name == 'el_qcdbctoe20'      : return 'QCD (BCtoE)'
+	elif name == 'el_qcdbctoe30'      : return 'QCD (BCtoE)'
+	elif name == 'el_qcdbctoe80'      : return 'QCD (BCtoE)'
 	elif name == 'totbg'              : return 'QCD + EW'
 	elif name == 'data'               : return 'Data'
 	elif name == 'datamcsub'          : return 'Data - EW'
@@ -233,7 +238,7 @@ def setFRPlotStyle(dataType, hist, color, title = '', title_hist = ''):
 	hist.SetTitle(title)
 	return hist
 
-def setRatioStyle(dataType, hist, title_hist='', title='Data/MC', max = 1.99, min = 0.0):
+def setRatioStyle(dataType, hist, title_hist='', title='Data/MC', max = 2.0, min = 0.0):
 	hist.SetMaximum(max)
 	hist.SetMinimum(min)
 	hist.SetTitle('')

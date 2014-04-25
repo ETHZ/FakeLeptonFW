@@ -51,6 +51,14 @@ void Fakerates::init(bool verbose){
 	fCutflow_afterMETCut = 0;
 	fCutflow_afterMTCut  = 0;
 
+	fCounter_all   = 0;
+	fCounter_loose = 0;
+	fCounter_veto  = 0;
+	fCounter_jet   = 0;
+	fCounter_jet30 = 0;
+	fCounter_met   = 0;
+	fCounter_mt    = 0;
+
 	Util::SetStyle();
 	
 
@@ -222,6 +230,7 @@ void Fakerates::loadConfigFile(TString configfile){
 
 	fPlotThreshold = fFRbinspt[binid];
 
+	cout << " fPlotThreshold: " << fPlotThreshold << endl;
 
 }
 
@@ -309,6 +318,16 @@ void Fakerates::loop(TFile* pFile){
 	cout << " mu: nevents passing MET    selection: " << fCutflow_afterMETCut << endl;
 	cout << " mu: nevents passing MT     selection: " << fCutflow_afterMTCut  << endl;
 	cout << " i just looped on " << ntot << " events." << endl;
+
+	cout << " fCounter_all      = " << fCounter_all     << " (" << (float) fCounter_all     / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_trigger  = " << fCounter_trigger << " (" << (float) fCounter_trigger / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_loose    = " << fCounter_loose   << " (" << (float) fCounter_loose   / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_veto     = " << fCounter_veto    << " (" << (float) fCounter_veto    / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_jet (40) = " << fCounter_jet     << " (" << (float) fCounter_jet     / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_jet (30) = " << fCounter_jet30   << " (" << (float) fCounter_jet30   / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_met      = " << fCounter_met     << " (" << (float) fCounter_met     / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_mt       = " << fCounter_mt      << " (" << (float) fCounter_mt      / (float) fCounter_all << ") " << endl;
+
 	delete file_, tree_;
 
 	// write histograms in output file
@@ -454,7 +473,7 @@ std::vector<float, std::allocator<float> >* Fakerates::getLepD0() {
 
 
 //____________________________________________________________________________
-bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
+bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count = false){
 	/*
 	checks, whether the event contains exactly one lepton and at least one away-jet in the calibration region
 	parameters: &lep (address of lepton index), &jet (address of away-jet index), jetcut
@@ -469,6 +488,8 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 	int nloose(0), nveto_add(0);
 	int nawayjets(0), jetind(-1);
 
+	if(count) ++fCounter_all;
+
 	//cout << "start FRRegionLepEvent" << endl;
 
 	// Event fails HLT muon trigger (if data) then return false
@@ -481,6 +502,8 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 		else if (fLepTrigger == "Ele17J" && !HLT_ELE17_JET30_TIGHT ) { return false; }
 		else                                                        {               }
 	}
+
+	if(count) ++fCounter_trigger;
 
 	//cout << "check 1" << endl;
 
@@ -504,10 +527,14 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 	//cout << "check 3" << endl;
 	// require exactly one loose muon and no additional veto muons
 	if(nloose    != 1) return false;
+
+	if(count) ++fCounter_loose;
 	
 	//cout << "check 4" << endl;
 	fCutflow_afterLepSel++;
 	if(nveto_add != 0) return false;
+
+	if(count) ++fCounter_veto;
 
 	//cout << "check 5" << endl;
 	// Jet Pt is not reasonable then return false
@@ -525,6 +552,9 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 	// no away jet found then return false 
 	if(awayjet_inds.size() < 1) return false;
 	fCutflow_afterJetSel++;
+
+	if(count) ++fCounter_jet;
+	if(jetcut==30.) ++fCounter_jet30;
 
 	//cout << "check 7" << endl;
 	// set jet index on the hardest jet
@@ -749,7 +779,7 @@ bool Fakerates::passesMTCut(int index){
 
 
 //____________________________________________________________________________
-bool Fakerates::passesUpperMETMT(int index){
+bool Fakerates::passesUpperMETMT(int index, bool count = false){
 	/* 
 	checks, if the event passes upper MET and MT cuts
 	parameters: index (index of the particle)
@@ -759,11 +789,15 @@ bool Fakerates::passesUpperMETMT(int index){
 	//cout << "start passesUpperMETMT" << endl;
 	//cout << "check 9" << endl;
     if(!passesMETCut()) return false;
-    fCutflow_afterMETCut++;
+    fCutflow_afterMETCut++;	
+
+	if(count) ++fCounter_met;
 
 	//cout << "check 10" << endl;
     if(!passesMTCut(index)) return false;
     fCutflow_afterMTCut++;
+	
+	if(count) ++fCounter_mt;
 
 	//cout << "check 11" << endl;
 	
@@ -986,9 +1020,9 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 
 
 	// leptons, first loose, then tight
-	if(isFRRegionLepEvent(lep, jet, fJetPtCut)){
+	if(isFRRegionLepEvent(lep, jet, fJetPtCut, true)){
 
-		if(passesUpperMETMT(lep)) {
+		if(passesUpperMETMT(lep, true)) {
  
 			h_Loose_AwayJetDR ->Fill(getAwayJet(1, lep)   , fEventweight);
 			h_Loose_AwayJetPt ->Fill(getAwayJet(0, lep)   , fEventweight);

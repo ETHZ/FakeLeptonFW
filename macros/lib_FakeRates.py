@@ -300,20 +300,20 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 
 	# this part needs adjustment
 	if mcsubstractscales:
-		scfirst = fit.getMCScaleFactorSimultaneouslyWithErrors(dataset, mcsetsplot, mcsubstract)
+		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(dataset, mcsetsplot, mcsubstract)
 		central1 = scfirst[0][1]
 		lower    = scfirst[1][1]
 		upper    = scfirst[2][1]
 		scsecond = fit.getMCScaleFactorMutually(mcsubstract, 'h_Tight_MTMET30', [dataset], mcsetsplot, 60, 100)
 		central2 = scsecond[0]
 
-	#print "------**------"
-	#print "qcd       = " + str(scfirst[0][0])
-	#print "central 1 = " + str(central1)
-	#print "lower   1 = " + str(lower)
-	#print "upper   1 = " + str(upper)
-	#print "central 2 = " + str(central2)
-	#print "------++------"
+	print "------**------"
+	print "qcd       = " + str(scfirst[0][0])
+	print "central 1 = " + str(central1)
+	print "lower   1 = " + str(lower)
+	print "upper   1 = " + str(upper)
+	print "central 2 = " + str(central2)
+	print "------++------"
 
 
 	if len(mcsubstract)>0:
@@ -354,7 +354,10 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 			index_denominator = i
 			data_denominator = copy.deepcopy(hist)
 			mc_denominator = ROOT.THStack()
+			print "---" + str(i) + "---"
+			print hist
 			for mc in mcsets:
+				print mc.hists[index_denominator]
 				mc_denominator.Add(copy.deepcopy(mc.hists[index_denominator]))
 			for j,mc in enumerate(mcsetsplot):
 				mcplot_denominator[j] = copy.deepcopy(mc.hists[index_denominator])
@@ -399,8 +402,12 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 	if len(mcsubstract)>0: 
 		for mc in mcsets:
 			if mc in mcsubstract:
+				print "h1"
+				print index_numerator
+				print mc.hists[index_numerator]
 				FR_data_mcsub.Add(mc.hists[index_numerator], -1)
 				mc.hists[index_numerator].Scale(central1)
+				print "h2"
 				FR_data_mcsub_c1.Add(mc.hists[index_numerator], -1)
 				mc.hists[index_numerator].Scale(lower/central1)
 				FR_data_mcsub_l1.Add(mc.hists[index_numerator], -1)
@@ -428,7 +435,7 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 	data_numerator_mcsub_c2 = copy.deepcopy(FR_data_mcsub_c2)
 
 
-	FR_data_mcsub_c1t=copy.deepcopy(FR_data_mcsub_c1)
+	FR_data_mcsub_c1t = copy.deepcopy(FR_data_mcsub_c1)
 	FR_data_mcsub_c1t .Divide(FR_data_mcsub_c1t, data_denominator_mcsub_c1, 1, 1, 'B')
 
 	#print "correlated:"
