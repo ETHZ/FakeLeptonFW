@@ -81,12 +81,21 @@ def getColor(name):
 	mycolor = ROOT.TColor()
 	if   name == 'el_data'            : return ROOT.kBlack
 	elif name == 'mu_data'            : return ROOT.kBlack
+	elif name == 'mu_data1'           : return ROOT.kBlack
+	elif name == 'mu_data2'           : return ROOT.kBlack
+	elif name == 'mu_data3'           : return ROOT.kBlack
+	elif name == 'mu_data4'           : return ROOT.kBlack
+	elif name == 'mu_data5'           : return ROOT.kBlack
+	elif name == 'mu_data6'           : return ROOT.kBlack
+	elif name == 'mu_data7'           : return ROOT.kBlack
 	elif name == 'el_wjets'           : return mycolor.GetColor(102,   0,   0)
 	elif name == 'mu_wjets'           : return mycolor.GetColor(102,   0,   0)
 	elif name == 'el_dyjets50'        : return mycolor.GetColor(255, 204,   0)
 	elif name == 'mu_dyjets50'        : return mycolor.GetColor(255, 204,   0)
 	elif name == 'el_dyjets10'        : return mycolor.GetColor(255, 204,   0)
 	elif name == 'mu_dyjets10'        : return mycolor.GetColor(255, 204,   0)
+	elif name == 'mu_ttbar'           : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'el_ttbar'           : return mycolor.GetColor( 51, 153,  58)
 	elif name == 'mu_qcdmuenr'        : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdelenr30'      : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdelenr80'      : return mycolor.GetColor( 51, 102, 153)
@@ -101,7 +110,7 @@ def getColor(name):
 	elif name == 'el_qcdbctoe20'      : return mycolor.GetColor( 12,  57, 102)
 	elif name == 'el_qcdbctoe30'      : return mycolor.GetColor( 12,  57, 102)
 	elif name == 'el_qcdbctoe80'      : return mycolor.GetColor( 12,  57, 102)
-	elif name == 'totbg'              : return mycolor.GetColor(172,   0,   0)
+	elif name == 'totbg'              : return mycolor.GetColor( 51, 153,  77)
 	elif name == 'data'               : return ROOT.kBlack
 	elif name == 'datamcsub'          : return ROOT.kOrange
 	elif name == 'datamcsub_central1' : return mycolor.GetColor( 51, 153,  51)
@@ -121,12 +130,21 @@ def getSampleColor(self):
 def getLegendName(name):
 	if   name == 'el_data'            : return 'Data'
 	elif name == 'mu_data'            : return 'Data'
+	elif name == 'mu_data1'           : return 'Data'
+	elif name == 'mu_data2'           : return 'Data'
+	elif name == 'mu_data3'           : return 'Data'
+	elif name == 'mu_data4'           : return 'Data'
+	elif name == 'mu_data5'           : return 'Data'
+	elif name == 'mu_data6'           : return 'Data'
+	elif name == 'mu_data7'           : return 'Data'
 	elif name == 'el_wjets'           : return 'W + Jets'
 	elif name == 'mu_wjets'           : return 'W + Jets'
 	elif name == 'el_dyjets50'        : return 'DY + Jets'
 	elif name == 'mu_dyjets50'        : return 'DY + Jets'
 	elif name == 'el_dyjets10'        : return 'DY + Jets'
 	elif name == 'mu_dyjets10'        : return 'DY + Jets'
+	elif name == 'mu_ttbar'           : return 'TTbar'
+	elif name == 'el_ttbar'           : return 'TTbar'
 	elif name == 'mu_qcdmuenr'        : return 'QCD'
 	elif name == 'el_qcdemenr20'      : return 'QCD (EMenr)'
 	elif name == 'el_qcdemenr30'      : return 'QCD (EMenr)'

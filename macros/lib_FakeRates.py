@@ -287,7 +287,7 @@ def PlotFR(dataType, outputDir, dataset, mcsets, histlist, mcsetsplot = [], mcsu
 
 
 
-def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], mcsubstract = [], doProjection = False, mcsubstractscales = False):
+def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], mcsubstract = [], doProjection = False, mcsubstractscales = False):
 	# attention: when calling this function with substraction of certain MC (e.g. electroweak)
 	#            you need to make sure that the monte carlo you want to substract already has
 	#            been given in mcsets as well
@@ -300,20 +300,20 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 
 	# this part needs adjustment
 	if mcsubstractscales:
-		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(dataset, mcsetsplot, mcsubstract)
+		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(datasets, mcsetsplot, mcsubstract)
 		central1 = scfirst[0][1]
 		lower    = scfirst[1][1]
 		upper    = scfirst[2][1]
-		scsecond = fit.getMCScaleFactorMutually(mcsubstract, 'h_Tight_MTMET30', [dataset], mcsetsplot, 60, 100)
+		scsecond = fit.getMCScaleFactorMutually(mcsubstract, 'h_Tight_MTMET30', datasets, mcsetsplot, 60, 100)
 		central2 = scsecond[0]
 
-	print "------**------"
-	print "qcd       = " + str(scfirst[0][0])
-	print "central 1 = " + str(central1)
-	print "lower   1 = " + str(lower)
-	print "upper   1 = " + str(upper)
-	print "central 2 = " + str(central2)
-	print "------++------"
+	#print "------**------"
+	#print "qcd       = " + str(scfirst[0][0])
+	#print "central 1 = " + str(central1)
+	#print "lower   1 = " + str(lower)
+	#print "upper   1 = " + str(upper)
+	#print "central 2 = " + str(central2)
+	#print "------++------"
 
 
 	if len(mcsubstract)>0:
@@ -330,9 +330,9 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 	mcplot_denominator = [{} for j in range(len(mcsetsplot))]
 	title_indeces = [0, 0]
 
-	for hist in dataset.hists:
+	for hist in datasets[0].hists:
 
-		i = dataset.hists.index(hist)
+		i = datasets[0].hists.index(hist)
 
 		if hist.GetName() == 'h_Loose_LepEta':
 			title_indeces[1] = i
@@ -342,8 +342,10 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 		# Get Numerator Plots
 		if 'h_FTight' in hist.GetName():
 			index_numerator = i
-			data_numerator = copy.deepcopy(hist)
+			data_numerator = ROOT.THStack()
 			mc_numerator = ROOT.THStack()
+			for data in datasets:
+				data_numerator.Add(copy.deepcopy(data.hists[index_numerator]))
 			for mc in mcsets:
 				mc_numerator.Add(copy.deepcopy(mc.hists[index_numerator]))
 			for j, mc in enumerate(mcsetsplot):
@@ -352,17 +354,18 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 		# Get Denominator Histograms
 		if 'h_FLoose' in hist.GetName():
 			index_denominator = i
-			data_denominator = copy.deepcopy(hist)
+			data_denominator = ROOT.THStack()
 			mc_denominator = ROOT.THStack()
-			print "---" + str(i) + "---"
-			print hist
+			for data in datasets:
+				data_denominator.Add(copy.deepcopy(data.hists[index_denominator]))
 			for mc in mcsets:
 				print mc.hists[index_denominator]
 				mc_denominator.Add(copy.deepcopy(mc.hists[index_denominator]))
 			for j,mc in enumerate(mcsetsplot):
 				mcplot_denominator[j] = copy.deepcopy(mc.hists[index_denominator])
 
-	FR_data      = data_numerator
+
+	FR_data      = data_numerator.GetStack().Last()
 
 	#sum = 0 
 	#for i in range(FR_data.GetNbinsX()+2, (FR_data.GetNbinsX()+2)*(FR_data.GetNbinsY()+1)):
@@ -378,17 +381,17 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 	#print "denominator has sum " + str(sum)
 	#print "---"
 
-	FR_data_copy = copy.deepcopy(FR_data)
+	FR_data_copy     = copy.deepcopy(FR_data)
 	FR_data_mcsub    = copy.deepcopy(FR_data)
 	FR_data_mcsub_c1 = copy.deepcopy(FR_data)
 	FR_data_mcsub_l1 = copy.deepcopy(FR_data)
 	FR_data_mcsub_u1 = copy.deepcopy(FR_data)
 	FR_data_mcsub_c2 = copy.deepcopy(FR_data)
-	data_denominator_mcsub    = copy.deepcopy(data_denominator)
-	data_denominator_mcsub_c1 = copy.deepcopy(data_denominator)
-	data_denominator_mcsub_l1 = copy.deepcopy(data_denominator)
-	data_denominator_mcsub_u1 = copy.deepcopy(data_denominator)
-	data_denominator_mcsub_c2 = copy.deepcopy(data_denominator)
+	data_denominator_mcsub    = copy.deepcopy(data_denominator.GetStack().Last())
+	data_denominator_mcsub_c1 = copy.deepcopy(data_denominator.GetStack().Last())
+	data_denominator_mcsub_l1 = copy.deepcopy(data_denominator.GetStack().Last())
+	data_denominator_mcsub_u1 = copy.deepcopy(data_denominator.GetStack().Last())
+	data_denominator_mcsub_c2 = copy.deepcopy(data_denominator.GetStack().Last())
 
 	FR_mc = [{} for j in range(len(mcsetsplot))]
 	FR_mc_copy = [{} for j in range(len(mcsetsplot))]
@@ -467,29 +470,29 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 	#FR_data_mcsub_u1 = helper.doTH2ErrorPropagation(FR_data_mcsub_u1, data_numerator_mcsub_u1, data_denominator_mcsub_u1, 4)
 	#FR_data_mcsub_c2 = helper.doTH2ErrorPropagation(FR_data_mcsub_c2, data_numerator_mcsub_c2, data_denominator_mcsub_c2, 4)
 	
-	FR_data.Divide(FR_data, data_denominator, 1, 1, 'B')
+	FR_data.Divide(FR_data, data_denominator.GetStack().Last(), 1, 1, 'B')
 
 	#for i in range(FR_data.GetNbinsX()+2, (FR_data.GetNbinsX()+2)*(FR_data.GetNbinsY()+1)):
 	#	print "bin " + str(i) + " has value " + str(FR_data.GetBinContent(i)) + " and error " + str(FR_data.GetBinError(i))
 
-	FR_bg = copy.deepcopy(mc_numerator.GetStack().Last())
-	FR_bg_copy = copy.deepcopy(FR_bg)
-	FR_bg.Divide(FR_bg, copy.deepcopy(mc_denominator.GetStack().Last()), 1, 1, 'B')
-	for j in range(len(mcsetsplot)): 
-		FR_mc[j] = mcplot_numerator[j]
-		FR_mc_copy[j] = copy.deepcopy(FR_mc[j])
-		FR_mc[j].Divide(FR_mc[j], mcplot_denominator[j], 1, 1, 'B')
+	##FR_bg = copy.deepcopy(mc_numerator.GetStack().Last())
+	##FR_bg_copy = copy.deepcopy(FR_bg)
+	##FR_bg.Divide(FR_bg, copy.deepcopy(mc_denominator.GetStack().Last()), 1, 1, 'B')
+	##for j in range(len(mcsetsplot)): 
+	##	FR_mc[j] = mcplot_numerator[j]
+	##	FR_mc_copy[j] = copy.deepcopy(FR_mc[j])
+	##	FR_mc[j].Divide(FR_mc[j], mcplot_denominator[j], 1, 1, 'B')
 
-	make2dFRPlot(dataType, canv, outputDir, dataset, FR_data, title_indeces, 'data', True)
-	if len(mcsubstract)>0: make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub, title_indeces, 'data-EW')
-	if mcsubstractscales:
-		make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub_c1, title_indeces, 'data-EW central1', True)
-		make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub_l1, title_indeces, 'data-EW lower1')
-		make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub_u1, title_indeces, 'data-EW upper1')
-		make2dFRPlot(dataType, canv, outputDir, dataset, FR_data_mcsub_c2, title_indeces, 'data-EW central2')
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data, title_indeces, 'data', True)
+	##if len(mcsubstract)>0: make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub, title_indeces, 'data-EW')
+	##if mcsubstractscales:
+	##	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c1, title_indeces, 'data-EW central1', True)
+	##	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_l1, title_indeces, 'data-EW lower1')
+	##	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_u1, title_indeces, 'data-EW upper1')
+	##	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c2, title_indeces, 'data-EW central2')
 
-	make2dFRPlot(dataType, canv, outputDir, dataset, FR_bg, title_indeces, 'MC', True)
-	for j in range(len(mcsetsplot)): make2dFRPlot(dataType, canv, outputDir, dataset, FR_mc[j], title_indeces, 'qcd')
+	##make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_bg, title_indeces, 'MC', True)
+	##for j in range(len(mcsetsplot)): make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mc[j], title_indeces, 'ttbar', True)
 
 
 
@@ -572,19 +575,19 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 		histstoplot = []
 		histstoplot.append([FR_data_px, 'data'])
 		histstoplot.append([FR_bg_px, 'totbg'])
-		make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'FR_proj_Pt_data')
+		make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[0]], 'FR_proj_Pt_data')
 
 		if len(mcsubstract)>0:
 			histstoplot = []
 			histstoplot.append([FR_data_px_mcsub, 'datamcsub'])
 			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_px[j], 'mu_qcdmuenr'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'FR_proj_Pt_data-ew')
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[0]], 'FR_proj_Pt_data-ew')
 
 		if mcsubstractscales:
 			histstoplot = []
 			histstoplot.append([FR_data_px, 'data'])
 			histstoplot.append([FR_data_px_mcsub_c1, 'datamcsub_central1'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'FR_proj_Pt_data-ew_data-eth', True, 'Data/ETH')
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[0]], 'FR_proj_Pt_data-ew_data-eth', True, 'Data/ETH')
 
 			#print "---------"
 			#print "data-ETH:"
@@ -594,7 +597,7 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 			histstoplot = []
 			histstoplot.append([FR_data_px_mcsub_c1, 'datamcsub_central1'])
 			histstoplot.append([FR_data_px_mcsub_c2, 'datamcsub_central2'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'FR_proj_Pt_data-ew_eth-ucsx', True, 'ETH/UCSx', 1.01, 0.99)
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[0]], 'FR_proj_Pt_data-ew_eth-ucsx', True, 'ETH/UCSx', 1.01, 0.99)
 
 			#print "---------"
 			#print "ETH-UCSx:"
@@ -605,7 +608,7 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 			histstoplot.append([FR_data_px_mcsub_c1, 'datamcsub_central1'])
 			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_px[j], 'mu_qcdmuenr'])
 			histstoplot.append([FR_data_px, 'data'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[0]], 'FR_proj_Pt_data-ew_data-eth-qcd', True, 'ETH/QCD')
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[0]], 'FR_proj_Pt_data-ew_data-eth-qcd', True, 'ETH/QCD')
 
 			#print "---------"
 			#print "ETH-QCD:"
@@ -617,31 +620,31 @@ def Plot2dFRMap(dataType, outputDir, module, dataset, mcsets, mcsetsplot = [], m
 		histstoplot = []
 		histstoplot.append([FR_data_py, 'data'])
 		histstoplot.append([FR_bg_py, 'totbg'])
-		make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'FR_proj_Eta_data')
+		make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[1]], 'FR_proj_Eta_data')
 
 		if len(mcsubstract)>0:
 			histstoplot = []
 			histstoplot.append([FR_data_py, 'data'])
 			histstoplot.append([FR_data_py_mcsub, 'datamcsub'])
 			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_py[j], 'mu_qcdmuenr'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'FR_proj_Eta_data-ew')
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[1]], 'FR_proj_Eta_data-ew')
 
 		if mcsubstractscales:
 			histstoplot = []
 			histstoplot.append([FR_data_py, 'data'])
 			histstoplot.append([FR_data_py_mcsub_c1, 'datamcsub_central1'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'FR_proj_Eta_data-ew_data-eth', True, 'Data/ETH')
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[1]], 'FR_proj_Eta_data-ew_data-eth', True, 'Data/ETH')
 
 			histstoplot = []
 			histstoplot.append([FR_data_py_mcsub_c1, 'datamcsub_central1'])
 			histstoplot.append([FR_data_py_mcsub_c2, 'datamcsub_central2'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'FR_proj_Eta_data-ew_eth-ucsx', True, 'ETH/UCSx', 1.01, 0.99)
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[1]], 'FR_proj_Eta_data-ew_eth-ucsx', True, 'ETH/UCSx', 1.01, 0.99)
 
 			histstoplot = []
 			histstoplot.append([FR_data_py_mcsub_c1, 'datamcsub_central1'])
 			for j in range(len(mcsetsplot)): histstoplot.append([FR_mc_py[j], 'mu_qcdmuenr'])
 			histstoplot.append([FR_data_py, 'data'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, dataset.hists[title_indeces[1]], 'FR_proj_Eta_data-ew_data-eth-qcd', True, 'ETH/QCD')
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[1]], 'FR_proj_Eta_data-ew_data-eth-qcd', True, 'ETH/QCD')
 
 
 

@@ -50,6 +50,7 @@ if dataType == 'el':
 	wjets      = sample('el_wjets'        , inputDir + 'el_wjets_ratios.root')
 	dyjets50   = sample('el_dyjets50'     , inputDir + 'el_dyjets50_ratios.root')
 	dyjets10   = sample('el_dyjets10'     , inputDir + 'el_dyjets10_ratios.root')
+	ttbar      = sample('el_ttbar'        , inputDir + 'el_ttbar_ratios.root')
 	qcdem20    = sample('el_qcdemenr20'   , inputDir + 'el_qcdemenr20_ratios.root')
 	qcdem30    = sample('el_qcdemenr30'   , inputDir + 'el_qcdemenr30_ratios.root')
 	qcdem80    = sample('el_qcdemenr80'   , inputDir + 'el_qcdemenr80_ratios.root')
@@ -75,17 +76,29 @@ if dataType == 'el':
 	mc_samples.append(dyjets10 )
 
 else:
-	data       = sample('mu_data'         , inputDir + 'mu_data_ratios.root')
-	wjets      = sample('mu_wjets'        , inputDir + 'mu_wjets_ratios.root')
-	dyjets50   = sample('mu_dyjets50'     , inputDir + 'mu_dyjets50_ratios.root')
-	dyjets10   = sample('mu_dyjets10'     , inputDir + 'mu_dyjets10_ratios.root')
-	qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root')
+	#data       = sample('mu_data'         , inputDir + 'mu_data_ratios.root')
+	#wjets      = sample('mu_wjets'        , inputDir + 'mu_wjets_ratios.root')
+	#dyjets50   = sample('mu_dyjets50'     , inputDir + 'mu_dyjets50_ratios.root')
+	#dyjets10   = sample('mu_dyjets10'     , inputDir + 'mu_dyjets10_ratios.root')
+	#qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root')
+	#ttbar      = sample('mu_ttbar'        , inputDir + 'mu_ttbar_ratios.root')
+
+	#mc_samples = []
+	#mc_samples.append(qcd     )
+	#mc_samples.append(wjets   )
+	#mc_samples.append(dyjets50)
+	#mc_samples.append(dyjets10)
+	#mc_samples.append(ttbar   )
+
+	data1      = sample('mu_data1'        , inputDir + 'mu_data1_ratios.root')
+	data2      = sample('mu_data2'        , inputDir + 'mu_data2_ratios.root')
+	data3      = sample('mu_data3'        , inputDir + 'mu_data3_ratios.root')
+	data4      = sample('mu_data4'        , inputDir + 'mu_data4_ratios.root')
+	data5      = sample('mu_data5'        , inputDir + 'mu_data5_ratios.root')
+	#data6      = sample('mu_data6'        , inputDir + 'mu_data6_ratios.root')
+	#data7      = sample('mu_data7'        , inputDir + 'mu_data7_ratios.root')
 
 	mc_samples = []
-	mc_samples.append(qcd     )
-	mc_samples.append(wjets   )
-	mc_samples.append(dyjets50)
-	mc_samples.append(dyjets10)
 
 module = helper.getModule(outputDir)
 scaling = helper.getScaling(outputDir)
@@ -182,6 +195,7 @@ if module == 'plots_1d' or module == 'all':
 	leg.AddEntry(data      .hists[0], helper.getLegendName(data      .GetName()), 'pe')
 	leg.AddEntry(wjets     .hists[0], helper.getLegendName(wjets     .GetName()), 'f' )
 	leg.AddEntry(dyjets10  .hists[0], helper.getLegendName(dyjets10  .GetName()), 'f' )
+	leg.AddEntry(ttbar     .hists[0], helper.getLegendName(ttbar     .GetName()), 'f' )
 	leg.AddEntry(qcdsample .hists[0], helper.getLegendName(qcdsample .GetName()), 'f' )
 	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
 	Plot.Plot1d(dataType, outputDir, data, mc_samples, plot1dHists, leg, True)
@@ -235,11 +249,13 @@ if module == 'fakerates_1d' or module == 'all':
 
 # compute and plot FR 2d Map (+ Projections)
 
-if module == 'fakerates_2d' or module == 'all':
-	print mc_samples[0]
-	if dataType == 'el': qcdlist = [qcdem30]
-	else:                qcdlist = [qcd] 
-	FR.Plot2dFRMap(dataType, outputDir, module, data, mc_samples, qcdlist, [wjets, dyjets50, dyjets10], True, True)
+#if module == 'fakerates_2d' or module == 'all':
+#	if dataType == 'el': qcdlist = [qcdem30]
+#	else:                qcdlist = [ttbar] 
+#	FR.Plot2dFRMap(dataType, outputDir, module, [data], mc_samples, qcdlist, [wjets, dyjets50, dyjets10], False, True)
+
+if module == 'fakerates_2d' or module == 'all': # testing PUweight_full
+	FR.Plot2dFRMap(dataType, outputDir, module, [data1, data2, data3, data4, data5], [], [], [], False, False)
 
 
 
@@ -353,6 +369,17 @@ if module == 'fakerates_1d' or module == 'all':
 
 if module == 'adhoc' or module == 'all':
 
+
+	if dataType == 'el': qcdsample = qcdem20
+	else:                qcdsample = qcd
+	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.45)
+	leg.AddEntry(data      .hists[0], helper.getLegendName(data      .GetName()), 'pe')
+	leg.AddEntry(wjets     .hists[0], helper.getLegendName(wjets     .GetName()), 'f' )
+	leg.AddEntry(dyjets10  .hists[0], helper.getLegendName(dyjets10  .GetName()), 'f' )
+	leg.AddEntry(ttbar     .hists[0], helper.getLegendName(ttbar     .GetName()), 'f' )
+	leg.AddEntry(qcdsample .hists[0], helper.getLegendName(qcdsample .GetName()), 'f' )
+	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
+	
 	canv = helper.makeCanvas(900, 675)
 	pad_plot = helper.makePad('plot')
 	pad_ratio = helper.makePad('ratio')
@@ -383,6 +410,46 @@ if module == 'adhoc' or module == 'all':
 		pad_ratio.cd()
 		hist_ratio = hist.Clone()
 		hist_ratio.Divide(dyjets50.hists[i])
+		hist_ratio.Draw("p e1")
+		hist_ratio = helper.setRatioStyle(dataType, hist_ratio, hist)
+		line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
+		line.Draw()
+		helper.saveCanvas(canv, pad_plot, outputDir + "adhoc/", prepend + helper.getSaveName(hist) + postpend)
+
+
+
+
+	canv = helper.makeCanvas(900, 675)
+	pad_plot = helper.makePad('plot')
+	pad_ratio = helper.makePad('ratio')
+	pad_ratio.cd()
+
+	for hist in qcd.hists:
+
+		i = qcd.hists.index(hist)
+		pad_plot.cd()
+
+
+		# Plot Histogram	
+		if not "LepIso" in hist.GetName(): continue
+
+		prepend = ''
+		postpend = '_closer'
+		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
+		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
+
+		hist.Draw()
+		hist.Scale(1.0/hist.Integral())
+		ttbar.hists[i].Draw("same")
+		ttbar.hists[i].Scale(1.0/ttbar.hists[i].Integral())
+		hist.SetMinimum(0.0001)
+		hist.SetMaximum(1.5*max(hist.GetMaximum(), ttbar.hists[i].GetMaximum()))
+		hist.GetYaxis().SetTitle("1/Integral")
+		leg.Draw()
+
+		pad_ratio.cd()
+		hist_ratio = hist.Clone()
+		hist_ratio.Divide(ttbar.hists[i])
 		hist_ratio.Draw("p e1")
 		hist_ratio = helper.setRatioStyle(dataType, hist_ratio, hist)
 		line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)

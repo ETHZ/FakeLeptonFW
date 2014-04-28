@@ -59,11 +59,13 @@ def getMCScaleFactorSimultaneouslyQCDEWK(data, qcd, ewk, hist_name = 'h_Tight_MT
 	scalefactors = [1.0 for i in range(1+len(ewk))]
 	
 	scind = 0
- 	for i, hist in enumerate(data.hists): 
+ 	for i, hist in enumerate(data[0].hists): 
  		if hist.GetName() == hist_name:
 			scind = i
 
-	data_hist    = data.hists[scind]
+	data_hist    = copy.deepcopy(data[0].hists[scind])
+	for i in range(1, len(data)):
+		data_hist.Add(data[i].hists[scind])
 
 	qcd_hist     = copy.deepcopy(qcd[0].hists[scind])
 	for i in range(1, len(qcd)):
@@ -168,19 +170,19 @@ def getMCScaleFactorSimultaneouslyWithErrors(data, qcd, ewk, hist_min = 50, hist
 	central[0] = scalefactors[0]
 	for mc in qcd: mc.Rescale(central[0])
 	
-	scalefactors = getMCScaleFactorMutually(ewk, hist_name, [data], qcd, hist_min, hist_max)
+	scalefactors = getMCScaleFactorMutually(ewk, hist_name, data, qcd, hist_min, hist_max)
 	central[1] = scalefactors[0]
 	
 	for mc in qcd: mc.Rescale(1.5/1.0)
 	upper[0] = 1.5*central[0]
 	
-	scalefactors = getMCScaleFactorMutually(ewk, hist_name, [data], qcd, hist_min, hist_max)
+	scalefactors = getMCScaleFactorMutually(ewk, hist_name, data, qcd, hist_min, hist_max)
 	upper[1] = scalefactors[0]
 	
 	for mc in qcd: mc.Rescale(0.5/1.5)
 	lower[0] = 0.5*central[0]
 	
-	scalefactors = getMCScaleFactorMutually(ewk, hist_name, [data], qcd, hist_min, hist_max)
+	scalefactors = getMCScaleFactorMutually(ewk, hist_name, data, qcd, hist_min, hist_max)
 	lower[1] = scalefactors[0]
 	
 	for mc in qcd: mc.Rescale(1.0/(0.5*central[0]))

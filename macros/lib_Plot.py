@@ -132,8 +132,11 @@ def Plot1d(dataType, outputDir, dataset, mcsets, histlist, leg, grouping = False
 			for j, group in enumerate(mcgroups):
 				group.Draw('hist')
 				histogram = group.GetStack().Last()
+				print mcnames[j] + ": " + str(histogram.Integral())
 				stackint += histogram.Integral()
 				stack.Add(histogram)
+
+			print mcnames
 		
 		else:
 			for j,mc in enumerate(mcsets):
