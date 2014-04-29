@@ -583,7 +583,8 @@ bool Fakerates::isLooseMuon(int index){
 	*/
 
 	if(!MuIsLoose->at(index)) return false;
-	//if(fabs(MuD0->at(index)) > 0.1) return false;
+	if(strstr(fName, "ttbar") && MuIsPrompt->at(index)) return false;
+	if(fabs(MuD0->at(index)) > 0.1) return false;
 	if(fLepD0Cut > 0.0 && fabs(MuD0->at(index)) > fLepD0Cut) return false; // leave this commented for synching!!
 	return true;
 }
@@ -598,6 +599,7 @@ bool Fakerates::isLooseElectron(int index){
 	*/
 
 	if(!ElIsLoose->at(index)) return false;
+	if(strstr(fName, "ttbar") && MuIsPrompt) return false;
 	if(ElPFIso->at(index) > 0.6) return false;
 	return true;
 }
@@ -1092,7 +1094,7 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 			}
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
 //	if(LepPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
-//	cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
+	//cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
 		}
 
 		if(passesMTCut(lep))    h_Loose_MET            ->Fill(getMET()            , fEventweight);

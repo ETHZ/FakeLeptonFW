@@ -1,5 +1,5 @@
 #!/bin/bash
-runFR mu ETH/corrected_jet/PUweight_runD/Mu17/ unweighted/adhoc/
+runFR mu ETH/corrected_jet/PUweight_runD/Mu17/ unweighted/zoom_met/
 #runFR mu ETH/corrected_jet/PUweight_runD/Mu17/ fit_weighted/
 #runFR mu ETH/corrected_jet/PUweight_runD/Mu17/ qcd_weighted/q
 #runFR mu ETH/corrected_jet/PUweight_runD/Mu17/ qcdwjets_weighted/

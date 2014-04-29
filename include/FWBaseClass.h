@@ -53,6 +53,7 @@ public :
    std::vector<int>     *MuCharge;
    std::vector<float>   *MuPFIso;
    std::vector<float>   *MuD0;
+   std::vector<float>   *MuD0BS;
 
    std::vector<bool>    *MuIsGlobal;
    std::vector<bool>    *MuIsPF;
@@ -65,6 +66,7 @@ public :
    std::vector<bool>    *MuIsVeto;
    std::vector<bool>    *MuIsLoose;
    std::vector<bool>    *MuIsTight;
+   std::vector<bool>    *MuIsPrompt;
    std::vector<float>   *ElPt;
    std::vector<float>   *ElEta;
    std::vector<float>   *ElPhi;
@@ -75,6 +77,7 @@ public :
    std::vector<bool>    *ElIsVeto;
    std::vector<bool>    *ElIsLoose;
    std::vector<bool>    *ElIsTight;
+   std::vector<bool>    *ElIsPrompt;
    Float_t         pfMET;
    Float_t         pfMETPhi;
    Float_t         pfMET1;
@@ -119,6 +122,7 @@ public :
    TBranch        *b_MuCharge;   //!
    TBranch        *b_MuPFIso;   //!
    TBranch        *b_MuD0;   //!
+   TBranch        *b_MuD0BS;   //!
    TBranch        *b_MuIsGlobal;   //!
    TBranch        *b_MuIsPF;   //!
    TBranch        *b_MuChi2;   //!
@@ -130,6 +134,7 @@ public :
    TBranch        *b_MuIsVeto;   //!
    TBranch        *b_MuIsLoose;   //!
    TBranch        *b_MuIsTight;   //!
+   TBranch        *b_MuIsPrompt;   //!
    TBranch        *b_ElPt;   //!
    TBranch        *b_ElEta;   //!
    TBranch        *b_ElPhi;   //!
@@ -139,6 +144,7 @@ public :
    TBranch        *b_ElIsVeto;   //!
    TBranch        *b_ElIsLoose;   //!
    TBranch        *b_ElIsTight;   //!
+   TBranch        *b_ElIsPrompt;   //!
    TBranch        *b_pfMET;   //!
    TBranch        *b_pfMETPhi;   //!
    TBranch        *b_pfMET1;   //!
@@ -223,6 +229,7 @@ void FWBaseClass::Init(TTree *tree)
    MuCharge = 0;
    MuPFIso = 0;
    MuD0 = 0;
+   MuD0BS = 0;
    MuIsGlobal = 0;
    MuIsPF = 0;
    MuChi2 = 0;
@@ -234,6 +241,7 @@ void FWBaseClass::Init(TTree *tree)
    MuIsVeto = 0;
    MuIsLoose = 0;
    MuIsTight = 0;
+   MuIsPrompt = 0;
    ElPt = 0;
    ElEta = 0;
    ElPhi = 0;
@@ -243,6 +251,7 @@ void FWBaseClass::Init(TTree *tree)
    ElIsVeto = 0;
    ElIsLoose = 0;
    ElIsTight = 0;
+   ElIsPrompt = 0;
    JetPt = 0;
    JetRawPt = 0;
    JetEta = 0;
@@ -287,6 +296,7 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuCharge", &MuCharge, &b_MuCharge);
    fChain->SetBranchAddress("MuPFIso", &MuPFIso, &b_MuPFIso);
    fChain->SetBranchAddress("MuD0", &MuD0, &b_MuD0);
+   fChain->SetBranchAddress("MuD0BS", &MuD0BS, &b_MuD0BS);
    fChain->SetBranchAddress("MuIsGlobal", &MuIsGlobal, &b_MuIsGlobal);
    fChain->SetBranchAddress("MuIsPF", &MuIsPF, &b_MuIsPF);
    fChain->SetBranchAddress("MuChi2", &MuChi2, &b_MuChi2);
@@ -298,6 +308,7 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuIsVeto", &MuIsVeto, &b_MuIsVeto);
    fChain->SetBranchAddress("MuIsLoose", &MuIsLoose, &b_MuIsLoose);
    fChain->SetBranchAddress("MuIsTight", &MuIsTight, &b_MuIsTight);
+   fChain->SetBranchAddress("MuIsPrompt", &MuIsPrompt, &b_MuIsPrompt);
    fChain->SetBranchAddress("ElPt", &ElPt, &b_ElPt);
    fChain->SetBranchAddress("ElEta", &ElEta, &b_ElEta);
    fChain->SetBranchAddress("ElPhi", &ElPhi, &b_ElPhi);
@@ -307,6 +318,7 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("ElIsVeto", &ElIsVeto, &b_ElIsVeto);
    fChain->SetBranchAddress("ElIsLoose", &ElIsLoose, &b_ElIsLoose);
    fChain->SetBranchAddress("ElIsTight", &ElIsTight, &b_ElIsTight);
+   fChain->SetBranchAddress("ElIsPrompt", &ElIsPrompt, &b_ElIsPrompt);
    fChain->SetBranchAddress("pfMET", &pfMET, &b_pfMET);
    fChain->SetBranchAddress("pfMETPhi", &pfMETPhi, &b_pfMETPhi);
    fChain->SetBranchAddress("pfMET1", &pfMET1, &b_pfMET1);

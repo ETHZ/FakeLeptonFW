@@ -18,7 +18,7 @@ def getScaling(outputDir, printall = 0):
 
 def getModule(outputDir, printall = 0):
 
-	list   = ['plots_1d', 'plots_2d', 'zoom_met', 'zoom_jpt', 'fakerates_1d', 'fakerates_2d', 'adhoc']
+	list   = ['plots_1d', 'plots_2d', 'zoom_met', 'zoom_jpt', 'fakerates_1d', 'fakerates_2d', 'adhoc', 'compare']
 	struct = outputDir.split('/')
 	result = ''
 
@@ -110,7 +110,7 @@ def getColor(name):
 	elif name == 'el_qcdbctoe20'      : return mycolor.GetColor( 12,  57, 102)
 	elif name == 'el_qcdbctoe30'      : return mycolor.GetColor( 12,  57, 102)
 	elif name == 'el_qcdbctoe80'      : return mycolor.GetColor( 12,  57, 102)
-	elif name == 'totbg'              : return mycolor.GetColor( 51, 153,  77)
+	elif name == 'totbg'              : return mycolor.GetColor(191,  11,  11)
 	elif name == 'data'               : return ROOT.kBlack
 	elif name == 'datamcsub'          : return ROOT.kOrange
 	elif name == 'datamcsub_central1' : return mycolor.GetColor( 51, 153,  51)
@@ -224,7 +224,7 @@ def makeLine(x1, y1, x2, y2):
 	line.SetLineStyle(7)
 	return line
 
-def set1dPlotStyle(dataType, hist, color, title = '', title_hist = ''):
+def set1dPlotStyle(dataType, hist, color, title = '', title_hist = '', ytitle = ''):
 	hist.SetMarkerColor(color)
 	hist.SetMarkerSize(1.4)
 	hist.SetMarkerStyle(20)
@@ -232,7 +232,7 @@ def set1dPlotStyle(dataType, hist, color, title = '', title_hist = ''):
 	hist.SetLineColor(color)
 	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(dataType, title_hist))
 	hist.GetXaxis().SetNdivisions(505)
-	hist.GetYaxis().SetTitle("")
+	hist.GetYaxis().SetTitle(ytitle)
 	hist.GetYaxis().SetTitleSize(0.08)
 	hist.GetYaxis().SetLabelSize(0.08)
 	hist.GetYaxis().SetNdivisions(505)

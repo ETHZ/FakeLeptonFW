@@ -61,6 +61,9 @@ if dataType == 'el':
 	qcdbc30    = sample('el_qcdbctoe30'   , inputDir + 'el_qcdbctoe30_ratios.root')
 	qcdbc80    = sample('el_qcdbctoe80'   , inputDir + 'el_qcdbctoe80_ratios.root')
 
+	data_samples = []
+	data_samples.append(data)
+
 	mc_samples = []
 	mc_samples.append(qcdem20  )
 	mc_samples.append(qcdem30  )
@@ -75,30 +78,56 @@ if dataType == 'el':
 	mc_samples.append(dyjets50 )
 	mc_samples.append(dyjets10 )
 
+	qcd_samples = []	
+	qcd_samples.append(qcdem20 )
+	qcd_samples.append(qcdem30 )
+	qcd_samples.append(qcdem80 )
+	qcd_samples.append(qcdem170)
+	qcd_samples.append(qcdem250)
+	qcd_samples.append(qcdem350)
+	qcd_samples.append(qcdbc20 )
+	qcd_samples.append(qcdbc30 )
+	qcd_samples.append(qcdbc80 )
+
 else:
-	#data       = sample('mu_data'         , inputDir + 'mu_data_ratios.root')
-	#wjets      = sample('mu_wjets'        , inputDir + 'mu_wjets_ratios.root')
-	#dyjets50   = sample('mu_dyjets50'     , inputDir + 'mu_dyjets50_ratios.root')
-	#dyjets10   = sample('mu_dyjets10'     , inputDir + 'mu_dyjets10_ratios.root')
-	#qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root')
-	#ttbar      = sample('mu_ttbar'        , inputDir + 'mu_ttbar_ratios.root')
+	data       = sample('mu_data'         , inputDir + 'mu_data_ratios.root')
+	wjets      = sample('mu_wjets'        , inputDir + 'mu_wjets_ratios.root')
+	dyjets50   = sample('mu_dyjets50'     , inputDir + 'mu_dyjets50_ratios.root')
+	dyjets10   = sample('mu_dyjets10'     , inputDir + 'mu_dyjets10_ratios.root')
+	qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root')
+	ttbar      = sample('mu_ttbar'        , inputDir + 'mu_ttbar_ratios.root')
 
-	#mc_samples = []
-	#mc_samples.append(qcd     )
-	#mc_samples.append(wjets   )
-	#mc_samples.append(dyjets50)
-	#mc_samples.append(dyjets10)
-	#mc_samples.append(ttbar   )
-
-	data1      = sample('mu_data1'        , inputDir + 'mu_data1_ratios.root')
-	data2      = sample('mu_data2'        , inputDir + 'mu_data2_ratios.root')
-	data3      = sample('mu_data3'        , inputDir + 'mu_data3_ratios.root')
-	data4      = sample('mu_data4'        , inputDir + 'mu_data4_ratios.root')
-	data5      = sample('mu_data5'        , inputDir + 'mu_data5_ratios.root')
-	#data6      = sample('mu_data6'        , inputDir + 'mu_data6_ratios.root')
-	#data7      = sample('mu_data7'        , inputDir + 'mu_data7_ratios.root')
+	data_samples = []
+	data_samples.append(data)
 
 	mc_samples = []
+	mc_samples.append(qcd     )
+	mc_samples.append(wjets   )
+	mc_samples.append(dyjets50)
+	mc_samples.append(dyjets10)
+	#mc_samples.append(ttbar   )
+
+	qcd_samples = []
+	qcd_samples.append(qcd)
+
+	#data1      = sample('mu_data1'        , inputDir + 'mu_data1_ratios.root')
+	#data2      = sample('mu_data2'        , inputDir + 'mu_data2_ratios.root')
+	#data3      = sample('mu_data3'        , inputDir + 'mu_data3_ratios.root')
+	#data4      = sample('mu_data4'        , inputDir + 'mu_data4_ratios.root')
+	#data5      = sample('mu_data5'        , inputDir + 'mu_data5_ratios.root')
+	##data6      = sample('mu_data6'        , inputDir + 'mu_data6_ratios.root')
+	##data7      = sample('mu_data7'        , inputDir + 'mu_data7_ratios.root')
+
+	#data_samples = []
+	#data_samples.append(data1)
+	#data_samples.append(data2)
+	#data_samples.append(data3)
+	#data_samples.append(data4)
+	#data_samples.append(data5)
+	#data_samples.append(data6)
+	#data_samples.append(data7)
+
+	#mc_samples = []
 
 module = helper.getModule(outputDir)
 scaling = helper.getScaling(outputDir)
@@ -139,39 +168,31 @@ lower = []
 upper = []
 
 if scaling == 'qcd_weighted':
-	if dataType == 'el': mclist = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80]
-	else:                mclist = [qcd]
-	scalefactors = fit.getMCScaleFactorMutually(mclist, 'h_Loose_LepIso', [data], [], 0.1) 
-	for i, mc in enumerate(mclist): mc.Rescale(scalefactors[i])
+	scalefactors = fit.getMCScaleFactorMutually(qcd_samples, 'h_Loose_LepIso', data_samples, [], 0.1) 
+	for i, mc in enumerate(qcd_samples): mc.Rescale(scalefactors[i])
 
 if scaling == 'qcdwjets_weighted' or scaling == 'wjets_weighted':
 	if dataType == 'el': mclist = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80, dyjets50, dyjets10]
 	else:                mclist = [qcd, dyjets50, dyjets10]
-	wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_MTMET20', [data], mclist, 60, 90)[0])
+	wjets.Rescale(fit.getMCScaleFactor(wjets, 'h_Tight_MTMET20', data_samples, mclist, 60, 90)[0])
 
 if scaling == 'wjetsdyjets_weighted':
-	if dataType == 'el': mclist = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80]
-	else:                mclist = [qcd]
-	scalefactors = fit.getMCScaleFactorMutually([wjets, dyjets50, dyjets10], 'h_Tight_MTMET20', [data], mclist, 60, 90)
+	scalefactors = fit.getMCScaleFactorMutually([wjets, dyjets50, dyjets10], 'h_Tight_MTMET20', data_samples, qcd_samples, 60, 90)
 	wjets.Rescale(scalefactors[0])
 	dyjets50.Rescale(scalefactors[1])
 	dyjets10.Rescale(scalefactors[2])
 
 if scaling == 'fit_weighted':
-	if dataType == 'el': mclist = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80]
-	else:                mclist = [qcd]
-	#scalefactors = fit.getMCScaleFactorSimultaneously(data, qcd, wjets, dyjets50, dyjets10)
-	scalefactors = fit.getMCScaleFactorSimultaneouslyQCDEWK(data, mclist, [wjets, dyjets50, dyjets10])
-	qcd.Rescale(scalefactors[0])
+	#scalefactors = fit.getMCScaleFactorSimultaneously(data_samples, qcd, wjets, dyjets50, dyjets10)
+	scalefactors = fit.getMCScaleFactorSimultaneouslyQCDEWK(data_samples, qcd_samples, [wjets, dyjets50, dyjets10])
+	for mc in qcd_samples: mc.Rescale(scalefactors[0])
 	wjets.Rescale(scalefactors[1])
 	dyjets50.Rescale(scalefactors[2])
 	dyjets10.Rescale(scalefactors[3])
 
 if scaling == 'fiterror_weighted':
-	if dataType == 'el': mclist = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80]
-	else:                mclist = [qcd]
-	scalefactors = fit.getMCScaleFactorSimultaneouslyWithErrors(data, mclist, [wjets, dyjets50, dyjets10])
-	qcd.Rescale(scalefactors[0][0])
+	scalefactors = fit.getMCScaleFactorSimultaneouslyWithErrors(data_samples, qcd_samples, [wjets, dyjets50, dyjets10])
+	for mc in qcd_samples: mc.Rescale(scalefactors[0][0])
 	wjets.Rescale(scalefactors[0][1])
 	dyjets50.Rescale(scalefactors[0][1])
 	dyjets10.Rescale(scalefactors[0][1])
@@ -189,73 +210,84 @@ if module == 'plots_1d' or module == 'all':
 # produce 1d Plots
 
 if module == 'plots_1d' or module == 'all':
-	if dataType == 'el': qcdsample = qcdem20
-	else:                qcdsample = qcd
 	leg = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
-	leg.AddEntry(data      .hists[0], helper.getLegendName(data      .GetName()), 'pe')
-	leg.AddEntry(wjets     .hists[0], helper.getLegendName(wjets     .GetName()), 'f' )
-	leg.AddEntry(dyjets10  .hists[0], helper.getLegendName(dyjets10  .GetName()), 'f' )
-	leg.AddEntry(ttbar     .hists[0], helper.getLegendName(ttbar     .GetName()), 'f' )
-	leg.AddEntry(qcdsample .hists[0], helper.getLegendName(qcdsample .GetName()), 'f' )
+	leg.AddEntry(data_samples[0].hists[0], helper.getLegendName(data_samples[0].GetName()), 'pe')
+	leg.AddEntry(wjets          .hists[0], helper.getLegendName(wjets          .GetName()), 'f' )
+	leg.AddEntry(dyjets10       .hists[0], helper.getLegendName(dyjets10       .GetName()), 'f' )
+	leg.AddEntry(ttbar          .hists[0], helper.getLegendName(ttbar          .GetName()), 'f' )
+	leg.AddEntry(qcd_samples[0] .hists[0], helper.getLegendName(qcd_samples[0] .GetName()), 'f' )
 	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
-	Plot.Plot1d(dataType, outputDir, data, mc_samples, plot1dHists, leg, True)
+	Plot.Plot1d(dataType, outputDir, data_samples, mc_samples, plot1dHists, leg, True)
 
 
 
 # produce 2d Plots
 
 if module == 'plots_2d' or module == 'all':
-	Plot.Plot2d(dataType, outputDir, data, mc_samples, plot2dHists)
+	Plot.Plot2d(dataType, outputDir, data_samples, mc_samples, plot2dHists)
 
 
 
 # Plot all MET Zooms
 
-#if module == 'zoom_met' or module == 'all':
-#	if dataType == 'el': mclist = [qcd30, qcd80, qcd250, qcd350, wjets, dyjets50]
-#	else:                mclist = [qcd, wjets, dyjets50] 
-#	#Plot.PlotMETZooms(dataType, outputDir, data, mclist, leg)
+if module == 'zoom_met' or module == 'all':
+	leg = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
+	leg.AddEntry(data_samples[0].hists[0], helper.getLegendName(data_samples[0].GetName()), 'pe')
+	leg.AddEntry(wjets          .hists[0], helper.getLegendName(wjets          .GetName()), 'f' )
+	leg.AddEntry(dyjets10       .hists[0], helper.getLegendName(dyjets10       .GetName()), 'f' )
+	leg.AddEntry(ttbar          .hists[0], helper.getLegendName(ttbar          .GetName()), 'f' )
+	leg.AddEntry(qcd_samples[0] .hists[0], helper.getLegendName(qcd_samples[0] .GetName()), 'f' )
+	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
+	Plot.PlotMETZooms(dataType, outputDir, data_samples, mc_samples, leg)
 
 
 
 # Plot all JPt Zooms
 
-if module == 'zoom_jpt' or module == 'all':
-	if dataType == 'el': 
-		mclist    = [qcdem20, qcdem30, qcdem80, qcdem170, qcdem250, qcdem350, qcdbc20, qcdbc30, qcdbc80, wjets, dyjets50, dyjets10]
-		qcdsample = qcdem20
-	else:
-		mclist    = [qcd, wjets, dyjets50, dyjets10] 
-		qcdsample = qcd
-	
-	leg0 = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
-	leg0.AddEntry(data      .hists[0], helper.getLegendName(data      .GetName()), 'l')
-	leg0.AddEntry(wjets     .hists[0], helper.getLegendName(wjets     .GetName()), 'l')
-	leg0.AddEntry(dyjets10  .hists[0], helper.getLegendName(dyjets10  .GetName()), 'l')
-	leg0.AddEntry(qcdsample .hists[0], helper.getLegendName(qcdsample .GetName()), 'l')
-	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
-	#Plot.PlotJPtZooms(dataType, outputDir, data, mclist, leg0)
+#if module == 'zoom_jpt' or module == 'all':
+#	leg0 = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
+#	leg0.AddEntry(data_samples[0].hists[0], helper.getLegendName(data_samples[0].GetName()), 'l')
+#	leg0.AddEntry(wjets          .hists[0], helper.getLegendName(wjets          .GetName()), 'l')
+#	leg0.AddEntry(dyjets10       .hists[0], helper.getLegendName(dyjets10       .GetName()), 'l')
+#	leg0.AddEntry(qcd_samples[0] .hists[0], helper.getLegendName(qcd_samples[0] .GetName()), 'l')
+#	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'l')
+#	Plot.PlotJPtZooms(dataType, outputDir, data_samples, mc_samples, leg0)
+
+
+
+# Compare AllJet quantities between WJets and DYjets
+
+if module == 'compare' or module == 'all':
+	leg = helper.makeLegend(0.6, 0.6, 0.85, 0.85)
+	leg.AddEntry(wjets   .hists[0], helper.getLegendName(wjets   .GetName()), 'l' )
+	leg.AddEntry(dyjets50.hists[0], helper.getLegendName(dyjets50.GetName()), 'l' )
+	Plot.PlotCompare(dataType, outputDir, [wjets, dyjets50], 'AllJ', leg)
+
+
+# Compare Isolation between QCD and TTBar
+
+if module == 'compare' or module == 'all':
+	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.35)
+	leg.AddEntry(qcd  .hists[0], helper.getLegendName(qcd  .GetName()), 'l' )
+	leg.AddEntry(ttbar.hists[0], helper.getLegendName(ttbar.GetName()), 'l' )
+	Plot.PlotCompare(dataType, outputDir, [qcd, ttbar], 'LepIso', leg)
 
 
 
 # compute and plot FR for every variable
 
 if module == 'fakerates_1d' or module == 'all':
- 	if dataType == 'el': qcdlist = [qcdem20]
-	else:                qcdlist = [qcd] 
-	FR.PlotFR(dataType, outputDir, data, mc_samples, plot1dHists, qcdlist, [wjets, dyjets50, dyjets10], True)
+	FR.PlotFR(dataType, outputDir, [data], mc_samples, plot1dHists, [ttbar], [wjets, dyjets50, dyjets10], qcd_samples, True)
 
 
 
 # compute and plot FR 2d Map (+ Projections)
 
-#if module == 'fakerates_2d' or module == 'all':
-#	if dataType == 'el': qcdlist = [qcdem30]
-#	else:                qcdlist = [ttbar] 
-#	FR.Plot2dFRMap(dataType, outputDir, module, [data], mc_samples, qcdlist, [wjets, dyjets50, dyjets10], False, True)
+if module == 'fakerates_2d' or module == 'all':
+	FR.Plot2dFRMap(dataType, outputDir, module, [data], mc_samples, [ttbar], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
 
-if module == 'fakerates_2d' or module == 'all': # testing PUweight_full
-	FR.Plot2dFRMap(dataType, outputDir, module, [data1, data2, data3, data4, data5], [], [], [], False, False)
+#if module == 'fakerates_2d' or module == 'all': # testing PUweight_full
+#	FR.Plot2dFRMap(dataType, outputDir, module, [data1, data2, data3, data4, data5], [], [], [], [], False, False)
 
 
 
@@ -361,101 +393,6 @@ if module == 'fakerates_1d' or module == 'all':
 	histstoplot.append([data_numerator_rpt, 'dataJRPt'])
 
 	FR.make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, data.hists[histindex_cpt], 'FR_JetPt_compare')
-
-
-
-
-# hard-coded to produce wjets and dyjets All-Jet comparisons
-
-if module == 'adhoc' or module == 'all':
-
-
-	if dataType == 'el': qcdsample = qcdem20
-	else:                qcdsample = qcd
-	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.45)
-	leg.AddEntry(data      .hists[0], helper.getLegendName(data      .GetName()), 'pe')
-	leg.AddEntry(wjets     .hists[0], helper.getLegendName(wjets     .GetName()), 'f' )
-	leg.AddEntry(dyjets10  .hists[0], helper.getLegendName(dyjets10  .GetName()), 'f' )
-	leg.AddEntry(ttbar     .hists[0], helper.getLegendName(ttbar     .GetName()), 'f' )
-	leg.AddEntry(qcdsample .hists[0], helper.getLegendName(qcdsample .GetName()), 'f' )
-	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
-	
-	canv = helper.makeCanvas(900, 675)
-	pad_plot = helper.makePad('plot')
-	pad_ratio = helper.makePad('ratio')
-	pad_ratio.cd()
-
-	for hist in wjets.hists:
-
-		i = wjets.hists.index(hist)
-		pad_plot.cd()
-
-
-		# Plot Histogram	
-		if not "AllJ" in hist.GetName(): continue
-
-		prepend = ''
-		postpend = '_closer'
-		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
-		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
-
-		hist.Draw()
-		hist.Scale(1.0/hist.Integral())
-		dyjets50.hists[i].Draw("same")
-		dyjets50.hists[i].Scale(1.0/dyjets50.hists[i].Integral())
-		hist.SetMaximum(1.5*max(hist.GetMaximum(), dyjets50.hists[i].GetMaximum()))
-		hist.GetYaxis().SetTitle("1/Integral")
-		leg.Draw()
-
-		pad_ratio.cd()
-		hist_ratio = hist.Clone()
-		hist_ratio.Divide(dyjets50.hists[i])
-		hist_ratio.Draw("p e1")
-		hist_ratio = helper.setRatioStyle(dataType, hist_ratio, hist)
-		line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
-		line.Draw()
-		helper.saveCanvas(canv, pad_plot, outputDir + "adhoc/", prepend + helper.getSaveName(hist) + postpend)
-
-
-
-
-	canv = helper.makeCanvas(900, 675)
-	pad_plot = helper.makePad('plot')
-	pad_ratio = helper.makePad('ratio')
-	pad_ratio.cd()
-
-	for hist in qcd.hists:
-
-		i = qcd.hists.index(hist)
-		pad_plot.cd()
-
-
-		# Plot Histogram	
-		if not "LepIso" in hist.GetName(): continue
-
-		prepend = ''
-		postpend = '_closer'
-		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
-		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
-
-		hist.Draw()
-		hist.Scale(1.0/hist.Integral())
-		ttbar.hists[i].Draw("same")
-		ttbar.hists[i].Scale(1.0/ttbar.hists[i].Integral())
-		hist.SetMinimum(0.0001)
-		hist.SetMaximum(1.5*max(hist.GetMaximum(), ttbar.hists[i].GetMaximum()))
-		hist.GetYaxis().SetTitle("1/Integral")
-		leg.Draw()
-
-		pad_ratio.cd()
-		hist_ratio = hist.Clone()
-		hist_ratio.Divide(ttbar.hists[i])
-		hist_ratio.Draw("p e1")
-		hist_ratio = helper.setRatioStyle(dataType, hist_ratio, hist)
-		line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
-		line.Draw()
-		helper.saveCanvas(canv, pad_plot, outputDir + "adhoc/", prepend + helper.getSaveName(hist) + postpend)
-
 
 
 
