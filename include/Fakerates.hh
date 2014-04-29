@@ -91,6 +91,7 @@ public:
 
 	bool fillFHist(float);
 	void fillFRPlots(float);
+	void fillFRPlotsTTBar(float);
 
 	// CUTS
 	bool passesUpperMETMT(int, bool);
@@ -102,7 +103,9 @@ public:
 	std::vector<float, std::allocator<float> >* getLepPhi();
 	std::vector<float, std::allocator<float> >* getLepPFIso();
 	std::vector<float, std::allocator<float> >* getLepD0();
+
 	bool isFRRegionLepEvent(int&, int&, float, bool);
+	bool isFRRegionLepEventTTBar(int);
 
 	// LEPTON 
 	bool isLooseMuon(int);	
@@ -110,9 +113,17 @@ public:
 	bool isLooseLepton(int);
 	bool isLooseOpLepton(int);
 
+	bool isLooseMuonTTBar(int);	
+	bool isLooseElectronTTBar(int);
+	bool isLooseLeptonTTBar(int);
+
 	bool isTightMuon(int);
 	bool isTightElectron(int);
 	bool isTightLepton(int);
+
+	bool isTightMuonTTBar(int);
+	bool isTightElectronTTBar(int);
+	bool isTightLeptonTTBar(int);
 
 	// JETS
 	float getJetPt(int);	

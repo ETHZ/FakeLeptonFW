@@ -100,18 +100,18 @@ def PlotFR(dataType, outputDir, datasets, mcsets, histlist, mcsetsplot = [], mcs
 
 	# this part needs adjustment
 	if mcsubtractscales:
-		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(datasets, mcsetsplot, mcsubtract, 50, 120, 'h_Tight_MTMET30')
+		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(datasets, mcsubtractplot, mcsubtract, 50, 120, 'h_Tight_MTMET30')
 		qcd2     = scfirst[0][0]
 		central12= scfirst[0][1]
 		lower2   = scfirst[1][1]
 		upper2   = scfirst[2][1]
-		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(datasets, mcsetsplot, mcsubtract)
+		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(datasets, mcsubtractplot, mcsubtract)
 		central1 = scfirst[0][1]
 		lower    = scfirst[1][1]
 		upper    = scfirst[2][1]
-		scsecond = fit.getMCScaleFactorMutually(mcsubtract, 'h_Tight_MTMET30', datasets, mcsetsplot, 60, 100)
+		scsecond = fit.getMCScaleFactorMutually(mcsubtract, 'h_Tight_MTMET30', datasets, mcsubtractplot, 60, 100)
 		central2 = scsecond[0]
-		scsecond = fit.getMCScaleFactorMutually(mcsubtract, 'h_Tight_MTMET20', datasets, mcsetsplot, 60, 100)
+		scsecond = fit.getMCScaleFactorMutually(mcsubtract, 'h_Tight_MTMET20', datasets, mcsubtractplot, 60, 100)
 		central22= scsecond[0]
 
 	#print "------**------"
@@ -248,8 +248,8 @@ def PlotFR(dataType, outputDir, datasets, mcsets, histlist, mcsetsplot = [], mcs
 		if len(mcsetsplot)>0:
 			histstoplot = []
 			histstoplot.append([FRs_data[i], 'data'])
-			histstoplot.append([FRs_mcplot[i], 'mu_ttbar'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, FRs_data[i], 'FR_' + FRs_data[i].GetName().lstrip('h_Tight_') + '_data-ttbar')
+			histstoplot.append([FRs_mcplot[i], mcsetsplot[0].GetName()])
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, FRs_data[i], 'FR_' + FRs_data[i].GetName().lstrip('h_Tight_') + '_data-' + mcsetsplot[0].GetName().lstrip('mu_'))
 
 		if len(mcsubtract)>0:
 			histstoplot = []
@@ -300,11 +300,11 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 
 	# this part needs adjustment
 	if mcsubtractscales:
-		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(datasets, mcsetsplot, mcsubtract)
+		scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(datasets, mcsubtractplot, mcsubtract)
 		central1 = scfirst[0][1]
 		lower    = scfirst[1][1]
 		upper    = scfirst[2][1]
-		scsecond = fit.getMCScaleFactorMutually(mcsubtract, 'h_Tight_MTMET30', datasets, mcsetsplot, 60, 100)
+		scsecond = fit.getMCScaleFactorMutually(mcsubtract, 'h_Tight_MTMET30', datasets, mcsubtractplot, 60, 100)
 		central2 = scsecond[0]
 
 	#print "------**------"
@@ -487,12 +487,11 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 	FR_mc     .Divide(FR_mc     , copy.deepcopy(mc_denominator     .GetStack().Last()), 1, 1, 'B')
 	FR_mcplot .Divide(FR_mcplot , copy.deepcopy(mcplot_denominator .GetStack().Last()), 1, 1, 'B')
 	FR_mcsub  .Divide(FR_mcsub  , copy.deepcopy(mcsub_denominator  .GetStack().Last()), 1, 1, 'B')
-
 	
 	# plot 2d maps
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data  , title_indeces, 'data' , True)
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mc    , title_indeces, 'MC'   , True)
-	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcplot, title_indeces, 'TTBar', True)
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcplot, title_indeces, mcsetsplot[0].GetName().lstrip('mu_'), True)
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcsub , title_indeces, 'QCD'        )
 
 	if len(mcsubtract)>0: 

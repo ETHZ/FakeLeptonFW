@@ -94,8 +94,12 @@ def getColor(name):
 	elif name == 'mu_dyjets50'        : return mycolor.GetColor(255, 204,   0)
 	elif name == 'el_dyjets10'        : return mycolor.GetColor(255, 204,   0)
 	elif name == 'mu_dyjets10'        : return mycolor.GetColor(255, 204,   0)
-	elif name == 'mu_ttbar'           : return mycolor.GetColor( 51, 153,  58)
-	elif name == 'el_ttbar'           : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'mu_ttbar0'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'el_ttbar0'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'mu_ttbar1'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'el_ttbar1'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'mu_ttbar2'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'el_ttbar2'          : return mycolor.GetColor( 51, 153,  58)
 	elif name == 'mu_qcdmuenr'        : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdelenr30'      : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdelenr80'      : return mycolor.GetColor( 51, 102, 153)
@@ -143,8 +147,12 @@ def getLegendName(name):
 	elif name == 'mu_dyjets50'        : return 'DY + Jets'
 	elif name == 'el_dyjets10'        : return 'DY + Jets'
 	elif name == 'mu_dyjets10'        : return 'DY + Jets'
-	elif name == 'mu_ttbar'           : return 'TTbar'
-	elif name == 'el_ttbar'           : return 'TTbar'
+	elif name == 'mu_ttbar0'          : return 'TTBar (0 BJets)'
+	elif name == 'el_ttbar0'          : return 'TTBar (0 BJets)'
+	elif name == 'mu_ttbar1'          : return 'TTBar (1 BJets)'
+	elif name == 'el_ttbar1'          : return 'TTBar (1 BJets)'
+	elif name == 'mu_ttbar2'          : return 'TTBar (2 BJets)'
+	elif name == 'el_ttbar2'          : return 'TTBar (2 BJets)'
 	elif name == 'mu_qcdmuenr'        : return 'QCD'
 	elif name == 'el_qcdemenr20'      : return 'QCD (EMenr)'
 	elif name == 'el_qcdemenr30'      : return 'QCD (EMenr)'
