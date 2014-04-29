@@ -492,6 +492,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 
 	//cout << "start FRRegionLepEvent" << endl;
 
+
 	// Event fails HLT muon trigger (if data) then return false
 	if(fLepTriggerMC || fIsData) {
 		if      (fLepTrigger == "Mu17"   && !HLT_MU17              ) { return false; }
@@ -520,6 +521,9 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 			looselep_inds.push_back(j);		
 		}
 		else if(isLooseLepton(j) && LepPt->at(j) < fLepPtCut){
+			nveto_add++;
+		}
+		else if(isLooseOpLepton(j) && LepPt->at(j) < fLepPtCut){
 			nveto_add++;
 		}
 	}
@@ -584,7 +588,7 @@ bool Fakerates::isLooseMuon(int index){
 
 	if(!MuIsLoose->at(index)) return false;
 	if(strstr(fName, "ttbar") && MuIsPrompt->at(index)) return false;
-	if(fabs(MuD0->at(index)) > 0.1) return false;
+	//if(fabs(MuD0->at(index)) > 0.1) return false;
 	if(fLepD0Cut > 0.0 && fabs(MuD0->at(index)) > fLepD0Cut) return false; // leave this commented for synching!!
 	return true;
 }
@@ -615,6 +619,20 @@ bool Fakerates::isLooseLepton(int index){
 
 	if(fDataType == 2) return isLooseElectron(index);
 	else isLooseMuon(index);
+
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isLooseOpLepton(int index){
+	/* 
+	checks, if the lepton of opposite flavor is loose
+	parameters: index (index of the particle)
+	return: true (if lepton is loose), false (else)
+	*/
+
+	if(fDataType == 2) return isLooseMuon(index);
+	else isLooseElectron(index);
 
 }
 
@@ -828,7 +846,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	// jet-lepton cleaning: if a tight lepton with dR too small found then return false
 	for(int lep = 0; lep < LepPhi->size(); ++lep){
-		if(!isTightLepton(lep)) continue;
+		if(!isLooseLepton(lep)) continue;
 		if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(j), LepPhi->at(lep), JetPhi->at(j)) > minDR ) continue;
 		return false;
 	}

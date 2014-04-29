@@ -108,6 +108,7 @@ public:
 	bool isLooseMuon(int);	
 	bool isLooseElectron(int);
 	bool isLooseLepton(int);
+	bool isLooseOpLepton(int);
 
 	bool isTightMuon(int);
 	bool isTightElectron(int);
