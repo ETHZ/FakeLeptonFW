@@ -572,8 +572,8 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 		if len(mcsetsplot)>0:
 			histstoplot = []
 			histstoplot.append([FR_data_px, 'data'])
-			histstoplot.append([FR_mcplot_px, 'mu_ttbar'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[0]], 'FR_proj_Pt_data-ttbar')
+			histstoplot.append([FR_mcplot_px, mcsetsplot[0].GetName()])
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[0]], 'FR_proj_Pt_data-' + mcsetsplot[0].GetName().lstrip('mu_'))
 			
 		if len(mcsubtract)>0:
 			histstoplot = []
@@ -609,8 +609,8 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 		if len(mcsetsplot)>0:
 			histstoplot = []
 			histstoplot.append([FR_data_py, 'data'])
-			histstoplot.append([FR_mcplot_py, 'mu_ttbar'])
-			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[1]], 'FR_proj_Pt_data-ttbar')
+			histstoplot.append([FR_mcplot_py, mcsetsplot[0].GetName()])
+			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[1]], 'FR_proj_Pt_data-' + mcsetsplot[0].GetName().lstrip('mu_'))
 			
 		if len(mcsubtract)>0:
 			histstoplot = []

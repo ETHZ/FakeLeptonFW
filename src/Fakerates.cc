@@ -304,7 +304,7 @@ void Fakerates::loop(TFile* pFile){
 		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
 		//	h_Loose_AllJEtatest1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
 
-		//smearAllJets();
+		smearAllJets();
 
 		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
 		//	h_Loose_AllJEtatest2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);

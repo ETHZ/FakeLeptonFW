@@ -95,9 +95,9 @@ else:
 	dyjets50   = sample('mu_dyjets50'     , inputDir + 'mu_dyjets50_ratios.root')
 	dyjets10   = sample('mu_dyjets10'     , inputDir + 'mu_dyjets10_ratios.root')
 	qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root')
-	ttbar0     = sample('mu_ttbar0'       , inputDir + 'mu_ttbar0_ratios.root')
-	ttbar1     = sample('mu_ttbar1'       , inputDir + 'mu_ttbar1_ratios.root')
-	ttbar2     = sample('mu_ttbar2'       , inputDir + 'mu_ttbar2_ratios.root')
+	#ttbar0     = sample('mu_ttbar0'       , inputDir + 'mu_ttbar0_ratios.root')
+	#ttbar1     = sample('mu_ttbar1'       , inputDir + 'mu_ttbar1_ratios.root')
+	#ttbar2     = sample('mu_ttbar2'       , inputDir + 'mu_ttbar2_ratios.root')
 
 	data_samples = []
 	data_samples.append(data)
@@ -233,14 +233,14 @@ if module == 'plots_2d' or module == 'all':
 
 # Plot all MET Zooms
 
-#if module == 'zoom_met' or module == 'all':
-#	leg = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
-#	leg.AddEntry(data_samples[0].hists[0], helper.getLegendName(data_samples[0].GetName()), 'pe')
-#	leg.AddEntry(wjets          .hists[0], helper.getLegendName(wjets          .GetName()), 'f' )
-#	leg.AddEntry(dyjets10       .hists[0], helper.getLegendName(dyjets10       .GetName()), 'f' )
-#	leg.AddEntry(qcd_samples[0] .hists[0], helper.getLegendName(qcd_samples[0] .GetName()), 'f' )
-#	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
-#	Plot.PlotMETZooms(dataType, outputDir, data_samples, mc_samples, leg)
+if module == 'zoom_met' or module == 'all':
+	leg = helper.makeLegend(0.6, 0.5, 0.85, 0.85)
+	leg.AddEntry(data_samples[0].hists[0], helper.getLegendName(data_samples[0].GetName()), 'pe')
+	leg.AddEntry(wjets          .hists[0], helper.getLegendName(wjets          .GetName()), 'f' )
+	leg.AddEntry(dyjets10       .hists[0], helper.getLegendName(dyjets10       .GetName()), 'f' )
+	leg.AddEntry(qcd_samples[0] .hists[0], helper.getLegendName(qcd_samples[0] .GetName()), 'f' )
+	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
+	Plot.PlotMETZooms(dataType, outputDir, data_samples, mc_samples, leg)
 
 
 
@@ -268,27 +268,25 @@ if module == 'compare' or module == 'all':
 
 # Compare Isolation between QCD and TTBar
 
-if module == 'compare' or module == 'all':
-	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.35)
-	leg.AddEntry(qcd   .hists[0], helper.getLegendName(qcd   .GetName()), 'l' )
-	leg.AddEntry(ttbar2.hists[0], helper.getLegendName(ttbar2.GetName()), 'l' )
-	Plot.PlotCompare(dataType, outputDir, [qcd, ttbar2], 'LepIso', leg)
+#if module == 'compare' or module == 'all':
+#	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.35)
+#	leg.AddEntry(qcd   .hists[0], helper.getLegendName(qcd   .GetName()), 'l' )
+#	leg.AddEntry(ttbar2.hists[0], helper.getLegendName(ttbar2.GetName()), 'l' )
+#	Plot.PlotCompare(dataType, outputDir, [qcd, ttbar2], 'LepIso', leg)
 
 
 
 # compute and plot FR for every variable
 
 if module == 'fakerates_1d' or module == 'all':
-	#FR.PlotFR(dataType, outputDir, [data], mc_samples, plot1dHists, [ttbar], [wjets, dyjets50, dyjets10], qcd_samples, True)
-	FR.PlotFR(dataType, outputDir, [data], mc_samples, plot1dHists, [], [wjets, dyjets50, dyjets10], qcd_samples, True)
+	FR.PlotFR(dataType, outputDir, [data], mc_samples, plot1dHists, [qcd], [wjets, dyjets50, dyjets10], qcd_samples, True)
 
 
 
 # compute and plot FR 2d Map (+ Projections)
 
 if module == 'fakerates_2d' or module == 'all':
-	#FR.Plot2dFRMap(dataType, outputDir, module, [data], mc_samples, [ttbar], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
-	FR.Plot2dFRMap(dataType, outputDir, module, [data], mc_samples, [ttbar2], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
+	FR.Plot2dFRMap(dataType, outputDir, module, [data], mc_samples, [qcd], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
 
 #if module == 'fakerates_2d' or module == 'all': # testing PUweight_full
 #	FR.Plot2dFRMap(dataType, outputDir, module, [data1, data2, data3, data4, data5], [], [], [], [], False, False)
