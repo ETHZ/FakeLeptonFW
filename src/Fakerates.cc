@@ -289,7 +289,6 @@ void Fakerates::loop(TFile* pFile){
 
 
 	int mu(-1), jet(-1);
-	float safer[30];	
 
 
 	// loop on events in the tree
@@ -425,6 +424,19 @@ std::vector<float, std::allocator<float> >* Fakerates::getLepPt() {
 
 
 //____________________________________________________________________________
+std::vector<float, std::allocator<float> >* Fakerates::getOpLepPt() {
+	/*
+	return Pt of the opposite flavor lepton
+	parameters: none
+	return: Pt
+	*/
+
+	if(fDataType == 2) return MuPt;
+	else               return ElPt;
+}
+
+
+//____________________________________________________________________________
 std::vector<float, std::allocator<float> >* Fakerates::getLepEta() {
 	/*
 	return Eta of the lepton
@@ -483,9 +495,10 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 
 	std::vector<int> looselep_inds;
 	std::vector<int> awayjet_inds;
-	std::vector<float, std::allocator<float> >* LepPt  = getLepPt();
-	std::vector<float, std::allocator<float> >* LepEta = getLepEta();
-	std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
+	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
+	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
+	std::vector<float, std::allocator<float> >* LepPhi   = getLepPhi();
+	std::vector<float, std::allocator<float> >* OpLepPt  = getOpLepPt();
 	int nloose(0), nveto_add(0);
 	int nawayjets(0), jetind(-1);
 
@@ -522,11 +535,12 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 			looselep_inds.push_back(j);		
 		}
 		else if(isLooseLepton(j) && LepPt->at(j) < fLepPtCut){
-			nveto_add++;
+			++nveto_add;
 		}
-		else if(isLooseOpLepton(j) && LepPt->at(j) < fLepPtCut){
-			nveto_add++;
-		}
+
+		for(int k=0; k < OpLepPt->size(); ++k)
+			if(isLooseOpLepton(k) && OpLepPt->at(k) < fLepPtCut)
+				++nveto_add;
 	}
 
 	//cout << "check 3" << endl;
@@ -610,16 +624,16 @@ bool Fakerates::isFRRegionLepEventTTBar(int num_bjets = 0){
 	// get the number of jets in the event
 
 	for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
+
+		bool nojet = true;
 		
 		for(int lep = 0; lep < LepPhi->size(); ++lep){
 			if(!isLooseLeptonTTBar(lep)) continue;
-			if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(thisjet), LepPhi->at(lep), JetPhi->at(thisjet)) < minDR ) goto NextLoop;
+			if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(thisjet), LepPhi->at(lep), JetPhi->at(thisjet)) < minDR ) nojet = false;
 		}
 	
-		if(JetCSVBTag->at(thisjet) >= btag) ++btag_jets;
+		if(nojet && JetCSVBTag->at(thisjet) >= btag) ++btag_jets;
 
-		NextLoop:
-		continue;
 	}
 
 	if(btag_jets < num_bjets) return false;
@@ -1232,9 +1246,6 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 				}
 			}
 
-
-
-
 			if( LepPt->at(lep) >  fFRbinspt.back() ){
 				int fillbin = h_FLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep)));
 				h_FLoose->AddBinContent(fillbin, eventweight);
@@ -1243,6 +1254,7 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 				if(fillFHist(LepPt->at(lep)))
 					h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
 			}
+
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
 //	if(LepPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
 	//cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
@@ -1330,8 +1342,8 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 						h_FTight->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
 				}
 
-//	if(LepPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
-//	cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
+//	if(L//epPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
+//	cout// << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
 
 			}
 
@@ -1369,6 +1381,9 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
 	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
 	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
+
+
+	
 
 
 	// Checks for jets

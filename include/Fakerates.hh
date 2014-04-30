@@ -103,6 +103,7 @@ public:
 	std::vector<float, std::allocator<float> >* getLepPhi();
 	std::vector<float, std::allocator<float> >* getLepPFIso();
 	std::vector<float, std::allocator<float> >* getLepD0();
+	std::vector<float, std::allocator<float> >* getOpLepPt();
 
 	bool isFRRegionLepEvent(int&, int&, float, bool);
 	bool isFRRegionLepEventTTBar(int);
