@@ -18,6 +18,7 @@ Closure::Closure(TString frfilestring, TString configfile):Fakerates(configfile)
 
 //____________________________________________________________________________
 Closure::~Closure(){
+	fFRFile->Close();
 	delete fFR;
 }
 
@@ -43,8 +44,6 @@ void Closure::init(TString frfilestring){
 	f_h_FR_ttbar_el     = (TH2F*) fFRFile->Get("FR_ttbar_el");
 	f_h_FR_ttbar_mu     = (TH2F*) fFRFile->Get("FR_ttbar_mu");
 
-	// fFRFile->Close();
-	// delete fFRFile; // don't use this anymore, let's keep it safe
 
 	fLuminosity = 19500.;
 
@@ -145,19 +144,6 @@ void Closure::storePredictions(){
 		p1 = 1.;
 		p2 = 1.;
 
-		// cout << "=============================" << endl;
-		// cout << Form("mu1: %d  mu2: %d  ", mu1, mu2) << endl;
-		// cout << Form("pt1: %.2f  eta1: %.2f    pt2: %.2f  eta2: %.2f \n    f1: %.3f    f2: %.3f", MuPt->at(mu1), fabs(MuEta->at(mu1)), MuPt->at(mu2), fabs(MuEta->at(mu2)), f1, f2) << endl;
-		// cout << Form("ch1: %d  ch2: %d  ", MuCharge->at(mu1), MuCharge->at(mu2)) << endl;
-		// cout << Form("loose1: %d  loose2: %d  ", (int) MuIsLoose->at(mu1), (int) MuIsLoose->at(mu2)) << endl;
-		// cout << Form("loose1FR: %d  loose2FR: %d  ", (int) Fakerates::isLooseMuon(mu1), (int) Fakerates::isLooseMuon(mu2)) << endl;
-		// cout << Form("tight1: %d  tight1: %d  ", (int) MuIsTight->at(mu1), (int) MuIsTight->at(mu2)) << endl;
-		// cout << Form("iso1: %.2f  iso2: %.2f  ", MuPFIso->at(mu1), MuPFIso->at(mu2)) << endl;
-
-		// if( MuIsTight->at(mu1) &&  MuIsTight->at(mu2)) cat = 0;
-		// if( MuIsTight->at(mu1) && !MuIsTight->at(mu2)) cat = 1;
-		// if(!MuIsTight->at(mu1) &&  MuIsTight->at(mu2)) cat = 2;
-		// if(!MuIsTight->at(mu1) && !MuIsTight->at(mu2)) cat = 3;
 		if( Fakerates::isTightMuon(mu1) &&  Fakerates::isTightMuon(mu2)) cat = 0;
 		if( Fakerates::isTightMuon(mu1) && !Fakerates::isTightMuon(mu2)) cat = 1;
 		if(!Fakerates::isTightMuon(mu1) &&  Fakerates::isTightMuon(mu2)) cat = 2;
