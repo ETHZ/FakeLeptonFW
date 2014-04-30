@@ -50,7 +50,7 @@ if dataType == 'el':
 	wjets      = sample('el_wjets'        , inputDir + 'el_wjets_ratios.root')
 	dyjets50   = sample('el_dyjets50'     , inputDir + 'el_dyjets50_ratios.root')
 	dyjets10   = sample('el_dyjets10'     , inputDir + 'el_dyjets10_ratios.root')
-	ttbar      = sample('el_ttbar'        , inputDir + 'el_ttbar_ratios.root')
+	#ttbar      = sample('el_ttbar'        , inputDir + 'el_ttbar_ratios.root')
 	qcdem20    = sample('el_qcdemenr20'   , inputDir + 'el_qcdemenr20_ratios.root')
 	qcdem30    = sample('el_qcdemenr30'   , inputDir + 'el_qcdemenr30_ratios.root')
 	qcdem80    = sample('el_qcdemenr80'   , inputDir + 'el_qcdemenr80_ratios.root')
@@ -279,14 +279,14 @@ if module == 'compare' or module == 'all':
 # compute and plot FR for every variable
 
 if module == 'fakerates_1d' or module == 'all':
-	FR.PlotFR(dataType, outputDir, [data], mc_samples, plot1dHists, [qcd], [wjets, dyjets50, dyjets10], qcd_samples, True)
+	FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, qcd_samples, [wjets, dyjets50, dyjets10], qcd_samples, True)
 
 
 
 # compute and plot FR 2d Map (+ Projections)
 
 if module == 'fakerates_2d' or module == 'all':
-	FR.Plot2dFRMap(dataType, outputDir, module, [data], mc_samples, [qcd], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
+	FR.Plot2dFRMap(dataType, outputDir, module, data_samples, mc_samples, qcd_samples, [wjets, dyjets50, dyjets10], qcd_samples, True, True)
 
 #if module == 'fakerates_2d' or module == 'all': # testing PUweight_full
 #	FR.Plot2dFRMap(dataType, outputDir, module, [data1, data2, data3, data4, data5], [], [], [], [], False, False)
