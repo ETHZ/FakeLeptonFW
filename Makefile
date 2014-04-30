@@ -7,11 +7,11 @@ ROOTGLIBS  = $(shell root-config --glibs)
 #ROOTINCDIR = $(shell root-config --incdir)
 
 LIBS       = $(ROOTLIBS)
-INCLUDES   = -I. $(ROOTCFLAGS) 
+INCLUDES   = -I. $(ROOTCFLAGS)
 # this is a roofit version somewhere: -I/swshare/cms/slc5_amd64_gcc462/lcg/roofit/5.32.03-cms16/include/
 
 CXX        = g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2
-CXXFLAGS   = $(ROOTCFLAGS) $(INCLUDES)
+CXXFLAGS   =  $(INCLUDES)
 
 
 SRCSA      = src/FWBaseClass.C src/Fakerates.cc
