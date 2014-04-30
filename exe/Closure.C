@@ -22,17 +22,28 @@ void usage( int status = 0 ) {
 
 //_____________________________________________________________________________________
 int main(int argc, char* argv[]) {
+	TString frfile  = "";
 	TString inputfile  = "";
 	TString outputdir  = "";
-	int verbose(0);
+	TString configfile = "";
+	TString name       = "";
+	int verbose        = 0;
+	bool isdata        = true;
+	float xsec         = 1.;
+	int maxsize        = 0;
 
 	// Parse options
 	char ch;
-	while ((ch = getopt(argc, argv, "i:v:h?")) != -1 ) {
+	while ((ch = getopt(argc, argv, "i:v:x:n:m:o:c:r:h?")) != -1 ) {
 		switch (ch) {
 			case 'i': inputfile  = TString(optarg);  break;
+			case 'r': frfile     = TString(optarg);  break;
 			case 'o': outputdir  = TString(optarg);  break;
+			case 'c': configfile = TString(optarg);  break;
+			case 'n': name       = TString(optarg);  break;
 			case 'v': verbose    = atoi(optarg);     break;
+			case 'x': xsec         = atof(optarg);   break; //::atof( ((std::string) optarg).c_str());  break;
+			case 'm': maxsize      = atoi(optarg);   break;
 			case '?':
 			case 'h': usage(0); break;
 			default:
@@ -48,13 +59,28 @@ int main(int argc, char* argv[]) {
 
 	if(verbose > 0) cout << "------------------------------------" << endl;
 	if(verbose > 0) cout << " Verbose level is:  " << verbose << endl;
-	if(verbose > 0) cout << " Inputfile is:      " << inputfile << endl;
+	if(verbose > 0) cout << " FR Inputfile is:   " << inputfile << endl;
 	if(verbose > 0) cout << " Outputdir is:      " << outputdir << endl;
 
-	Closure *frA = new Closure();
-	frA->setVerbose(verbose);
-	frA->doStuff();
-	delete frA;
+	if(verbose > 0) cout << " inputfile is:       " << inputfile   << endl;
+	if(verbose > 0) cout << " name is:            " << name        << endl;
+	if(verbose > 0) cout << " running on " << (isdata?"data":"mc") << endl;
+	if(verbose > 0) cout << " xsec is:            " << xsec        << endl;
+	if(verbose > 0) cout << " sample max size is: " << maxsize     << endl;
+	if(verbose > 0) cout << "=======================================================" << endl;
+	if(verbose > 0) cout << "=======================================================" << endl;
+
+	Closure *clA = new Closure(frfile, configfile);
+	clA->setVerbose(verbose);
+	clA->setFRFile(frfile);
+	clA->setXS(xsec);
+	clA->setInputFile(inputfile);
+	clA->setOutputDir(outputdir);
+	clA->setName(name);
+	clA->setMaxSize(maxsize);
+	clA->doStuff();
+
+	// delete clA;
 	return 0;
 }
 

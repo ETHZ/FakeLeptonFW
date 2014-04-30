@@ -18,6 +18,7 @@
 #include "TLorentzVector.h"
 
 #include "TPaveStats.h"
+#include "TPaletteAxis.h"
 
 #include <iostream>
 #include <fstream>
@@ -30,16 +31,21 @@
 #include <map>
 #include <time.h> // access to date/time
 
-#include "TreeClass.h"
+#include "include/FWBaseClass.h"
+#include "include/FakeRatios.hh"
 #include "Utilities.hh"
 
-class Closure: public TreeClass{
+#include "include/Fakerates.hh"
+
+// class Closure: public FWBaseClass{
+class Closure: public Fakerates{
 
 public:
 	Closure();
+	Closure(TString, TString);
 	virtual ~Closure();
 
-	virtual void init(bool = false); // Careful, MakeClass produces Init with capital I!
+	virtual void init(TString); // Careful, MakeClass produces Init with capital I!
 
 	template <class T> inline void getObjectSafe(TFile* pFile, TString name, T*& object){
 		pFile->GetObject(name, object);
@@ -51,13 +57,99 @@ public:
 	};
 
 	TString fOutputSubDir;
-	inline virtual void setVerbose(int v){ fVerbose = v;};
+	inline void setVerbose      (int     v) {fVerbose      = v;};
+	inline void setData         (bool    d) {fIsData       = d;};
+	inline void setInputFile    (TString i) {fInputFile    = i;};
+	inline void setOutputDir    (TString o) {fOutputDir    = o;};
+	inline void setName         (TString n) {fName         = n;};
+	inline void setMaxSize      (int     m) {fMaxSize      = m;};
+	inline void setXS           (float   x) {if (!fIsData) fXSec = x; else fXSec = -1.;};
+	inline void setFRFile(TString infile){ fFRFileString = infile;};
 
-	int fVerbose;
+	int     fVerbose;
+	bool    fIsData;
+	TString fOutputDir;
+	TString fInputFile;
+	TString fName;
+	int     fMaxSize;
+	float   fXSec;
+	float   fLuminosity;
+
+// COUNTERS
+	int fTot;
+	int fSS;
+	int fSSmm;
+
+
+// INPUT FR FILE
+	TString   fFRFileString;
+	TFile   * fFRFile;
+// INPUT FR HISTOGRAMS
+	TH2F    * f_h_FR_data_el;
+	TH2F    * f_h_FR_data_mu;
+	TH2F    * f_h_FR_data_pure_el;
+	TH2F    * f_h_FR_data_pure_mu;
+	TH2F    * f_h_FR_mc_el;
+	TH2F    * f_h_FR_mc_mu;
+	TH2F    * f_h_FR_ttbar_el;
+	TH2F    * f_h_FR_ttbar_mu;
+
+	FakeRatios * fFR;
+	float getFRatio(int, float, float);
+	void  storePredictions();
 	
 // FUNCTIONS
 	void doStuff(); // this one gets called by the executable
-	void loop(const char *);
+	void loop(TFile*);
+
+	bool isSameSignLLEvent(int&, int&, int&);
+
+// Eventweight
+	float fEventWeight;
+
+// OUTPUT TREE
+
+	void bookClosureTree();
+	void writeClosureTree(TFile *);
+	void resetClosureTree();
+	void fillClosureTree();
+
+	TTree * fClosureTree;
+
+	TString  fCT_sname;
+
+	int   fCT_run;
+	int   fCT_ls;
+	int   fCT_event;
+	int   fCT_type;
+
+	float fCT_lumiW;
+	float fCT_npp;
+	float fCT_npf;
+	float fCT_nfp;
+	float fCT_nff;
+	int   fCT_tlcat;
+
+	float fCT_pt1;
+	float fCT_pt2;
+	float fCT_eta1;
+	float fCT_eta2;
+	float fCT_phi1;
+	float fCT_phi2;
+	float fCT_iso1;
+	float fCT_iso2;
+	int   fCT_ch1;
+
+	float fCT_dptrel;
+	float fCT_deltas;
+	float fCT_lproj;
+	float fCT_drl;
+
+	int   fCT_nj;
+	int   fCT_nb;
+	float fCT_ht;
+	float fCT_met;
+
 
 private:
 	
