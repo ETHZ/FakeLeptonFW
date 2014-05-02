@@ -109,6 +109,8 @@ public:
 	bool isFRRegionLepEventTTBar(int);
 
 	// LEPTON 
+	int  getMuonOrigin(int, int);
+
 	bool isLooseMuon(int);	
 	bool isLooseElectron(int);
 	bool isLooseLepton(int);

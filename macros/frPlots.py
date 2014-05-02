@@ -50,7 +50,9 @@ if dataType == 'el':
 	wjets      = sample('el_wjets'        , inputDir + 'el_wjets_ratios.root')
 	dyjets50   = sample('el_dyjets50'     , inputDir + 'el_dyjets50_ratios.root')
 	dyjets10   = sample('el_dyjets10'     , inputDir + 'el_dyjets10_ratios.root')
-	#ttbar      = sample('el_ttbar'        , inputDir + 'el_ttbar_ratios.root')
+	ttbar0     = sample('el_ttbar0'       , inputDir + 'el_ttbar0_ratios.root')
+	ttbar1     = sample('el_ttbar1'       , inputDir + 'el_ttbar1_ratios.root')
+	ttbar2     = sample('el_ttbar2'       , inputDir + 'el_ttbar2_ratios.root')
 	qcdem20    = sample('el_qcdemenr20'   , inputDir + 'el_qcdemenr20_ratios.root')
 	qcdem30    = sample('el_qcdemenr30'   , inputDir + 'el_qcdemenr30_ratios.root')
 	qcdem80    = sample('el_qcdemenr80'   , inputDir + 'el_qcdemenr80_ratios.root')
@@ -95,9 +97,9 @@ else:
 	dyjets50   = sample('mu_dyjets50'     , inputDir + 'mu_dyjets50_ratios.root')
 	dyjets10   = sample('mu_dyjets10'     , inputDir + 'mu_dyjets10_ratios.root')
 	qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root')
-	#ttbar0     = sample('mu_ttbar0'       , inputDir + 'mu_ttbar0_ratios.root')
-	#ttbar1     = sample('mu_ttbar1'       , inputDir + 'mu_ttbar1_ratios.root')
-	#ttbar2     = sample('mu_ttbar2'       , inputDir + 'mu_ttbar2_ratios.root')
+	ttbar0     = sample('mu_ttbar0'       , inputDir + 'mu_ttbar0_ratios.root')
+	ttbar1     = sample('mu_ttbar1'       , inputDir + 'mu_ttbar1_ratios.root')
+	ttbar2     = sample('mu_ttbar2'       , inputDir + 'mu_ttbar2_ratios.root')
 
 	data_samples = []
 	data_samples.append(data)
@@ -107,9 +109,6 @@ else:
 	mc_samples.append(wjets   )
 	mc_samples.append(dyjets50)
 	mc_samples.append(dyjets10)
-	#mc_samples.append(ttbar0  )
-	#mc_samples.append(ttbar1  )
-	#mc_samples.append(ttbar2  )
 
 	qcd_samples = []
 	qcd_samples.append(qcd)
@@ -268,25 +267,27 @@ if module == 'compare' or module == 'all':
 
 # Compare Isolation between QCD and TTBar
 
-#if module == 'compare' or module == 'all':
-#	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.35)
-#	leg.AddEntry(qcd   .hists[0], helper.getLegendName(qcd   .GetName()), 'l' )
-#	leg.AddEntry(ttbar2.hists[0], helper.getLegendName(ttbar2.GetName()), 'l' )
-#	Plot.PlotCompare(dataType, outputDir, [qcd, ttbar2], 'LepIso', leg)
+if module == 'compare' or module == 'all':
+	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.35)
+	leg.AddEntry(qcd   .hists[0], helper.getLegendName(qcd   .GetName()), 'l' )
+	leg.AddEntry(ttbar2.hists[0], helper.getLegendName(ttbar2.GetName()), 'l' )
+	Plot.PlotCompare(dataType, outputDir, [qcd, ttbar0], 'LepIso', leg)
+	Plot.PlotCompare(dataType, outputDir, [qcd, ttbar1], 'LepIso', leg)
+	Plot.PlotCompare(dataType, outputDir, [qcd, ttbar2], 'LepIso', leg)
 
 
 
 # compute and plot FR for every variable
 
 if module == 'fakerates_1d' or module == 'all':
-	FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, qcd_samples, [wjets, dyjets50, dyjets10], qcd_samples, True)
+	FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [ttbar0, ttbar1, ttbar2], [wjets, dyjets50, dyjets10], qcd_samples, True)
 
 
 
 # compute and plot FR 2d Map (+ Projections)
 
 if module == 'fakerates_2d' or module == 'all':
-	FR.Plot2dFRMap(dataType, outputDir, module, data_samples, mc_samples, qcd_samples, [wjets, dyjets50, dyjets10], qcd_samples, True, True)
+	FR.Plot2dFRMap(dataType, outputDir, module, data_samples, mc_samples, [ttbar0, ttbar1, ttbar2], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
 
 #if module == 'fakerates_2d' or module == 'all': # testing PUweight_full
 #	FR.Plot2dFRMap(dataType, outputDir, module, [data1, data2, data3, data4, data5], [], [], [], [], False, False)

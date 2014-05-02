@@ -56,7 +56,7 @@ def getMCScaleFactorMutually(mcdatasets, histforscale, datalist, mclist = [], mi
 
 def getMCScaleFactorSimultaneouslyQCDEWK(data, qcd, ewk, hist_name = 'h_Tight_MTMET20'):
 
-	scalefactors = [1.0 for i in range(1+len(ewk))]
+	scalefactors = [1.0 for i in range(len(qcd)+len(ewk))]
 	
 	scind = 0
  	for i, hist in enumerate(data[0].hists): 

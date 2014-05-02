@@ -594,7 +594,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 
 
 //____________________________________________________________________________
-bool Fakerates::isFRRegionLepEventTTBar(int num_bjets = 0){
+bool Fakerates::isFRRegionLepEventTTBar(int origin = 0){
 	/*
 	checks, whether the event is ok or not
 	parameters: none
@@ -602,11 +602,12 @@ bool Fakerates::isFRRegionLepEventTTBar(int num_bjets = 0){
 	*/ 
 	
 
-	float minDR = 0.4;
-	float btag = 0.679;
-	int btag_jets = 0;	
-	std::vector<float, std::allocator<float> >* LepEta = getLepEta();
-	std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
+	//float minDR = 0.4;
+	//float btag = 0.679;
+	//int btag_jets = 0;	
+	//std::vector<float, std::allocator<float> >* LepEta = getLepEta();
+	//std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
+	//std::vector<float, std::allocator<float> >* LepPt = getLepPt();
 
 
 	// Event fails HLT muon trigger (if data) then return false
@@ -621,27 +622,70 @@ bool Fakerates::isFRRegionLepEventTTBar(int num_bjets = 0){
 	}
 
 
+	// Muon GEN Origin
+	//origin = 2;
+	//for(int j = 0; j < LepPt->size(); ++j){
+	//	int leporigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
+	//	cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (leporigin == 0 || (origin != 0 && leporigin != origin)) << endl;
+	//	//if(leporigin == 0 || (origin != 0 && leporigin != origin)) return false;
+	//}
+
+	// drops out if leporigin = 0
+	// origin == all => leporigin may not be 0
+	// origin != all => leporigin may be origin
+
+	
+
 	// get the number of jets in the event
 
-	for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
+	//for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
 
-		bool nojet = true;
-		
-		for(int lep = 0; lep < LepPhi->size(); ++lep){
-			if(!isLooseLeptonTTBar(lep)) continue;
-			if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(thisjet), LepPhi->at(lep), JetPhi->at(thisjet)) < minDR ) nojet = false;
-		}
-	
-		if(nojet && JetCSVBTag->at(thisjet) >= btag) ++btag_jets;
+	//	bool nojet = true;
+	//	
+	//	for(int lep = 0; lep < LepPhi->size(); ++lep){
+	//		if(!isLooseLeptonTTBar(lep)) continue;
+	//		if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(thisjet), LepPhi->at(lep), JetPhi->at(thisjet)) < minDR ) nojet = false;
+	//	}
+	//
+	//	if(nojet && JetCSVBTag->at(thisjet) >= btag) ++btag_jets;
 
-	}
+	//}
 
-	if(btag_jets < num_bjets) return false;
+	//if(btag_jets < num_bjets) return false;
 
 
 	return true;
 }
 
+
+//____________________________________________________________________________
+int Fakerates::getMuonOrigin(int mid, int gmid){
+	/*
+	returns the original quark flavor of the muon
+	parameters: none
+	return: 0 (error, is prompt!), 1 (bottom), 2 (charm), 3 (other)
+	*/ 
+
+	int mother           = (int) fabs(mid);
+	int grandmother      = (int) fabs(gmid);
+	int mother_3dig      = mother % 1000;
+	int grandmother_3dig = grandmother % 1000;
+
+	if      (grandmother == 6                                                                                ) return 0;
+	else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
+	else if (grandmother >= 5000 && grandmother <= 5999                                                      ) return 1;
+	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 450) return 2;
+	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 550) return 1;
+	else if (mother == 6                                                                                     ) return 0;
+	else if (mother >= 4000 && mother <= 4999                                                                ) return 2;
+	else if (mother >= 5000 && mother <= 5999                                                                ) return 1;
+	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 450                    ) return 2;
+	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 550                    ) return 1;
+	else                                                                                                       return 3;
+
+	return 0;
+}
+	
 
 //____________________________________________________________________________
 bool Fakerates::isLooseMuon(int index){
@@ -1378,16 +1422,33 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 	*/
 
 
+	int njets = 0, origin = 0;
 	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
 	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
 	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
 
 
-	
+
+	//// Checks for jet
+
+	//if     (strstr(fName, "ttbar0")) njets = 0;
+	//else if(strstr(fName, "ttbar1")) njets = 1;
+	//else if(strstr(fName, "ttbar2")) njets = 2;
+
+	//if(!isFRRegionLepEventTTBar(njets)) return; 
 
 
-	// Checks for jets
-	if(!isFRRegionLepEventTTBar(2)) return; 
+	// Checks for Trigger
+
+	if(!isFRRegionLepEventTTBar()) return; 
+
+
+	// Get Desired Particle GEN Origin
+
+	if     (strstr(fName, "ttbar0")) origin = 0; // all
+	else if(strstr(fName, "ttbar1")) origin = 1; // b
+	else if(strstr(fName, "ttbar2")) origin = 2; // c
+	else if(strstr(fName, "ttbar3")) origin = 3; // other
 
 
 
@@ -1395,35 +1456,42 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 	for(int j=0; j < LepPt->size(); ++j){
 
-		// loose lepton
-		if(isLooseLeptonTTBar(j)){
-	
-			h_Loose_LepIso ->Fill(LepPFIso->at(j), eventweight);
 
-			if( LepPt->at(j) > fFRbinspt.back() ){
-				int fillbin = h_FLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(j)));
-				h_FLoose->AddBinContent(fillbin, eventweight);
-			}
-			else{
-				if(fillFHist(LepPt->at(j)))
-					h_FLoose->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
-			}
+		// lepton origin
+
+		int thisorigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
+		cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (thisorigin == 0 || (origin != 0 && thisorigin != origin)) << endl;
+		if(thisorigin == 0 || (origin != 0 && thisorigin != origin)) continue;
+
+
+		// loose lepton
+		if(!isLooseLeptonTTBar(j)) continue;
+	
+		h_Loose_LepIso ->Fill(LepPFIso->at(j), eventweight);
+
+		if( LepPt->at(j) > fFRbinspt.back() ){
+			int fillbin = h_FLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(j)));
+			h_FLoose->AddBinContent(fillbin, eventweight);
+		}
+		else{
+			if(fillFHist(LepPt->at(j)))
+				h_FLoose->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
+		}
 //cout << Form("%d\t%d\t%d\t%.2f\t%d", Run, Lumi, Event, LepPt->at(j), isTightLeptonTTBar(j)) << endl;
 
-			// tight lepton
-			if(isTightLeptonTTBar(j)) {
 
-				h_Tight_LepIso ->Fill(LepPFIso->at(j), eventweight);
+		// tight lepton
+		if(!isTightLeptonTTBar(j)) continue;
 
-				if( LepPt->at(j) >  fFRbinspt.back()){
-					int fillbin = h_FTight->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(j)));
-					h_FTight->AddBinContent(fillbin, eventweight);
-				}
-				else{
-					if(fillFHist(LepPt->at(j)))
-						h_FTight->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
-				}
-			}
+		h_Tight_LepIso ->Fill(LepPFIso->at(j), eventweight);
+
+		if( LepPt->at(j) >  fFRbinspt.back()){
+			int fillbin = h_FTight->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(j)));
+			h_FTight->AddBinContent(fillbin, eventweight);
+		}
+		else{
+			if(fillFHist(LepPt->at(j)))
+				h_FTight->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
 		}
 	}
 }

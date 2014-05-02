@@ -67,6 +67,8 @@ public :
    std::vector<bool>    *MuIsLoose;
    std::vector<bool>    *MuIsTight;
    std::vector<bool>    *MuIsPrompt;
+   std::vector<int>     *MuMID;
+   std::vector<int>     *MuGMID;
    std::vector<float>   *ElPt;
    std::vector<float>   *ElEta;
    std::vector<float>   *ElPhi;
@@ -78,6 +80,8 @@ public :
    std::vector<bool>    *ElIsLoose;
    std::vector<bool>    *ElIsTight;
    std::vector<bool>    *ElIsPrompt;
+   std::vector<int>     *ElMID;
+   std::vector<int>     *ElGMID;
    Float_t         pfMET;
    Float_t         pfMETPhi;
    Float_t         pfMET1;
@@ -135,6 +139,8 @@ public :
    TBranch        *b_MuIsLoose;   //!
    TBranch        *b_MuIsTight;   //!
    TBranch        *b_MuIsPrompt;   //!
+   TBranch        *b_MuMID;   //!
+   TBranch        *b_MuGMID;   //!
    TBranch        *b_ElPt;   //!
    TBranch        *b_ElEta;   //!
    TBranch        *b_ElPhi;   //!
@@ -145,6 +151,8 @@ public :
    TBranch        *b_ElIsLoose;   //!
    TBranch        *b_ElIsTight;   //!
    TBranch        *b_ElIsPrompt;   //!
+   TBranch        *b_ElMID;   //!
+   TBranch        *b_ElGMID;   //!
    TBranch        *b_pfMET;   //!
    TBranch        *b_pfMETPhi;   //!
    TBranch        *b_pfMET1;   //!
@@ -242,6 +250,8 @@ void FWBaseClass::Init(TTree *tree)
    MuIsLoose = 0;
    MuIsTight = 0;
    MuIsPrompt = 0;
+   MuMID = 0;
+   MuGMID = 0;
    ElPt = 0;
    ElEta = 0;
    ElPhi = 0;
@@ -252,6 +262,8 @@ void FWBaseClass::Init(TTree *tree)
    ElIsLoose = 0;
    ElIsTight = 0;
    ElIsPrompt = 0;
+   ElMID = 0;
+   ElGMID = 0;
    JetPt = 0;
    JetRawPt = 0;
    JetEta = 0;
@@ -309,6 +321,8 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuIsLoose", &MuIsLoose, &b_MuIsLoose);
    fChain->SetBranchAddress("MuIsTight", &MuIsTight, &b_MuIsTight);
    fChain->SetBranchAddress("MuIsPrompt", &MuIsPrompt, &b_MuIsPrompt);
+   fChain->SetBranchAddress("MuMID", &MuMID, &b_MuMID);
+   fChain->SetBranchAddress("MuGMID", &MuGMID, &b_MuGMID);
    fChain->SetBranchAddress("ElPt", &ElPt, &b_ElPt);
    fChain->SetBranchAddress("ElEta", &ElEta, &b_ElEta);
    fChain->SetBranchAddress("ElPhi", &ElPhi, &b_ElPhi);
@@ -319,6 +333,8 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("ElIsLoose", &ElIsLoose, &b_ElIsLoose);
    fChain->SetBranchAddress("ElIsTight", &ElIsTight, &b_ElIsTight);
    fChain->SetBranchAddress("ElIsPrompt", &ElIsPrompt, &b_ElIsPrompt);
+   fChain->SetBranchAddress("ElMID", &ElMID, &b_ElMID);
+   fChain->SetBranchAddress("ElGMID", &ElGMID, &b_ElGMID);
    fChain->SetBranchAddress("pfMET", &pfMET, &b_pfMET);
    fChain->SetBranchAddress("pfMETPhi", &pfMETPhi, &b_pfMETPhi);
    fChain->SetBranchAddress("pfMET1", &pfMET1, &b_pfMET1);
