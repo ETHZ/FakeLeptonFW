@@ -101,10 +101,14 @@ def getColor(name):
 	elif name == 'mu_ttbar2'          : return mycolor.GetColor( 51, 153,  58)
 	elif name == 'el_ttbar2'          : return mycolor.GetColor( 51, 153,  58)
 	elif name == 'mu_qcdmuenr'        : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcdelenr30'      : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcdelenr80'      : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcdelenr250'     : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcdelenr350'     : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdtot50'        : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot80'        : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot120'       : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot170'       : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot170v2'     : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot300'       : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot300v2'     : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot300v3'     : return mycolor.GetColor( 15, 106, 196)
 	elif name == 'el_qcdemenr20'      : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdemenr30'      : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdemenr80'      : return mycolor.GetColor( 51, 102, 153)
@@ -154,6 +158,14 @@ def getLegendName(name):
 	elif name == 'mu_ttbar2'          : return 'TTBar (2 BJets)'
 	elif name == 'el_ttbar2'          : return 'TTBar (2 BJets)'
 	elif name == 'mu_qcdmuenr'        : return 'QCD'
+	elif name == 'el_qcdtot50'        : return 'QCD (tot)'
+	elif name == 'el_qcdtot80'        : return 'QCD (tot)'
+	elif name == 'el_qcdtot120'       : return 'QCD (tot)'
+	elif name == 'el_qcdtot170'       : return 'QCD (tot)'
+	elif name == 'el_qcdtot170v2'     : return 'QCD (tot)'
+	elif name == 'el_qcdtot300'       : return 'QCD (tot)'
+	elif name == 'el_qcdtot300v2'     : return 'QCD (tot)'
+	elif name == 'el_qcdtot300v3'     : return 'QCD (tot)'
 	elif name == 'el_qcdemenr20'      : return 'QCD (EMenr)'
 	elif name == 'el_qcdemenr30'      : return 'QCD (EMenr)'
 	elif name == 'el_qcdemenr80'      : return 'QCD (EMenr)'
