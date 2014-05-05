@@ -51,13 +51,14 @@ void Fakerates::init(bool verbose){
 	fCutflow_afterMETCut = 0;
 	fCutflow_afterMTCut  = 0;
 
-	fCounter_all   = 0;
-	fCounter_loose = 0;
-	fCounter_veto  = 0;
-	fCounter_jet   = 0;
-	fCounter_jet30 = 0;
-	fCounter_met   = 0;
-	fCounter_mt    = 0;
+	fCounter_all    = 0;
+	fCounter_loose  = 0;
+	fCounter_veto   = 0;
+	fCounter_jet    = 0;
+	fCounter_jet30  = 0;
+	fCounter_met    = 0;
+	fCounter_mt     = 0;
+	fCounter_origin = 0;
 
 	Util::SetStyle();
 	
@@ -310,6 +311,7 @@ void Fakerates::loop(TFile* pFile){
 
 		if(strstr(fName, "ttbar")) fillFRPlotsTTBar(eventweight);
 		else fillFRPlots(eventweight);
+		//fillFRPlots(eventweight);
 
 	}
 
@@ -319,14 +321,16 @@ void Fakerates::loop(TFile* pFile){
 	cout << " mu: nevents passing MT     selection: " << fCutflow_afterMTCut  << endl;
 	cout << " i just looped on " << ntot << " events." << endl;
 
-	cout << " fCounter_all      = " << fCounter_all     << " (" << (float) fCounter_all     / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_trigger  = " << fCounter_trigger << " (" << (float) fCounter_trigger / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_loose    = " << fCounter_loose   << " (" << (float) fCounter_loose   / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_veto     = " << fCounter_veto    << " (" << (float) fCounter_veto    / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_jet (40) = " << fCounter_jet     << " (" << (float) fCounter_jet     / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_jet (30) = " << fCounter_jet30   << " (" << (float) fCounter_jet30   / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_met      = " << fCounter_met     << " (" << (float) fCounter_met     / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_mt       = " << fCounter_mt      << " (" << (float) fCounter_mt      / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_all             = " << fCounter_all     << " (" << (float) fCounter_all     / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_trigger         = " << fCounter_trigger << " (" << (float) fCounter_trigger / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_loose           = " << fCounter_loose   << " (" << (float) fCounter_loose   / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_veto            = " << fCounter_veto    << " (" << (float) fCounter_veto    / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_jet (40)        = " << fCounter_jet     << " (" << (float) fCounter_jet     / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_jet (30)        = " << fCounter_jet30   << " (" << (float) fCounter_jet30   / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_met             = " << fCounter_met     << " (" << (float) fCounter_met     / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_mt              = " << fCounter_mt      << " (" << (float) fCounter_mt      / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_origin (ttbar)  = " << fCounter_origin  << " (" << (float) fCounter_origin  / (float) fCounter_all << ") " << endl;
+
 
 	delete file_, tree_;
 
@@ -539,7 +543,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 		}
 
 		for(int k=0; k < OpLepPt->size(); ++k)
-			if(isLooseOpLepton(k) && OpLepPt->at(k) < fLepPtCut)
+			if(isLooseOpLepton(k) && OpLepPt->at(k) > 10.)
 				++nveto_add;
 	}
 
@@ -554,6 +558,10 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 	if(nveto_add != 0) return false;
 
 	if(count) ++fCounter_veto;
+
+
+//	if(count) cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), getAwayJet(0, lep), isTightLepton(lep), 0.0, -99.0, getMET(), getMT(lep)) << endl;
+
 
 	//cout << "check 5" << endl;
 	// Jet Pt is not reasonable then return false
@@ -663,7 +671,7 @@ int Fakerates::getMuonOrigin(int mid, int gmid){
 	/*
 	returns the original quark flavor of the muon
 	parameters: none
-	return: 0 (error, is prompt!), 1 (bottom), 2 (charm), 3 (other)
+	return: (0 is reserved for all), 1 (bottom), 2 (charm), 3 (other, light-flavor), 4 (other, top), 5 (other, unidentified), 6 (W)
 	*/ 
 
 	int mother           = (int) fabs(mid);
@@ -671,17 +679,34 @@ int Fakerates::getMuonOrigin(int mid, int gmid){
 	int mother_3dig      = mother % 1000;
 	int grandmother_3dig = grandmother % 1000;
 
-	if      (grandmother == 6                                                                                ) return 0;
-	else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
+	if      (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
 	else if (grandmother >= 5000 && grandmother <= 5999                                                      ) return 1;
 	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 450) return 2;
 	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 550) return 1;
-	else if (mother == 6                                                                                     ) return 0;
+	else if (mother == 24                                                                                    ) return 6;
 	else if (mother >= 4000 && mother <= 4999                                                                ) return 2;
 	else if (mother >= 5000 && mother <= 5999                                                                ) return 1;
 	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 450                    ) return 2;
 	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 550                    ) return 1;
-	else                                                                                                       return 3;
+	else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 350                    ) return 3;
+	else if (mother == 6                                                                                     ) return 4;
+	else                                                                                                       return 5;
+
+	//if      (grandmother == 24                                                                               ) return 6;
+	//else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
+	//else if (grandmother >= 5000 && grandmother <= 5999                                                      ) return 1;
+	//else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 450) return 2;
+	//else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 550) return 1;
+	//else if ((grandmother > 999 || grandmother < 10000) && grandmother_3dig >= 100 && grandmother_3dig <= 350) return 3;
+	//else if (grandmother == 6                                                                                ) return 4;
+	//else if (mother == 24                                                                                    ) return 6;
+	//else if (mother >= 4000 && mother <= 4999                                                                ) return 2;
+	//else if (mother >= 5000 && mother <= 5999                                                                ) return 1;
+	//else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 450                    ) return 2;
+	//else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 550                    ) return 1;
+	//else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 350                    ) return 3;
+	//else if (mother == 6                                                                                     ) return 4;
+	//else                                                                                                       return 5;
 
 	return 0;
 }
@@ -753,7 +778,7 @@ bool Fakerates::isLooseMuonTTBar(int index){
 	*/
 
 	if(!MuIsLoose->at(index)) return false;
-	if(MuIsPrompt->at(index)) return false;
+	//if(MuIsPrompt->at(index)) return false;
 	return true;
 }
 
@@ -767,7 +792,7 @@ bool Fakerates::isLooseElectronTTBar(int index){
 	*/
 
 	if(!ElIsLoose->at(index)) return false;
-	if(MuIsPrompt->at(index)) return false;
+	if(ElIsPrompt->at(index)) return false;
 	return true;
 }
 
@@ -1301,8 +1326,9 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
 //	if(LepPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
-	//cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
-		}
+//	cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
+
+ 		}
 
 		if(passesMTCut(lep))    h_Loose_MET            ->Fill(getMET()            , eventweight);
 		                        h_Loose_METnoMTCut     ->Fill(getMET()            , eventweight);
@@ -1428,6 +1454,8 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
 
 
+	++fCounter_all;
+
 
 	//// Checks for jet
 
@@ -1442,30 +1470,44 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 	if(!isFRRegionLepEventTTBar()) return; 
 
+	++fCounter_trigger;
+
 
 	// Get Desired Particle GEN Origin
 
 	if     (strstr(fName, "ttbar0")) origin = 0; // all
 	else if(strstr(fName, "ttbar1")) origin = 1; // b
 	else if(strstr(fName, "ttbar2")) origin = 2; // c
-	else if(strstr(fName, "ttbar3")) origin = 3; // other
-
+	else if(strstr(fName, "ttbar3")) origin = 3; // other, light-flavor
+	else if(strstr(fName, "ttbar4")) origin = 4; // other, t
+	else if(strstr(fName, "ttbar5")) origin = 5; // other, misidentified
+	else if(strstr(fName, "ttbar6")) origin = 6; // W
 
 
 	// fill Plots for all loose leptons in the event
 
+	//int counted = 0;
+
 	for(int j=0; j < LepPt->size(); ++j){
+
+
+		// loose lepton
+		if(!isLooseLeptonTTBar(j)) continue;
 
 
 		// lepton origin
 
 		int thisorigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
-		cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (thisorigin == 0 || (origin != 0 && thisorigin != origin)) << endl;
+		//cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (thisorigin == 0 || (origin != 0 && thisorigin != origin)) << endl;
 		if(thisorigin == 0 || (origin != 0 && thisorigin != origin)) continue;
 
+		//if(counted==0) ++fCounter_origin;
+		//++counted;
+		++fCounter_origin;
 
-		// loose lepton
-		if(!isLooseLeptonTTBar(j)) continue;
+
+
+		// fill histogram
 	
 		h_Loose_LepIso ->Fill(LepPFIso->at(j), eventweight);
 
@@ -1482,6 +1524,9 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 		// tight lepton
 		if(!isTightLeptonTTBar(j)) continue;
+
+
+		// fill histograms
 
 		h_Tight_LepIso ->Fill(LepPFIso->at(j), eventweight);
 

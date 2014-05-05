@@ -291,6 +291,7 @@ public:
 	int fCounter_jet30;
 	int fCounter_met;
 	int fCounter_mt;
+	int fCounter_origin;
 
 	// Binning for FakeRate Projection Plots
 	std::vector<float> fFRbinseta;
