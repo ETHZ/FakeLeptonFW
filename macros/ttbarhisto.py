@@ -8,11 +8,11 @@ ROOT.TGaxis.SetMaxDigits(3)
 mycolor = ROOT.TColor()
 label = ['W', 'B', 'C', 'light-flavor', 'T', 'unmatched']
 h = [{} for i in range(len(label))]
-filename = 'ttbarevents_mu_prompt'
+filename = 'ttbarevents_mu_noprompt'
 
 # ttbar    6, 1, 2, 3, 4, 5 (all = 0)
-#values = [598, 1147208, 142021, 9890, 79, 11033] # mu !prompt (all = 1310829)
-values = [] # mu prompt (all = 6969326)
+values = [168, 1147208, 142021, 9468, 27, 11937] # mu !prompt (all = 1310829)
+#values = [4960545, 1147208, 142021, 9468, 27, 710057] # mu prompt (all = 6969326)
 
 integral = sum(values[:])
 

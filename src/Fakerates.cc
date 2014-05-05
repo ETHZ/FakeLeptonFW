@@ -793,7 +793,7 @@ bool Fakerates::isLooseMuonTTBar(int index){
 	*/
 
 	if(!MuIsLoose->at(index)) return false;
-	//if(MuIsPrompt->at(index)) return false;
+	if(MuIsPrompt->at(index)) return false;
 	return true;
 }
 
