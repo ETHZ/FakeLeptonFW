@@ -34,6 +34,20 @@
 #include "include/FWBaseClass.h"
 #include "Utilities.hh"
 
+enum iTrig {
+  iHLTMU5,
+  iHLTMU8,
+  iHLTMU12,
+  iHLTMU17,
+  iHLTMU24,
+  iHLTMU40,
+  //  iHLTEL17,
+  //  iHLTEL17JET30,
+  //  iHLTMU17MU8,
+  //  iHLTMU17TKMU8,
+  iNTRIGS
+};
+
 class Fakerates: public FWBaseClass{
 
 public:
@@ -80,10 +94,10 @@ public:
 	bool  fPUweight;
 	TString fLepTrigger;
 	bool  fLepTriggerMC;
-	
+  bool  fCSA14;
 
-    // FUNCTIONS
-	void doStuff(); // this one gets called by the executable
+        // FUNCTIONS
+ 	void doStuff(); // this one gets called by the executable
 	void loop(TFile *);
 
 	float getSigmaMC(float, float);
@@ -91,6 +105,7 @@ public:
 
 	bool fillFHist(float);
 	void fillFRPlots(float);
+        void fillHLTPlots(float);
 
 	// CUTS
 	bool passesUpperMETMT(int);
@@ -126,11 +141,17 @@ public:
 	float getHT();
 	int getNJets(int);
 
-		// MET
+        // MET
 	void setMET(float);
 	void setMETPhi(float);
 	float getMET();
 	float getMETPhi();
+
+        // HELPER 
+        void fillPurities(int, float,float);
+        bool PassesHLT(int);
+        void fill2DWithoutOF(TH2F *&, float, float, float);
+        void printProgress(Long64_t, Long64_t, TString);
 
 	std::vector<float>::const_iterator fITFloat;
 	std::vector<bool >::const_iterator fITBool;
@@ -249,6 +270,22 @@ public:
 	TH1F * h_Tight_FRMETZoomEta;
 	TH1F * h_Tight_FRMETZoomPt;
 	TH1F * h_Tight_METZoom[40];
+  
+        // =============================
+        TH2F * h_FLoose_trig      [iNTRIGS];
+        TH2F * h_FTight_trig      [iNTRIGS];
+        TH1F * h_Tight_LepPt_trig [iNTRIGS];
+        TH1F * h_Tight_LepEta_trig[iNTRIGS];
+        TH1F * h_Loose_LepEta_trig[iNTRIGS];
+        TH1F * h_Loose_LepPt_trig [iNTRIGS];
+
+        TH1F * h_Purity           [iNTRIGS];
+        TH1F * h_Purity_LepPt     [iNTRIGS];
+        TH1F * h_Purity_JetPt     [iNTRIGS];
+        TH1F * h_Purity_JetRawPt  [iNTRIGS];
+        TH1F * h_Purity_DRLepJet  [iNTRIGS];
+        TH1F * h_Purity_MET       [iNTRIGS];
+        TH1F * h_Purity_MT        [iNTRIGS];
 
 	void bookHistos();
 	void writeHistos(TFile *);
@@ -286,7 +323,7 @@ public:
 	int fDFn_binseta;
 	int fDFn_binspt;	
 
-    // SAMPLE CLASS
+        // SAMPLE CLASS
 	class Sample{
 		public:
 			// Sample(){};
