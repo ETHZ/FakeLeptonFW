@@ -8,14 +8,14 @@ run = [{} for i in range(n_sets)]
 URL = [{} for i in range(n_sets)]
 names = [{} for i in range(n_sets)]
 
-fn = ['FR_2dmap_data.root', 'FR_2dmap_mc.root', 'FR_2dmap_data-ew_central1.root']
+fn = ['FR_2dmap_data.root', 'FR_2dmap_mc.root', 'FR_2dmap_data-ew_central1.root', 'FR_2dmap_ttbar.root']
 nn  = [{} for i in range(n_sets)]
 
 for i in range(n_sets):
 	run[i] = args[i*2+1]
 	URL[i] = args[i*2+2]
 	names[i] = URL[i].split('/')[-2]
-	nn[i] = ['FR_data_' + str(run[i]) + '_pure', 'FR_mc_' + str(run[i]), 'FR_data_' + str(run[i])]
+	nn[i] = ['FR_data_' + str(run[i]) + '_pure', 'FR_mc_' + str(run[i]), 'FR_data_' + str(run[i]), 'FR_ttbar_' + str(run[i])]
 
 fl = []
 fr = []

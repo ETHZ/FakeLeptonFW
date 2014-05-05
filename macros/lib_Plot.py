@@ -4,26 +4,16 @@ import ROOT, copy
 import lib as helper
 
 
-
-def make1dPlot(dataType, canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_name, leg):
-
-
-	# create PLOT
+def make1dPlot_plot(dataType, pad_plot, hists, title_hist, leg):
 
 	pad_plot.cd()
 
 	max = hists[0][0].GetMaximum()
 	for i in range(1,len(hists)):
-		if max < hists[i][0].GetMaximum():
-			max = hists[i][0].GetMaximum()
+		if max < hists[i][0].GetStack().Last().GetMaximum():
+			max = hists[i][0].GetStack().Last().GetMaximum()
 
 	hists[0][0] = helper.set1dPlotStyle(dataType, hists[0][0], helper.getColor(hists[0][1]), '', title_hist)
-	#for i in range(len(hists)):
-	#	hists[i][0] = helper.set1dPlotStyle(hists[i][0], helper.getColor(hists[i][1]), '', title_hist)
-	
-	#if "Tight_muMTMET20" in hists[0][0].GetName():
-	#	for i in range(1,hists[0][0].GetXaxis().GetNbins()):
-	#		print hists[1][0].GetStack().Last().GetBinContent(i)
 
 	hists[0][0].Draw("p x0 e")
 	hists[0][0].SetMinimum(0.001)
@@ -37,18 +27,39 @@ def make1dPlot(dataType, canv, pad_plot, pad_ratio, outputDir, hists, title_hist
 	leg.Draw()
 
 
-	# create RATIO PLOT
-	
+def make1dPlot_ratio(dataType, pad_ratio, hists, title_hist):
+
 	pad_ratio.cd()
 	data_bg_ratio = copy.deepcopy(hists[0][0])
-	data_bg_ratio.Divide(hists[1][0].GetStack().Last())
+	data_bg_ratio.Divide(copy.deepcopy(hists[1][0].GetStack().Last()))
 	data_bg_ratio.Draw("p e")
 	data_bg_ratio = helper.setRatioStyle(dataType, data_bg_ratio, title_hist)
 	line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 	line.Draw()
 
-	ROOT.gPad.RedrawAxis()
 
+
+def make1dPlot(dataType, canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_name, leg):
+
+
+	# create PLOT
+	make1dPlot_plot(dataType, pad_plot, hists, title_hist, leg) 
+
+	# create RATIO 
+	#make1dPlot_ratio(dataType, pad_ratio, hists, title_hist)
+
+	pad_ratio.cd()
+	data_bg_ratio = copy.deepcopy(hists[0][0])
+	data_bg_ratio.Divide(copy.deepcopy(hists[1][0].GetStack().Last()))
+	data_bg_ratio.Draw("p e")
+	data_bg_ratio = helper.setRatioStyle(dataType, data_bg_ratio, title_hist)
+	line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
+	line.Draw()
+
+
+
+	# save plot
+	ROOT.gPad.RedrawAxis()
 	helper.saveCanvas(canv, pad_plot, outputDir + "plots_1d/", file_name)
 
 
@@ -74,17 +85,17 @@ def make2dPlot(dataType, canv, pad_plot, outputDir, hist, postpend, file_name):
 
 
 
-def Plot1d(dataType, outputDir, dataset, mcsets, histlist, leg, grouping = False):
-
+def Plot1d(dataType, outputDir, datasets, mcsets, histlist, leg, grouping = False):
+	
 	canv = helper.makeCanvas(900, 675, 'c1d')
 	pad_plot = helper.makePad('plot')
 	pad_ratio = helper.makePad('ratio')
 	pad_plot.SetTicks(1,1)
 	pad_ratio.SetTicks(1,1)
 
-	for hist in dataset.hists:
+	for hist in datasets[0].hists:
 		
-		i = dataset.hists.index(hist)
+		i = datasets[0].hists.index(hist)
 		pad_plot.cd()
 		
 		
@@ -99,57 +110,51 @@ def Plot1d(dataType, outputDir, dataset, mcsets, histlist, leg, grouping = False
 
 
 		# Sum BG Contributions in Stack
-		stack = ROOT.THStack()
-		stackint = 0.
+		data = ROOT.THStack()
+		mc   = ROOT.THStack()
+
+		for dataset in datasets:	
+				data.Add(dataset.hists[i])
 
 		if grouping:
 
 			mcgroups = []
 			mcnames  = []
 
-			for mc in mcsets:
-				label = ''.join([j for j in mc.GetName() if not j.isdigit()])
+			for mcset in mcsets:
+				label = ''.join([j for j in mcset.GetName() if not j.isdigit()])
 				
 				foundat = -1
 				for j, mcname in enumerate(mcnames): 
 					if label == mcname: foundat = j
 
 				if foundat == -1:
-					#print "--- did not find anything ---"
 					mcgroups.append(ROOT.THStack())
-					#print mc.hists[i]
-					#print mc.hists[i].GetXaxis().GetNbins()
-					mcgroups[len(mcgroups)-1].Add(mc.hists[i])
+					mcgroups[len(mcgroups)-1].Add(mcset.hists[i])
 					mcnames.append(label)
 				else:
-					#print "--- found " + str(foundat) + " ---"
-					#print mc.hists[i]
-					#print mc.hists[i].GetXaxis().GetNbins()
-					mcgroups[foundat].Add(mc.hists[i])
-		
-			#print mcgroups
+					mcgroups[foundat].Add(mcset.hists[i])
 
 			for j, group in enumerate(mcgroups):
 				group.Draw('hist')
 				histogram = group.GetStack().Last()
-				stackint += histogram.Integral()
-				stack.Add(histogram)
+				mc.Add(histogram)
 		
 		else:
-			for j,mc in enumerate(mcsets):
-				stackint += mc.hists[i].Integral()
-				stack.Add(mc.hists[i])
+			for mc in mcsets:	
+				mc.Add(mc.hists[i])
 
-		stack.Draw('hist')
-
+		#mc.Draw('hist')
+	
 		histstoplot = []
-		histstoplot.append([hist, 'data'])
-		histstoplot.append([stack, 'totbg'])
+		histstoplot.append([data.GetStack().Last(), 'data' ])
+		histstoplot.append([mc                    , 'totbg'])
 		make1dPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, hist, prepend + helper.getSaveName(hist) + postpend, leg)
 
 
 
-def PlotMETZooms(dataType, outputDir, dataset, mcsets, leg):
+
+def PlotMETZooms(dataType, outputDir, datasets, mcsets, leg, grouping = False):
 
 	canv = helper.makeCanvas(900, 675, 'c1dM')
 	pad_plot = helper.makePad('plot')
@@ -173,9 +178,9 @@ def PlotMETZooms(dataType, outputDir, dataset, mcsets, leg):
 	bins_pt  = [20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0]
 	bins_tot = (len(bins_eta)-1)*(len(bins_pt)-1)
 
-	for hist in dataset.hists:
+	for hist in datasets[0].hists:
 
-		i = dataset.hists.index(hist)
+		i = datasets[0].hists.index(hist)
 		pad_plot.cd()
 
 
@@ -191,35 +196,54 @@ def PlotMETZooms(dataType, outputDir, dataset, mcsets, leg):
 
 
 		# Sum BG Contributions in Stack
-		stack = ROOT.THStack()
-		stackint = 0.
-		for j,mc in enumerate(mcsets):
-			stackint += mc.hists[i].Integral()
-			stack.Add(mc.hists[i])
 
-		stack.Draw('hist')
+		data = ROOT.THStack()
+		mc = ROOT.THStack()
+
+		for dataset in datasets:
+			data.Add(dataset.hists[i])
+
+		if grouping:
+
+			mcgroups = []
+			mcnames  = []
+
+			for mcset in mcsets:
+				label = ''.join([j for j in mcset.GetName() if not j.isdigit()])
+				
+				foundat = -1
+				for j, mcname in enumerate(mcnames): 
+					if label == mcname: foundat = j
+
+				if foundat == -1:
+					mcgroups.append(ROOT.THStack())
+					mcgroups[len(mcgroups)-1].Add(mcset.hists[i])
+					mcnames.append(label)
+				else:
+					mcgroups[foundat].Add(mcset.hists[i])
+		
+
+			for j, group in enumerate(mcgroups):
+				group.Draw('hist')
+				histogram = group.GetStack().Last()
+				mc.Add(histogram)
+		
+		else:
+			for mcset in mcsets:
+				mc.Add(mcset.hists[i])
+
+		mc.Draw('hist')
+
+
+		# Create Plot
 
 		hists = []
-		hists.append([hist, 'data'])
-		hists.append([stack, 'totbg'])
-		#make1dPlot(canv, pad_plot, pad_ratio, outputDir, histstoplot, hist, prepend + helper.getSaveName(hist, '-2:') + postpend, leg)
+		hists.append([data.GetStack().Last(), 'data' ])
+		hists.append([mc                    , 'totbg'])
+		make1dPlot_plot(dataType, pad_plot, hists, hists[0][0], leg)
 
-		max = hists[0][0].GetMaximum()
-		for i in range(1,len(hists)):
-			if max < hists[i][0].GetMaximum():
-				max = hists[i][0].GetMaximum()
 
-		hists[0][0] = helper.set1dPlotStyle(dataType, hists[0][0], helper.getColor(hists[0][1]), '', hist)
-		hists[0][0].Draw("p x0 e")
-		hists[0][0].SetMinimum(0.001)
-		hists[0][0].SetMaximum(1.5*max)
-		for i in range(1,len(hists)):
-			hists[i][0].Draw("hist same")
-			hists[i][0].SetMinimum(0.001)
-			hists[i][0].SetMaximum(1.5*max)
-	
-		hists[0][0].Draw("p x0 e same")
-		leg.Draw()
+		# Write Text
 
 		m = int(id)//(len(bins_pt)-1)
 		n = int(id)%(len(bins_pt)-1)
@@ -234,18 +258,22 @@ def PlotMETZooms(dataType, outputDir, dataset, mcsets, leg):
 		t_pt.DrawLatex(0.22, 0.73, text_pt)
 
 
-		# create RATIO PLOT
-		
+		# Create RATIO PLOT
+
+		#make1dPlot_ratio(dataType, pad_ratio, hists, hists[0][0])
+
 		pad_ratio.cd()
 		data_bg_ratio = copy.deepcopy(hists[0][0])
-		data_bg_ratio.Divide(hists[1][0].GetStack().Last())
+		data_bg_ratio.Divide(copy.deepcopy(hists[1][0].GetStack().Last()))
 		data_bg_ratio.Draw("p e")
-		data_bg_ratio = helper.setRatioStyle(dataType, data_bg_ratio, hist)
+		data_bg_ratio = helper.setRatioStyle(dataType, data_bg_ratio, hists[0][0])
 		line = helper.makeLine(data_bg_ratio.GetXaxis().GetXmin(), 1.00, data_bg_ratio.GetXaxis().GetXmax(), 1.00)
 		line.Draw()
 
-		ROOT.gPad.RedrawAxis()
 
+		# Save Plot
+
+		ROOT.gPad.RedrawAxis()
 		helper.saveCanvas(canv, pad_plot, outputDir + "zoom_met/", prepend + helper.getSaveName(hist, '-2:') + postpend)
 
 
@@ -333,17 +361,67 @@ def PlotJPtZooms(dataType, outputDir, dataset, mcsets, leg):
 
 
 
+def PlotCompare(dataType, outputDir, mcsets, histname, leg):
 
-def Plot2d(dataType, outputDir, dataset, mcsets, histlist):
+	canv = helper.makeCanvas(900, 675)
+	pad_plot = helper.makePad('plot')
+	pad_ratio = helper.makePad('ratio')
+	pad_ratio.cd()
+
+
+	for hist in mcsets[0].hists:
+
+		i = mcsets[0].hists.index(hist)
+		pad_plot.cd()
+
+		if not histname in hist.GetName(): continue
+
+		prepend = ''
+		postpend = '_compare'
+		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
+		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
+
+		hist.Draw('hist')
+		hist.SetFillStyle(0)
+		hist.Scale(1.0/hist.Integral())
+		max = hist.GetMaximum()
+
+		for j in range(1,len(mcsets)):	
+			mcsets[j].hists[i].Draw('hist same')
+			mcsets[j].hists[i].SetFillStyle(0)
+			mcsets[j].hists[i].SetLineStyle(2)
+			mcsets[j].hists[i].Scale(1.0/mcsets[j].hists[i].Integral())
+			if max < mcsets[j].hists[i].GetMaximum(): max = mcsets[j].hists[i].GetMaximum()
+
+		hist.SetMinimum(0.0001)
+		hist.SetMaximum(1.5 * max)
+		hist = helper.set1dPlotStyle(dataType, hist, helper.getColor(mcsets[0].GetName()), '', hist, '1/Integral')
+		leg.Draw()
+
+		pad_ratio.cd()
+		hist_ratio = copy.deepcopy(hist)
+		hist_ratio.Divide(copy.deepcopy(mcsets[1].hists[i]))
+		hist_ratio.Draw("p e1")
+		hist_ratio = helper.setRatioStyle(dataType, hist_ratio, hist)
+		line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
+		line.Draw()
+		helper.saveCanvas(canv, pad_plot, outputDir + "compare/", prepend + helper.getSaveName(hist) + postpend)
+
+
+
+
+
+
+def Plot2d(dataType, outputDir, datasets, mcsets, histlist):
 
 	canv = helper.makeCanvas(900, 675, 'c2d')
 	pad_plot = helper.makePad('tot')
 	pad_plot.cd()
 	pad_plot.SetTicks(1,1)
 
-	for hist in dataset.hists:
+	for hist in datasets[0].hists:
 		
-		i = dataset.hists.index(hist)
+		i = datasets[0].hists.index(hist)
 		
 		# Plot Histogram
 		if not hist.GetName() in histlist: continue
@@ -353,8 +431,18 @@ def Plot2d(dataType, outputDir, dataset, mcsets, histlist):
 		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
 		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
 
-		make2dPlot(dataType, canv, pad_plot, outputDir, hist, 'data', prepend + helper.getSaveName(hist) + postpend)
-		for mc in mcsets: make2dPlot(dataType, canv, pad_plot, outputDir, mc.hists[i], mc.GetName(), prepend + helper.getSaveName(hist) + postpend)
+		data = ROOT.THStack()
+		mc   = ROOT.THStack()
+
+		for dataset in datasets: data.Add(dataset.hists[i])
+		for mcset   in mcsets:   mc  .Add(mcset  .hists[i])
+
+		make2dPlot(dataType, canv, pad_plot, outputDir, data.GetStack().Last(), 'data', prepend + helper.getSaveName(hist) + postpend)
+		make2dPlot(dataType, canv, pad_plot, outputDir, mc  .GetStack().Last(), 'MC'  , prepend + helper.getSaveName(hist) + postpend)
+		for mcset in mcsets: make2dPlot(dataType, canv, pad_plot, outputDir, mcset.hists[i], mcset.GetName(), prepend + helper.getSaveName(hist) + postpend)
+
+
+
 
 
 

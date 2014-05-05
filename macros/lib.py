@@ -18,7 +18,7 @@ def getScaling(outputDir, printall = 0):
 
 def getModule(outputDir, printall = 0):
 
-	list   = ['plots_1d', 'plots_2d', 'zoom_met', 'zoom_jpt', 'fakerates_1d', 'fakerates_2d', 'adhoc']
+	list   = ['plots_1d', 'plots_2d', 'zoom_met', 'zoom_jpt', 'fakerates_1d', 'fakerates_2d', 'adhoc', 'compare']
 	struct = outputDir.split('/')
 	result = ''
 
@@ -81,17 +81,34 @@ def getColor(name):
 	mycolor = ROOT.TColor()
 	if   name == 'el_data'            : return ROOT.kBlack
 	elif name == 'mu_data'            : return ROOT.kBlack
+	elif name == 'mu_data1'           : return ROOT.kBlack
+	elif name == 'mu_data2'           : return ROOT.kBlack
+	elif name == 'mu_data3'           : return ROOT.kBlack
+	elif name == 'mu_data4'           : return ROOT.kBlack
+	elif name == 'mu_data5'           : return ROOT.kBlack
+	elif name == 'mu_data6'           : return ROOT.kBlack
+	elif name == 'mu_data7'           : return ROOT.kBlack
 	elif name == 'el_wjets'           : return mycolor.GetColor(102,   0,   0)
 	elif name == 'mu_wjets'           : return mycolor.GetColor(102,   0,   0)
 	elif name == 'el_dyjets50'        : return mycolor.GetColor(255, 204,   0)
 	elif name == 'mu_dyjets50'        : return mycolor.GetColor(255, 204,   0)
 	elif name == 'el_dyjets10'        : return mycolor.GetColor(255, 204,   0)
 	elif name == 'mu_dyjets10'        : return mycolor.GetColor(255, 204,   0)
+	elif name == 'mu_ttbar0'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'el_ttbar0'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'mu_ttbar1'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'el_ttbar1'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'mu_ttbar2'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'el_ttbar2'          : return mycolor.GetColor( 51, 153,  58)
 	elif name == 'mu_qcdmuenr'        : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcdelenr30'      : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcdelenr80'      : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcdelenr250'     : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcdelenr350'     : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcdtot50'        : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot80'        : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot120'       : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot170'       : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot170v2'     : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot300'       : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot300v2'     : return mycolor.GetColor( 15, 106, 196)
+	elif name == 'el_qcdtot300v3'     : return mycolor.GetColor( 15, 106, 196)
 	elif name == 'el_qcdemenr20'      : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdemenr30'      : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdemenr80'      : return mycolor.GetColor( 51, 102, 153)
@@ -101,7 +118,7 @@ def getColor(name):
 	elif name == 'el_qcdbctoe20'      : return mycolor.GetColor( 12,  57, 102)
 	elif name == 'el_qcdbctoe30'      : return mycolor.GetColor( 12,  57, 102)
 	elif name == 'el_qcdbctoe80'      : return mycolor.GetColor( 12,  57, 102)
-	elif name == 'totbg'              : return mycolor.GetColor(172,   0,   0)
+	elif name == 'totbg'              : return mycolor.GetColor(191,  11,  11)
 	elif name == 'data'               : return ROOT.kBlack
 	elif name == 'datamcsub'          : return ROOT.kOrange
 	elif name == 'datamcsub_central1' : return mycolor.GetColor( 51, 153,  51)
@@ -121,17 +138,43 @@ def getSampleColor(self):
 def getLegendName(name):
 	if   name == 'el_data'            : return 'Data'
 	elif name == 'mu_data'            : return 'Data'
+	elif name == 'mu_data1'           : return 'Data'
+	elif name == 'mu_data2'           : return 'Data'
+	elif name == 'mu_data3'           : return 'Data'
+	elif name == 'mu_data4'           : return 'Data'
+	elif name == 'mu_data5'           : return 'Data'
+	elif name == 'mu_data6'           : return 'Data'
+	elif name == 'mu_data7'           : return 'Data'
 	elif name == 'el_wjets'           : return 'W + Jets'
 	elif name == 'mu_wjets'           : return 'W + Jets'
 	elif name == 'el_dyjets50'        : return 'DY + Jets'
 	elif name == 'mu_dyjets50'        : return 'DY + Jets'
 	elif name == 'el_dyjets10'        : return 'DY + Jets'
 	elif name == 'mu_dyjets10'        : return 'DY + Jets'
+	elif name == 'mu_ttbar0'          : return 'TTBar (0 BJets)'
+	elif name == 'el_ttbar0'          : return 'TTBar (0 BJets)'
+	elif name == 'mu_ttbar1'          : return 'TTBar (1 BJets)'
+	elif name == 'el_ttbar1'          : return 'TTBar (1 BJets)'
+	elif name == 'mu_ttbar2'          : return 'TTBar (2 BJets)'
+	elif name == 'el_ttbar2'          : return 'TTBar (2 BJets)'
 	elif name == 'mu_qcdmuenr'        : return 'QCD'
-	elif name == 'el_qcdelenr30'      : return 'QCD'
-	elif name == 'el_qcdelenr80'      : return 'QCD'
-	elif name == 'el_qcdelenr250'     : return 'QCD'
-	elif name == 'el_qcdelenr350'     : return 'QCD'
+	elif name == 'el_qcdtot50'        : return 'QCD (tot)'
+	elif name == 'el_qcdtot80'        : return 'QCD (tot)'
+	elif name == 'el_qcdtot120'       : return 'QCD (tot)'
+	elif name == 'el_qcdtot170'       : return 'QCD (tot)'
+	elif name == 'el_qcdtot170v2'     : return 'QCD (tot)'
+	elif name == 'el_qcdtot300'       : return 'QCD (tot)'
+	elif name == 'el_qcdtot300v2'     : return 'QCD (tot)'
+	elif name == 'el_qcdtot300v3'     : return 'QCD (tot)'
+	elif name == 'el_qcdemenr20'      : return 'QCD (EMenr)'
+	elif name == 'el_qcdemenr30'      : return 'QCD (EMenr)'
+	elif name == 'el_qcdemenr80'      : return 'QCD (EMenr)'
+	elif name == 'el_qcdemenr170'     : return 'QCD (EMenr)'
+	elif name == 'el_qcdemenr250'     : return 'QCD (EMenr)'
+	elif name == 'el_qcdemenr350'     : return 'QCD (EMenr)'
+	elif name == 'el_qcdbctoe20'      : return 'QCD (BCtoE)'
+	elif name == 'el_qcdbctoe30'      : return 'QCD (BCtoE)'
+	elif name == 'el_qcdbctoe80'      : return 'QCD (BCtoE)'
 	elif name == 'totbg'              : return 'QCD + EW'
 	elif name == 'data'               : return 'Data'
 	elif name == 'datamcsub'          : return 'Data - EW'
@@ -201,7 +244,7 @@ def makeLine(x1, y1, x2, y2):
 	line.SetLineStyle(7)
 	return line
 
-def set1dPlotStyle(dataType, hist, color, title = '', title_hist = ''):
+def set1dPlotStyle(dataType, hist, color, title = '', title_hist = '', ytitle = ''):
 	hist.SetMarkerColor(color)
 	hist.SetMarkerSize(1.4)
 	hist.SetMarkerStyle(20)
@@ -209,7 +252,7 @@ def set1dPlotStyle(dataType, hist, color, title = '', title_hist = ''):
 	hist.SetLineColor(color)
 	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(dataType, title_hist))
 	hist.GetXaxis().SetNdivisions(505)
-	hist.GetYaxis().SetTitle("")
+	hist.GetYaxis().SetTitle(ytitle)
 	hist.GetYaxis().SetTitleSize(0.08)
 	hist.GetYaxis().SetLabelSize(0.08)
 	hist.GetYaxis().SetNdivisions(505)
@@ -233,7 +276,7 @@ def setFRPlotStyle(dataType, hist, color, title = '', title_hist = ''):
 	hist.SetTitle(title)
 	return hist
 
-def setRatioStyle(dataType, hist, title_hist='', title='Data/MC', max = 1.99, min = 0.0):
+def setRatioStyle(dataType, hist, title_hist='', title='Data/MC', max = 2.0, min = 0.0):
 	hist.SetMaximum(max)
 	hist.SetMinimum(min)
 	hist.SetTitle('')

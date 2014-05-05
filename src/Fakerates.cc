@@ -59,6 +59,14 @@ void Fakerates::init(bool verbose){
 	fCutflow_afterMETCut = 0;
 	fCutflow_afterMTCut  = 0;
 
+	fCounter_all   = 0;
+	fCounter_loose = 0;
+	fCounter_veto  = 0;
+	fCounter_jet   = 0;
+	fCounter_jet30 = 0;
+	fCounter_met   = 0;
+	fCounter_mt    = 0;
+
 	Util::SetStyle();
 	
 
@@ -232,6 +240,7 @@ void Fakerates::loadConfigFile(TString configfile){
 
 	fPlotThreshold = fFRbinspt[binid];
 
+	cout << " fPlotThreshold: " << fPlotThreshold << endl;
 
 }
 
@@ -290,7 +299,6 @@ void Fakerates::loop(TFile* pFile){
 
 
 	int mu(-1), jet(-1);
-	float safer[30];	
 
 
 	// loop on events in the tree
@@ -301,8 +309,8 @@ void Fakerates::loop(TFile* pFile){
 		tree_->GetEntry(jentry);
 		ntot++;
 
-		float fEventweight = fLumiweight;
-		if(!fIsData && fPUweight) fEventweight *= PUWeight;
+		float eventweight = fLumiweight;
+		if(!fIsData && fPUweight) eventweight *= PUWeight;
 
 		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
 		//	h_Loose_AllJEtatest1 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
@@ -311,9 +319,11 @@ void Fakerates::loop(TFile* pFile){
 
 		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
 		//	h_Loose_AllJEtatest2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
-		fillHLTPlots(fEventweight);
-		fillFRPlots(fEventweight);
-
+		if(strstr(fName, "ttbar")) fillFRPlotsTTBar(eventweight);
+		else {
+		  fillFRPlots(eventweight);
+		  fillHLTPlots(eventweight);
+		}
 	}
 
 	cout << " mu: nevents passing lepton selection: " << fCutflow_afterLepSel << endl;
@@ -321,6 +331,16 @@ void Fakerates::loop(TFile* pFile){
 	cout << " mu: nevents passing MET    selection: " << fCutflow_afterMETCut << endl;
 	cout << " mu: nevents passing MT     selection: " << fCutflow_afterMTCut  << endl;
 	cout << " i just looped on " << ntot << " events." << endl;
+
+	cout << " fCounter_all      = " << fCounter_all     << " (" << (float) fCounter_all     / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_trigger  = " << fCounter_trigger << " (" << (float) fCounter_trigger / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_loose    = " << fCounter_loose   << " (" << (float) fCounter_loose   / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_veto     = " << fCounter_veto    << " (" << (float) fCounter_veto    / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_jet (40) = " << fCounter_jet     << " (" << (float) fCounter_jet     / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_jet (30) = " << fCounter_jet30   << " (" << (float) fCounter_jet30   / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_met      = " << fCounter_met     << " (" << (float) fCounter_met     / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_mt       = " << fCounter_mt      << " (" << (float) fCounter_mt      / (float) fCounter_all << ") " << endl;
+
 	delete file_, tree_;
 
 	// write histograms in output file
@@ -417,6 +437,19 @@ std::vector<float, std::allocator<float> >* Fakerates::getLepPt() {
 
 
 //____________________________________________________________________________
+std::vector<float, std::allocator<float> >* Fakerates::getOpLepPt() {
+	/*
+	return Pt of the opposite flavor lepton
+	parameters: none
+	return: Pt
+	*/
+
+	if(fDataType == 2) return MuPt;
+	else               return ElPt;
+}
+
+
+//____________________________________________________________________________
 std::vector<float, std::allocator<float> >* Fakerates::getLepEta() {
 	/*
 	return Eta of the lepton
@@ -466,7 +499,7 @@ std::vector<float, std::allocator<float> >* Fakerates::getLepD0() {
 
 
 //____________________________________________________________________________
-bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
+bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count = false){
 	/*
 	checks, whether the event contains exactly one lepton and at least one away-jet in the calibration region
 	parameters: &lep (address of lepton index), &jet (address of away-jet index), jetcut
@@ -475,13 +508,17 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 
 	std::vector<int> looselep_inds;
 	std::vector<int> awayjet_inds;
-	std::vector<float, std::allocator<float> >* LepPt  = getLepPt();
-	std::vector<float, std::allocator<float> >* LepEta = getLepEta();
-	std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
+	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
+	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
+	std::vector<float, std::allocator<float> >* LepPhi   = getLepPhi();
+	std::vector<float, std::allocator<float> >* OpLepPt  = getOpLepPt();
 	int nloose(0), nveto_add(0);
 	int nawayjets(0), jetind(-1);
 
+	if(count) ++fCounter_all;
+
 	//cout << "start FRRegionLepEvent" << endl;
+
 
 	// Event fails HLT muon trigger (if data) then return false
 	if(fLepTriggerMC || fIsData) {
@@ -493,6 +530,8 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 		else if (fLepTrigger == "Ele17J" && !HLT_ELE17_JET30_TIGHT ) { return false; }
 		else                                                         {               }
 	}
+
+	if(count) ++fCounter_trigger;
 
 	//cout << "check 1" << endl;
 
@@ -509,17 +548,25 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 			looselep_inds.push_back(j);		
 		}
 		else if(isLooseLepton(j) && LepPt->at(j) < fLepPtCut){
-			nveto_add++;
+			++nveto_add;
 		}
+
+		for(int k=0; k < OpLepPt->size(); ++k)
+			if(isLooseOpLepton(k) && OpLepPt->at(k) < fLepPtCut)
+				++nveto_add;
 	}
 
 	//cout << "check 3" << endl;
 	// require exactly one loose muon and no additional veto muons
 	if(nloose    != 1) return false;
+
+	if(count) ++fCounter_loose;
 	
 	//cout << "check 4" << endl;
 	fCutflow_afterLepSel++;
 	if(nveto_add != 0) return false;
+
+	if(count) ++fCounter_veto;
 
 	//cout << "check 5" << endl;
 	// Jet Pt is not reasonable then return false
@@ -538,6 +585,9 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
 	if(awayjet_inds.size() < 1) return false;
 	fCutflow_afterJetSel++;
 
+	if(count) ++fCounter_jet;
+	if(jetcut==30.) ++fCounter_jet30;
+
 	//cout << "check 7" << endl;
 	// set jet index on the hardest jet
 	jet = awayjet_inds[0];
@@ -555,6 +605,100 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut){
     return true;
 }
 
+
+//____________________________________________________________________________
+bool Fakerates::isFRRegionLepEventTTBar(int origin = 0){
+	/*
+	checks, whether the event is ok or not
+	parameters: none
+	return: true (if event is ok), false (else)
+	*/ 
+	
+
+	//float minDR = 0.4;
+	//float btag = 0.679;
+	//int btag_jets = 0;	
+	//std::vector<float, std::allocator<float> >* LepEta = getLepEta();
+	//std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
+	//std::vector<float, std::allocator<float> >* LepPt = getLepPt();
+
+
+	// Event fails HLT muon trigger (if data) then return false
+	if(fLepTriggerMC || fIsData) {
+		if      (fLepTrigger == "Mu17"   && !HLT_MU17              ) { return false; }
+		else if (fLepTrigger == "Mu24"   && !HLT_MU24              ) { return false; }
+		else if (fLepTrigger == "Mu40"   && !HLT_MU40              ) { return false; }
+		else if (fLepTrigger == "Ele8"   && !HLT_ELE8_TIGHT        ) { return false; }
+		else if (fLepTrigger == "Ele17"  && !HLT_ELE17_TIGHT       ) { return false; }
+		else if (fLepTrigger == "Ele17J" && !HLT_ELE17_JET30_TIGHT ) { return false; }
+		else                                                         {               }
+	}
+
+
+	// Muon GEN Origin
+	//origin = 2;
+	//for(int j = 0; j < LepPt->size(); ++j){
+	//	int leporigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
+	//	cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (leporigin == 0 || (origin != 0 && leporigin != origin)) << endl;
+	//	//if(leporigin == 0 || (origin != 0 && leporigin != origin)) return false;
+	//}
+
+	// drops out if leporigin = 0
+	// origin == all => leporigin may not be 0
+	// origin != all => leporigin may be origin
+
+	
+
+	// get the number of jets in the event
+
+	//for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
+
+	//	bool nojet = true;
+	//	
+	//	for(int lep = 0; lep < LepPhi->size(); ++lep){
+	//		if(!isLooseLeptonTTBar(lep)) continue;
+	//		if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(thisjet), LepPhi->at(lep), JetPhi->at(thisjet)) < minDR ) nojet = false;
+	//	}
+	//
+	//	if(nojet && JetCSVBTag->at(thisjet) >= btag) ++btag_jets;
+
+	//}
+
+	//if(btag_jets < num_bjets) return false;
+
+
+	return true;
+}
+
+
+//____________________________________________________________________________
+int Fakerates::getMuonOrigin(int mid, int gmid){
+	/*
+	returns the original quark flavor of the muon
+	parameters: none
+	return: 0 (error, is prompt!), 1 (bottom), 2 (charm), 3 (other)
+	*/ 
+
+	int mother           = (int) fabs(mid);
+	int grandmother      = (int) fabs(gmid);
+	int mother_3dig      = mother % 1000;
+	int grandmother_3dig = grandmother % 1000;
+
+	if      (grandmother == 6                                                                                ) return 0;
+	else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
+	else if (grandmother >= 5000 && grandmother <= 5999                                                      ) return 1;
+	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 450) return 2;
+	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 550) return 1;
+	else if (mother == 6                                                                                     ) return 0;
+	else if (mother >= 4000 && mother <= 4999                                                                ) return 2;
+	else if (mother >= 5000 && mother <= 5999                                                                ) return 1;
+	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 450                    ) return 2;
+	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 550                    ) return 1;
+	else                                                                                                       return 3;
+
+	return 0;
+}
+	
 
 //____________________________________________________________________________
 bool Fakerates::isLooseMuon(int index){
@@ -601,6 +745,60 @@ bool Fakerates::isLooseLepton(int index){
 
 
 //____________________________________________________________________________
+bool Fakerates::isLooseOpLepton(int index){
+	/* 
+	checks, if the lepton of opposite flavor is loose
+	parameters: index (index of the particle)
+	return: true (if lepton is loose), false (else)
+	*/
+
+	if(fDataType == 2) return isLooseMuon(index);
+	else isLooseElectron(index);
+
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isLooseMuonTTBar(int index){
+	/* 
+	checks, if the muon in the ttbar sample is loose
+	parameters: index (index of the particle)
+	return: true (if muon is loose), false (else)
+	*/
+
+	if(!MuIsLoose->at(index)) return false;
+	if(MuIsPrompt->at(index)) return false;
+	return true;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isLooseElectronTTBar(int index){
+	/* 
+	checks, if the electron in the ttbar sample is loose
+	parameters: index (index of the particle)
+	return: true (if electron is loose), false (else)
+	*/
+
+	if(!ElIsLoose->at(index)) return false;
+	if(MuIsPrompt->at(index)) return false;
+	return true;
+}
+
+//____________________________________________________________________________
+bool Fakerates::isLooseLeptonTTBar(int index){
+	/* 
+	checks, if the lepton in the ttbar sample is loose
+	parameters: index (index of the particle)
+	return: true (if lepton is loose), false (else)
+	*/
+
+	if(fDataType == 2) return isLooseElectronTTBar(index);
+	else return isLooseMuonTTBar(index);
+}
+
+
+//____________________________________________________________________________
 bool Fakerates::isTightMuon(int index){
 	/* 
 	checks, if the muon is tight
@@ -643,6 +841,50 @@ bool Fakerates::isTightLepton(int index){
 
 	if(fDataType == 2) return isTightElectron(index);
 	else return isTightMuon(index);
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isTightMuonTTBar(int index){
+	/* 
+	checks, if the muon in the ttbar sample is tight
+	parameters: index (index of the particle)
+	return: true (if muon is tight), false (else)
+	*/
+
+	if(!isLooseMuon(index)) return false;
+	if(!MuIsTight->at(index)) return false;
+
+	return true;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isTightElectronTTBar(int index){
+	/* 
+	checks, if the electron in the ttbar sample is tight
+	parameters: index (index of the particle)
+	return: true (if electron is tight), false (else)
+	*/
+
+	if(!isLooseElectron(index)) return false;
+	if(!ElIsTight->at(index)) return false;
+
+	return true;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isTightLeptonTTBar(int index){
+	/* 
+	checks, if the lepton in the ttbar sample is tight
+	parameters: index (index of the particle)
+	return: true (if lepton is tight), false (else)
+	*/
+
+	if(fDataType == 2) return isTightElectronTTBar(index);
+	else return isTightMuonTTBar(index);
+
 }
 
 
@@ -762,7 +1004,7 @@ bool Fakerates::passesMTCut(int index){
 
 
 //____________________________________________________________________________
-bool Fakerates::passesUpperMETMT(int index){
+bool Fakerates::passesUpperMETMT(int index, bool count = false){
 	/* 
 	checks, if the event passes upper MET and MT cuts
 	parameters: index (index of the particle)
@@ -772,11 +1014,15 @@ bool Fakerates::passesUpperMETMT(int index){
 	//cout << "start passesUpperMETMT" << endl;
 	//cout << "check 9" << endl;
     if(!passesMETCut()) return false;
-    fCutflow_afterMETCut++;
+    fCutflow_afterMETCut++;	
+
+	if(count) ++fCounter_met;
 
 	//cout << "check 10" << endl;
     if(!passesMTCut(index)) return false;
     fCutflow_afterMTCut++;
+	
+	if(count) ++fCounter_mt;
 
 	//cout << "check 11" << endl;
 	
@@ -805,7 +1051,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	// jet-lepton cleaning: if a tight lepton with dR too small found then return false
 	for(int lep = 0; lep < LepPhi->size(); ++lep){
-		if(!isTightLepton(lep)) continue;
+		if(!isLooseLepton(lep)) continue;
 		if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(j), LepPhi->at(lep), JetPhi->at(j)) > minDR ) continue;
 		return false;
 	}
@@ -1167,7 +1413,7 @@ void Fakerates::fillHLTPlots(float fEventweight = 1.0){
 }
 
 //____________________________________________________________________________
-void Fakerates::fillFRPlots(float fEventweight = 1.0){
+void Fakerates::fillFRPlots(float eventweight = 1.0){
 	/* 
 	create plos for muons and electrons
 	parameters: none
@@ -1185,137 +1431,135 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 
 	if(isFRRegionLepEvent(lep, jet, 30.)) {
 		if(passesUpperMETMT(lep)) {
-			h_Loose_LepEta_30 ->Fill(fabs(LepEta->at(lep)), fEventweight);
-			h_Loose_LepPt_30  ->Fill(LepPt->at(lep)       , fEventweight);
+			h_Loose_LepEta_30 ->Fill(fabs(LepEta->at(lep)), eventweight);
+			h_Loose_LepPt_30  ->Fill(LepPt->at(lep)       , eventweight);
 			if(isTightLepton(lep)){
-				h_Tight_LepEta_30 ->Fill(fabs(LepEta->at(lep)), fEventweight);
-				h_Tight_LepEta_30 ->Fill(LepPt->at(lep)       , fEventweight);
+				h_Tight_LepEta_30 ->Fill(fabs(LepEta->at(lep)), eventweight);
+				h_Tight_LepEta_30 ->Fill(LepPt->at(lep)       , eventweight);
 			}
 		}
 	}
 
 	if(isFRRegionLepEvent(lep, jet, 40.)) {
 		if(passesUpperMETMT(lep)) {
-			h_Loose_LepEta_40 ->Fill(fabs(LepEta->at(lep)), fEventweight);
-			h_Loose_LepPt_40  ->Fill(LepPt->at(lep)       , fEventweight);
+			h_Loose_LepEta_40 ->Fill(fabs(LepEta->at(lep)), eventweight);
+			h_Loose_LepPt_40  ->Fill(LepPt->at(lep)       , eventweight);
 			if(isTightLepton(lep)) {
-				h_Tight_LepEta_40 ->Fill(fabs(LepEta->at(lep)), fEventweight);
-				h_Tight_LepPt_40  ->Fill(LepPt->at(lep)       , fEventweight);
+				h_Tight_LepEta_40 ->Fill(fabs(LepEta->at(lep)), eventweight);
+				h_Tight_LepPt_40  ->Fill(LepPt->at(lep)       , eventweight);
 			}
 		}
 	}
 
 	if(isFRRegionLepEvent(lep, jet, 50.)) {
 		if(passesUpperMETMT(lep)) {
-			h_Loose_LepEta_50 ->Fill(fabs(LepEta->at(lep)), fEventweight);
-			h_Loose_LepPt_50  ->Fill(LepPt->at(lep)       , fEventweight);
+			h_Loose_LepEta_50 ->Fill(fabs(LepEta->at(lep)), eventweight);
+			h_Loose_LepPt_50  ->Fill(LepPt->at(lep)       , eventweight);
 			if(isTightLepton(lep)) {
-				h_Tight_LepEta_50 ->Fill(fabs(LepEta->at(lep)), fEventweight);
-				h_Tight_LepPt_50  ->Fill(LepPt->at(lep)       , fEventweight);
+				h_Tight_LepEta_50 ->Fill(fabs(LepEta->at(lep)), eventweight);
+				h_Tight_LepPt_50  ->Fill(LepPt->at(lep)       , eventweight);
 			}
 		}
 	}
 
 	if(isFRRegionLepEvent(lep, jet, 60.)) {
 		if(passesUpperMETMT(lep)) {
-			h_Loose_LepEta_60 ->Fill(fabs(LepEta->at(lep)), fEventweight);
-			h_Loose_LepPt_60  ->Fill(LepPt->at(lep)       , fEventweight);
+			h_Loose_LepEta_60 ->Fill(fabs(LepEta->at(lep)), eventweight);
+			h_Loose_LepPt_60  ->Fill(LepPt->at(lep)       , eventweight);
 			if(isTightLepton(lep)){
-				h_Tight_LepEta_60 ->Fill(fabs(LepEta->at(lep)), fEventweight);
-				h_Tight_LepPt_60  ->Fill(LepPt->at(lep)       , fEventweight);
+				h_Tight_LepEta_60 ->Fill(fabs(LepEta->at(lep)), eventweight);
+				h_Tight_LepPt_60  ->Fill(LepPt->at(lep)       , eventweight);
 			}
 		}
 	}
 
 
 	// leptons, first loose, then tight
-	if(isFRRegionLepEvent(lep, jet, fJetPtCut)){
+	if(isFRRegionLepEvent(lep, jet, fJetPtCut, true)){
 
-		if(passesUpperMETMT(lep)) {
+		if(passesUpperMETMT(lep, true)) {
  
-			h_Loose_AwayJetDR ->Fill(getAwayJet(1, lep)   , fEventweight);
-			h_Loose_AwayJetPt ->Fill(getAwayJet(0, lep)   , fEventweight);
-			h_Loose_ClosJetDR ->Fill(getClosestJet(1, lep), fEventweight);
-			h_Loose_ClosJetPt ->Fill(getClosestJet(0, lep), fEventweight);
+			h_Loose_AwayJetDR ->Fill(getAwayJet(1, lep)   , eventweight);
+			h_Loose_AwayJetPt ->Fill(getAwayJet(0, lep)   , eventweight);
+			h_Loose_ClosJetDR ->Fill(getClosestJet(1, lep), eventweight);
+			h_Loose_ClosJetPt ->Fill(getClosestJet(0, lep), eventweight);
 
-			h_Loose_HT        ->Fill(getHT()              , fEventweight);
-			h_Loose_LepEta    ->Fill(fabs(LepEta->at(lep)), fEventweight);
-			h_Loose_LepIso    ->Fill(LepPFIso->at(lep)    , fEventweight);
-			h_Loose_LepPt     ->Fill(LepPt->at(lep)       , fEventweight);
+			h_Loose_HT        ->Fill(getHT()              , eventweight);
+			h_Loose_LepEta    ->Fill(fabs(LepEta->at(lep)), eventweight);
+			h_Loose_LepIso    ->Fill(LepPFIso->at(lep)    , eventweight);
+			h_Loose_LepPt     ->Fill(LepPt->at(lep)       , eventweight);
 
-			h_Loose_MaxJPt    ->Fill(getJetPt(jet)        , fEventweight);
-			h_Loose_NBJets    ->Fill(getNJets(1)          , fEventweight);
-			h_Loose_NJets     ->Fill(getNJets()           , fEventweight);
+			h_Loose_MaxJPt    ->Fill(getJetPt(jet)        , eventweight);
+			h_Loose_NBJets    ->Fill(getNJets(1)          , eventweight);
+			h_Loose_NJets     ->Fill(getNJets()           , eventweight);
 			
-			h_Loose_NVertices ->Fill((NVrtx>40)?40:NVrtx  , fEventweight);
-			h_Loose_NVertices1->Fill((NVrtx>30)?30:NVrtx  , fEventweight);
+			h_Loose_NVertices ->Fill((NVrtx>40)?40:NVrtx  , eventweight);
+			h_Loose_NVertices1->Fill((NVrtx>30)?30:NVrtx  , eventweight);
 
-			h_Loose_D0        ->Fill(LepD0->at(lep)       , fEventweight);
-			h_Loose_MaxJCPt   ->Fill(JetPt->at(jet)       , fEventweight); // always corrected Jet Pt!
-			h_Loose_MaxJRPt   ->Fill(JetRawPt->at(jet)    , fEventweight); // always raw Jet Pt!
+			h_Loose_D0        ->Fill(LepD0->at(lep)       , eventweight);
+			h_Loose_MaxJCPt   ->Fill(JetPt->at(jet)       , eventweight); // always corrected Jet Pt!
+			h_Loose_MaxJRPt   ->Fill(JetRawPt->at(jet)    , eventweight); // always raw Jet Pt!
 
-			h_Loose_JCPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet), fEventweight);
-			h_Loose_JRPtJEta  ->Fill(fabs(JetEta->at(jet)), JetRawPt->at(jet), fEventweight);
-			h_Loose_JCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), fEventweight);
-			h_Loose_JRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), fEventweight);
+			h_Loose_JCPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet), eventweight);
+			h_Loose_JRPtJEta  ->Fill(fabs(JetEta->at(jet)), JetRawPt->at(jet), eventweight);
+			h_Loose_JCPtJPt   ->Fill(JetPt->at(jet), JetPt->at(jet), eventweight);
+			h_Loose_JRPtJPt   ->Fill(JetPt->at(jet), JetRawPt->at(jet), eventweight);
 
 
 			for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
 
-				h_Loose_AllJCPt   ->Fill(JetPt->at(thisjet)       , fEventweight);
-				h_Loose_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , fEventweight);
-				h_Loose_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), fEventweight);
+				h_Loose_AllJCPt   ->Fill(JetPt->at(thisjet)       , eventweight);
+				h_Loose_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , eventweight);
+				h_Loose_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), eventweight);
 
-				h_Loose_DJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-				h_Loose_FJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
-				h_Loose_DJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-				h_Loose_FJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+				h_Loose_DJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       eventweight);
+				h_Loose_FJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), eventweight);
+				h_Loose_DJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       eventweight);
+				h_Loose_FJPtJPt   ->Fill(JetPt->at(thisjet),        (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), eventweight);
 
 				int i = h_Loose_DFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
 				if(fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1]){
 				
 					if(fDFbinspt[0]<=JetPt->at(thisjet) && JetPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
 						int j = h_Loose_DFZoomPt  ->FindBin(JetPt->at(thisjet));
-						h_Loose_DJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-						h_Loose_FJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+						h_Loose_DJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       eventweight);
+						h_Loose_FJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), eventweight);
 					}
 
 					if(fDFbinspt[0]<=JetRawPt->at(thisjet) && JetRawPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
 						int k = h_Loose_DFZoomPt  ->FindBin(JetRawPt->at(thisjet));
-						h_Loose_DJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-						h_Loose_FJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+						h_Loose_DJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       eventweight);
+						h_Loose_FJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), eventweight);
 					}
 				}
 			}
 
-
-
-
 			if( LepPt->at(lep) >  fFRbinspt.back() ){
 				int fillbin = h_FLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep)));
-				h_FLoose->AddBinContent(fillbin, fEventweight);
+				h_FLoose->AddBinContent(fillbin, eventweight);
 			}
 			else{
 				if(fillFHist(LepPt->at(lep)))
-					h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+					h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
 			}
+
 // cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
 //	if(LepPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
-//	cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
+	//cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
 		}
 
-		if(passesMTCut(lep))    h_Loose_MET            ->Fill(getMET()            , fEventweight);
-		                        h_Loose_METnoMTCut     ->Fill(getMET()            , fEventweight);
-		if(passesMETCut())      h_Loose_MT             ->Fill(getMT(lep)          , fEventweight);
-		if(passesMETCut(20,1))  h_Loose_MTMET20        ->Fill(getMT(lep)          , fEventweight);
-		if(passesMETCut(30,1))  h_Loose_MTMET30        ->Fill(getMT(lep)          , fEventweight);
-		if(passesMETCut(20,1))  h_Loose_NVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
+		if(passesMTCut(lep))    h_Loose_MET            ->Fill(getMET()            , eventweight);
+		                        h_Loose_METnoMTCut     ->Fill(getMET()            , eventweight);
+		if(passesMETCut())      h_Loose_MT             ->Fill(getMT(lep)          , eventweight);
+		if(passesMETCut(20,1))  h_Loose_MTMET20        ->Fill(getMT(lep)          , eventweight);
+		if(passesMETCut(30,1))  h_Loose_MTMET30        ->Fill(getMT(lep)          , eventweight);
+		if(passesMETCut(20,1))  h_Loose_NVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , eventweight);
 
 		if(passesMTCut(lep) && fFRMETbinseta[0]<=fabs(LepEta->at(lep)) && fabs(LepEta->at(lep))<fFRMETbinseta[fFRMETn_binseta-1]){
 			if(fFRMETbinspt[0]<=LepPt->at(lep) && LepPt->at(lep)<fFRMETbinspt[fFRMETn_binspt-1]){
 				int i = h_Loose_FRMETZoomEta ->FindBin(fabs(LepEta->at(lep)));
 				int j = h_Loose_FRMETZoomPt  ->FindBin(LepPt->at(lep));
-				h_Loose_METZoom[(i-1)*(fFRMETn_binspt-1) + j - 1] ->Fill((getMET()), fEventweight);
+				h_Loose_METZoom[(i-1)*(fFRMETn_binspt-1) + j - 1] ->Fill((getMET()), eventweight);
 			}
 		}
 
@@ -1325,84 +1569,84 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 
 			if(passesUpperMETMT(lep)) {
   
-				h_Tight_AwayJetDR ->Fill(getAwayJet(1, lep)    , fEventweight);
-				h_Tight_AwayJetPt ->Fill(getAwayJet(0, lep)    , fEventweight);
-				h_Tight_ClosJetDR ->Fill(getClosestJet(1, lep) , fEventweight);
-				h_Tight_ClosJetPt ->Fill(getClosestJet(0, lep) , fEventweight);
+				h_Tight_AwayJetDR ->Fill(getAwayJet(1, lep)    , eventweight);
+				h_Tight_AwayJetPt ->Fill(getAwayJet(0, lep)    , eventweight);
+				h_Tight_ClosJetDR ->Fill(getClosestJet(1, lep) , eventweight);
+				h_Tight_ClosJetPt ->Fill(getClosestJet(0, lep) , eventweight);
 
-				h_Tight_HT        ->Fill(getHT()               , fEventweight);
-				h_Tight_LepEta    ->Fill(fabs(LepEta->at(lep)) , fEventweight);
-				h_Tight_LepIso    ->Fill(LepPFIso->at(lep)     , fEventweight);
-				h_Tight_LepPt     ->Fill(LepPt->at(lep)        , fEventweight);
+				h_Tight_HT        ->Fill(getHT()               , eventweight);
+				h_Tight_LepEta    ->Fill(fabs(LepEta->at(lep)) , eventweight);
+				h_Tight_LepIso    ->Fill(LepPFIso->at(lep)     , eventweight);
+				h_Tight_LepPt     ->Fill(LepPt->at(lep)        , eventweight);
 
-				h_Tight_MaxJPt    ->Fill(getJetPt(jet)         , fEventweight);
-				h_Tight_NBJets    ->Fill(getNJets(1)           , fEventweight);
-				h_Tight_NJets     ->Fill(getNJets()            , fEventweight);
-				h_Tight_NVertices ->Fill((NVrtx>40)?40:NVrtx   , fEventweight);
-				h_Tight_NVertices1->Fill((NVrtx>30)?30:NVrtx   , fEventweight);
+				h_Tight_MaxJPt    ->Fill(getJetPt(jet)         , eventweight);
+				h_Tight_NBJets    ->Fill(getNJets(1)           , eventweight);
+				h_Tight_NJets     ->Fill(getNJets()            , eventweight);
+				h_Tight_NVertices ->Fill((NVrtx>40)?40:NVrtx   , eventweight);
+				h_Tight_NVertices1->Fill((NVrtx>30)?30:NVrtx   , eventweight);
 
-				h_Tight_D0        ->Fill(LepD0->at(lep)        , fEventweight);
-				h_Tight_MaxJCPt   ->Fill(JetPt->at(jet)        , fEventweight); // always corrected Jet Pt!
-				h_Tight_MaxJRPt   ->Fill(JetRawPt->at(jet)     , fEventweight); // always raw Jet Pt!
+				h_Tight_D0        ->Fill(LepD0->at(lep)        , eventweight);
+				h_Tight_MaxJCPt   ->Fill(JetPt->at(jet)        , eventweight); // always corrected Jet Pt!
+				h_Tight_MaxJRPt   ->Fill(JetRawPt->at(jet)     , eventweight); // always raw Jet Pt!
 
-				h_Tight_JCPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetPt->at(jet)    , fEventweight);
-				h_Tight_JRPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetRawPt->at(jet) , fEventweight);
-				h_Tight_JCPtJPt   ->Fill(JetPt->at(jet)        , JetPt->at(jet)    , fEventweight);
-				h_Tight_JRPtJPt   ->Fill(JetPt->at(jet)        , JetRawPt->at(jet) , fEventweight);
+				h_Tight_JCPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetPt->at(jet)    , eventweight);
+				h_Tight_JRPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetRawPt->at(jet) , eventweight);
+				h_Tight_JCPtJPt   ->Fill(JetPt->at(jet)        , JetPt->at(jet)    , eventweight);
+				h_Tight_JRPtJPt   ->Fill(JetPt->at(jet)        , JetRawPt->at(jet) , eventweight);
 
 				for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) {
-					h_Tight_AllJCPt   ->Fill(JetPt->at(thisjet)       , fEventweight);
-					h_Tight_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , fEventweight);
-					h_Tight_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), fEventweight);
+					h_Tight_AllJCPt   ->Fill(JetPt->at(thisjet)       , eventweight);
+					h_Tight_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , eventweight);
+					h_Tight_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), eventweight);
 
-					h_Tight_DJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))                      , fEventweight);
-					h_Tight_FJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
-					h_Tight_DJPtJPt  ->Fill(JetPt->at(thisjet)       , (JetPt->at(thisjet)-JetRawPt->at(thisjet))                      , fEventweight);
-					h_Tight_FJPtJPt  ->Fill(JetPt->at(thisjet)       , (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+					h_Tight_DJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))                      , eventweight);
+					h_Tight_FJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), eventweight);
+					h_Tight_DJPtJPt  ->Fill(JetPt->at(thisjet)       , (JetPt->at(thisjet)-JetRawPt->at(thisjet))                      , eventweight);
+					h_Tight_FJPtJPt  ->Fill(JetPt->at(thisjet)       , (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), eventweight);
 				
 					int i = h_Tight_DFZoomEta ->FindBin(fabs(JetEta->at(thisjet)));
 					if(fDFbinseta[0]<=fabs(JetEta->at(thisjet)) && fabs(JetEta->at(thisjet))<fDFbinseta[fDFn_binseta-1]){
 				
 						if(fDFbinspt[0]<=JetPt->at(thisjet) && JetPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
 							int j = h_Tight_DFZoomPt  ->FindBin(JetPt->at(thisjet));
-							h_Tight_DJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-							h_Tight_FJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+							h_Tight_DJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       eventweight);
+							h_Tight_FJPtZoomC[(i-1)*(fDFn_binspt-1) + j - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), eventweight);
 						}
 
 						if(fDFbinspt[0]<=JetRawPt->at(thisjet) && JetRawPt->at(thisjet)<fDFbinspt[fDFn_binspt-1]){
 							int k = h_Tight_DFZoomPt  ->FindBin(JetRawPt->at(thisjet));
-							h_Tight_DJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       fEventweight);
-							h_Tight_FJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), fEventweight);
+							h_Tight_DJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       eventweight);
+							h_Tight_FJPtZoomR[(i-1)*(fDFn_binspt-1) + k - 1] ->Fill((JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), eventweight);
 						}
 					}
 				}
 
 				if( LepPt->at(lep) >  fFRbinspt.back()){
 					int fillbin = h_FTight->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep)));
-					h_FTight->AddBinContent(fillbin, fEventweight);
+					h_FTight->AddBinContent(fillbin, eventweight);
 				}
 				else{
 					if(fillFHist(LepPt->at(lep)))
-						h_FTight->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+						h_FTight->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
 				}
 
-//	if(LepPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
-//	cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
+//	if(L//epPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
+//	cout// << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
 
 			}
 
-			if(passesMTCut(lep))    h_Tight_MET        -> Fill(getMET()               , fEventweight);
-			                        h_Tight_METnoMTCut -> Fill(getMET()               , fEventweight);
-			if(passesMETCut())      h_Tight_MT         -> Fill(getMT(lep)             , fEventweight);
-			if(passesMETCut(20,1))  h_Tight_MTMET20    -> Fill(getMT(lep)             , fEventweight);
-			if(passesMETCut(30,1))  h_Tight_MTMET30    -> Fill(getMT(lep)             , fEventweight);
-			if(passesMETCut(20,1))  h_Tight_NVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , fEventweight);
+			if(passesMTCut(lep))    h_Tight_MET        -> Fill(getMET()               , eventweight);
+			                        h_Tight_METnoMTCut -> Fill(getMET()               , eventweight);
+			if(passesMETCut())      h_Tight_MT         -> Fill(getMT(lep)             , eventweight);
+			if(passesMETCut(20,1))  h_Tight_MTMET20    -> Fill(getMT(lep)             , eventweight);
+			if(passesMETCut(30,1))  h_Tight_MTMET30    -> Fill(getMT(lep)             , eventweight);
+			if(passesMETCut(20,1))  h_Tight_NVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , eventweight);
 
 			if(passesMTCut(lep) && fFRMETbinseta[0]<=fabs(LepEta->at(lep)) && fabs(LepEta->at(lep))<fFRMETbinseta[fFRMETn_binseta-1]){
 				if(fFRMETbinspt[0]<=LepPt->at(lep) && LepPt->at(lep)<fFRMETbinspt[fFRMETn_binspt-1]){
 					int i = h_Tight_FRMETZoomEta ->FindBin(fabs(LepEta->at(lep)));
 					int j = h_Tight_FRMETZoomPt  ->FindBin(LepPt->at(lep));
-					h_Tight_METZoom[(i-1)*(fFRMETn_binspt-1) + j - 1] ->Fill((getMET()), fEventweight);
+					h_Tight_METZoom[(i-1)*(fFRMETn_binspt-1) + j - 1] ->Fill((getMET()), eventweight);
 				}
 			}
 		}
@@ -1411,6 +1655,91 @@ void Fakerates::fillFRPlots(float fEventweight = 1.0){
 	h_FRatio->Divide(h_FTight, h_FLoose);
 
 }
+
+
+//____________________________________________________________________________
+void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
+	/* 
+	create plos for muons and electrons
+	parameters: none
+	return: none
+	*/
+
+
+	int njets = 0, origin = 0;
+	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
+	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
+	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
+
+
+
+	//// Checks for jet
+
+	//if     (strstr(fName, "ttbar0")) njets = 0;
+	//else if(strstr(fName, "ttbar1")) njets = 1;
+	//else if(strstr(fName, "ttbar2")) njets = 2;
+
+	//if(!isFRRegionLepEventTTBar(njets)) return; 
+
+
+	// Checks for Trigger
+
+	if(!isFRRegionLepEventTTBar()) return; 
+
+
+	// Get Desired Particle GEN Origin
+
+	if     (strstr(fName, "ttbar0")) origin = 0; // all
+	else if(strstr(fName, "ttbar1")) origin = 1; // b
+	else if(strstr(fName, "ttbar2")) origin = 2; // c
+	else if(strstr(fName, "ttbar3")) origin = 3; // other
+
+
+
+	// fill Plots for all loose leptons in the event
+
+	for(int j=0; j < LepPt->size(); ++j){
+
+
+		// lepton origin
+
+		int thisorigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
+		cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (thisorigin == 0 || (origin != 0 && thisorigin != origin)) << endl;
+		if(thisorigin == 0 || (origin != 0 && thisorigin != origin)) continue;
+
+
+		// loose lepton
+		if(!isLooseLeptonTTBar(j)) continue;
+	
+		h_Loose_LepIso ->Fill(LepPFIso->at(j), eventweight);
+
+		if( LepPt->at(j) > fFRbinspt.back() ){
+			int fillbin = h_FLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(j)));
+			h_FLoose->AddBinContent(fillbin, eventweight);
+		}
+		else{
+			if(fillFHist(LepPt->at(j)))
+				h_FLoose->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
+		}
+//cout << Form("%d\t%d\t%d\t%.2f\t%d", Run, Lumi, Event, LepPt->at(j), isTightLeptonTTBar(j)) << endl;
+
+
+		// tight lepton
+		if(!isTightLeptonTTBar(j)) continue;
+
+		h_Tight_LepIso ->Fill(LepPFIso->at(j), eventweight);
+
+		if( LepPt->at(j) >  fFRbinspt.back()){
+			int fillbin = h_FTight->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(j)));
+			h_FTight->AddBinContent(fillbin, eventweight);
+		}
+		else{
+			if(fillFHist(LepPt->at(j)))
+				h_FTight->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
+		}
+	}
+}
+
 
 
 //____________________________________________________________________________

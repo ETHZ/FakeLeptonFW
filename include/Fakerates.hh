@@ -106,9 +106,10 @@ public:
 	bool fillFHist(float);
 	void fillFRPlots(float);
         void fillHLTPlots(float);
+	void fillFRPlotsTTBar(float);
 
 	// CUTS
-	bool passesUpperMETMT(int);
+	bool passesUpperMETMT(int, bool);
 	bool passesMETCut(float, int);
 	bool passesMTCut(int);
 	
@@ -117,16 +118,30 @@ public:
 	std::vector<float, std::allocator<float> >* getLepPhi();
 	std::vector<float, std::allocator<float> >* getLepPFIso();
 	std::vector<float, std::allocator<float> >* getLepD0();
-	bool isFRRegionLepEvent(int&, int&, float);
+	std::vector<float, std::allocator<float> >* getOpLepPt();
+
+	bool isFRRegionLepEvent(int&, int&, float, bool);
+	bool isFRRegionLepEventTTBar(int);
 
 	// LEPTON 
+	int  getMuonOrigin(int, int);
+
 	bool isLooseMuon(int);	
 	bool isLooseElectron(int);
 	bool isLooseLepton(int);
+	bool isLooseOpLepton(int);
+
+	bool isLooseMuonTTBar(int);	
+	bool isLooseElectronTTBar(int);
+	bool isLooseLeptonTTBar(int);
 
 	bool isTightMuon(int);
 	bool isTightElectron(int);
 	bool isTightLepton(int);
+
+	bool isTightMuonTTBar(int);
+	bool isTightElectronTTBar(int);
+	bool isTightLeptonTTBar(int);
 
 	// JETS
 	float getJetPt(int);	
@@ -304,6 +319,15 @@ public:
 	int fCutflow_afterJetSel;
 	int fCutflow_afterMETCut;
 	int fCutflow_afterMTCut;
+
+	int fCounter_all;
+	int fCounter_trigger;
+	int fCounter_loose;
+	int fCounter_veto;
+	int fCounter_jet;
+	int fCounter_jet30;
+	int fCounter_met;
+	int fCounter_mt;
 
 	// Binning for FakeRate Projection Plots
 	std::vector<float> fFRbinseta;
