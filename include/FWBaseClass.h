@@ -26,8 +26,12 @@ public :
    Int_t           Run;
    Int_t           Lumi;
    Int_t           Event;
+   Int_t           HLT_MU5;
+   Int_t           HLT_MU5_PS;
    Int_t           HLT_MU8;
    Int_t           HLT_MU8_PS;
+   Int_t           HLT_MU12;
+   Int_t           HLT_MU12_PS;
    Int_t           HLT_MU17;
    Int_t           HLT_MU17_PS;
    Int_t           HLT_MU24;
@@ -53,19 +57,23 @@ public :
    std::vector<int>     *MuCharge;
    std::vector<float>   *MuPFIso;
    std::vector<float>   *MuD0;
-   std::vector<float>   *MuD0BS;
-
-   std::vector<bool>    *MuIsGlobal;
-   std::vector<bool>    *MuIsPF;
-   std::vector<float>   *MuChi2;
-   std::vector<int>     *MuChamberHits;
-   std::vector<int>     *MuMatchedStations;
+   std::vector<int>     *MuIsGlobalMuon;
+   std::vector<int>     *MuIsPFMuon;
+   std::vector<float>   *MuNChi2;
+   std::vector<int>     *MuNGlMuHits;
+   std::vector<int>     *MuNMatchedStations;
    std::vector<float>   *MuDz;
-   std::vector<int>     *MuPixelHits;
-   std::vector<int>     *MuNLayers;
+   std::vector<int>     *MuNPxHits;
+   std::vector<int>     *MuNSiLayers;
+   std::vector<float>   *MuD0BS;
+   std::vector<float>   *MuIso03SumPt;
+   std::vector<float>   *MuIso03EmPt;
+   std::vector<float>   *MuIso03HadPt;
+
    std::vector<bool>    *MuIsVeto;
    std::vector<bool>    *MuIsLoose;
    std::vector<bool>    *MuIsTight;
+
    std::vector<bool>    *MuIsPrompt;
    std::vector<int>     *MuMID;
    std::vector<int>     *MuGMID;
@@ -99,8 +107,12 @@ public :
    TBranch        *b_Run;   //!
    TBranch        *b_Lumi;   //!
    TBranch        *b_Event;   //!
+   TBranch        *b_HLT_MU5;   //!
+   TBranch        *b_HLT_MU5_PS;   //!
    TBranch        *b_HLT_MU8;   //!
    TBranch        *b_HLT_MU8_PS;   //!
+   TBranch        *b_HLT_MU12;   //!
+   TBranch        *b_HLT_MU12_PS;   //!
    TBranch        *b_HLT_MU17;   //!
    TBranch        *b_HLT_MU17_PS;   //!
    TBranch        *b_HLT_MU24; //!
@@ -126,15 +138,18 @@ public :
    TBranch        *b_MuCharge;   //!
    TBranch        *b_MuPFIso;   //!
    TBranch        *b_MuD0;   //!
-   TBranch        *b_MuD0BS;   //!
-   TBranch        *b_MuIsGlobal;   //!
-   TBranch        *b_MuIsPF;   //!
-   TBranch        *b_MuChi2;   //!
-   TBranch        *b_MuChamberHits;   //!
-   TBranch        *b_MuMatchedStations;   //!
+   TBranch        *b_MuIsGlobalMuon;   //!
+   TBranch        *b_MuIsPFMuon;   //!
+   TBranch        *b_MuNChi2;   //!
+   TBranch        *b_MuNGlMuHits;   //!
+   TBranch        *b_MuNMatchedStations;   //!
    TBranch        *b_MuDz;   //!
-   TBranch        *b_MuPixelHits;   //!
-   TBranch        *b_MuNLayers;   //!
+   TBranch        *b_MuNPxHits;   //!
+   TBranch        *b_MuNSiLayers;   //!
+   TBranch	*b_MuD0BS;
+   TBranch	*b_MuIso03SumPt;
+   TBranch	*b_MuIso03EmPt;
+   TBranch	*b_MuIso03HadPt;
    TBranch        *b_MuIsVeto;   //!
    TBranch        *b_MuIsLoose;   //!
    TBranch        *b_MuIsTight;   //!
@@ -238,14 +253,17 @@ void FWBaseClass::Init(TTree *tree)
    MuPFIso = 0;
    MuD0 = 0;
    MuD0BS = 0;
-   MuIsGlobal = 0;
-   MuIsPF = 0;
-   MuChi2 = 0;
-   MuChamberHits = 0;
-   MuMatchedStations = 0;
+   MuIso03SumPt = 0;
+   MuIso03EmPt = 0;
+   MuIso03HadPt = 0;
+   MuIsGlobalMuon = 0;
+   MuIsPFMuon = 0;
+   MuNChi2 = 0;
+   MuNGlMuHits = 0;
+   MuNMatchedStations = 0;
    MuDz = 0;
-   MuPixelHits = 0;
-   MuNLayers = 0;
+   MuNPxHits = 0;
+   MuNSiLayers = 0;
    MuIsVeto = 0;
    MuIsLoose = 0;
    MuIsTight = 0;
@@ -281,8 +299,12 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("Run", &Run, &b_Run);
    fChain->SetBranchAddress("Lumi", &Lumi, &b_Lumi);
    fChain->SetBranchAddress("Event", &Event, &b_Event);
+   fChain->SetBranchAddress("HLT_MU5", &HLT_MU5, &b_HLT_MU5);
+   fChain->SetBranchAddress("HLT_MU5_PS", &HLT_MU5_PS, &b_HLT_MU5_PS);
    fChain->SetBranchAddress("HLT_MU8", &HLT_MU8, &b_HLT_MU8);
    fChain->SetBranchAddress("HLT_MU8_PS", &HLT_MU8_PS, &b_HLT_MU8_PS);
+   fChain->SetBranchAddress("HLT_MU12", &HLT_MU12, &b_HLT_MU12);
+   fChain->SetBranchAddress("HLT_MU12_PS", &HLT_MU12_PS, &b_HLT_MU12_PS);
    fChain->SetBranchAddress("HLT_MU17", &HLT_MU17, &b_HLT_MU17);
    fChain->SetBranchAddress("HLT_MU17_PS", &HLT_MU17_PS, &b_HLT_MU17_PS);
    fChain->SetBranchAddress("HLT_MU24", &HLT_MU24, &b_HLT_MU24);
@@ -308,15 +330,18 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuCharge", &MuCharge, &b_MuCharge);
    fChain->SetBranchAddress("MuPFIso", &MuPFIso, &b_MuPFIso);
    fChain->SetBranchAddress("MuD0", &MuD0, &b_MuD0);
-   fChain->SetBranchAddress("MuD0BS", &MuD0BS, &b_MuD0BS);
-   fChain->SetBranchAddress("MuIsGlobal", &MuIsGlobal, &b_MuIsGlobal);
-   fChain->SetBranchAddress("MuIsPF", &MuIsPF, &b_MuIsPF);
-   fChain->SetBranchAddress("MuChi2", &MuChi2, &b_MuChi2);
-   fChain->SetBranchAddress("MuChamberHits", &MuChamberHits, &b_MuChamberHits);
-   fChain->SetBranchAddress("MuMatchedStations", &MuMatchedStations, &b_MuMatchedStations);
+   fChain->SetBranchAddress("MuIsGlobalMuon", &MuIsGlobalMuon, &b_MuIsGlobalMuon);
+   fChain->SetBranchAddress("MuIsPFMuon", &MuIsPFMuon, &b_MuIsPFMuon);
+   fChain->SetBranchAddress("MuNChi2", &MuNChi2, &b_MuNChi2);
+   fChain->SetBranchAddress("MuNGlMuHits", &MuNGlMuHits, &b_MuNGlMuHits);
+   fChain->SetBranchAddress("MuNMatchedStations", &MuNMatchedStations, &b_MuNMatchedStations);
    fChain->SetBranchAddress("MuDz", &MuDz, &b_MuDz);
-   fChain->SetBranchAddress("MuPixelHits", &MuPixelHits, &b_MuPixelHits);
-   fChain->SetBranchAddress("MuNLayers", &MuNLayers, &b_MuNLayers);
+   fChain->SetBranchAddress("MuNPxHits", &MuNPxHits, &b_MuNPxHits);
+   fChain->SetBranchAddress("MuNSiLayers", &MuNSiLayers, &b_MuNSiLayers);
+   fChain->SetBranchAddress("MuD0BS", &MuD0BS , &b_MuD0BS);
+   fChain->SetBranchAddress("MuIso03SumPt", &MuIso03SumPt , &b_MuIso03SumPt);
+   fChain->SetBranchAddress("MuIso03EmPt", &MuIso03EmPt , &b_MuIso03EmPt);
+   fChain->SetBranchAddress("MuIso03HadPt", &MuIso03HadPt , &b_MuIso03HadPt);
    fChain->SetBranchAddress("MuIsVeto", &MuIsVeto, &b_MuIsVeto);
    fChain->SetBranchAddress("MuIsLoose", &MuIsLoose, &b_MuIsLoose);
    fChain->SetBranchAddress("MuIsTight", &MuIsTight, &b_MuIsTight);

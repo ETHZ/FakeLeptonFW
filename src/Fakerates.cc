@@ -12,7 +12,15 @@
 // ClassImp(Fakerates);
 using namespace std;
 
-
+TString TrigNames[iNTRIGS] = {"HLTMU5",
+			      "HLTMU8",
+			      "HLTMU12",
+			      "HLTMU17",
+			      "HLTMU24",
+			      "HLTMU40"
+			      //				 "iHLTEL17",
+				 //				 "iHLTEL17JET30"
+};
 //____________________________________________________________________________
 Fakerates::Fakerates(TString configfile){
 	/* 
@@ -172,18 +180,19 @@ void Fakerates::loadConfigFile(TString configfile){
 
 				if(v != "v") { cout << " ERROR in reading variable (" << name << ")!" << endl; exit(1); }
 
-				if      (type == "TString" && name == "fOutputDir")        fOutputDir         = value;
-				else if (type == "float"   && name == "fLuminosity")       fLuminosity        = value.Atof();
-				else if (type == "bool"    && name == "fJetCorrection")    fJetCorrection     = (bool) value.Atoi();
-				else if (type == "float"   && name == "fJetPtCut")         fJetPtCut          = value.Atof();
-				else if (type == "float"   && name == "fLepPtCut")         fLepPtCut          = value.Atof();
-				else if (type == "float"   && name == "fLepD0Cut")         fLepD0Cut          = value.Atof();
-				else if (type == "float"   && name == "fLepIsoCut")        fLepIsoCut         = value.Atof();
-				else if (type == "float"   && name == "fAwayJetBTagCut")   fAwayJetBTagCut    = value.Atof();
-				else if (type == "float"   && name == "fAwayJetDPhiCut")   fAwayJetDPhiCut    = value.Atof();
-				else if (type == "bool"    && name == "fPUweight")         fPUweight          = (bool) value.Atoi();
-				else if (type == "TString" && name == "fLepTrigger")       fLepTrigger        = value;
-				else if (type == "bool"    && name == "fLepTriggerMC")     fLepTriggerMC      = (bool) value.Atoi();			
+				if      (type == "TString" && name == "fOutputDir")      fOutputDir      = value;
+				else if (type == "float"   && name == "fLuminosity")     fLuminosity     = value.Atof();
+				else if (type == "bool"    && name == "fJetCorrection")  fJetCorrection  = (bool) value.Atoi();
+				else if (type == "float"   && name == "fJetPtCut")       fJetPtCut       = value.Atof();
+				else if (type == "float"   && name == "fLepPtCut")       fLepPtCut       = value.Atof();
+				else if (type == "float"   && name == "fLepD0Cut")       fLepD0Cut       = value.Atof();
+				else if (type == "float"   && name == "fLepIsoCut")      fLepIsoCut      = value.Atof();
+				else if (type == "float"   && name == "fAwayJetBTagCut") fAwayJetBTagCut = value.Atof();
+				else if (type == "float"   && name == "fAwayJetDPhiCut") fAwayJetDPhiCut = value.Atof();
+				else if (type == "bool"    && name == "fPUweight")       fPUweight       = (bool) value.Atoi();
+				else if (type == "TString" && name == "fLepTrigger")     fLepTrigger     = value;
+				else if (type == "bool"    && name == "fLepTriggerMC")   fLepTriggerMC   = (bool) value.Atoi();		
+				else if (type == "bool"    && name == "fCSA14")          fCSA14          = (bool) value.Atoi(); 
 				else { cout << " ERROR in reading variable (" << name << ")!" << endl; exit(1); }
 			}
 			else {
@@ -197,18 +206,19 @@ void Fakerates::loadConfigFile(TString configfile){
 		}
 	}
 	
-	cout << " fOutputDir:        " << fOutputDir        << endl;
-	cout << " fLuminosity:       " << fLuminosity       << endl;
-	cout << " fJetCorrection:    " << fJetCorrection    << endl;
-	cout << " fJetPtCut:         " << fJetPtCut         << endl;
-	cout << " fLepPtCut:         " << fLepPtCut         << endl;
-	cout << " fLepD0Cut:         " << fLepD0Cut         << endl;
-	cout << " fLepIsoCut:        " << fLepIsoCut        << endl;
-	cout << " fAwayJetBTagCut:   " << fAwayJetBTagCut   << endl;
-	cout << " fAwayJetDPhiCut:   " << fAwayJetDPhiCut   << endl;
-	cout << " fPUweight:         " << fPUweight         << endl;
-	cout << " fLepTrigger:       " << fLepTrigger       << endl;
-	cout << " fLepTriggerMC:     " << fLepTriggerMC     << endl;
+	cout << " fOutputDir:       " << fOutputDir      << endl;
+	cout << " fLuminosity:      " << fLuminosity     << endl;
+	cout << " fJetCorrection:   " << fJetCorrection  << endl;
+	cout << " fJetPtCut:        " << fJetPtCut       << endl;
+	cout << " fLepPtCut:        " << fLepPtCut       << endl;
+	cout << " fLepD0Cut:        " << fLepD0Cut       << endl;
+	cout << " fLepIsoCut:       " << fLepIsoCut      << endl;
+	cout << " fAwayJetBTagCut:  " << fAwayJetBTagCut << endl;
+	cout << " fAwayJetDPhiCut:  " << fAwayJetDPhiCut << endl;
+	cout << " fPUweight:        " << fPUweight       << endl;
+	cout << " fLepTrigger:      " << fLepTrigger     << endl;
+	cout << " fLepTriggerMC:    " << fLepTriggerMC   << endl;
+	cout << " fCSA14:           " << fCSA14          << endl;
 	cout << "=======================================================" << endl;
 	cout << "=======================================================" << endl;
 
@@ -295,6 +305,8 @@ void Fakerates::loop(TFile* pFile){
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events; jentry++) {
 		if(jentry > (fMaxSize>0?fMaxSize:Ngen)) break;
+		printProgress(jentry,tot_events,fName);
+
 		tree_->GetEntry(jentry);
 		ntot++;
 
@@ -308,11 +320,13 @@ void Fakerates::loop(TFile* pFile){
 
 		//for(int thisjet = 0; thisjet < JetRawPt->size(); ++thisjet) 
 		//	h_Loose_AllJEtatest2 -> Fill(fabs(JetEta->at(thisjet)), fEventweight);
-
-		if(strstr(fName, "ttbar")) fillFRPlotsTTBar(eventweight);
-		else fillFRPlots(eventweight);
-		//fillFRPlots(eventweight);
-
+		if(strstr(fName, "ttbar")) {
+			fillFRPlotsTTBar(eventweight);
+		}
+		else {
+			fillFRPlots(eventweight);
+			fillHLTPlots(eventweight);
+		}
 	}
 
 	cout << " mu: nevents passing lepton selection: " << fCutflow_afterLepSel << endl;
@@ -519,7 +533,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 		else if (fLepTrigger == "Ele8"   && !HLT_ELE8_TIGHT        ) { return false; }
 		else if (fLepTrigger == "Ele17"  && !HLT_ELE17_TIGHT       ) { return false; }
 		else if (fLepTrigger == "Ele17J" && !HLT_ELE17_JET30_TIGHT ) { return false; }
-		else                                                        {               }
+		else                                                         {               }
 	}
 
 	if(count) ++fCounter_trigger;
@@ -719,10 +733,11 @@ bool Fakerates::isLooseMuon(int index){
 	parameters: index (index of the particle)
 	return: true (if muon is loose), false (else)
 	*/
-
 	if(!MuIsLoose->at(index)) return false;
 	//if(fabs(MuD0->at(index)) > 0.1) return false;
 	if(fLepD0Cut > 0.0 && fabs(MuD0->at(index)) > fLepD0Cut) return false; // leave this commented for synching!!
+	if(fCSA14 && MuIso03SumPt->at(0)/MuPt->at(0) > 0.4)      return false;
+	
 	return true;
 }
 
@@ -1192,6 +1207,236 @@ bool Fakerates::fillFHist(float LepPt){
 
 }
 
+//____________________________________________________________________________
+void Fakerates::fillHLTPlots(float fEventweight = 1.0){
+  /* 
+     Let's use this function to measure purities for the different triggers that 
+     we use and also to measure the FR measured with every-single trigger. 
+     parameters: none
+     return:
+  */ 
+  
+  int lep(-1), jet(-1);
+  std::vector<int> looselep_inds;
+  std::vector<int> awayjet_inds;
+  std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
+  std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
+  std::vector<float, std::allocator<float> >* LepPhi   = getLepPhi();
+  std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
+  std::vector<float, std::allocator<float> >* LepD0    = getLepD0();
+  int nloose(0), nveto_add(0);
+  int ngoodjets20(0), nawayjets20(0),ngoodjets30(0), nawayjets30(0),ngoodjets40(0), nawayjets40(0);
+  int jetind(-1);
+  
+  /// FOR MUONS FOR THE MOMENT
+  for(int tr=0; tr<iNTRIGS; tr++) {
+    if(PassesHLT(tr)) { 
+      fillPurities(tr,0., fEventweight);  
+      
+      // muon Pt is not reasonable then return false
+      if(MuPt->size() > 0)  {
+	
+	if(!fCSA14 || MuIso03SumPt->at(0)/MuPt->at(0) < 0.4) { // FOR 2015 SCENARIO
+	  
+	  fillPurities(tr,1., fEventweight);
+	  h_Purity_LepPt[tr] -> Fill(MuPt->at(0), fEventweight); 
+	  
+	  // count numbers of loose and veto muons in the event 
+	  float ptcut = -1;
+	  if (tr == iHLTMU5 ) ptcut =  5.;
+	  if (tr == iHLTMU8 ) ptcut =  8.;
+	  if (tr == iHLTMU12) ptcut = 12.;
+	  if (tr == iHLTMU17) ptcut = 17.;
+	  if (tr == iHLTMU24) ptcut = 24.;
+	  if (tr == iHLTMU40) ptcut = 40.;
+	  
+	  for(int j=0; j < MuPt->size(); ++j){
+	    if(nloose==0){
+	      if(MuPt->at(j) < ptcut)             continue; fillPurities(tr, 2. , fEventweight);
+	      if(TMath::Abs(MuEta->at(j) ) > 2.4) continue; 
+	      if(MuIsGlobalMuon    ->at(j) == 0 ) continue; fillPurities(tr, 3. , fEventweight);
+	      if(MuIsPFMuon        ->at(j) == 0 ) continue; fillPurities(tr, 4. , fEventweight);
+	      if(MuNChi2           ->at(j) > 10 ) continue; fillPurities(tr, 5. , fEventweight);
+	      if(MuNGlMuHits       ->at(j) < 1  ) continue; fillPurities(tr, 6. , fEventweight);
+	      if(MuNMatchedStations->at(j) < 2  ) continue; fillPurities(tr, 7. , fEventweight); 
+	      if(MuDz              ->at(j) > 0.2) continue; fillPurities(tr, 8. , fEventweight);
+	      if(MuD0              ->at(j) > 0.2) continue; fillPurities(tr, 9. , fEventweight);
+	      if(MuNPxHits         ->at(j) < 1  ) continue; fillPurities(tr, 10., fEventweight);
+	      if(MuNSiLayers       ->at(j) < 6  ) continue; fillPurities(tr, 11., fEventweight);
+	      if(MuPFIso           ->at(j) > 1.0) continue; fillPurities(tr, 12., fEventweight);
+	    }
+	    lep = j;
+	    nloose++;
+	    looselep_inds.push_back(j);		
+	    
+	    //   if(!isLooseLepton(j)) continue;
+	    if(isLooseLepton(j) && MuPt->at(j) < fLepPtCut){
+	      nveto_add++;
+	    }
+	  }
+	  
+	  // require exactly one loose muon and no additional veto muons
+	  if(nloose == 1 && nveto_add == 0) {
+	    fillPurities(tr,13., fEventweight);
+	    
+	    // Jet Pt is not reasonable then return false
+	    if(JetRawPt->size() > 0) {
+	      fillPurities(tr,14., fEventweight);
+	      h_Purity_JetRawPt[tr] -> Fill(JetRawPt->at(0), fEventweight);
+	      
+	      // count the number of away jets
+	      for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
+		if(!isGoodJet(thisjet, 20., fAwayJetBTagCut)) continue;
+		ngoodjets20++;
+		if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(lep), JetPhi->at(thisjet), MuPhi->at(lep)) > 1.0 ) nawayjets20++;
+		
+		if(!isGoodJet(thisjet, 30., fAwayJetBTagCut)) continue;
+		ngoodjets30++;
+		if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(lep), JetPhi->at(thisjet), MuPhi->at(lep)) > 1.0 ) nawayjets30++;
+		
+		if(!isGoodJet(thisjet, fJetPtCut, fAwayJetBTagCut)) continue;
+		ngoodjets40++;
+		if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(lep), JetPhi->at(thisjet), MuPhi->at(lep)) > 1.0 ) nawayjets40++;
+	      }
+	      
+	      if(ngoodjets20 > 0) {
+		fillPurities(tr,15., fEventweight);
+		h_Purity_JetPt   [tr] -> Fill(JetPt->at(0), fEventweight);
+		h_Purity_DRLepJet[tr] -> Fill(Util::GetDeltaR(JetEta->at(0), MuEta->at(lep), JetPhi->at(0), MuPhi->at(lep)), fEventweight);
+		
+		if(nawayjets20 > 0) {
+		  fillPurities(tr,16., fEventweight);
+		  
+		  h_Purity_MET     [tr] -> Fill(getMET(),   fEventweight);
+		  h_Purity_MT      [tr] -> Fill(getMT(lep), fEventweight);
+		  
+		  if(passesMETCut()){
+		    fillPurities(tr,17., fEventweight);
+		    
+		    if(passesMTCut(lep)){
+		      fillPurities(tr,18., fEventweight);
+		    }
+		  }
+		}
+	      }
+	      
+	      if(ngoodjets30 > 0) {
+		fillPurities(tr,19., fEventweight);
+
+		if(nawayjets30 > 0) {
+		  fillPurities(tr,20., fEventweight);
+		  
+		  if(passesMETCut()){
+		    fillPurities(tr,21., fEventweight);
+		    
+		    if(passesMTCut(lep)){
+		      fillPurities(tr,22., fEventweight);
+		    }
+		  }
+		}
+	      }
+
+	      if(ngoodjets40 > 0) {
+		fillPurities(tr,23., fEventweight);
+
+		if(nawayjets40 > 0) {
+		  fillPurities(tr,24., fEventweight);
+		  
+		  if(passesMETCut()){
+		    fillPurities(tr,25., fEventweight);
+		    
+		    if(passesMTCut(lep)){
+		      fillPurities(tr,26., fEventweight);
+		    }
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  }
+  ////////////////////////////////////////////////// 
+  ///// CALCULATE FR...
+  ////////////////////////////////////////////////
+  //++ get number of fakeables per trigger
+  TString LepTrigger_tmp = fLepTrigger;
+  fLepTrigger = "";  // deactivate trigger requirement in isFRRegionLepEvent
+
+  if (isFRRegionLepEvent(lep, jet, fJetPtCut)){
+    // loose leptons
+    if(passesUpperMETMT(lep)) {
+      if (HLT_MU5) {
+	fill2DWithoutOF(h_FLoose_trig[iHLTMU5 ], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	h_Loose_LepPt_trig [iHLTMU5]->Fill(LepPt->at(lep), fEventweight);
+	h_Loose_LepEta_trig[iHLTMU5]->Fill(fabs(LepEta->at(lep)), fEventweight);
+      }
+      if (HLT_MU8) {
+	fill2DWithoutOF(h_FLoose_trig[iHLTMU8 ], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	h_Loose_LepPt_trig [iHLTMU8]->Fill(LepPt->at(lep), fEventweight);
+	h_Loose_LepEta_trig[iHLTMU8]->Fill(fabs(LepEta->at(lep)), fEventweight);
+      }
+      if (HLT_MU12) {
+	fill2DWithoutOF(h_FLoose_trig[iHLTMU12], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	h_Loose_LepPt_trig [iHLTMU12]->Fill(LepPt->at(lep), fEventweight);
+	h_Loose_LepEta_trig[iHLTMU12]->Fill(fabs(LepEta->at(lep)), fEventweight);
+      }
+      if (HLT_MU17) {
+	fill2DWithoutOF(h_FLoose_trig[iHLTMU17], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	h_Loose_LepPt_trig [iHLTMU17]->Fill(LepPt->at(lep), fEventweight);
+	h_Loose_LepEta_trig[iHLTMU17]->Fill(fabs(LepEta->at(lep)), fEventweight);
+      }
+      if (HLT_MU24) {
+	fill2DWithoutOF(h_FLoose_trig[iHLTMU24], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	h_Loose_LepPt_trig [iHLTMU24]->Fill(LepPt->at(lep), fEventweight);
+	h_Loose_LepEta_trig[iHLTMU24]->Fill(fabs(LepEta->at(lep)), fEventweight);
+      }
+      if (HLT_MU40) {
+	fill2DWithoutOF(h_FLoose_trig[iHLTMU40], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	h_Loose_LepPt_trig [iHLTMU40]->Fill(LepPt->at(lep), fEventweight);
+	h_Loose_LepEta_trig[iHLTMU40]->Fill(fabs(LepEta->at(lep)), fEventweight);
+      }
+    }
+    
+    // Tight leptons
+    if(isTightLepton(lep)) {
+      if(passesUpperMETMT(lep)) {
+	if (HLT_MU5) {
+	  fill2DWithoutOF(h_FTight_trig[iHLTMU5 ], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	  h_Tight_LepPt_trig [iHLTMU5]->Fill(LepPt->at(lep), fEventweight);
+	  h_Tight_LepEta_trig[iHLTMU5]->Fill(fabs(LepEta->at(lep)), fEventweight);
+	}
+	if (HLT_MU8) {
+	  fill2DWithoutOF(h_FTight_trig[iHLTMU8 ], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	  h_Tight_LepPt_trig [iHLTMU8]->Fill(LepPt->at(lep), fEventweight);
+	  h_Tight_LepEta_trig[iHLTMU8]->Fill(fabs(LepEta->at(lep)), fEventweight);
+	}
+	if (HLT_MU12) {
+	  fill2DWithoutOF(h_FTight_trig[iHLTMU12], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	  h_Tight_LepPt_trig [iHLTMU12]->Fill(LepPt->at(lep), fEventweight);
+	  h_Tight_LepEta_trig[iHLTMU12]->Fill(fabs(LepEta->at(lep)), fEventweight);
+	}
+	if (HLT_MU17) {
+	  fill2DWithoutOF(h_FTight_trig[iHLTMU17], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	  h_Tight_LepPt_trig [iHLTMU17]->Fill(LepPt->at(lep), fEventweight);
+	  h_Tight_LepEta_trig[iHLTMU17]->Fill(fabs(LepEta->at(lep)), fEventweight);
+	}
+	if (HLT_MU24) {
+	  fill2DWithoutOF(h_FTight_trig[iHLTMU24], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	  h_Tight_LepPt_trig [iHLTMU24]->Fill(LepPt->at(lep), fEventweight);
+	  h_Tight_LepEta_trig[iHLTMU24]->Fill(fabs(LepEta->at(lep)), fEventweight);
+	}
+	if (HLT_MU40) {
+	  fill2DWithoutOF(h_FTight_trig[iHLTMU40], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
+	  h_Tight_LepPt_trig [iHLTMU40]->Fill(LepPt->at(lep), fEventweight);
+	  h_Tight_LepEta_trig[iHLTMU40]->Fill(fabs(LepEta->at(lep)), fEventweight);
+	}
+      }
+    }
+  }
+  fLepTrigger = LepTrigger_tmp;  // reactivate trigger requirement in isFRRegionLepEvent
+}
 
 //____________________________________________________________________________
 void Fakerates::fillFRPlots(float eventweight = 1.0){
@@ -1767,9 +2012,46 @@ void Fakerates::bookHistos(){
 			++n;
 		}
 	}
+
+	
+	/// TRIGGERS
+	for (size_t tr=0; tr<iNTRIGS; tr++){
+	  TString title = "Loose "+TrigNames[tr];
+	  h_FLoose_trig[tr] = new TH2F("h_FLoose_"+TrigNames[tr], title ,fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); 
+	  h_FLoose_trig[tr]->Sumw2();  
+
+	  title = "Tight "+TrigNames[tr];
+	  h_FTight_trig[tr] = new TH2F("h_FTight_"+TrigNames[tr], title ,fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); 
+	  h_FTight_trig[tr]->Sumw2();  
+	  
+	  title = "Loose_Pt "+TrigNames[tr];
+	  h_Loose_LepPt_trig [tr] = new TH1F("h_Loose_LepPt_"+TrigNames[tr], title, 100  , pt_min  , pt_max);     h_Loose_LepPt_trig[tr]-> Sumw2();    
+	  title = "Loose_Eta "+TrigNames[tr];
+	  h_Loose_LepEta_trig[tr] = new TH1F("h_Loose_LepEta_"+TrigNames[tr], title, 100  , eta_min  , eta_max);  h_Loose_LepEta_trig[tr]-> Sumw2();    
+
+	  title = "Tight_Pt "+TrigNames[tr];
+	  h_Tight_LepPt_trig [tr] = new TH1F("h_Tight_LepPt_"+TrigNames[tr], title, 100  , pt_min  , pt_max);     h_Tight_LepPt_trig[tr]-> Sumw2();    	
+	  title = "Tight_Eta "+TrigNames[tr];
+	  h_Tight_LepEta_trig[tr] = new TH1F("h_Tight_LepEta_"+TrigNames[tr], title, 100  , eta_min  , eta_max);  h_Tight_LepEta_trig[tr]-> Sumw2();    
+	  	  
+	  title = "Purity " + TrigNames[tr];
+	  h_Purity[tr] = new TH1F("h_Purity_"+TrigNames[tr], title, 27, -0.5, 26.5);
+	  h_Purity[tr]->Sumw2();
+	  
+	  title = "Purity LeptonPt " + TrigNames[tr];
+	  h_Purity_LepPt   [tr] = new TH1F("h_Purity_LepPt_"   +TrigNames[tr], title, 100, pt_min, pt_max);  h_Purity_LepPt   [tr]->Sumw2(); 
+	  title = "Purity JetPt " + TrigNames[tr];
+	  h_Purity_JetPt   [tr] = new TH1F("h_Purity_JetPt_"   +TrigNames[tr], title,  10,    20.,   120.);  h_Purity_JetPt   [tr]->Sumw2();
+	  title = "Purity JetRawPt " + TrigNames[tr];
+	  h_Purity_JetRawPt[tr] = new TH1F("h_Purity_JetRawPt_"+TrigNames[tr], title,  10,    20.,   120.);  h_Purity_JetRawPt[tr]->Sumw2();
+	  title = "Purity DRLepJet " + TrigNames[tr];
+	  h_Purity_DRLepJet[tr] = new TH1F("h_Purity_DRLepJet_"+TrigNames[tr], title,  15,     0.,     6.);  h_Purity_DRLepJet[tr]->Sumw2();
+	  title = "Purity MET " + TrigNames[tr];
+	  h_Purity_MET     [tr] = new TH1F("h_Purity_MET_"     +TrigNames[tr], title,  10,     0.,   100.);  h_Purity_MET     [tr]->Sumw2();
+	  title = "Purity MT " + TrigNames[tr];
+	  h_Purity_MT      [tr] = new TH1F("h_Purity_MT"       +TrigNames[tr], title,  10,     0.,   100.);  h_Purity_MT      [tr]->Sumw2();
+	}
 }
-
-
 //____________________________________________________________________________
 void Fakerates::writeHistos(TFile* pFile){
 	/* 
@@ -1915,8 +2197,94 @@ void Fakerates::writeHistos(TFile* pFile){
 		h_Tight_METZoom[n]   ->Write(fName + "_" + h_Tight_METZoom[n]   ->GetName(), TObject::kWriteDelete);
 	}
 
-}
 
+	// TRIGGER...
+	for (size_t tr=0; tr<iNTRIGS; tr++){
+	  h_FLoose_trig[tr]      ->Write(fName + "_" + h_FLoose_trig[tr]->GetName(),       TObject::kWriteDelete);
+	  h_FTight_trig[tr]      ->Write(fName + "_" + h_FTight_trig[tr]->GetName(),       TObject::kWriteDelete);
+	  h_Loose_LepPt_trig[tr] ->Write(fName + "_" + h_Loose_LepPt_trig[tr]->GetName(),  TObject::kWriteDelete);
+	  h_Tight_LepPt_trig[tr] ->Write(fName + "_" + h_Tight_LepPt_trig[tr]->GetName(),  TObject::kWriteDelete);
+	  h_Loose_LepEta_trig[tr]->Write(fName + "_" + h_Loose_LepEta_trig[tr]->GetName(), TObject::kWriteDelete);
+	  h_Tight_LepEta_trig[tr]->Write(fName + "_" + h_Tight_LepEta_trig[tr]->GetName(), TObject::kWriteDelete);
+	  
+	  h_Purity         [tr] ->Write(fName + "_" + h_Purity         [tr]->GetName(), TObject::kWriteDelete);
+	  h_Purity_LepPt   [tr] ->Write(fName + "_" + h_Purity_LepPt   [tr]->GetName(), TObject::kWriteDelete); 
+	  h_Purity_JetPt   [tr] ->Write(fName + "_" + h_Purity_JetPt   [tr]->GetName(), TObject::kWriteDelete);
+	  h_Purity_JetRawPt[tr] ->Write(fName + "_" + h_Purity_JetRawPt[tr]->GetName(), TObject::kWriteDelete);
+	  h_Purity_DRLepJet[tr] ->Write(fName + "_" + h_Purity_DRLepJet[tr]->GetName(), TObject::kWriteDelete);
+	  h_Purity_MET     [tr] ->Write(fName + "_" + h_Purity_MET     [tr]->GetName(), TObject::kWriteDelete);
+	  h_Purity_MT      [tr] ->Write(fName + "_" + h_Purity_MT      [tr]->GetName(), TObject::kWriteDelete);
+	}
+}
+bool Fakerates::PassesHLT(int hlt){
+  if (hlt == iHLTMU5 ) return HLT_MU5;
+  if (hlt == iHLTMU8 ) return HLT_MU8;
+  if (hlt == iHLTMU12) return HLT_MU12;
+  if (hlt == iHLTMU17) return HLT_MU17;
+  if (hlt == iHLTMU24) return HLT_MU24;
+  if (hlt == iHLTMU40) return HLT_MU40;
+
+  return false;
+}
+void Fakerates::fillPurities(int trig, float bin, float fEventweight){
+  /////////////////////////////////////////////////////////////////////////
+  // For each trigger fill the corresponding histogram with the value bin
+
+  // MEANING: 
+  //  0 - # of events selected by the trigger
+  //  1 - # of events with one lepton
+  //  2 - # of events with one lepton with pT 
+  //  3 - # of events with one lepton GlbMuon
+  //  4 - # of events with one lepton IsPFMuon
+  //  5 - # of events with one lepton passing Chi2
+  //  6 - # of events with one lepton passing GlMuHits
+  //  7 - # of events with one lepton passing MatchedStat
+  //  8 - # of events with one lepton passing Dz
+  //  9 - # of events with one lepton passing D0
+  // 10 - # of events with one lepton passing NPxHits
+  // 11 - # of events with one lepton passing NSiLayers
+  // 12 - # of events with one loose lepton +ISO 
+  // 13 - # of events with one and only one lepton
+  // 14 - # of events with one jet
+  // 15 - # of events with one good jet with pT > 20 GeV
+  // 16 - # of events with one good away jet with pT > 20 GeV
+  // 17 - # of events with MET < 20 GeV 
+  // 18 - # of events with MT  < 20 GeV
+
+  // 19 - # of events with one good jet with pT > 30 GeV
+  // 20 - # of events with one good away jet with pT > 30 GeV
+  // 21 - # of events with MET < 20 GeV 
+  // 22 - # of events with MT  < 20 GeV
+
+  // 23 - # of events with one good jet with pT > 40 GeV
+  // 24 - # of events with one good away jet with pT > 40 GeV
+  // 25 - # of events with MET < 20 GeV 
+  // 26 - # of events with MT  < 20 GeV
+
+  h_Purity[trig]->Fill(bin, fEventweight);
+}
+void Fakerates::fill2DWithoutOF(TH2F *&ihist, float x, float y, float w){
+  
+  float xmax = ihist->GetXaxis()->GetBinLowEdge(ihist->GetNbinsX());
+  // float xmax = ihist->GetBinLowEdge(ihist->GetMaximumBin());
+  float bw = ihist->GetXaxis()->GetBinWidth(ihist->GetMaximumBin());
+  if(x > xmax) ihist->Fill(xmax + bw*0.5, y , w); // always increment last bin (i.e. never the overflow)
+  else ihist->Fill(x, y, w);
+
+}
+void Fakerates::printProgress(Long64_t entry, Long64_t nentries, TString header){
+  Long64_t step = nentries/20;
+  if( step < 200 )   step = 200;
+  if( step > 10000 ) step = 10000;
+
+  if(entry%step != 0 && (entry+1 != nentries) ) return;
+  
+  float progress_f = (float)(entry+1)/(float)(nentries)*100.;
+  char progress[10];
+  sprintf(progress, "%5.1f", progress_f);
+  cout << " Processing " << setw(50) << left << header << setw(6) << right << progress << " %      \r" << flush;
+  if(entry+1 == nentries) cout << endl;
+}
 
 
 
