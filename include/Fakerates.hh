@@ -94,7 +94,7 @@ public:
 	bool  fPUweight;
 	TString fLepTrigger;
 	bool  fLepTriggerMC;
-  bool  fCSA14;
+	bool  fCSA14;
 
         // FUNCTIONS
  	void doStuff(); // this one gets called by the executable
@@ -105,7 +105,7 @@ public:
 
 	bool fillFHist(float);
 	void fillFRPlots(float);
-        void fillHLTPlots(float);
+	void fillHLTPlots(float);
 	void fillFRPlotsTTBar(float);
 
 	// CUTS
@@ -156,17 +156,17 @@ public:
 	float getHT();
 	int getNJets(int);
 
-        // MET
+	// MET
 	void setMET(float);
 	void setMETPhi(float);
 	float getMET();
 	float getMETPhi();
 
-        // HELPER 
-        void fillPurities(int, float,float);
-        bool PassesHLT(int);
-        void fill2DWithoutOF(TH2F *&, float, float, float);
-        void printProgress(Long64_t, Long64_t, TString);
+	// HELPER 
+	void fillPurities(int, float,float);
+	bool PassesHLT(int);
+	void fill2DWithoutOF(TH2F *&, float, float, float);
+	void printProgress(Long64_t, Long64_t, TString);
 
 	std::vector<float>::const_iterator fITFloat;
 	std::vector<bool >::const_iterator fITBool;
@@ -286,21 +286,21 @@ public:
 	TH1F * h_Tight_FRMETZoomPt;
 	TH1F * h_Tight_METZoom[40];
   
-        // =============================
-        TH2F * h_FLoose_trig      [iNTRIGS];
-        TH2F * h_FTight_trig      [iNTRIGS];
-        TH1F * h_Tight_LepPt_trig [iNTRIGS];
-        TH1F * h_Tight_LepEta_trig[iNTRIGS];
-        TH1F * h_Loose_LepEta_trig[iNTRIGS];
-        TH1F * h_Loose_LepPt_trig [iNTRIGS];
-
-        TH1F * h_Purity           [iNTRIGS];
-        TH1F * h_Purity_LepPt     [iNTRIGS];
-        TH1F * h_Purity_JetPt     [iNTRIGS];
-        TH1F * h_Purity_JetRawPt  [iNTRIGS];
-        TH1F * h_Purity_DRLepJet  [iNTRIGS];
-        TH1F * h_Purity_MET       [iNTRIGS];
-        TH1F * h_Purity_MT        [iNTRIGS];
+	// =============================
+	TH2F * h_FLoose_trig      [iNTRIGS];
+	TH2F * h_FTight_trig      [iNTRIGS];
+	TH1F * h_Tight_LepPt_trig [iNTRIGS];
+	TH1F * h_Tight_LepEta_trig[iNTRIGS];
+	TH1F * h_Loose_LepEta_trig[iNTRIGS];
+	TH1F * h_Loose_LepPt_trig [iNTRIGS];
+	
+	TH1F * h_Purity           [iNTRIGS];
+	TH1F * h_Purity_LepPt     [iNTRIGS];
+	TH1F * h_Purity_JetPt     [iNTRIGS];
+	TH1F * h_Purity_JetRawPt  [iNTRIGS];
+	TH1F * h_Purity_DRLepJet  [iNTRIGS];
+	TH1F * h_Purity_MET       [iNTRIGS];
+	TH1F * h_Purity_MT        [iNTRIGS];
 
 	void bookHistos();
 	void writeHistos(TFile *);

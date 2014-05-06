@@ -305,7 +305,7 @@ void Fakerates::loop(TFile* pFile){
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events; jentry++) {
 		if(jentry > (fMaxSize>0?fMaxSize:Ngen)) break;
-		//printProgress(jentry,tot_events,fName);
+		printProgress(jentry,tot_events,fName);
 
 		tree_->GetEntry(jentry);
 		ntot++;
@@ -569,7 +569,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 	if(count) ++fCounter_veto;
 
 
-	if(count) cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), getAwayJet(0, lep), isTightLepton(lep), 0.0, -99.0, getMET(), getMT(lep)) << endl;
+	//if(count) cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), getAwayJet(0, lep), isTightLepton(lep), 0.0, -99.0, getMET(), getMT(lep)) << endl;
 
 
 	//cout << "check 5" << endl;
