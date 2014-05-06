@@ -5,13 +5,24 @@ ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetPaintTextFormat("4.5f")
 ROOT.TGaxis.SetMaxDigits(3)
 
-mycolor = ROOT.TColor()
-label = ['W', 'B', 'C', 'light-flavor', 'T', 'unmatched']
-h = [{} for i in range(len(label))]
-filename = 'ttbarevents_mu_noprompt'
+mycolor  = ROOT.TColor()
+label    = ['W', 'B', 'C', 'light-flavor', 'T', 'unmatched']
+index    = [6, 1, 2, 3, 4, 5, 0] # element 1 in lines goes to element 1 in values, element 0 goes nowhere, element 6 goes to 0
+values   = [0, 0, 0, 0, 0, 0, 0]
+h        = [{} for i in range(len(label))]
+filename = 'ttbar_mu_noprompt'
+
+fo    = open('Plots/' + filename + '.txt', 'r')
+lines = fo.readlines()
+
+for j, line in enumerate(lines):
+	if j>0:
+		split = line.split(': ')	
+		values[index[j]] = int(split[1])
+
 
 # ttbar    6, 1, 2, 3, 4, 5 (all = 0)
-values = [168, 1147208, 142021, 9468, 27, 11937] # mu !prompt (all = 1310829)
+#values = [168, 1147208, 142021, 9468, 27, 11937] # mu !prompt (all = 1310829)
 #values = [4960545, 1147208, 142021, 9468, 27, 710057] # mu prompt (all = 6969326)
 
 integral = sum(values[:])
@@ -45,7 +56,7 @@ t.SetTextSize(0.05)
 t.SetTextAlign(13)
 t.SetTextColor(ROOT.kBlack)
 
-for i in range(len(label)):
+for i in range(len(h)):
 	x = h[0].GetXaxis().GetBinCenter(i+1) - 0.1
 	t.DrawText(x, y, label[i])
 

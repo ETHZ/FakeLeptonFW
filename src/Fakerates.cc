@@ -305,7 +305,7 @@ void Fakerates::loop(TFile* pFile){
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events; jentry++) {
 		if(jentry > (fMaxSize>0?fMaxSize:Ngen)) break;
-		printProgress(jentry,tot_events,fName);
+		//printProgress(jentry,tot_events,fName);
 
 		tree_->GetEntry(jentry);
 		ntot++;
@@ -340,6 +340,10 @@ void Fakerates::loop(TFile* pFile){
 	cout << " fCounter_mt              = " << fCounter_mt      << " (" << (float) fCounter_mt      / (float) fCounter_all << ") " << endl;
 	cout << " fCounter_origin (ttbar)  = " << fCounter_origin  << " (" << (float) fCounter_origin  / (float) fCounter_all << ") " << endl;
 
+	ofstream ttbarfile;
+	ttbarfile.open("macros/Plots/ttbar_mu_noprompt.txt", ios::app);
+	ttbarfile << fName << ": " << fCounter_origin << endl;
+	ttbarfile.close();
 
 	delete file_, tree_;
 
@@ -699,7 +703,8 @@ int Fakerates::getMuonOrigin(int mid, int gmid){
 	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 550                    ) return 1;
 	else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 350                    ) return 3;
 	else if (mother == 6                                                                                     ) return 4;
-	else                                                                                                       return 5;
+	else if (grandmother == 24                                                                               ) return 6;
+	else cout << "MID: " << mother << " GMID: " << grandmother << endl;
 
 	//if      (grandmother == 24                                                                               ) return 6;
 	//else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
@@ -717,7 +722,7 @@ int Fakerates::getMuonOrigin(int mid, int gmid){
 	//else if (mother == 6                                                                                     ) return 4;
 	//else                                                                                                       return 5;
 
-	return 0;
+	return 5;
 }
 	
 
