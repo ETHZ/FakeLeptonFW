@@ -59,14 +59,42 @@ void Fakerates::init(bool verbose){
 	fCutflow_afterMETCut = 0;
 	fCutflow_afterMTCut  = 0;
 
-	fCounter_all    = 0;
-	fCounter_loose  = 0;
-	fCounter_veto   = 0;
-	fCounter_jet    = 0;
-	fCounter_jet30  = 0;
-	fCounter_met    = 0;
-	fCounter_mt     = 0;
-	fCounter_origin = 0;
+	fCounter_all         = 0;
+	fCounter_loose       = 0;
+	fCounter_veto        = 0;
+	fCounter_jet         = 0;
+	fCounter_jet30       = 0;
+	fCounter_met         = 0;
+	fCounter_mt          = 0;
+	fCounter_origin      = 0;
+
+	fCounter_origin_pl1   = 0;
+	fCounter_origin_pl2   = 0;
+	fCounter_origin_pl3   = 0;
+	fCounter_origin_pl4   = 0;
+	fCounter_origin_pl5   = 0;
+	fCounter_origin_pl6   = 0;
+
+	fCounter_origin_pt1   = 0;
+	fCounter_origin_pt2   = 0;
+	fCounter_origin_pt3   = 0;
+	fCounter_origin_pt4   = 0;
+	fCounter_origin_pt5   = 0;
+	fCounter_origin_pt6   = 0;
+
+	fCounter_origin_nl1   = 0;
+	fCounter_origin_nl2   = 0;
+	fCounter_origin_nl3   = 0;
+	fCounter_origin_nl4   = 0;
+	fCounter_origin_nl5   = 0;
+	fCounter_origin_nl6   = 0;
+
+	fCounter_origin_nt1   = 0;
+	fCounter_origin_nt2   = 0;
+	fCounter_origin_nt3   = 0;
+	fCounter_origin_nt4   = 0;
+	fCounter_origin_nt5   = 0;
+	fCounter_origin_nt6   = 0;
 
 	Util::SetStyle();
 	
@@ -315,13 +343,13 @@ void Fakerates::loop(TFile* pFile){
 
 		//smearAllJets(); // Jet-Energy Smearing, leave commented for snyching
 
-		if(strstr(fName, "ttbar")) {
+		//if(strstr(fName, "ttbar")) {
 			fillFRPlotsTTBar(eventweight);
-		}
-		else {
-			fillFRPlots(eventweight);
-			//fillHLTPlots(eventweight);
-		}
+		//}
+		//else {
+		//	fillFRPlots(eventweight);
+		//	//fillHLTPlots(eventweight);
+		//}
 	}
 
 	cout << " mu: nevents passing lepton selection: " << fCutflow_afterLepSel << endl;
@@ -341,8 +369,11 @@ void Fakerates::loop(TFile* pFile){
 	cout << " fCounter_origin (ttbar)  = " << fCounter_origin  << " (" << (float) fCounter_origin  / (float) fCounter_all << ") " << endl;
 
 	ofstream ttbarfile;
-	ttbarfile.open("macros/Plots/ttbar_mu_noprompt.txt", ios::app);
-	ttbarfile << fName << ": " << fCounter_origin << endl;
+	ttbarfile.open("macros/Plots/qcd_mu_counters.txt", ios::app);
+	ttbarfile << fName << ": " << fCounter_origin_pl1 << "," << fCounter_origin_pl2 << ","  << fCounter_origin_pl3 << ","  << fCounter_origin_pl4 << ","  << fCounter_origin_pl5 << "," << fCounter_origin_pl6 << endl;
+	ttbarfile << fName << ": " << fCounter_origin_nl1 << "," << fCounter_origin_nl2 << ","  << fCounter_origin_nl3 << ","  << fCounter_origin_nl4 << ","  << fCounter_origin_nl5 << "," << fCounter_origin_nl6 << endl;
+	ttbarfile << fName << ": " << fCounter_origin_pt1 << "," << fCounter_origin_pt2 << ","  << fCounter_origin_pt3 << ","  << fCounter_origin_pt4 << ","  << fCounter_origin_pt5 << "," << fCounter_origin_pt6 << endl;
+	ttbarfile << fName << ": " << fCounter_origin_nt1 << "," << fCounter_origin_nt2 << ","  << fCounter_origin_nt3 << ","  << fCounter_origin_nt4 << ","  << fCounter_origin_nt5 << "," << fCounter_origin_nt6 << endl;
 	ttbarfile.close();
 
 	delete file_, tree_;
@@ -538,6 +569,13 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 	if(count) ++fCounter_trigger;
 
 	//cout << "check 1" << endl;
+	
+	//if(count && Run == 203912 && Lumi == 229 && Event == 281860639) {
+	//	cout << "this event is still here after trigger!" << endl;
+	//	for(int j=0; j < LepPt->size(); ++j)
+	//		cout << "j: " << isLooseLepton(j) << ": " << ElIsLoose->at(j) << ": " << ElPFIso->at(j) << ": " << LepPt->at(j) << endl;
+	//}
+
 
 	// muon Pt is not reasonable then return false
 	if(LepPt->size() < 1) return false;
@@ -551,7 +589,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 			lep = j;
 			looselep_inds.push_back(j);		
 		}
-		else if(isLooseLepton(j) && LepPt->at(j) < fLepPtCut){
+		else if(isLooseLepton(j) && LepPt->at(j) > 10.){
 			++nveto_add;
 		}
 
@@ -573,7 +611,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 	if(count) ++fCounter_veto;
 
 
-	//if(count) cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), getAwayJet(0, lep), isTightLepton(lep), 0.0, -99.0, getMET(), getMT(lep)) << endl;
+	if(count) cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), getAwayJet(0, lep), isTightLepton(lep), 0.0, -99.0, getMET(), getMT(lep)) << endl;
 
 
 	//cout << "check 5" << endl;
@@ -694,14 +732,14 @@ int Fakerates::getMuonOrigin(int mid, int gmid){
 
 	if      (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
 	else if (grandmother >= 5000 && grandmother <= 5999                                                      ) return 1;
-	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 450) return 2;
-	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 550) return 1;
+	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 499) return 2;
+	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 599) return 1;
 	else if (mother == 24                                                                                    ) return 6;
 	else if (mother >= 4000 && mother <= 4999                                                                ) return 2;
 	else if (mother >= 5000 && mother <= 5999                                                                ) return 1;
-	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 450                    ) return 2;
-	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 550                    ) return 1;
-	else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 350                    ) return 3;
+	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 499                    ) return 2;
+	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 599                    ) return 1;
+	else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 399                    ) return 3;
 	else if (mother == 6                                                                                     ) return 4;
 	else if (grandmother == 24                                                                               ) return 6;
 	else cout << "MID: " << mother << " GMID: " << grandmother << endl;
@@ -1744,27 +1782,61 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 	else if(strstr(fName, "ttbar6")) origin = 6; // W
 
 
-	// fill Plots for all loose leptons in the event
 
-	//int counted = 0;
+	// prompt counters
+
+	for(int j=0; j < LepPt->size(); ++j){
+
+		if(!MuIsLoose->at(j))  continue;
+		if(!MuIsPrompt->at(j)) continue;
+
+		int thisorigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
+
+		if     (thisorigin == 1) ++fCounter_origin_pl1;
+		else if(thisorigin == 2) ++fCounter_origin_pl2;
+		else if(thisorigin == 3) ++fCounter_origin_pl3;
+		else if(thisorigin == 4) ++fCounter_origin_pl4;
+		else if(thisorigin == 5) ++fCounter_origin_pl5;
+		else if(thisorigin == 6) ++fCounter_origin_pl6;
+
+		if(!MuIsTight->at(j)) continue;
+
+		if     (thisorigin == 1) ++fCounter_origin_pt1;
+		else if(thisorigin == 2) ++fCounter_origin_pt2;
+		else if(thisorigin == 3) ++fCounter_origin_pt3;
+		else if(thisorigin == 4) ++fCounter_origin_pt4;
+		else if(thisorigin == 5) ++fCounter_origin_pt5;
+		else if(thisorigin == 6) ++fCounter_origin_pt6;
+
+	}
+
+
+
+	// fill Plots for all loose leptons in the event
 
 	for(int j=0; j < LepPt->size(); ++j){
 
 
 		// loose lepton
+
 		if(!isLooseLeptonTTBar(j)) continue;
+
+		int thisorigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
+
+		if     (thisorigin == 1) ++fCounter_origin_nl1;
+		else if(thisorigin == 2) ++fCounter_origin_nl2;
+		else if(thisorigin == 3) ++fCounter_origin_nl3;
+		else if(thisorigin == 4) ++fCounter_origin_nl4;
+		else if(thisorigin == 5) ++fCounter_origin_nl5;
+		else if(thisorigin == 6) ++fCounter_origin_nl6;
 
 
 		// lepton origin
 
-		int thisorigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
 		//cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (thisorigin == 0 || (origin != 0 && thisorigin != origin)) << endl;
+
 		if(thisorigin == 0 || (origin != 0 && thisorigin != origin)) continue;
-
-		//if(counted==0) ++fCounter_origin;
-		//++counted;
 		++fCounter_origin;
-
 
 
 		// fill histogram
@@ -1785,6 +1857,12 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 		// tight lepton
 		if(!isTightLeptonTTBar(j)) continue;
 
+		if     (thisorigin == 1) ++fCounter_origin_nt1;
+		else if(thisorigin == 2) ++fCounter_origin_nt2;
+		else if(thisorigin == 3) ++fCounter_origin_nt3;
+		else if(thisorigin == 4) ++fCounter_origin_nt4;
+		else if(thisorigin == 5) ++fCounter_origin_nt5;
+		else if(thisorigin == 6) ++fCounter_origin_nt6;
 
 		// fill histograms
 

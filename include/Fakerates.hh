@@ -330,6 +330,34 @@ public:
 	int fCounter_mt;
 	int fCounter_origin;
 
+	int fCounter_origin_pl1;
+	int fCounter_origin_pl2;
+	int fCounter_origin_pl3;
+	int fCounter_origin_pl4;
+	int fCounter_origin_pl5;
+	int fCounter_origin_pl6;
+
+	int fCounter_origin_pt1;
+	int fCounter_origin_pt2;
+	int fCounter_origin_pt3;
+	int fCounter_origin_pt4;
+	int fCounter_origin_pt5;
+	int fCounter_origin_pt6;
+
+	int fCounter_origin_nl1;
+	int fCounter_origin_nl2;
+	int fCounter_origin_nl3;
+	int fCounter_origin_nl4;
+	int fCounter_origin_nl5;
+	int fCounter_origin_nl6;
+
+	int fCounter_origin_nt1;
+	int fCounter_origin_nt2;
+	int fCounter_origin_nt3;
+	int fCounter_origin_nt4;
+	int fCounter_origin_nt5;
+	int fCounter_origin_nt6;
+
 	// Binning for FakeRate Projection Plots
 	std::vector<float> fFRbinseta;
 	std::vector<float> fFRbinspt;
