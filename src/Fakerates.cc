@@ -369,7 +369,7 @@ void Fakerates::loop(TFile* pFile){
 	cout << " fCounter_origin (ttbar)  = " << fCounter_origin  << " (" << (float) fCounter_origin  / (float) fCounter_all << ") " << endl;
 
 	ofstream ttbarfile;
-	ttbarfile.open("macros/Plots/qcd_mu_counters.txt", ios::app);
+	ttbarfile.open("macros/Plots/ttbar_mu_counters.txt", ios::app);
 	ttbarfile << fName << ": " << fCounter_origin_pl1 << "," << fCounter_origin_pl2 << ","  << fCounter_origin_pl3 << ","  << fCounter_origin_pl4 << ","  << fCounter_origin_pl5 << "," << fCounter_origin_pl6 << endl;
 	ttbarfile << fName << ": " << fCounter_origin_nl1 << "," << fCounter_origin_nl2 << ","  << fCounter_origin_nl3 << ","  << fCounter_origin_nl4 << ","  << fCounter_origin_nl5 << "," << fCounter_origin_nl6 << endl;
 	ttbarfile << fName << ": " << fCounter_origin_pt1 << "," << fCounter_origin_pt2 << ","  << fCounter_origin_pt3 << ","  << fCounter_origin_pt4 << ","  << fCounter_origin_pt5 << "," << fCounter_origin_pt6 << endl;
@@ -730,7 +730,10 @@ int Fakerates::getMuonOrigin(int mid, int gmid){
 	int mother_3dig      = mother % 1000;
 	int grandmother_3dig = grandmother % 1000;
 
-	if      (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
+	if      (grandmother == 4                                                                                ) return 2;
+	else if (grandmother == 5                                                                                ) return 1;
+	else if (grandmother == 1 || grandmother == 2 || grandmother == 3                                        ) return 3;
+	else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
 	else if (grandmother >= 5000 && grandmother <= 5999                                                      ) return 1;
 	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 499) return 2;
 	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 599) return 1;
