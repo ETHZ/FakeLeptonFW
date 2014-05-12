@@ -9,7 +9,7 @@ g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2 -I. -pthread -m
  verbose level is:   2
  config file is:     config/ETH/corrected_jet/PUweight_runD/Mu17/0.config
  inputfile is:       /shome/cheidegg/FakeTrees/TTJets_complete.root
- name is:            el_ttbar0
+ name is:            mu_ttbar0
  running on mc
  particles are:      1
  xsec is:            245
@@ -2138,7 +2138,7 @@ MID: 92 GMID: 21
  fCounter_met             = 0 (0) 
  fCounter_mt              = 0 (0) 
  fCounter_origin (ttbar)  = 1310829 (0.12762) 
-Creating directory el_ttbar0
+Creating directory mu_ttbar0
  done ...                                              
 =======================================================
 =======================================================

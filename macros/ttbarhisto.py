@@ -63,7 +63,7 @@ hpf       = [{} for i in range(len(label))]
 hnl       = [{} for i in range(len(label))]
 hnt       = [{} for i in range(len(label))]
 hnf       = [{} for i in range(len(label))]
-filename  = 'qcd_mu_counters'
+filename  = 'ttbar_el_counters'
 
 
 
