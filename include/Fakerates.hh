@@ -119,29 +119,31 @@ public:
 	std::vector<float, std::allocator<float> >* getLepPFIso();
 	std::vector<float, std::allocator<float> >* getLepD0();
 	std::vector<float, std::allocator<float> >* getOpLepPt();
+	std::vector<int, std::allocator<int> >* getLepMID();
+	std::vector<int, std::allocator<int> >* getLepGMID();
 
 	bool isFRRegionLepEvent(int&, int&, float, bool);
 	bool isFRRegionLepEventTTBar(int);
 
 	// LEPTON 
-	int  getMuonOrigin(int, int);
+	int  getLeptonOrigin(int, int);
 
 	bool isLooseMuon(int);	
 	bool isLooseElectron(int);
 	bool isLooseLepton(int);
 	bool isLooseOpLepton(int);
 
-	bool isLooseMuonTTBar(int);	
-	bool isLooseElectronTTBar(int);
-	bool isLooseLeptonTTBar(int);
+	bool isLooseMuonTTBar(int, bool);	
+	bool isLooseElectronTTBar(int, bool);
+	bool isLooseLeptonTTBar(int, bool);
 
 	bool isTightMuon(int);
 	bool isTightElectron(int);
 	bool isTightLepton(int);
 
-	bool isTightMuonTTBar(int);
-	bool isTightElectronTTBar(int);
-	bool isTightLeptonTTBar(int);
+	bool isTightMuonTTBar(int, bool);
+	bool isTightElectronTTBar(int, bool);
+	bool isTightLeptonTTBar(int, bool);
 
 	// JETS
 	float getJetPt(int);	

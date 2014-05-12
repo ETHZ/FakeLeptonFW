@@ -343,13 +343,13 @@ void Fakerates::loop(TFile* pFile){
 
 		//smearAllJets(); // Jet-Energy Smearing, leave commented for snyching
 
-		//if(strstr(fName, "ttbar")) {
-			fillFRPlotsTTBar(eventweight);
-		//}
-		//else {
-		//	fillFRPlots(eventweight);
-		//	//fillHLTPlots(eventweight);
-		//}
+		if(strstr(fName, "ttbar")) {
+		  fillFRPlotsTTBar(eventweight);
+		}
+		else {
+			fillFRPlots(eventweight);
+			//fillHLTPlots(eventweight);
+		}
 	}
 
 	cout << " mu: nevents passing lepton selection: " << fCutflow_afterLepSel << endl;
@@ -368,13 +368,13 @@ void Fakerates::loop(TFile* pFile){
 	cout << " fCounter_mt              = " << fCounter_mt      << " (" << (float) fCounter_mt      / (float) fCounter_all << ") " << endl;
 	cout << " fCounter_origin (ttbar)  = " << fCounter_origin  << " (" << (float) fCounter_origin  / (float) fCounter_all << ") " << endl;
 
-	ofstream ttbarfile;
-	ttbarfile.open("macros/Plots/ttbar_mu_counters.txt", ios::app);
-	ttbarfile << fName << ": " << fCounter_origin_pl1 << "," << fCounter_origin_pl2 << ","  << fCounter_origin_pl3 << ","  << fCounter_origin_pl4 << ","  << fCounter_origin_pl5 << "," << fCounter_origin_pl6 << endl;
-	ttbarfile << fName << ": " << fCounter_origin_nl1 << "," << fCounter_origin_nl2 << ","  << fCounter_origin_nl3 << ","  << fCounter_origin_nl4 << ","  << fCounter_origin_nl5 << "," << fCounter_origin_nl6 << endl;
-	ttbarfile << fName << ": " << fCounter_origin_pt1 << "," << fCounter_origin_pt2 << ","  << fCounter_origin_pt3 << ","  << fCounter_origin_pt4 << ","  << fCounter_origin_pt5 << "," << fCounter_origin_pt6 << endl;
-	ttbarfile << fName << ": " << fCounter_origin_nt1 << "," << fCounter_origin_nt2 << ","  << fCounter_origin_nt3 << ","  << fCounter_origin_nt4 << ","  << fCounter_origin_nt5 << "," << fCounter_origin_nt6 << endl;
-	ttbarfile.close();
+	//ofstream ttbarfile;
+	//ttbarfile.open("macros/Plots/ttbar_mu_counters.txt", ios::app);
+	//ttbarfile << fName << ": " << fCounter_origin_pl1 << "," << fCounter_origin_pl2 << ","  << fCounter_origin_pl3 << ","  << fCounter_origin_pl4 << ","  << fCounter_origin_pl5 << "," << fCounter_origin_pl6 << endl;
+	//ttbarfile << fName << ": " << fCounter_origin_nl1 << "," << fCounter_origin_nl2 << ","  << fCounter_origin_nl3 << ","  << fCounter_origin_nl4 << ","  << fCounter_origin_nl5 << "," << fCounter_origin_nl6 << endl;
+	//ttbarfile << fName << ": " << fCounter_origin_pt1 << "," << fCounter_origin_pt2 << ","  << fCounter_origin_pt3 << ","  << fCounter_origin_pt4 << ","  << fCounter_origin_pt5 << "," << fCounter_origin_pt6 << endl;
+	//ttbarfile << fName << ": " << fCounter_origin_nt1 << "," << fCounter_origin_nt2 << ","  << fCounter_origin_nt3 << ","  << fCounter_origin_nt4 << ","  << fCounter_origin_nt5 << "," << fCounter_origin_nt6 << endl;
+	//ttbarfile.close();
 
 	delete file_, tree_;
 
@@ -534,6 +534,32 @@ std::vector<float, std::allocator<float> >* Fakerates::getLepD0() {
 
 
 //____________________________________________________________________________
+std::vector<int, std::allocator<int> >* Fakerates::getLepMID() {
+	/*
+	return MID of the lepton
+	parameters: none
+	return: MID
+	*/
+
+	if(fDataType == 2) return ElMID;
+	else               return MuMID;
+}
+
+
+//____________________________________________________________________________
+std::vector<int, std::allocator<int> >* Fakerates::getLepGMID() {
+	/*
+	return GMID of the lepton
+	parameters: none
+	return: GMID
+	*/
+
+	if(fDataType == 2) return ElGMID;
+	else               return MuGMID;
+}
+
+
+//____________________________________________________________________________
 bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count = false){
 	/*
 	checks, whether the event contains exactly one lepton and at least one away-jet in the calibration region
@@ -611,7 +637,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 	if(count) ++fCounter_veto;
 
 
-	if(count) cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), getAwayJet(0, lep), isTightLepton(lep), 0.0, -99.0, getMET(), getMT(lep)) << endl;
+	//if(count) cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), getAwayJet(0, lep), isTightLepton(lep), 0.0, -99.0, getMET(), getMT(lep)) << endl;
 
 
 	//cout << "check 5" << endl;
@@ -718,10 +744,10 @@ bool Fakerates::isFRRegionLepEventTTBar(int origin = 0){
 
 
 //____________________________________________________________________________
-int Fakerates::getMuonOrigin(int mid, int gmid){
+int Fakerates::getLeptonOrigin(int mid, int gmid){
 	/*
-	returns the original quark flavor of the muon
-	parameters: none
+	returns the original quark flavor of the lepton
+	parameters: mid (mother id), gmid (grandmother id)
 	return: (0 is reserved for all), 1 (bottom), 2 (charm), 3 (other, light-flavor), 4 (other, top), 5 (other, unidentified), 6 (W)
 	*/ 
 
@@ -745,7 +771,7 @@ int Fakerates::getMuonOrigin(int mid, int gmid){
 	else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 399                    ) return 3;
 	else if (mother == 6                                                                                     ) return 4;
 	else if (grandmother == 24                                                                               ) return 6;
-	else cout << "MID: " << mother << " GMID: " << grandmother << endl;
+	else return 5; //cout << "MID: " << mother << " GMID: " << grandmother << endl;
 
 	//if      (grandmother == 24                                                                               ) return 6;
 	//else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
@@ -826,42 +852,44 @@ bool Fakerates::isLooseOpLepton(int index){
 
 
 //____________________________________________________________________________
-bool Fakerates::isLooseMuonTTBar(int index){
+bool Fakerates::isLooseMuonTTBar(int index, bool checkforprompt = false){
 	/* 
 	checks, if the muon in the ttbar sample is loose
-	parameters: index (index of the particle)
+	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
 	return: true (if muon is loose), false (else)
 	*/
 
 	if(!MuIsLoose->at(index)) return false;
-	if(MuIsPrompt->at(index)) return false;
+	if(checkforprompt  && !MuIsPrompt->at(index)) return false;
+	if(!checkforprompt && MuIsPrompt->at(index) ) return false;
 	return true;
 }
 
 
 //____________________________________________________________________________
-bool Fakerates::isLooseElectronTTBar(int index){
+bool Fakerates::isLooseElectronTTBar(int index, bool checkforprompt = false){
 	/* 
 	checks, if the electron in the ttbar sample is loose
-	parameters: index (index of the particle)
+	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
 	return: true (if electron is loose), false (else)
 	*/
 
 	if(!ElIsLoose->at(index)) return false;
-	if(ElIsPrompt->at(index)) return false;
+	if(checkforprompt  && !ElIsPrompt->at(index)) return false;
+	if(!checkforprompt && ElIsPrompt->at(index) ) return false;
 	return true;
 }
 
 //____________________________________________________________________________
-bool Fakerates::isLooseLeptonTTBar(int index){
+bool Fakerates::isLooseLeptonTTBar(int index, bool checkforprompt = false){
 	/* 
 	checks, if the lepton in the ttbar sample is loose
-	parameters: index (index of the particle)
+	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
 	return: true (if lepton is loose), false (else)
 	*/
 
-	if(fDataType == 2) return isLooseElectronTTBar(index);
-	else return isLooseMuonTTBar(index);
+	if(fDataType == 2) return isLooseElectronTTBar(index, checkforprompt);
+	else return isLooseMuonTTBar(index, checkforprompt);
 }
 
 
@@ -912,14 +940,14 @@ bool Fakerates::isTightLepton(int index){
 
 
 //____________________________________________________________________________
-bool Fakerates::isTightMuonTTBar(int index){
+bool Fakerates::isTightMuonTTBar(int index, bool checkforprompt = false){
 	/* 
 	checks, if the muon in the ttbar sample is tight
-	parameters: index (index of the particle)
+	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
 	return: true (if muon is tight), false (else)
 	*/
 
-	if(!isLooseMuon(index)) return false;
+	if(!isLooseMuonTTBar(index, checkforprompt)) return false;
 	if(!MuIsTight->at(index)) return false;
 
 	return true;
@@ -927,14 +955,14 @@ bool Fakerates::isTightMuonTTBar(int index){
 
 
 //____________________________________________________________________________
-bool Fakerates::isTightElectronTTBar(int index){
+bool Fakerates::isTightElectronTTBar(int index, bool checkforprompt = false){
 	/* 
 	checks, if the electron in the ttbar sample is tight
-	parameters: index (index of the particle)
+	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
 	return: true (if electron is tight), false (else)
 	*/
 
-	if(!isLooseElectron(index)) return false;
+	if(!isLooseElectronTTBar(index, checkforprompt)) return false;
 	if(!ElIsTight->at(index)) return false;
 
 	return true;
@@ -942,15 +970,15 @@ bool Fakerates::isTightElectronTTBar(int index){
 
 
 //____________________________________________________________________________
-bool Fakerates::isTightLeptonTTBar(int index){
+bool Fakerates::isTightLeptonTTBar(int index, bool checkforprompt = false){
 	/* 
 	checks, if the lepton in the ttbar sample is tight
-	parameters: index (index of the particle)
+	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
 	return: true (if lepton is tight), false (else)
 	*/
 
-	if(fDataType == 2) return isTightElectronTTBar(index);
-	else return isTightMuonTTBar(index);
+	if(fDataType == 2) return isTightElectronTTBar(index, checkforprompt);
+	else return isTightMuonTTBar(index, checkforprompt);
 
 }
 
@@ -1753,6 +1781,8 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
 	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
 	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
+	std::vector<int, std::allocator<int> >* LepMID       = getLepMID();
+	std::vector<int, std::allocator<int> >* LepGMID      = getLepGMID();
 
 
 	++fCounter_all;
@@ -1790,10 +1820,9 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 	for(int j=0; j < LepPt->size(); ++j){
 
-		if(!MuIsLoose->at(j))  continue;
-		if(!MuIsPrompt->at(j)) continue;
+		if(!isLooseLeptonTTBar(j, true)) continue;
 
-		int thisorigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
+		int thisorigin = getLeptonOrigin(LepMID->at(j), LepGMID->at(j));
 
 		if     (thisorigin == 1) ++fCounter_origin_pl1;
 		else if(thisorigin == 2) ++fCounter_origin_pl2;
@@ -1802,7 +1831,7 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 		else if(thisorigin == 5) ++fCounter_origin_pl5;
 		else if(thisorigin == 6) ++fCounter_origin_pl6;
 
-		if(!MuIsTight->at(j)) continue;
+		if(!isTightLeptonTTBar(j, true)) continue;
 
 		if     (thisorigin == 1) ++fCounter_origin_pt1;
 		else if(thisorigin == 2) ++fCounter_origin_pt2;
@@ -1824,7 +1853,7 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 		if(!isLooseLeptonTTBar(j)) continue;
 
-		int thisorigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
+		int thisorigin = getLeptonOrigin(LepMID->at(j), LepGMID->at(j));
 
 		if     (thisorigin == 1) ++fCounter_origin_nl1;
 		else if(thisorigin == 2) ++fCounter_origin_nl2;

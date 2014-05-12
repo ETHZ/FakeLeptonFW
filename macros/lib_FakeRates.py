@@ -79,7 +79,7 @@ def make2dFRPlot(dataType, canv, outputDir, dataset, hist, title_indeces, name='
 	hist.SetMinimum(0.0)
 	if dataType == 'el': hist.SetMaximum(0.6)
 	else               : hist.SetMaximum(0.4)
-	hist.SetTitle("FR 2d Map (" + name + ")")
+	hist.SetTitle("FR 2d Map (" + helper.getLegendName(name) + ")")
 	helper.saveCanvas(canv, pad_plot, outputDir + "fakerates_2d/", "FR_2dmap_" + name.lower().replace(" ", "_"), False, exportinroot)
 	pad_plot.Close()
 
@@ -495,22 +495,22 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 
 
 	# plot 2d maps
-	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data  , title_indeces, 'data' , True)
-	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mc    , title_indeces, 'MC'   , True)
-	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcsub , title_indeces, 'QCD'        )
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data  , title_indeces, 'data', True)
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mc    , title_indeces, 'mc'  , True)
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcsub , title_indeces, mcsubtractplot[0].GetName())
 
 	if len(mcsetsplot)>0:
 		for j in range(len(mcsetsplot)):
-			make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcplot[j], title_indeces, mcsetsplot[j].GetName().lstrip(dataType + '_'), True)
+			make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcplot[j], title_indeces, mcsetsplot[j].GetName(), True)
 
 	if len(mcsubtract)>0: 
-		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub, title_indeces, 'data-EW')
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub, title_indeces, 'datamcsub')
 
 	if mcsubtractscales:
-		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c1, title_indeces, 'data-EW central1', True)
-		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_l1, title_indeces, 'data-EW lower1'        )
-		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_u1, title_indeces, 'data-EW upper1'        )
-		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c2, title_indeces, 'data-EW central2'      )
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c1, title_indeces, 'datamcsub_central1', True)
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_l1, title_indeces, 'datamcsub_lower1'        )
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_u1, title_indeces, 'datamcsub_upper1'        )
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c2, title_indeces, 'datamcsub_central2'      )
 
 
 

@@ -53,15 +53,19 @@ if dataType == 'el':
 	ttbar0      = sample('el_ttbar0'       , inputDir + 'el_ttbar0_ratios.root'     )
 	ttbar1      = sample('el_ttbar1'       , inputDir + 'el_ttbar1_ratios.root'     )
 	ttbar2      = sample('el_ttbar2'       , inputDir + 'el_ttbar2_ratios.root'     )
+	ttbar3      = sample('el_ttbar3'       , inputDir + 'el_ttbar3_ratios.root'     )
+	ttbar4      = sample('el_ttbar4'       , inputDir + 'el_ttbar4_ratios.root'     )
+	ttbar5      = sample('el_ttbar5'       , inputDir + 'el_ttbar5_ratios.root'     )
+	ttbar6      = sample('el_ttbar6'       , inputDir + 'el_ttbar6_ratios.root'     )
 
-	qcdtot50    = sample('el_qcdtot50'     , inputDir + 'el_qcdtot50_ratios.root'   )
-	qcdtot80    = sample('el_qcdtot80'     , inputDir + 'el_qcdtot80_ratios.root'   )
-	qcdtot120   = sample('el_qcdtot120'    , inputDir + 'el_qcdtot120_ratios.root'  )
-	qcdtot170   = sample('el_qcdtot170'    , inputDir + 'el_qcdtot170_ratios.root'  )
-	qcdtot170v2 = sample('el_qcdtot170v2'  , inputDir + 'el_qcdtot170v2_ratios.root')
-	qcdtot300   = sample('el_qcdtot300'    , inputDir + 'el_qcdtot300_ratios.root'  )
-	qcdtot300v2 = sample('el_qcdtot300v2'  , inputDir + 'el_qcdtot300v2_ratios.root')
-	qcdtot300v3 = sample('el_qcdtot300v3'  , inputDir + 'el_qcdtot300v3_ratios.root')
+	#qcdtot50    = sample('el_qcdtot50'     , inputDir + 'el_qcdtot50_ratios.root'   )
+	#qcdtot80    = sample('el_qcdtot80'     , inputDir + 'el_qcdtot80_ratios.root'   )
+	#qcdtot120   = sample('el_qcdtot120'    , inputDir + 'el_qcdtot120_ratios.root'  )
+	#qcdtot170   = sample('el_qcdtot170'    , inputDir + 'el_qcdtot170_ratios.root'  )
+	#qcdtot170v2 = sample('el_qcdtot170v2'  , inputDir + 'el_qcdtot170v2_ratios.root')
+	#qcdtot300   = sample('el_qcdtot300'    , inputDir + 'el_qcdtot300_ratios.root'  )
+	#qcdtot300v2 = sample('el_qcdtot300v2'  , inputDir + 'el_qcdtot300v2_ratios.root')
+	#qcdtot300v3 = sample('el_qcdtot300v3'  , inputDir + 'el_qcdtot300v3_ratios.root')
 
 	qcdem20     = sample('el_qcdemenr20'   , inputDir + 'el_qcdemenr20_ratios.root' ) 
 	qcdem30     = sample('el_qcdemenr30'   , inputDir + 'el_qcdemenr30_ratios.root' )
@@ -77,14 +81,14 @@ if dataType == 'el':
 	data_samples.append(data)
 
 	mc_samples = []
-	mc_samples.append(qcdtot50   )
-	mc_samples.append(qcdtot80   )
-	mc_samples.append(qcdtot120  )
-	mc_samples.append(qcdtot170  )
-	mc_samples.append(qcdtot170v2)
-	mc_samples.append(qcdtot300  )
-	mc_samples.append(qcdtot300v2)
-	mc_samples.append(qcdtot300v3)
+	#mc_samples.append(qcdtot50   )
+	#mc_samples.append(qcdtot80   )
+	#mc_samples.append(qcdtot120  )
+	#mc_samples.append(qcdtot170  )
+	#mc_samples.append(qcdtot170v2)
+	#mc_samples.append(qcdtot300  )
+	#mc_samples.append(qcdtot300v2)
+	#mc_samples.append(qcdtot300v3)
 
 	mc_samples.append(qcdem20    )
 	mc_samples.append(qcdem30    )
@@ -103,14 +107,14 @@ if dataType == 'el':
 
 	qcd_samples = []	
 
-	qcd_samples.append(qcdtot50   )
-	qcd_samples.append(qcdtot80   )
-	qcd_samples.append(qcdtot120  )
-	qcd_samples.append(qcdtot170  )
-	qcd_samples.append(qcdtot170v2)
-	qcd_samples.append(qcdtot300  )
-	qcd_samples.append(qcdtot300v2)
-	qcd_samples.append(qcdtot300v3)
+	#qcd_samples.append(qcdtot50   )
+	#qcd_samples.append(qcdtot80   )
+	#qcd_samples.append(qcdtot120  )
+	#qcd_samples.append(qcdtot170  )
+	#qcd_samples.append(qcdtot170v2)
+	#qcd_samples.append(qcdtot300  )
+	#qcd_samples.append(qcdtot300v2)
+	#qcd_samples.append(qcdtot300v3)
 
 	qcd_samples.append(qcdem20    )
 	qcd_samples.append(qcdem30    )
@@ -131,6 +135,10 @@ else:
 	ttbar0     = sample('mu_ttbar0'       , inputDir + 'mu_ttbar0_ratios.root')
 	ttbar1     = sample('mu_ttbar1'       , inputDir + 'mu_ttbar1_ratios.root')
 	ttbar2     = sample('mu_ttbar2'       , inputDir + 'mu_ttbar2_ratios.root')
+	ttbar3     = sample('mu_ttbar3'       , inputDir + 'mu_ttbar3_ratios.root')
+	ttbar4     = sample('mu_ttbar4'       , inputDir + 'mu_ttbar4_ratios.root')
+	ttbar5     = sample('mu_ttbar5'       , inputDir + 'mu_ttbar5_ratios.root')
+	ttbar6     = sample('mu_ttbar6'       , inputDir + 'mu_ttbar6_ratios.root')
 
 	data_samples = []
 	data_samples.append(data)
@@ -311,14 +319,14 @@ if module == 'compare' or module == 'all':
 # compute and plot FR for every variable
 
 if module == 'fakerates_1d' or module == 'all':
-	FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [ttbar0, ttbar1, ttbar2], [wjets, dyjets50, dyjets10], qcd_samples, True)
+	FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [ttbar0, ttbar1, ttbar2, ttbar3], [wjets, dyjets50, dyjets10], qcd_samples, True)
 
 
 
 # compute and plot FR 2d Map (+ Projections)
 
 if module == 'fakerates_2d' or module == 'all':
-	FR.Plot2dFRMap(dataType, outputDir, module, data_samples, mc_samples, [ttbar0, ttbar1, ttbar2], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
+	FR.Plot2dFRMap(dataType, outputDir, module, data_samples, mc_samples, [ttbar0, ttbar1, ttbar2, ttbar3], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
 
 #if module == 'fakerates_2d' or module == 'all': # testing PUweight_full
 #	FR.Plot2dFRMap(dataType, outputDir, module, [data1, data2, data3, data4, data5], [], [], [], [], False, False)
