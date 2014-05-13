@@ -343,7 +343,8 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 			title_indeces[1] = i
 		if hist.GetName() == 'h_Loose_LepPt':
 			title_indeces[0] = i
-			
+		
+	
 		# Get Numerator Plots
 		if 'h_FTight' in hist.GetName():
 
@@ -495,22 +496,22 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 
 
 	# plot 2d maps
-	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data  , title_indeces, 'data', True)
-	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mc    , title_indeces, 'mc'  , True)
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data  , title_indeces, 'data')
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mc    , title_indeces, 'mc'  )
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcsub , title_indeces, mcsubtractplot[0].GetName())
 
 	if len(mcsetsplot)>0:
 		for j in range(len(mcsetsplot)):
-			make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcplot[j], title_indeces, mcsetsplot[j].GetName(), True)
+			make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcplot[j], title_indeces, mcsetsplot[j].GetName())
 
 	if len(mcsubtract)>0: 
 		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub, title_indeces, 'datamcsub')
 
 	if mcsubtractscales:
-		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c1, title_indeces, 'datamcsub_central1', True)
-		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_l1, title_indeces, 'datamcsub_lower1'        )
-		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_u1, title_indeces, 'datamcsub_upper1'        )
-		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c2, title_indeces, 'datamcsub_central2'      )
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c1, title_indeces, 'datamcsub_central1')
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_l1, title_indeces, 'datamcsub_lower1'  )
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_u1, title_indeces, 'datamcsub_upper1'  )
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c2, title_indeces, 'datamcsub_central2')
 
 
 
@@ -654,6 +655,149 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 
 
 	return True
+
+
+
+
+
+def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], mcsubtract = [], mcsubtractplot = []):
+	# attention: when calling this function with substraction of certain MC (e.g. electroweak)
+	#            you need to make sure that the monte carlo you want to substract already has
+	#            been given in mcsets as well
+
+
+	central1 = 1.0
+	lower    = 1.0
+	upper    = 1.0
+	central2 = 1.0
+
+	# this part needs adjustment
+	scfirst  = fit.getMCScaleFactorSimultaneouslyWithErrors(datasets, mcsubtractplot, mcsubtract)
+	central1 = scfirst[0][1]
+	lower    = scfirst[1][1]
+	upper    = scfirst[2][1]
+	scsecond = fit.getMCScaleFactorMutually(mcsubtract, 'h_Tight_MTMET30', datasets, mcsubtractplot, 60, 100)
+	central2 = scsecond[0]
+
+	#print "------**------"
+	#print "qcd       = " + str(scfirst[0][0])
+	#print "central 1 = " + str(central1)
+	#print "lower   1 = " + str(lower)
+	#print "upper   1 = " + str(upper)
+	#print "central 2 = " + str(central2)
+	#print "------++------"
+
+
+	if len(mcsubtract)>0:
+		for mc in mcsubtract:
+			if not mc in mcsets:
+				print "ERROR in calling Plot2dFRMapClosureTest"
+				print "Every MC that shall be substracted from data must also be given in the BG"
+				return False
+
+	canv = helper.makeCanvas(900, 675, 'c2dFR')
+	index_numerator    = 0
+	index_denominator  = 0
+	FR_ttbar           = [{} for i in range(4)]
+	FR_qcd             = [{} for i in range(4)]
+	ttbar_numerator    = [ROOT.THStack() for i in range(4)]
+	qcd_numerator      = [ROOT.THStack() for i in range(4)]
+	ttbar_denominator  = [ROOT.THStack() for i in range(4)]
+	qcd_denominator    = [ROOT.THStack() for i in range(4)]
+	title_indeces      = [0, 0]
+
+
+	for hist in datasets[0].hists:
+
+		i = datasets[0].hists.index(hist)
+
+		if hist.GetName() == 'h_Loose_LepEta':
+			title_indeces[1] = i
+		if hist.GetName() == 'h_Loose_LepPt':
+			title_indeces[0] = i
+
+			
+		# Get Numerator Plots
+		if 'h_FTight' in hist.GetName():
+
+			index_numerator = i
+
+			data_numerator   = ROOT.THStack()
+			mc_numerator     = ROOT.THStack()
+
+			for data in datasets: data_numerator.Add(copy.deepcopy(data.hists[index_numerator]))
+			for mc in mcsets:     mc_numerator  .Add(copy.deepcopy(mc  .hists[index_numerator]))
+			
+			for mc in mcsetsplot:
+				label = ''.join([j for j in mc.GetName() if not j.isdigit()])
+				index = int(mc.GetName()[-1])
+
+				if 'qcd'   in label: qcd_numerator  [index].Add(copy.deepcopy(mc.hists[index_numerator]))
+				if 'ttbar' in label: ttbar_numerator[index].Add(copy.deepcopy(mc.hists[index_numerator]))
+
+
+		# Get Denominator Histograms
+		if 'h_FLoose' in hist.GetName():
+
+			index_denominator = i
+
+			data_denominator   = ROOT.THStack()
+			mc_denominator     = ROOT.THStack()
+
+			for data in datasets: data_denominator.Add(copy.deepcopy(data.hists[index_denominator]))
+			for mc in mcsets:     mc_denominator  .Add(copy.deepcopy(mc  .hists[index_denominator]))
+			
+			for mc in mcsetsplot:
+				label = ''.join([j for j in mc.GetName() if not j.isdigit()])
+				index = int(mc.GetName()[-1])
+
+				if 'qcd'   in label: qcd_denominator  [index].Add(copy.deepcopy(mc.hists[index_denominator]))
+				if 'ttbar' in label: ttbar_denominator[index].Add(copy.deepcopy(mc.hists[index_denominator]))
+
+
+
+	FR_data          = copy.deepcopy(data_numerator .GetStack().Last())
+	FR_mc            = copy.deepcopy(mc_numerator   .GetStack().Last())
+	FR_data_mcsub_c1 = copy.deepcopy(FR_data)
+
+	for j in range(4):
+		FR_ttbar[j] = copy.deepcopy(ttbar_numerator[j].GetStack().Last())
+		FR_qcd  [j] = copy.deepcopy(qcd_numerator  [j].GetStack().Last())
+
+	data_denominator_mcsub_c1 = copy.deepcopy(data_denominator.GetStack().Last())
+
+
+	# create 2d PLOT
+
+	if len(mcsubtract)>0: 
+		for mc in mcsets:
+			if mc in mcsubtract:
+				mc.hists[index_numerator].Scale(central1)
+				FR_data_mcsub_c1.Add(mc.hists[index_numerator], -1)
+				mc.hists[index_numerator].Scale(1.0/central1)
+
+				mc.hists[index_denominator].Scale(central1)
+				data_denominator_mcsub_c1.Add(mc.hists[index_denominator],-1)
+				mc.hists[index_denominator].Scale(1.0/central1)
+
+	
+	FR_data         .Divide(FR_data         , copy.deepcopy(data_denominator.GetStack().Last()), 1, 1, 'B')
+	FR_mc           .Divide(FR_mc           , copy.deepcopy(mc_denominator  .GetStack().Last()), 1, 1, 'B')
+	FR_data_mcsub_c1.Divide(FR_data_mcsub_c1, data_denominator_mcsub_c1                        , 1, 1, '' )
+
+	for j in range(4):
+		FR_ttbar[j].Divide(FR_ttbar[j], copy.deepcopy(ttbar_denominator[j].GetStack().Last()), 1, 1, 'B')
+		FR_qcd  [j].Divide(FR_qcd  [j], copy.deepcopy(qcd_denominator  [j].GetStack().Last()), 1, 1, 'B')
+
+
+	# plot 2d maps
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data         , title_indeces, 'data'              , True)
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mc           , title_indeces, 'mc'                , True)
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c1, title_indeces, 'datamcsub_central1', True)
+
+	for j in range(4):
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_ttbar[j], title_indeces, dataType + '_ttbar' + str(j), True)
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_qcd  [j], title_indeces, dataType + '_qcd' + str(j)  , True)
 
 
 

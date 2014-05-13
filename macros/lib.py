@@ -108,6 +108,14 @@ def getColor(name):
 	elif name == 'el_ttbar5'          : return mycolor.GetColor( 51, 153,  58)
 	elif name == 'mu_ttbar6'          : return mycolor.GetColor( 51, 153,  58)
 	elif name == 'el_ttbar6'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'mu_qcd0'            : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd0'            : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'mu_qcd1'            : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd1'            : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'mu_qcd2'            : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd2'            : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'mu_qcd3'            : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd3'            : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'mu_qcdmuenr'        : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdtot50'        : return mycolor.GetColor( 15, 106, 196)
 	elif name == 'el_qcdtot80'        : return mycolor.GetColor( 15, 106, 196)
@@ -173,6 +181,14 @@ def getLegendName(name):
 	elif name == 'el_ttbar5'          : return 'TTBar (unmatched)'
 	elif name == 'mu_ttbar6'          : return 'TTBar (W)'
 	elif name == 'el_ttbar6'          : return 'TTBar (W)'
+	elif name == 'mu_qcd0'            : return 'QCD (total)'
+	elif name == 'el_qcd0'            : return 'QCD (total)'
+	elif name == 'mu_qcd1'            : return 'QCD (b)'
+	elif name == 'el_qcd1'            : return 'QCD (b)'
+	elif name == 'mu_qcd2'            : return 'QCD (c)'
+	elif name == 'el_qcd2'            : return 'QCD (c)'
+	elif name == 'mu_qcd3'            : return 'QCD (light)'
+	elif name == 'el_qcd3'            : return 'QCD (light)'
 	elif name == 'mu_qcdmuenr'        : return 'QCD'
 	elif name == 'el_qcdtot50'        : return 'QCD (tot)'
 	elif name == 'el_qcdtot80'        : return 'QCD (tot)'
