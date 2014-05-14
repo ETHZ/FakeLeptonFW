@@ -748,7 +748,7 @@ TGraphAsymmErrors* FakeRatios::getGraphPoissonErrors(TH1D* histo, float nSigma, 
 		y = (int)histo->GetBinContent(iBin);
 
 		double ym, yp;
-		// FUCK THIS! RooHistError::instance().getPoissonInterval(y,ym,yp,nSigma);
+		RooHistError::instance().getPoissonInterval(y,ym,yp,nSigma);
 
 		yerrplus = yp - y;
 		yerrminus = y - ym;
