@@ -1156,11 +1156,11 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 	//	return false;
 	//}
 
-	for(int lep = 0; lep < LepPhi->size(); ++lep){
-		if(!isLooseLepton(lep)) continue;
-		if(getClosestJet(0, lep) != j || getClosestJet(1, lep) > minDR) continue;
-		return false;
-	}
+ 	for(int lep = 0; lep < LepPhi->size(); ++lep){
+ 		if(!isLooseLepton(lep)) continue;
+ 		if(getClosestJet(0, lep) != j || getClosestJet(1, lep) > minDR) continue;
+ 		return false;
+ 	}
 
 	return true;
 }
