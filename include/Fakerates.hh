@@ -153,18 +153,20 @@ public:
 	float getJetPt(int);	
 	float getMT(int);
 
-	bool isGoodJet(int, float, float);
-	bool isGoodSynchJet(int, float);
+	bool  isGoodJet(int, float, float);
+	bool  isGoodSynchJet(int, float);
 
-	float getAwayJet(int, int);
-	float getClosestJet(int, int);
+	int   getAwayJet(int);
+	float getAwayJetDR(int);
+	int   getClosestJet(int);
+	float getClosestJetDR(int);
 
 	float getHT();
-	int getNJets(int);
+	int   getNJets(int);
 
 	// MET
-	void setMET(float);
-	void setMETPhi(float);
+	void  setMET(float);
+	void  setMETPhi(float);
 	float getMET();
 	float getMETPhi();
 
