@@ -640,7 +640,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 	if(count) ++fCounter_veto;
 
 
-	//if(count) cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), getAwayJet(0, lep), isTightLepton(lep), 0.0, -99.0, getMET(), getMT(lep)) << endl;
+	//if(count) cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), getAwayJet(2, lep), isTightLepton(lep), 0.0, -99.0, getMET(), getMT(lep)) << endl;
 
 
 	//cout << "check 5" << endl;
@@ -1158,7 +1158,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	for(int lep = 0; lep < LepPhi->size(); ++lep){
 		if(!isLooseLepton(lep)) continue;
-		if(getClosestJet(1, lep) > minDR) continue;
+		if(getClosestJet(0, lep) != j || getClosestJet(1, lep) > minDR) continue;
 		return false;
 	}
 
@@ -1170,7 +1170,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 float Fakerates::getAwayJet(int info = 0, int lep = 0){
 	/*
 	get information about the away jet with largest Pt
-	parameters: info (0 = Pt, 1 = dR), lep (lepton index)
+	parameters: info (0 = jetind, 1 = dR, 2 = Pt), lep (lepton index)
 	return: info
 	*/
 
@@ -1193,8 +1193,9 @@ float Fakerates::getAwayJet(int info = 0, int lep = 0){
 		for(int thisjet=0; thisjet < nawayjets; ++thisjet)
 			if(getJetPt(awayjet_inds[thisjet]) > getJetPt(jetind) ) jetind = awayjet_inds[thisjet];
 
-	if(info==1) return Util::GetDeltaR(JetEta->at(jetind), LepEta->at(lep), JetPhi->at(jetind), LepPhi->at(lep));
-	return getJetPt(jetind);
+	if     (info == 1) return Util::GetDeltaR(JetEta->at(jetind), LepEta->at(lep), JetPhi->at(jetind), LepPhi->at(lep));
+	else if(info == 2) return getJetPt(jetind);
+	else               return jetind;
 }
 
 
@@ -1202,7 +1203,7 @@ float Fakerates::getAwayJet(int info = 0, int lep = 0){
 float Fakerates::getClosestJet(int info = 0, int lep = 0){
 	/*
 	get information about the closest jet (i.e. smallest dR)
-	parameters: info (0 = Pt, 1 = dR), lep (lepton index)
+	parameters: info (0 = jetind, 1 = dR, 2 = Pt), lep (lepton index)
 	return: info
 	*/
 
@@ -1225,8 +1226,9 @@ float Fakerates::getClosestJet(int info = 0, int lep = 0){
 		for(int thisjet=0; thisjet < nclosjets; ++thisjet)
 			if(Util::GetDeltaR(JetEta->at(closjet_inds[thisjet]), LepEta->at(lep), JetPhi->at(closjet_inds[thisjet]), LepPhi->at(lep)) < Util::GetDeltaR(JetEta->at(jetind), LepEta->at(lep), JetPhi->at(jetind), LepPhi->at(lep)) ) jetind = closjet_inds[thisjet];
 
-	if(info==1) return Util::GetDeltaR(JetEta->at(jetind), LepEta->at(lep), JetPhi->at(jetind), LepPhi->at(lep));
-	return getJetPt(jetind);
+	if     (info == 1) return Util::GetDeltaR(JetEta->at(jetind), LepEta->at(lep), JetPhi->at(jetind), LepPhi->at(lep));
+	else if(info == 2) return getJetPt(jetind);
+	else               return jetind;
 }
 
 
@@ -1601,9 +1603,9 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 		if(passesUpperMETMT(lep, true)) {
  
 			h_Loose_AwayJetDR ->Fill(getAwayJet(1, lep)   , eventweight);
-			h_Loose_AwayJetPt ->Fill(getAwayJet(0, lep)   , eventweight);
+			h_Loose_AwayJetPt ->Fill(getAwayJet(2, lep)   , eventweight);
 			h_Loose_ClosJetDR ->Fill(getClosestJet(1, lep), eventweight);
-			h_Loose_ClosJetPt ->Fill(getClosestJet(0, lep), eventweight);
+			h_Loose_ClosJetPt ->Fill(getClosestJet(2, lep), eventweight);
 
 			h_Loose_HT        ->Fill(getHT()              , eventweight);
 			h_Loose_LepEta    ->Fill(fabs(LepEta->at(lep)), eventweight);
@@ -1664,7 +1666,7 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 					h_FLoose->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
 			}
 
-// cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(0,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
+// cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(mu), getAwayJet(2,mu), isTightMuon(mu), getAwayJet(1,mu), getMET(), getMT(0, mu)) << endl;
 //	if(LepPt->at(lep)>=35. && LepPt->at(lep)<45. && fabs(LepEta->at(lep))>=2. && fabs(LepEta->at(lep))<2.5)
 //	cout << Form("%d\t%d\t%d\t%.2f\t%d\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), isTightLepton(lep), getMET(), getMT(lep)) << endl;
 
@@ -1692,9 +1694,9 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 			if(passesUpperMETMT(lep)) {
   
 				h_Tight_AwayJetDR ->Fill(getAwayJet(1, lep)    , eventweight);
-				h_Tight_AwayJetPt ->Fill(getAwayJet(0, lep)    , eventweight);
+				h_Tight_AwayJetPt ->Fill(getAwayJet(2, lep)    , eventweight);
 				h_Tight_ClosJetDR ->Fill(getClosestJet(1, lep) , eventweight);
-				h_Tight_ClosJetPt ->Fill(getClosestJet(0, lep) , eventweight);
+				h_Tight_ClosJetPt ->Fill(getClosestJet(2, lep) , eventweight);
 
 				h_Tight_HT        ->Fill(getHT()               , eventweight);
 				h_Tight_LepEta    ->Fill(fabs(LepEta->at(lep)) , eventweight);
