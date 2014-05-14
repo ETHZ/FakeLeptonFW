@@ -346,7 +346,7 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 		
 	
 		# Get Numerator Plots
-		if 'h_FTight' in hist.GetName():
+		if hist.GetName()[-8:] == 'h_FTight':
 
 			index_numerator = i
 
@@ -361,7 +361,7 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 
 
 		# Get Denominator Histograms
-		if 'h_FLoose' in hist.GetName():
+		if hist.GetName()[-8:] == 'h_FLoose':
 
 			index_denominator = i
 

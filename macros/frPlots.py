@@ -211,8 +211,7 @@ else:
 	dyjets50   = sample('mu_dyjets50'     , inputDir + 'mu_dyjets50_ratios.root')
 	dyjets10   = sample('mu_dyjets10'     , inputDir + 'mu_dyjets10_ratios.root')
 	qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root')
-	print qcd.GetName()
-	#ttbar0     = sample('mu_ttbar0'       , inputDir + 'mu_ttbar0_ratios.root'  )
+	ttbar0     = sample('mu_ttbar0'       , inputDir + 'mu_ttbar0_ratios.root'  )
 	#ttbar1     = sample('mu_ttbar1'       , inputDir + 'mu_ttbar1_ratios.root'  )
 	#ttbar2     = sample('mu_ttbar2'       , inputDir + 'mu_ttbar2_ratios.root'  )
 	#ttbar3     = sample('mu_ttbar3'       , inputDir + 'mu_ttbar3_ratios.root'  )
@@ -414,14 +413,14 @@ if module == 'compare' or module == 'all':
 
 if module == 'fakerates_1d' or module == 'all':
 	#FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [ttbar0, ttbar1, ttbar2, ttbar3], [wjets, dyjets50, dyjets10], qcd_samples, True)
-	FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [], [wjets, dyjets50, dyjets10], qcd_samples, True)
+	FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [ttbar0], [wjets, dyjets50, dyjets10], qcd_samples, True)
 
 
 
 # compute and plot FR 2d Map (+ Projections)
 
 if module == 'fakerates_2d' or module == 'all':
-	FR.Plot2dFRMap(dataType, outputDir, module, data_samples, mc_samples, [], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
+	FR.Plot2dFRMap(dataType, outputDir, module, data_samples, mc_samples, [ttbar0], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
 	#FR.Plot2dFRMapClosureTest(dataType, outputDir, module, data_samples, mc_samples, closure_samples, [wjets, dyjets50, dyjets10], qcd_samples)
 
 #if module == 'fakerates_2d' or module == 'all': # testing PUweight_full
