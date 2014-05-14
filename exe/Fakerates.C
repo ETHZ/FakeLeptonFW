@@ -38,10 +38,12 @@ int main(int argc, char* argv[]) {
 	bool isdata          = true;
 	float xsec           = 1.;
 	int maxsize          = 0;
+	bool closure         = false;
+	int origin           = 0;
 
 	// Parse options
 	char ch;
-	while ((ch = getopt(argc, argv, "i:n:v:t:x:m:sn:c:h:?")) != -1 ) {
+	while ((ch = getopt(argc, argv, "i:n:v:t:x:m:g:sn:c:h:?")) != -1 ) {
 		switch (ch) {
 			case 'i': inputfile    = TString(optarg)       ;  break;
 			case 'n': name         = TString(optarg)       ;  break;
@@ -51,12 +53,14 @@ int main(int argc, char* argv[]) {
 			case 'c': configfile   = TString(optarg)       ;  break;
 			case 'x': xsec         = atof(optarg)          ;  break; //::atof( ((std::string) optarg).c_str());  break;
 			case 'm': maxsize      = atoi(optarg)          ;  break;
+			case 'g': origin       = atoi(optarg)          ;  break;
 			case '?':
 			case 'h': usage(0); break;
 			default:
 			cerr << "*** Error: unknown option " << optarg << std::endl;
 			usage(-1);
 		}
+		if(ch == 'g') closure = true;
 	}
 
 	// Check arguments
@@ -72,6 +76,8 @@ int main(int argc, char* argv[]) {
 	cout << " particles are:      " << datatype    << endl;
 	cout << " xsec is:            " << xsec        << endl;
 	cout << " sample max size is: " << maxsize     << endl;
+	cout << " closure test:       " << (closure?"yes":"no") << endl;
+	cout << " lepton origin is:   " << origin      << endl;
 	cout << "=======================================================" << endl;
 	cout << "=======================================================" << endl;
 
@@ -83,6 +89,8 @@ int main(int argc, char* argv[]) {
 	frA->setInputFile(inputfile);
 	frA->setName(name);
 	frA->setMaxSize(maxsize);
+	frA->setClosure(closure);
+	frA->setOrigin(origin);
 	frA->doStuff();
 	// delete frA;
 	

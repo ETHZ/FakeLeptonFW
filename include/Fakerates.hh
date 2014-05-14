@@ -73,6 +73,8 @@ public:
 	inline virtual void setName         (TString n) {fName         = n;};
 	inline virtual void setMaxSize      (int     m) {fMaxSize      = m;};
 	inline virtual void setXS           (float   x) {if (!fIsData) fXSec = x; else fXSec = -1.;};
+	inline virtual void setClosure      (bool    c) {fClosure      = c;};
+	inline virtual void setOrigin       (int     g) {fOrigin       = g;};
 
 	int  fVerbose;
 	bool fIsData;
@@ -81,6 +83,8 @@ public:
 	TString fName;
 	int fMaxSize;
 	float fXSec;
+	bool fClosure;
+	int fOrigin;
 
 	TString fOutputDir;
 	float fLuminosity;

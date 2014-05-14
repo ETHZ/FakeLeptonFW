@@ -254,10 +254,11 @@ void Fakerates::loadConfigFile(TString configfile){
 
 	// set Plot Threshold
 	float limit = 0.0;
-	if     (fLepTrigger == "Mu17") limit = 17.0;
-	else if(fLepTrigger == "Mu24") limit = 24.0;
-	else if(fLepTrigger == "Mu40") limit = 40.0;
-	else                           limit = 0.0;
+	if      (fLepTrigger == "Mu17"  ) limit = 17.0;
+	else if (fLepTrigger == "Mu24"  ) limit = 24.0;
+	else if (fLepTrigger == "Mu40"  ) limit = 40.0;
+	else if (fLepTrigger == "Ele17J") limit = 17.0;
+	else                              limit = 0.0;
 
 	int binid = 0;
 	for(int i = 0; i < fFRn_binspt; ++i) {
@@ -343,7 +344,7 @@ void Fakerates::loop(TFile* pFile){
 
 		//smearAllJets(); // Jet-Energy Smearing, leave commented for snyching
 
-		if(strstr(fName, "ttbar")) {
+		if(fClosure) {
 		  fillFRPlotsTTBar(eventweight);
 		}
 		else {
@@ -368,13 +369,15 @@ void Fakerates::loop(TFile* pFile){
 	cout << " fCounter_mt              = " << fCounter_mt      << " (" << (float) fCounter_mt      / (float) fCounter_all << ") " << endl;
 	cout << " fCounter_origin (ttbar)  = " << fCounter_origin  << " (" << (float) fCounter_origin  / (float) fCounter_all << ") " << endl;
 
-	//ofstream ttbarfile;
-	//ttbarfile.open("macros/Plots/ttbar_mu_counters.txt", ios::app);
-	//ttbarfile << fName << ": " << fCounter_origin_pl1 << "," << fCounter_origin_pl2 << ","  << fCounter_origin_pl3 << ","  << fCounter_origin_pl4 << ","  << fCounter_origin_pl5 << "," << fCounter_origin_pl6 << endl;
-	//ttbarfile << fName << ": " << fCounter_origin_nl1 << "," << fCounter_origin_nl2 << ","  << fCounter_origin_nl3 << ","  << fCounter_origin_nl4 << ","  << fCounter_origin_nl5 << "," << fCounter_origin_nl6 << endl;
-	//ttbarfile << fName << ": " << fCounter_origin_pt1 << "," << fCounter_origin_pt2 << ","  << fCounter_origin_pt3 << ","  << fCounter_origin_pt4 << ","  << fCounter_origin_pt5 << "," << fCounter_origin_pt6 << endl;
-	//ttbarfile << fName << ": " << fCounter_origin_nt1 << "," << fCounter_origin_nt2 << ","  << fCounter_origin_nt3 << ","  << fCounter_origin_nt4 << ","  << fCounter_origin_nt5 << "," << fCounter_origin_nt6 << endl;
-	//ttbarfile.close();
+	if(fClosure) {
+		ofstream ttbarfile;
+		ttbarfile.open("macros/Plots/qcd_mu_counters.txt", ios::app);
+		ttbarfile << fName << ": " << fCounter_origin_pl1 << ", " << fCounter_origin_pl2 << ", " << fCounter_origin_pl3 << ", " << fCounter_origin_pl4 << ", " << fCounter_origin_pl5 << ", " << fCounter_origin_pl6 << endl; 
+		ttbarfile << fName << ": " << fCounter_origin_nl1 << ", " << fCounter_origin_nl2 << ", " << fCounter_origin_nl3 << ", " << fCounter_origin_nl4 << ", " << fCounter_origin_nl5 << ", " << fCounter_origin_nl6 << endl; 
+		ttbarfile << fName << ": " << fCounter_origin_pt1 << ", " << fCounter_origin_pt2 << ", " << fCounter_origin_pt3 << ", " << fCounter_origin_pt4 << ", " << fCounter_origin_pt5 << ", " << fCounter_origin_pt6 << endl; 
+		ttbarfile << fName << ": " << fCounter_origin_nt1 << ", " << fCounter_origin_nt2 << ", " << fCounter_origin_nt3 << ", " << fCounter_origin_nt4 << ", " << fCounter_origin_nt5 << ", " << fCounter_origin_nt6 << endl; 
+		ttbarfile.close();
+	}
 
 	delete file_, tree_;
 
@@ -859,7 +862,7 @@ bool Fakerates::isLooseMuonTTBar(int index, bool checkforprompt = false){
 	return: true (if muon is loose), false (else)
 	*/
 
-	if(!MuIsLoose->at(index)) return false;
+	if(!isLooseMuon(index)) return false;
 	if(checkforprompt  && !MuIsPrompt->at(index)) return false;
 	if(!checkforprompt && MuIsPrompt->at(index) ) return false;
 	return true;
@@ -874,7 +877,7 @@ bool Fakerates::isLooseElectronTTBar(int index, bool checkforprompt = false){
 	return: true (if electron is loose), false (else)
 	*/
 
-	if(!ElIsLoose->at(index)) return false;
+	if(!isLooseElectron(index)) return false;
 	if(checkforprompt  && !ElIsPrompt->at(index)) return false;
 	if(!checkforprompt && ElIsPrompt->at(index) ) return false;
 	return true;
@@ -947,8 +950,9 @@ bool Fakerates::isTightMuonTTBar(int index, bool checkforprompt = false){
 	return: true (if muon is tight), false (else)
 	*/
 
-	if(!isLooseMuonTTBar(index, checkforprompt)) return false;
-	if(!MuIsTight->at(index)) return false;
+	if(!isTightMuon(index)) return false;
+	if(checkforprompt  && !MuIsPrompt->at(index)) return false;
+	if(!checkforprompt && MuIsPrompt->at(index) ) return false;
 
 	return true;
 }
@@ -962,8 +966,9 @@ bool Fakerates::isTightElectronTTBar(int index, bool checkforprompt = false){
 	return: true (if electron is tight), false (else)
 	*/
 
-	if(!isLooseElectronTTBar(index, checkforprompt)) return false;
-	if(!ElIsTight->at(index)) return false;
+	if(!isTightElectron(index)) return false;
+	if(checkforprompt  && !ElIsPrompt->at(index)) return false;
+	if(!checkforprompt && ElIsPrompt->at(index) ) return false;
 
 	return true;
 }
@@ -1144,12 +1149,14 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	// if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
 
-	// jet-lepton cleaning: if a tight lepton with dR too small found then return false
-	for(int lep = 0; lep < LepPhi->size(); ++lep){
-		if(!isLooseLepton(lep)) continue;
-		if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(j), LepPhi->at(lep), JetPhi->at(j)) > minDR ) continue;
-		return false;
-	}
+	// jet-lepton cleaning: if a loose lepton with dR too small found then return false
+	//for(int lep = 0; lep < LepPhi->size(); ++lep){
+	//	if(!isLooseLepton(lep)) continue;
+	//	if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(j), LepPhi->at(lep), JetPhi->at(j)) > minDR ) continue;
+	//	return false;
+	//}
+
+	if(isLooseLepton(lep) && getClosestJet(1,lep) <= minDR) return false;
 
 	return true;
 }
@@ -1777,7 +1784,6 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 	*/
 
 
-	int njets = 0, origin = 0;
 	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
 	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
 	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
@@ -1806,13 +1812,13 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 	// Get Desired Particle GEN Origin
 
-	if     (strstr(fName, "ttbar0")) origin = 0; // all
-	else if(strstr(fName, "ttbar1")) origin = 1; // b
-	else if(strstr(fName, "ttbar2")) origin = 2; // c
-	else if(strstr(fName, "ttbar3")) origin = 3; // other, light-flavor
-	else if(strstr(fName, "ttbar4")) origin = 4; // other, t
-	else if(strstr(fName, "ttbar5")) origin = 5; // other, misidentified
-	else if(strstr(fName, "ttbar6")) origin = 6; // W
+	//if     (strstr(fName, "ttbar0")) origin = 0; // all
+	//else if(strstr(fName, "ttbar1")) origin = 1; // b
+	//else if(strstr(fName, "ttbar2")) origin = 2; // c
+	//else if(strstr(fName, "ttbar3")) origin = 3; // other, light-flavor
+	//else if(strstr(fName, "ttbar4")) origin = 4; // other, t
+	//else if(strstr(fName, "ttbar5")) origin = 5; // other, misidentified
+	//else if(strstr(fName, "ttbar6")) origin = 6; // W
 
 
 
@@ -1867,7 +1873,7 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 		//cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (thisorigin == 0 || (origin != 0 && thisorigin != origin)) << endl;
 
-		if(thisorigin == 0 || (origin != 0 && thisorigin != origin)) continue;
+		if(thisorigin == 0 || (fOrigin != 0 && thisorigin != fOrigin)) continue;
 		++fCounter_origin;
 
 
@@ -1880,7 +1886,7 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 			h_FLoose->AddBinContent(fillbin, eventweight);
 		}
 		else{
-			if(fillFHist(LepPt->at(j)))
+			//if(fillFHist(LepPt->at(j)))
 				h_FLoose->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
 		}
 //cout << Form("%d\t%d\t%d\t%.2f\t%d", Run, Lumi, Event, LepPt->at(j), isTightLeptonTTBar(j)) << endl;
@@ -1905,7 +1911,7 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 			h_FTight->AddBinContent(fillbin, eventweight);
 		}
 		else{
-			if(fillFHist(LepPt->at(j)))
+			//if(fillFHist(LepPt->at(j)))
 				h_FTight->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
 		}
 	}
