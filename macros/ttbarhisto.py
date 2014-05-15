@@ -15,9 +15,12 @@ def SetFillStyle(hists, integral, normalize = True):
 	if integral>0. and normalize:
 		for i in range(len(hists)): 
 			hists[i].Scale(1.0/integral)
+			hists[i].GetYaxis().SetTitle('1/Integral')
 
 	for i in range(len(hists)):
 		hists[i].SetMaximum(1.1)
+		hists[i].SetTitle('')
+		hists[i].GetXaxis().SetLabelSize(0)
 
 	return hists
 
@@ -38,7 +41,7 @@ def DrawAndPlot(canv, pad_plot, hists, filename):
 		x = hists[0].GetXaxis().GetBinCenter(i+1) - 0.1
 		t.DrawText(x, y, label[i])
 
-	lib.saveCanvas(canv, pad_plot, 'Plots/', filename, False)
+	lib.saveCanvas(canv, pad_plot, 'Closure/', filename, False)
 
 
 
@@ -57,18 +60,22 @@ values_pl = [{} for i in range(len(label))]
 values_pt = [{} for i in range(len(label))]
 values_nl = [{} for i in range(len(label))]
 values_nt = [{} for i in range(len(label))]
+values_l  = [{} for i in range(len(label))]
+values_t  = [{} for i in range(len(label))]
 hpl       = [{} for i in range(len(label))]
 hpt       = [{} for i in range(len(label))]
 hpf       = [{} for i in range(len(label))]
 hnl       = [{} for i in range(len(label))]
 hnt       = [{} for i in range(len(label))]
 hnf       = [{} for i in range(len(label))]
-filename  = 'ttbar_el_counters'
+ht        = [{} for i in range(len(label))]
+hl        = [{} for i in range(len(label))]
+filename  = 'ttbar_mu_counters'
 
 
 
 
-fo    = open('Plots/' + filename + '.txt', 'r')
+fo    = open('Closure/' + filename + '.txt', 'r')
 lines = fo.readlines()
 
 for j, line in enumerate(lines):
@@ -79,7 +86,9 @@ for j, line in enumerate(lines):
 		if j == 1: values_nl[index[k]] = int(split[k])
 		if j == 3: values_nt[index[k]] = int(split[k])
 
-
+for k in range(len(values_pl)):
+	values_l[index[k]] = values_pl[index[k]] + values_nl[index[k]]
+	values_t[index[k]] = values_pt[index[k]] + values_nt[index[k]]
 
 
 
@@ -94,10 +103,14 @@ for i in range(len(hpl)):
 	hnl[i] = ROOT.TH1F('hnl' + str(i), 'hnl' + str(i), len(hnl), 0, len(hnl))
 	hnt[i] = ROOT.TH1F('hnt' + str(i), 'hnt' + str(i), len(hnt), 0, len(hnt))
 	hnf[i] = ROOT.TH1F('hnf' + str(i), 'hnf' + str(i), len(hnf), 0, len(hnf))
+	ht[i]  = ROOT.TH1F('ht' + str(i) , 'ht' + str(i) , len(ht) , 0, len(ht) )
+	hl[i]  = ROOT.TH1F('hl' + str(i) , 'hl' + str(i) , len(hl) , 0, len(hl) )
 	hpl[i].SetBinContent(i+1, values_pl[i])
 	hpt[i].SetBinContent(i+1, values_pt[i])
 	hnl[i].SetBinContent(i+1, values_nl[i])
 	hnt[i].SetBinContent(i+1, values_nt[i])
+	ht[i] .SetBinContent(i+1, values_t[i] )
+	hl[i] .SetBinContent(i+1, values_l[i] )
 	if values_pl[i]>0: 	hpf[i].SetBinContent(i+1, values_pt[i] / float(values_pl[i]))
 	else:               hpf[i].SetBinContent(i+1, 0)
 	if values_nl[i]>0:  hnf[i].SetBinContent(i+1, values_nt[i] / float(values_nl[i]))
@@ -110,6 +123,8 @@ integral_pf = sum([hpf[i].Integral() for i in range(len(hpf))])
 integral_nl = sum([hnl[i].Integral() for i in range(len(hnl))])
 integral_nt = sum([hnt[i].Integral() for i in range(len(hnt))])
 integral_nf = sum([hnf[i].Integral() for i in range(len(hnf))])
+integral_t  = sum([ht[i].Integral()  for i in range(len(ht)) ])
+integral_l  = sum([hl[i].Integral()  for i in range(len(hl)) ])
 
 hpl = SetFillStyle(hpl, integral_pl)
 hpt = SetFillStyle(hpt, integral_pt)
@@ -117,6 +132,8 @@ hpf = SetFillStyle(hpf, integral_pf, False)
 hnl = SetFillStyle(hnl, integral_nl)
 hnt = SetFillStyle(hnt, integral_nt)
 hnf = SetFillStyle(hnf, integral_nf, False)
+ht  = SetFillStyle(ht , integral_t )
+hl  = SetFillStyle(hl , integral_l )
 
 DrawAndPlot(canv, pad_plot, hpl, filename + '_prompt_loose')
 DrawAndPlot(canv, pad_plot, hpt, filename + '_prompt_tight')
@@ -124,7 +141,8 @@ DrawAndPlot(canv, pad_plot, hpf, filename + '_prompt_rate')
 DrawAndPlot(canv, pad_plot, hnl, filename + '_noprompt_loose')
 DrawAndPlot(canv, pad_plot, hnt, filename + '_noprompt_tight')
 DrawAndPlot(canv, pad_plot, hnf, filename + '_noprompt_rate')
-
+DrawAndPlot(canv, pad_plot, ht , filename + '_tight')
+DrawAndPlot(canv, pad_plot, hl , filename + '_loose')
 
 
 
