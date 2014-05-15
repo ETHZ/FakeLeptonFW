@@ -413,14 +413,14 @@ if module == 'compare' or module == 'all':
 
 if module == 'fakerates_1d' or module == 'all':
 	#FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [ttbar0, ttbar1, ttbar2, ttbar3], [wjets, dyjets50, dyjets10], qcd_samples, True)
-	FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [ttbar0], [wjets, dyjets50, dyjets10], qcd_samples, True)
+	FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [], [wjets, dyjets50, dyjets10], qcd_samples, True)
 
 
 
 # compute and plot FR 2d Map (+ Projections)
 
 if module == 'fakerates_2d' or module == 'all':
-	FR.Plot2dFRMap(dataType, outputDir, module, data_samples, mc_samples, [ttbar0], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
+	FR.Plot2dFRMap(dataType, outputDir, module, data_samples, mc_samples, [], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
 	#FR.Plot2dFRMapClosureTest(dataType, outputDir, module, data_samples, mc_samples, closure_samples, [wjets, dyjets50, dyjets10], qcd_samples)
 
 #if module == 'fakerates_2d' or module == 'all': # testing PUweight_full
