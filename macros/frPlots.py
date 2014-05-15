@@ -94,47 +94,47 @@ if dataType == 'el':
 	#qcd82       = sample('el_qcd82'        , inputDir + 'el_qcd82_ratios.root'      ) 
 	#qcd83       = sample('el_qcd83'        , inputDir + 'el_qcd83_ratios.root'      ) 
 
-	#qcdtot50    = sample('el_qcdtot50'     , inputDir + 'el_qcdtot50_ratios.root'   )
-	#qcdtot80    = sample('el_qcdtot80'     , inputDir + 'el_qcdtot80_ratios.root'   )
-	#qcdtot120   = sample('el_qcdtot120'    , inputDir + 'el_qcdtot120_ratios.root'  )
-	#qcdtot170   = sample('el_qcdtot170'    , inputDir + 'el_qcdtot170_ratios.root'  )
-	#qcdtot170v2 = sample('el_qcdtot170v2'  , inputDir + 'el_qcdtot170v2_ratios.root')
-	#qcdtot300   = sample('el_qcdtot300'    , inputDir + 'el_qcdtot300_ratios.root'  )
-	#qcdtot300v2 = sample('el_qcdtot300v2'  , inputDir + 'el_qcdtot300v2_ratios.root')
-	#qcdtot300v3 = sample('el_qcdtot300v3'  , inputDir + 'el_qcdtot300v3_ratios.root')
+	qcdtot50    = sample('el_qcdtot50'     , inputDir + 'el_qcdtot50_ratios.root'   )
+	qcdtot80    = sample('el_qcdtot80'     , inputDir + 'el_qcdtot80_ratios.root'   )
+	qcdtot120   = sample('el_qcdtot120'    , inputDir + 'el_qcdtot120_ratios.root'  )
+	qcdtot170   = sample('el_qcdtot170'    , inputDir + 'el_qcdtot170_ratios.root'  )
+	qcdtot170v2 = sample('el_qcdtot170v2'  , inputDir + 'el_qcdtot170v2_ratios.root')
+	qcdtot300   = sample('el_qcdtot300'    , inputDir + 'el_qcdtot300_ratios.root'  )
+	qcdtot300v2 = sample('el_qcdtot300v2'  , inputDir + 'el_qcdtot300v2_ratios.root')
+	qcdtot300v3 = sample('el_qcdtot300v3'  , inputDir + 'el_qcdtot300v3_ratios.root')
 
-	qcdem20     = sample('el_qcdemenr20'   , inputDir + 'el_qcdemenr20_ratios.root' ) 
-	qcdem30     = sample('el_qcdemenr30'   , inputDir + 'el_qcdemenr30_ratios.root' )
-	qcdem80     = sample('el_qcdemenr80'   , inputDir + 'el_qcdemenr80_ratios.root' )
-	qcdem170    = sample('el_qcdemenr170'  , inputDir + 'el_qcdemenr170_ratios.root')
-	qcdem250    = sample('el_qcdemenr250'  , inputDir + 'el_qcdemenr250_ratios.root')
-	qcdem350    = sample('el_qcdemenr350'  , inputDir + 'el_qcdemenr350_ratios.root')
-	qcdbc20     = sample('el_qcdbctoe20'   , inputDir + 'el_qcdbctoe20_ratios.root' )
-	qcdbc30     = sample('el_qcdbctoe30'   , inputDir + 'el_qcdbctoe30_ratios.root' )
-	qcdbc80     = sample('el_qcdbctoe80'   , inputDir + 'el_qcdbctoe80_ratios.root' )
+	#qcdem20     = sample('el_qcdemenr20'   , inputDir + 'el_qcdemenr20_ratios.root' ) 
+	#qcdem30     = sample('el_qcdemenr30'   , inputDir + 'el_qcdemenr30_ratios.root' )
+	#qcdem80     = sample('el_qcdemenr80'   , inputDir + 'el_qcdemenr80_ratios.root' )
+	#qcdem170    = sample('el_qcdemenr170'  , inputDir + 'el_qcdemenr170_ratios.root')
+	#qcdem250    = sample('el_qcdemenr250'  , inputDir + 'el_qcdemenr250_ratios.root')
+	#qcdem350    = sample('el_qcdemenr350'  , inputDir + 'el_qcdemenr350_ratios.root')
+	#qcdbc20     = sample('el_qcdbctoe20'   , inputDir + 'el_qcdbctoe20_ratios.root' )
+	#qcdbc30     = sample('el_qcdbctoe30'   , inputDir + 'el_qcdbctoe30_ratios.root' )
+	#qcdbc80     = sample('el_qcdbctoe80'   , inputDir + 'el_qcdbctoe80_ratios.root' )
 
 	data_samples = []
 	data_samples.append(data)
 
 	mc_samples = []
-	#mc_samples.append(qcdtot50   )
-	#mc_samples.append(qcdtot80   )
-	#mc_samples.append(qcdtot120  )
-	#mc_samples.append(qcdtot170  )
-	#mc_samples.append(qcdtot170v2)
-	#mc_samples.append(qcdtot300  )
-	#mc_samples.append(qcdtot300v2)
-	#mc_samples.append(qcdtot300v3)
+	mc_samples.append(qcdtot50   )
+	mc_samples.append(qcdtot80   )
+	mc_samples.append(qcdtot120  )
+	mc_samples.append(qcdtot170  )
+	mc_samples.append(qcdtot170v2)
+	mc_samples.append(qcdtot300  )
+	mc_samples.append(qcdtot300v2)
+	mc_samples.append(qcdtot300v3)
 
-	mc_samples.append(qcdem20    )
-	mc_samples.append(qcdem30    )
-	mc_samples.append(qcdem80    )
-	mc_samples.append(qcdem170   )
-	mc_samples.append(qcdem250   )
-	mc_samples.append(qcdem350   )
-	mc_samples.append(qcdbc20    )
-	mc_samples.append(qcdbc30    )
-	mc_samples.append(qcdbc80    )
+	#mc_samples.append(qcdem20    )
+	#mc_samples.append(qcdem30    )
+	#mc_samples.append(qcdem80    )
+	#mc_samples.append(qcdem170   )
+	#mc_samples.append(qcdem250   )
+	#mc_samples.append(qcdem350   )
+	#mc_samples.append(qcdbc20    )
+	#mc_samples.append(qcdbc30    )
+	#mc_samples.append(qcdbc80    )
 
 	mc_samples.append(wjets      )
 	mc_samples.append(dyjets50   )
@@ -143,24 +143,24 @@ if dataType == 'el':
 
 	qcd_samples = []	
 
-	#qcd_samples.append(qcdtot50   )
-	#qcd_samples.append(qcdtot80   )
-	#qcd_samples.append(qcdtot120  )
-	#qcd_samples.append(qcdtot170  )
-	#qcd_samples.append(qcdtot170v2)
-	#qcd_samples.append(qcdtot300  )
-	#qcd_samples.append(qcdtot300v2)
-	#qcd_samples.append(qcdtot300v3)
+	qcd_samples.append(qcdtot50   )
+	qcd_samples.append(qcdtot80   )
+	qcd_samples.append(qcdtot120  )
+	qcd_samples.append(qcdtot170  )
+	qcd_samples.append(qcdtot170v2)
+	qcd_samples.append(qcdtot300  )
+	qcd_samples.append(qcdtot300v2)
+	qcd_samples.append(qcdtot300v3)
 
-	qcd_samples.append(qcdem20    )
-	qcd_samples.append(qcdem30    )
-	qcd_samples.append(qcdem80    )
-	qcd_samples.append(qcdem170   )
-	qcd_samples.append(qcdem250   ) 
-	qcd_samples.append(qcdem350   )
-	qcd_samples.append(qcdbc20    )
-	qcd_samples.append(qcdbc30    )
-	qcd_samples.append(qcdbc80    )
+	#qcd_samples.append(qcdem20    )
+	#qcd_samples.append(qcdem30    )
+	#qcd_samples.append(qcdem80    )
+	#qcd_samples.append(qcdem170   )
+	#qcd_samples.append(qcdem250   ) 
+	#qcd_samples.append(qcdem350   )
+	#qcd_samples.append(qcdbc20    )
+	#qcd_samples.append(qcdbc30    )
+	#qcd_samples.append(qcdbc80    )
 
 	#closure_samples = []
 	#closure_samples.append(ttbar0)
@@ -335,9 +335,7 @@ if scaling == 'fiterror_weighted':
 	upper = scalefactors[2]
 
 if module == 'plots_1d' or module == 'all':
-	if dataType == 'el': mclist = [qcdem20, qcdbc20, wjets, dyjets50, dyjets10]
-	else:                mclist = [qcd, wjets, dyjets50, dyjets10]
-	helper.PrintScale(canv, outputDir, mclist, lower, upper)
+	helper.PrintScale(canv, outputDir, [qcd_samples[0], wjets, dyjets50, dyjets10], lower, upper)
 
 
 
@@ -350,7 +348,7 @@ if module == 'plots_1d' or module == 'all':
 	leg.AddEntry(wjets          .hists[0], helper.getLegendName(wjets          .GetName()), 'f' )
 	leg.AddEntry(dyjets10       .hists[0], helper.getLegendName(dyjets10       .GetName()), 'f' )
 	leg.AddEntry(qcd_samples[0] .hists[0], helper.getLegendName(qcd_samples[0] .GetName()), 'f' )
-	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
+	#if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
 	Plot.Plot1d(dataType, outputDir, data_samples, mc_samples, plot1dHists, leg, True)
 
 
@@ -370,7 +368,7 @@ if module == 'zoom_met' or module == 'all':
 	leg.AddEntry(wjets          .hists[0], helper.getLegendName(wjets          .GetName()), 'f' )
 	leg.AddEntry(dyjets10       .hists[0], helper.getLegendName(dyjets10       .GetName()), 'f' )
 	leg.AddEntry(qcd_samples[0] .hists[0], helper.getLegendName(qcd_samples[0] .GetName()), 'f' )
-	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
+	#if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
 	Plot.PlotMETZooms(dataType, outputDir, data_samples, mc_samples, leg)
 
 
@@ -412,7 +410,6 @@ if module == 'compare' or module == 'all':
 # compute and plot FR for every variable
 
 if module == 'fakerates_1d' or module == 'all':
-	#FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [ttbar0, ttbar1, ttbar2, ttbar3], [wjets, dyjets50, dyjets10], qcd_samples, True)
 	FR.PlotFR(dataType, outputDir, data_samples, mc_samples, plot1dHists, [], [wjets, dyjets50, dyjets10], qcd_samples, True)
 
 
@@ -421,10 +418,18 @@ if module == 'fakerates_1d' or module == 'all':
 
 if module == 'fakerates_2d' or module == 'all':
 	FR.Plot2dFRMap(dataType, outputDir, module, data_samples, mc_samples, [], [wjets, dyjets50, dyjets10], qcd_samples, True, True)
-	#FR.Plot2dFRMapClosureTest(dataType, outputDir, module, data_samples, qcd_samples, closure_samples, [wjets, dyjets50, dyjets10], qcd_samples)
 
 #if module == 'fakerates_2d' or module == 'all': # testing PUweight_full
 #	FR.Plot2dFRMap(dataType, outputDir, module, [data1, data2, data3, data4, data5], [], [], [], [], False, False)
+
+
+
+
+# compute and plot FR 2d Map for Closure Test
+
+#if module == 'fakerates_2dct' or module == 'all':
+#	FR.Plot2dFRMapClosureTest(dataType, outputDir, module, data_samples, mc_samples, closure_samples, [wjets, dyjets50, dyjets10], qcd_samples)
+
 
 
 

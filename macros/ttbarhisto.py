@@ -18,15 +18,15 @@ def SetFillStyle(hists, integral, normalize = True):
 			hists[i].GetYaxis().SetTitle('1/Integral')
 
 	for i in range(len(hists)):
-		hists[i].SetMaximum(1.1)
+		hists[i].SetMaximum(1.4)
 		hists[i].SetTitle('')
 		hists[i].SetMarkerSize(2.0)
 		hists[i].GetXaxis().SetLabelSize(0.07)
 		hists[i].GetXaxis().SetTitleSize(0.06)
-		#hists[i].GetXaxis().SetLabel
+		hists[i].GetXaxis().SetLabelFont(62)
 		hists[i].GetYaxis().SetLabelSize(0.06)
 		hists[i].GetYaxis().SetTitleSize(0.06)
-		#hists[i].GetXaxis().SetLabelSize(0)
+		hists[i].GetYaxis().SetRangeUser(0.0001, 1.4)
 		for j in range(len(label)):
 			hists[i].GetXaxis().SetBinLabel(j+1, label[j])
 
@@ -49,7 +49,7 @@ def DrawAndPlot(canv, pad_plot, hists, filename):
 	#	x = hists[0].GetXaxis().GetBinCenter(i+1) - 0.1
 	#	t.DrawText(x, y, label[i])
 
-	lib.saveCanvas(canv, pad_plot, 'Closure/', filename, False)
+	lib.saveCanvas(canv, pad_plot, 'Closure/', filename)
 
 
 
