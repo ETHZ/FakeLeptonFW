@@ -11,22 +11,22 @@ ntt, ntl, nlt, nll = 0., 0., 0., 0.
 
 for evt in tree:
 
-	if evt.nj < 4: continue
+	#if evt.nj < 4: continue
 
-	npp += evt.npp*evt.lumiW
-	npf += evt.npf*evt.lumiW
-	nfp += evt.nfp*evt.lumiW
-	nff += evt.nff*evt.lumiW
+	npp += evt.npp
+	npf += evt.npf
+	nfp += evt.nfp
+	nff += evt.nff
 
-	if evt.tlcat is 0: ntt +=evt.lumiW
-	if evt.tlcat is 1: nlt +=evt.lumiW
-	if evt.tlcat is 2: ntl +=evt.lumiW
-	if evt.tlcat is 3: nll +=evt.lumiW
+	if evt.tlcat is 0: ntt +=1
+	if evt.tlcat is 1: nlt +=1
+	if evt.tlcat is 2: ntl +=1
+	if evt.tlcat is 3: nll +=1
 
 fakes = npf+nfp+nff
 print 'npp: %.3f  npf: %.3f  nfp: %.3f  nff: %.3f   sum: %.3f' %(npp, npf, nfp, nff, npp+npf+nfp+nff)
 print 'sum of fakes: %.3f' %(fakes)
-print '%.3f  %.3f  %.3f  %.3f   sum: %.3f' %(ntt, ntl, nlt, nll, ntt+ntl+nlt+nll)
+print 'ntt: %.3f  ntl: %.3f  nlt: %.3f  nll: %.3f   sum: %.3f' %(ntt, ntl, nlt, nll, ntt+ntl+nlt+nll)
 
 print '\n \t (obs. - pred.) / pred.: %.3f' %((ntt - fakes)/fakes)
 

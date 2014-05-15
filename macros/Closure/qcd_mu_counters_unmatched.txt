@@ -1,5 +1,13 @@
+<<<<<<< HEAD:evtlist_synch_mc.txt
+
+[1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+=======
 g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2 -I. -pthread -m64 -I/swshare/ROOT/root_v5.34.18_slc5_amd64//include/root   -c -o src/Fakerates.o src/Fakerates.cc
 g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2 -I. -pthread -m64 -I/swshare/ROOT/root_v5.34.18_slc5_amd64//include/root -L/swshare/ROOT/root_v5.34.18_slc5_amd64//lib/root -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic -ldl -o Fakerates exe/Fakerates.C src/FWBaseClass.o src/Fakerates.o
+>>>>>>> 00a687ba14169244b59f31fbc23bb0c1dcf98cbe:macros/Closure/qcd_mu_counters_unmatched.txt
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =======================================================
 =======================================================
@@ -7,9 +15,15 @@ g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2 -I. -pthread -m
 =======================================================
 =======================================================
  verbose level is:   2
+<<<<<<< HEAD:evtlist_synch_mc.txt
+ config file is:     config/ETH/corrected_jet/PUweight_runD/Ele17J/0.config
+ inputfile is:       /shome/cheidegg/FakeTrees/synching/eleSynch_mc_minitree_new.root
+ name is:            l_mctest
+=======
  config file is:     config/ETH/corrected_jet/PUweight_runD/Mu17/0.config
  inputfile is:       /shome/cheidegg/FakeTrees/QCD-Pt-20-MuEnrichedPt-15-TuneZ2star-8TeV-pythia6.root
  name is:            mu_qcdmuenr
+>>>>>>> 00a687ba14169244b59f31fbc23bb0c1dcf98cbe:macros/Closure/qcd_mu_counters_unmatched.txt
  running on mc
  particles are:      1
  xsec is:            134700
@@ -67,7 +81,11 @@ Error in <TTree::SetBranchAddress>: unknown branch -> MuIso03HadPt
  fCounter_met             = 649453 (0.0549031) 
  fCounter_mt              = 346316 (0.0292767) 
  fCounter_origin (ttbar)  = 0 (0) 
+<<<<<<< HEAD:evtlist_synch_mc.txt
+Creating directory l_mctest
+=======
 Creating directory mu_qcdmuenr
+>>>>>>> 00a687ba14169244b59f31fbc23bb0c1dcf98cbe:macros/Closure/qcd_mu_counters_unmatched.txt
  done ...                                              
 =======================================================
 =======================================================

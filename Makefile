@@ -2,7 +2,7 @@
 
 
 ROOTCFLAGS = $(shell root-config --cflags)
-ROOTLIBS   = $(shell root-config --libs)
+ROOTLIBS   = $(shell root-config --libs) -lRooFitCore -lRooFit
 ROOTGLIBS  = $(shell root-config --glibs)
 #ROOTINCDIR = $(shell root-config --incdir)
 

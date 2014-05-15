@@ -1143,36 +1143,58 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 	std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
 
 	// if pt too low, eta too large, jet beta star too large then return false
-	if(pt>0. && getJetPt(j) < pt          ) return false;
+	if(pt  >0. && getJetPt(j)       < pt  ) return false;
 	if(btag>0. && JetCSVBTag->at(j) < btag) return false;
 	if(fabs(JetEta->at(j)) > 2.5          ) return false;
 
 	// if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
 
 	// jet-lepton cleaning: if a loose lepton with dR too small found then return false
-	for(int lep = 0; lep < LepPhi->size(); ++lep){
-		float thisDR = Util::GetDeltaR(LepEta->at(lep), JetEta->at(j), LepPhi->at(lep), JetPhi->at(j));
-		if(!isLooseLepton(lep)) continue;
-		if(thisDR > minDR ) continue;
-		return false;
+
+	bool isClosest = false;
+
+
+	// clean w/r/t loose electrons
+	for(int el = 0; el < ElPt->size(); ++el){
+		if(!isLooseElectron(el)) continue;
+
+		float closestDR  = 99.;
+		int   closestInd =  -1;
+
+		for(int thisjet = 0; thisjet < JetPt->size(); ++thisjet){
+			float dr = Util::GetDeltaR(ElEta->at(el), JetEta->at(thisjet), ElPhi->at(el), JetPhi->at(thisjet));
+			if(dr < closestDR) {
+				closestDR  = dr;
+				closestInd = thisjet;
+			}
+		}
+
+		if(closestInd == j && closestDR < 0.4) isClosest = true;
+
 	}
 
+	if(isClosest) return false; // don't run on muons if already closest to a loose electron
 
-	//for(int lep = 0; lep < LepPhi->size(); ++lep){
+	// clean w/r/t loose muons
+	for(int mu = 0; mu < MuPt->size(); ++mu){
+		if(!isLooseMuon(mu)) continue;
 
-	//	float thisDR = Util::GetDeltaR(LepEta->at(lep), JetEta->at(j), LepPhi->at(lep), JetPhi->at(j));
-	//	bool isclosest = true;
+		float closestDR  = 99.;
+		int   closestInd =  -1;
 
-	//	for(int thisjet = 0; thisjet < JetPt->size(); ++thisjet) 
-	//		if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(thisjet), LepPhi->at(lep), JetPhi->at(thisjet)) < thisDR) 
-	//			isclosest = false;	
+		for(int thisjet = 0; thisjet < JetPt->size(); ++thisjet){
+			float dr = Util::GetDeltaR(MuEta->at(mu), JetEta->at(thisjet), MuPhi->at(mu), JetPhi->at(thisjet));
+			if(dr < closestDR) {
+				closestDR  = dr;
+				closestInd = thisjet;
+			}
+		}
 
-	//	if(!isLooseLepton(lep)) continue;
-	//	if(!isclosest || thisDR > minDR ) continue;
-	//	return false;
-	//}
+		if(closestInd == j && closestDR < 0.4) isClosest = true;
 
+	}
 
+	if(isClosest) return false; //no good jet if closest to a loose lepton
 	return true;
 }
 
