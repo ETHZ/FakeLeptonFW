@@ -20,7 +20,15 @@ def SetFillStyle(hists, integral, normalize = True):
 	for i in range(len(hists)):
 		hists[i].SetMaximum(1.1)
 		hists[i].SetTitle('')
-		hists[i].GetXaxis().SetLabelSize(0)
+		hists[i].SetMarkerSize(2.0)
+		hists[i].GetXaxis().SetLabelSize(0.07)
+		hists[i].GetXaxis().SetTitleSize(0.06)
+		#hists[i].GetXaxis().SetLabel
+		hists[i].GetYaxis().SetLabelSize(0.06)
+		hists[i].GetYaxis().SetTitleSize(0.06)
+		#hists[i].GetXaxis().SetLabelSize(0)
+		for j in range(len(label)):
+			hists[i].GetXaxis().SetBinLabel(j+1, label[j])
 
 	return hists
 
@@ -30,16 +38,16 @@ def DrawAndPlot(canv, pad_plot, hists, filename):
 	hists[0].Draw("hist text")
 	for i in range(1, len(hists)): hists[i].Draw('hist text same')
 
-	y = ROOT.gPad.GetUymin() + 0.25 * hists[0].GetXaxis().GetBinWidth(1)
-	t = ROOT.TText()
-	t.SetTextAngle(90)
-	t.SetTextSize(0.05)
-	t.SetTextAlign(13)
-	t.SetTextColor(ROOT.kBlack)
+	#y = ROOT.gPad.GetUymin() + 0.25 * hists[0].GetXaxis().GetBinWidth(1)
+	#t = ROOT.TText()
+	#t.SetTextAngle(90)
+	#t.SetTextSize(0.05)
+	#t.SetTextAlign(13)
+	#t.SetTextColor(ROOT.kBlack)
 
-	for i in range(len(hists)):
-		x = hists[0].GetXaxis().GetBinCenter(i+1) - 0.1
-		t.DrawText(x, y, label[i])
+	#for i in range(len(hists)):
+	#	x = hists[0].GetXaxis().GetBinCenter(i+1) - 0.1
+	#	t.DrawText(x, y, label[i])
 
 	lib.saveCanvas(canv, pad_plot, 'Closure/', filename, False)
 
@@ -54,7 +62,7 @@ ROOT.TGaxis.SetMaxDigits(3)
 
 
 mycolor   = ROOT.TColor()
-label     = ['W', 'B', 'C', 'light-flavor', 'T', 'unmatched']
+label     = ['W', 'B', 'C', 'U/D/S', 'T', 'unm.']
 index     = [1, 2, 3, 4, 5, 0] # element 1 in lines goes to element 1 in values, element 0 goes nowhere, element 6 goes to 0
 values_pl = [{} for i in range(len(label))]
 values_pt = [{} for i in range(len(label))]
