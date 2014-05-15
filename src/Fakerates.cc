@@ -774,7 +774,7 @@ int Fakerates::getLeptonOrigin(int mid, int gmid){
 	else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 399                    ) return 3;
 	else if (mother == 6                                                                                     ) return 4;
 	else if (grandmother == 24                                                                               ) return 6;
-	else return 5; //cout << "MID: " << mother << " GMID: " << grandmother << endl;
+	else cout << "MID: " << mother << " GMID: " << grandmother << endl;
 
 	//if      (grandmother == 24                                                                               ) return 6;
 	//else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
@@ -1150,20 +1150,27 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 	// if(JetBetaStar->at(j) > 0.2*TMath::Log(NVrtx-0.67)) return false; // value for jets with eta < 2.5
 
 	// jet-lepton cleaning: if a loose lepton with dR too small found then return false
-
 	for(int lep = 0; lep < LepPhi->size(); ++lep){
-
 		float thisDR = Util::GetDeltaR(LepEta->at(lep), JetEta->at(j), LepPhi->at(lep), JetPhi->at(j));
-		bool isclosest = true;
-
-		for(int thisjet = 0; thisjet < JetPt->size(); ++thisjet) 
-			if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(thisjet), LepPhi->at(lep), JetPhi->at(thisjet)) < thisDR) 
-				isclosest = false;	
-
 		if(!isLooseLepton(lep)) continue;
-		if(!isclosest || thisDR > minDR ) continue;
+		if(thisDR > minDR ) continue;
 		return false;
 	}
+
+
+	//for(int lep = 0; lep < LepPhi->size(); ++lep){
+
+	//	float thisDR = Util::GetDeltaR(LepEta->at(lep), JetEta->at(j), LepPhi->at(lep), JetPhi->at(j));
+	//	bool isclosest = true;
+
+	//	for(int thisjet = 0; thisjet < JetPt->size(); ++thisjet) 
+	//		if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(thisjet), LepPhi->at(lep), JetPhi->at(thisjet)) < thisDR) 
+	//			isclosest = false;	
+
+	//	if(!isLooseLepton(lep)) continue;
+	//	if(!isclosest || thisDR > minDR ) continue;
+	//	return false;
+	//}
 
 
 	return true;
@@ -1190,7 +1197,7 @@ int Fakerates::getAwayJet(int lep = 0){
 		awayjet_inds.push_back(thisjet);
     }
 
-	if(awayjet_inds.size() == 0) return 0.;
+	if(awayjet_inds.size() == 0) return 0;
 
 	jetind = awayjet_inds[0];
 	if(awayjet_inds.size() > 1)
@@ -1238,7 +1245,7 @@ int Fakerates::getClosestJet(int lep = 0){
 		closjet_inds.push_back(thisjet);
 	}
 
-	if(closjet_inds.size() == 0) return 0.;
+	if(closjet_inds.size() == 0) return 0;
 
 	jetind = closjet_inds[0];
 	if(closjet_inds.size() > 1)

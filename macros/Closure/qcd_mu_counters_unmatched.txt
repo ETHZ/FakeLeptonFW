@@ -1,0 +1,74 @@
+g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2 -I. -pthread -m64 -I/swshare/ROOT/root_v5.34.18_slc5_amd64//include/root   -c -o src/Fakerates.o src/Fakerates.cc
+g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2 -I. -pthread -m64 -I/swshare/ROOT/root_v5.34.18_slc5_amd64//include/root -L/swshare/ROOT/root_v5.34.18_slc5_amd64//lib/root -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic -ldl -o Fakerates exe/Fakerates.C src/FWBaseClass.o src/Fakerates.o
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+=======================================================
+=======================================================
+ Starting Fakerates ...                                
+=======================================================
+=======================================================
+ verbose level is:   2
+ config file is:     config/ETH/corrected_jet/PUweight_runD/Mu17/0.config
+ inputfile is:       /shome/cheidegg/FakeTrees/QCD-Pt-20-MuEnrichedPt-15-TuneZ2star-8TeV-pythia6.root
+ name is:            mu_qcdmuenr
+ running on mc
+ particles are:      1
+ xsec is:            134700
+ sample max size is: 0
+=======================================================
+=======================================================
+Error in <TFile::TFile>: file qcdBigFile_START53_V20.root does not exist
+ Initializing Fakerates Class ...                      
+=======================================================
+=======================================================
+ Reading Config File ...                               
+=======================================================
+=======================================================
+ fOutputDir:       fakeHistos/ETH/corrected_jet/PUweight_runD/Mu17/
+ fLuminosity:      8.1
+ fJetCorrection:   1
+ fJetPtCut:        40
+ fLepPtCut:        20
+ fLepD0Cut:        -1
+ fLepIsoCut:       -1
+ fAwayJetBTagCut:  -1
+ fAwayJetDPhiCut:  -1
+ fPUweight:        1
+ fLepTrigger:      Mu17
+ fLepTriggerMC:    0
+ fCSA14:           0
+=======================================================
+=======================================================
+ fPlotThreshold: 20
+Error in <TTree::SetBranchAddress>: unknown branch -> MuIsGlobalMuon
+Error in <TTree::SetBranchAddress>: unknown branch -> MuIsPFMuon
+Error in <TTree::SetBranchAddress>: unknown branch -> MuNChi2
+Error in <TTree::SetBranchAddress>: unknown branch -> MuNGlMuHits
+Error in <TTree::SetBranchAddress>: unknown branch -> MuNMatchedStations
+Error in <TTree::SetBranchAddress>: unknown branch -> MuDz
+Error in <TTree::SetBranchAddress>: unknown branch -> MuNPxHits
+Error in <TTree::SetBranchAddress>: unknown branch -> MuNSiLayers
+Error in <TTree::SetBranchAddress>: unknown branch -> MuD0BS
+Error in <TTree::SetBranchAddress>: unknown branch -> MuIso03SumPt
+Error in <TTree::SetBranchAddress>: unknown branch -> MuIso03EmPt
+Error in <TTree::SetBranchAddress>: unknown branch -> MuIso03HadPt
+ going to loop over 2.07058e+07 events...
+ eventweight is 0.0526939
+ mu: nevents passing lepton selection: 19447980
+ mu: nevents passing jet    selection: 7229873
+ mu: nevents passing MET    selection: 2954707
+ mu: nevents passing MT     selection: 1571830
+ i just looped on 11829076 events.
+ fCounter_all             = 11829076 (1) 
+ fCounter_trigger         = 11829076 (1) 
+ fCounter_loose           = 3889596 (0.328817) 
+ fCounter_veto            = 3856719 (0.326037) 
+ fCounter_jet (40)        = 1595274 (0.13486) 
+ fCounter_jet (30)        = 2356861 (0.199243) 
+ fCounter_met             = 649453 (0.0549031) 
+ fCounter_mt              = 346316 (0.0292767) 
+ fCounter_origin (ttbar)  = 0 (0) 
+Creating directory mu_qcdmuenr
+ done ...                                              
+=======================================================
+=======================================================
+.......................................................

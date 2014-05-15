@@ -688,12 +688,12 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 	#print "------++------"
 
 
-	if len(mcsubtract)>0:
-		for mc in mcsubtract:
-			if not mc in mcsets:
-				print "ERROR in calling Plot2dFRMapClosureTest"
-				print "Every MC that shall be substracted from data must also be given in the BG"
-				return False
+	#if len(mcsubtract)>0:
+	#	for mc in mcsubtract:
+	#		if not mc in mcsets:
+	#			print "ERROR in calling Plot2dFRMapClosureTest"
+	#			print "Every MC that shall be substracted from data must also be given in the BG"
+	#			return False
 
 	canv = helper.makeCanvas(900, 675, 'c2dFR')
 	index_numerator    = 0
@@ -718,7 +718,7 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 
 			
 		# Get Numerator Plots
-		if 'h_FTight' in hist.GetName():
+		if hist.GetName()[-8:] == 'h_FTight':
 
 			index_numerator = i
 
@@ -737,7 +737,7 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 
 
 		# Get Denominator Histograms
-		if 'h_FLoose' in hist.GetName():
+		if hist.GetName()[-8:] == 'h_FLoose':
 
 			index_denominator = i
 

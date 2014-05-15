@@ -13,8 +13,9 @@ for i in range(n_sets):
 	run[i] = args[i*2+1]
 	URL[i] = args[i*2+2]
 	names[i] = URL[i].split('/')[-2]
-	fn = ['FR_2dmap_data.root', 'FR_2dmap_mc.root', 'FR_2dmap_datamcsub_central1.root', 'FR_2dmap_' + str(run[i]) + '_ttbar0.root', 'FR_2dmap_' + str(run[i]) + '_ttbar1.root', 'FR_2dmap_' + str(run[i]) + '_ttbar2.root', 'FR_2dmap_' + str(run[i]) + '_ttbar3.root', 'FR_2dmap_' + str(run[i]) + '_qcd' + str(run[i]) + 'enr0.root']
+	fn = ['FR_2dmap_data.root', 'FR_2dmap_mc.root', 'FR_2dmap_datamcsub_central1.root', 'FR_2dmap_' + str(run[i]) + '_ttbar0.root', 'FR_2dmap_' + str(run[i]) + '_ttbar1.root', 'FR_2dmap_' + str(run[i]) + '_ttbar2.root', 'FR_2dmap_' + str(run[i]) + '_ttbar3.root', 'FR_2dmap_' + str(run[i]) + '_qcd0.root', 'FR_2dmap_' + str(run[i]) + '_qcd1.root', 'FR_2dmap_' + str(run[i]) + '_qcd2.root', 'FR_2dmap_' + str(run[i]) + '_qcd3.root']
 	nn[i] = ['FR_data_' + str(run[i]) + '_pure', 'FR_mc_' + str(run[i]), 'FR_data_' + str(run[i]), 'FR_ttbar_all_' + str(run[i]), 'FR_ttbar_b_' + str(run[i]), 'FR_ttbar_c_' + str(run[i]), 'FR_ttbar_light_' + str(run[i]), 'FR_qcd_all_' + str(run[i]), 'FR_qcd_b_' + str(run[i]), 'FR_qcd_c_' + str(run[i]), 'FR_qcd_light_' + str(run[i])]
+
 
 fl = []
 fr = []
@@ -32,7 +33,7 @@ for i in range(n_sets):
 	fr[i] = [ROOT.TFile(f, 'read') for f in fl[i]]
 
 
-nf = ROOT.TFile('Plots/histos_' + ''.join(names) + '.root', 'recreate')
+nf = ROOT.TFile('Closure/histos_' + ''.join(names) + '.root', 'recreate')
 
 for i in range(n_sets):
 
