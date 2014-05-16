@@ -80,16 +80,15 @@ for cat in cats:
 	print '%10.2f \t| %10.2f \t| %10.2f \t| %10.2f \t|| %10.2f' %(cat.npp, cat.npf, cat.nfp, cat.nff, cat.npp+cat.npf+cat.nfp+cat.nff)
 
 	print '-------------------------------------------------------------------------------------'
-	print 'sum of fakes: %.3f' %(cat.fakes)
-	print 'observed    : %.3f' %(cat.obs)
+	print 'SUM OF FAKES: %.3f' %(cat.fakes)
+	print 'OBSERVED    : %.3f' %(cat.obs)
 
 	
 	print '\n %25s %.3f' %('pred./ obs.:', cat.fakes/cat.obs)
 	print '\n %25s %.3f' %('(pred. - obs.) / pred.:', (cat.fakes - cat.obs)/cat.fakes)
 	
-	print '\n \npure counts:'
+	print '\n \nPURE COUNTS:'
 	print '%10s \t| %10s \t| %10s \t| %10s \t|| %10s' %('NTT', 'NTL', 'NLT', 'NLL', 'SUM')
 	print '-------------------------------------------------------------------------------------'
 	print '%10.2f \t| %10.2f \t| %10.2f \t| %10.2f \t|| %10.2f' %(cat.nttc, cat.ntlc, cat.nltc, cat.nllc, cat.nttc+cat.ntlc+cat.nltc+cat.nllc)
-
 
