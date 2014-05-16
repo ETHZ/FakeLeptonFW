@@ -79,6 +79,8 @@ public:
 	int fTot;
 	int fSS;
 	int fSSmm;
+	int fSSem;
+	int fSSee;
 
 
 // INPUT FR FILE
@@ -103,6 +105,7 @@ public:
 	void loop(TFile*);
 
 	bool isSameSignLLEvent(int&, int&, int&);
+	bool passMllCut(int, int, int, float);
 
 // Eventweight
 	float fEventWeight;

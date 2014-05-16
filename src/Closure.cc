@@ -35,10 +35,10 @@ void Closure::init(TString frfilestring){
 	fFRFile = new TFile(fFRFileString, "READ");
 
 	// SET ALL THE HISTOGRAMS CORRECTLY
-	// f_h_FR_data_el      = (TH2F*) fFRFile->Get("FR_data_el");
-	// f_h_FR_data_pure_el = (TH2F*) fFRFile->Get("FR_data_pure_el");
-	// f_h_FR_mc_el        = (TH2F*) fFRFile->Get("FR_mc_el");
-	// f_h_FR_ttbar_el     = (TH2F*) fFRFile->Get("FR_ttbar_el");
+	f_h_FR_data_el      = (TH2F*) fFRFile->Get("FR_data_el");
+	f_h_FR_data_pure_el = (TH2F*) fFRFile->Get("FR_data_pure_el");
+	f_h_FR_mc_el        = (TH2F*) fFRFile->Get("FR_mc_el");
+	f_h_FR_ttbar_el     = (TH2F*) fFRFile->Get("FR_ttbar_el");
 
 	f_h_FR_data_mu      = (TH2F*) fFRFile->Get("FR_data_mu");
 	f_h_FR_data_pure_mu = (TH2F*) fFRFile->Get("FR_data_pure_mu");
@@ -121,7 +121,7 @@ void Closure::loop(TFile * outFile){
 
 	}
 
-	cout << Form("fTot: %d \t fSS: %d \t fSSmm: %d", fTot, fSS, fSSmm) <<endl;
+	cout << Form("fTot: %15d \t fSS: %d \r \t fSSmm: %d \t fSSem: %d \t fSSee: %d ", fTot, fSS, fSSmm, fSSem, fSSee) <<endl;
 
 	writeClosureTree(outFile);
 	outFile->Close();
@@ -137,19 +137,41 @@ void Closure::storePredictions(){
 	float npp(-1.), npf(-1.), nfp(-1.), nff(-1.);
 	int   cat(-1);
 
-	int mu1(-1), mu2(-1), type(-1);
-	if(isSameSignLLEvent(mu1, mu2, type)){
-		fSS++; fSSmm++;
+	int lep1(-1), lep2(-1), type(-1);
+	if(isSameSignLLEvent(lep1, lep2, type)){
+		fSS++; 
 
-		f1 = getFRatio(0, MuPt->at(mu1), fabs(MuEta->at(mu1)) );
-		f2 = getFRatio(0, MuPt->at(mu2), fabs(MuEta->at(mu2)) );
+
+		if     (type == 0) fSSmm++;
+		else if(type == 1) fSSem++;
+		else if(type == 2) fSSee++;
+
+		// if(! (type == 0) ) return;
+
+		f1 = 1.; //(type == 0 || type == 1) ? getFRatio(0, MuPt->at(lep1), MuEta->at(lep1) ) : getFRatio(1, ElPt->at(lep1), ElEta->at(lep1)) ;
+		f2 = 1.; //(type == 1 || type == 2) ? getFRatio(1, ElPt->at(lep2), ElEta->at(lep2) ) : getFRatio(0, MuPt->at(lep2), MuEta->at(lep2)) ;
 		p1 = 1.;
 		p2 = 1.;
 
-		if( Fakerates::isTightMuon(mu1) &&  Fakerates::isTightMuon(mu2)) cat = 0;
-		if( Fakerates::isTightMuon(mu1) && !Fakerates::isTightMuon(mu2)) cat = 1;
-		if(!Fakerates::isTightMuon(mu1) &&  Fakerates::isTightMuon(mu2)) cat = 2;
-		if(!Fakerates::isTightMuon(mu1) && !Fakerates::isTightMuon(mu2)) cat = 3;
+		if     (type == 0){ // MU-MU
+			if( isTightMuon(lep1) &&  isTightMuon(lep2)) cat = 0;
+			if( isTightMuon(lep1) && !isTightMuon(lep2)) cat = 1;
+			if(!isTightMuon(lep1) &&  isTightMuon(lep2)) cat = 2;
+			if(!isTightMuon(lep1) && !isTightMuon(lep2)) cat = 3;
+		}
+		else if(type == 1){  // E-MU
+			if( isTightMuon(lep1) &&  isTightElectron(lep2)) cat = 0;
+			if( isTightMuon(lep1) && !isTightElectron(lep2)) cat = 1;
+			if(!isTightMuon(lep1) &&  isTightElectron(lep2)) cat = 2;
+			if(!isTightMuon(lep1) && !isTightElectron(lep2)) cat = 3;
+		}
+		else if(type == 2){ // E-E
+			if( isTightElectron(lep1) &&  isTightElectron(lep2)) cat = 0;
+			if( isTightElectron(lep1) && !isTightElectron(lep2)) cat = 1;
+			if(!isTightElectron(lep1) &&  isTightElectron(lep2)) cat = 2;
+			if(!isTightElectron(lep1) && !isTightElectron(lep2)) cat = 3;
+		}
+		else {cout << "TYPE IS NOT WHAT IT SHOULD BE!" << endl; exit(-1);}
 
 		// Get the weights (don't depend on event selection)
 		npp = fFR->getWpp(FakeRatios::gTLCat(cat), f1, f2, p1, p2);
@@ -181,15 +203,16 @@ void Closure::storePredictions(){
 
 		fCT_tlcat = cat;
 
-		fCT_pt1   = MuPt->at(mu1);
-		fCT_pt2   = MuPt->at(mu2);
-		fCT_eta1  = MuEta->at(mu1);
-		fCT_eta2  = MuEta->at(mu2);
-		fCT_phi1  = MuPhi->at(mu1);
-		fCT_phi2  = MuPhi->at(mu2);
-		fCT_iso1  = MuPFIso->at(mu1);
-		fCT_iso2  = MuPFIso->at(mu2);
-		fCT_ch1   = MuCharge->at(mu1);
+		fCT_pt1   = (type == 0 || type == 1) ? MuPt    ->at(lep1) : ElPt    ->at(lep1);
+		fCT_eta1  = (type == 0 || type == 1) ? MuEta   ->at(lep1) : ElEta   ->at(lep1);
+		fCT_phi1  = (type == 0 || type == 1) ? MuPhi   ->at(lep1) : ElPhi   ->at(lep1);
+		fCT_iso1  = (type == 0 || type == 1) ? MuPFIso ->at(lep1) : ElPFIso ->at(lep1);
+		fCT_ch1   = (type == 0 || type == 1) ? MuCharge->at(lep1) : ElCharge->at(lep1);
+
+		fCT_pt2   = (type == 1 || type == 2) ? ElPt    ->at(lep2) : MuPt    ->at(lep2);
+		fCT_eta2  = (type == 1 || type == 2) ? ElEta   ->at(lep2) : MuEta   ->at(lep2);
+		fCT_phi2  = (type == 1 || type == 2) ? ElPhi   ->at(lep2) : MuPhi   ->at(lep2);
+		fCT_iso2  = (type == 1 || type == 2) ? ElPFIso ->at(lep2) : MuPFIso ->at(lep2);
 
 		fCT_nj    = Fakerates::getNJets(0);
 		fCT_nb    = Fakerates::getNJets(1);
@@ -212,12 +235,16 @@ float Closure::getFRatio(int type, float pt, float eta){
 
 	float fr(-1.);
 
+	// make sure we get the right bin if pt is too high -----
 	int corr = 0;
-	if(pt >= f_h_FR_mc_mu->GetXaxis()->GetXmax()) corr = 1; // make sure we get the right bin if pt is too high
+	if(pt >= f_h_FR_mc_mu->GetXaxis()->GetXmax()) corr = 1;
+	// ------------------------------------------------------
 
 	if(type==0){
-		//fr = f_h_FR_ttbar_mu->GetBinContent( f_h_FR_ttbar_mu->FindBin(pt, feta) - corr);
 		fr = f_h_FR_mc_mu->GetBinContent( f_h_FR_mc_mu->FindBin(pt, feta) - corr);
+	}
+	if(type==1){
+		fr = f_h_FR_mc_el->GetBinContent( f_h_FR_mc_el->FindBin(pt, feta) - corr);
 	}
 
 	return fr;
@@ -225,15 +252,19 @@ float Closure::getFRatio(int type, float pt, float eta){
 }
 
 
-bool Closure::isSameSignLLEvent(int &mu1, int &mu2, int &type){
+bool Closure::isSameSignLLEvent(int &lep1, int &lep2, int &type){
 
 	std::vector< std::pair<int, int> > lepneg;
 	std::vector< std::pair<int, int> > leppos;
 
+	int nLooseSoft = 0;
+
 	for(int i=0; i< MuPt->size(); ++i){
-		if(MuPt->at(i) < 20.)        continue;
-		if(fabs(MuEta->at(i)) > 2.4) continue;
 		if(!isLooseMuon(i))          continue;
+		if(MuPt->at(i) < 20.) {
+			nLooseSoft++;
+			continue;
+		}
 		if      (MuCharge->at(i) < 0) 
 			lepneg.push_back(make_pair(0,i));
 		else if (MuCharge->at(i) > 0) 
@@ -243,9 +274,11 @@ bool Closure::isSameSignLLEvent(int &mu1, int &mu2, int &type){
 	
 	}
 	for(int i=0; i< ElPt->size(); ++i){
-		if(ElPt->at(i) < 20.)          continue;
-		if(fabs(ElEta->at(i)) > 2.5)   continue;
 		if(!isLooseElectron(i))        continue;
+		if(ElPt->at(i) < 20.) {
+			nLooseSoft++;
+			continue;
+		}
 		if      (ElCharge->at(i) < 0) 
 			lepneg.push_back(make_pair(1,i));
 		else if (ElCharge->at(i) > 0) 
@@ -255,32 +288,56 @@ bool Closure::isSameSignLLEvent(int &mu1, int &mu2, int &type){
 	
 	}
 
-	if(lepneg.size() < 2 && leppos.size() < 2) return false;
-	if(lepneg.size() > 1){
+	if(lepneg.size() != 2 && leppos.size() != 2) return false; // require == 2 same sign leptons
+	if(nLooseSoft > 0) return false; // veto on any third soft lepton
 
-		if(lepneg[0].first + lepneg[1].first == 0 ) { // mu-mu
-			lep1 = lepneg[0];
-			lep2 = lepneg[1];
-			type = 0;
-		}
-		else if(lepneg[0].first + lepneg[1].first == 1 ) { // el-mu
-			lep1 = lepneg[0];
-			lep2 = lepneg[1];
-			type = 1;
-		}
-		else if(lepneg[0].first + lepneg[1].first == 2 ) { // el-el
-			lep1 = lepneg[0];
-			lep2 = lepneg[1];
-			type = 2;
-		}
+	std::vector< std::pair<int, int> > ssleps;
+	if     (lepneg.size() == 2) ssleps = lepneg;
+	else if(leppos.size() == 2) ssleps = leppos;
+	else { cout << "SOMETHING WRONG WITH THE SAMESIGN SELECTION! CHECK THE CODE" << endl; exit(-1);}
+
+
+	if(ssleps[0].first + ssleps[1].first == 0 ) { // mu-mu
+		lep1 = ssleps[0].second;
+		lep2 = ssleps[1].second;
+		type = 0;
 	}
-	if(leppos.size() > 1){
-		lep1 = leppos[0];
-		lep2 = leppos[1];
+	else if(ssleps[0].first + ssleps[1].first == 1 ) { // el-mu
+		lep1 = ssleps[0].second; //since muons are filled first, this should always be the muon
+		lep2 = ssleps[1].second;
+		type = 1;
 	}
-	type = 0;
-	
+	else if(ssleps[0].first + ssleps[1].first == 2 ) { // el-el
+		lep1 = ssleps[0].second;
+		lep2 = ssleps[1].second;
+		type = 2;
+	}
+	else { cout << "SOMETHING WRONG WITH THE SAMESIGN SELECTION! CHECK THE CODE" << endl; exit(-1);}
+
+	if(!passMllCut(lep1, lep2, type, 12.)) return false;
+
 	return true;
+}
+
+bool Closure::passMllCut(int lep1, int lep2, int type, float mass){
+	TLorentzVector l1, l2;
+	if(type == 0) {
+		l1.SetPtEtaPhiM(MuPt->at(lep1), MuEta->at(lep1), MuPhi->at(lep1), 0.105);
+		l2.SetPtEtaPhiM(MuPt->at(lep2), MuEta->at(lep2), MuPhi->at(lep2), 0.105);
+	}
+	else if(type == 1) {
+		l1.SetPtEtaPhiM(MuPt->at(lep1), MuEta->at(lep1), MuPhi->at(lep1), 0.105);
+		l2.SetPtEtaPhiM(ElPt->at(lep2), ElEta->at(lep2), ElPhi->at(lep2), 0.005);
+	}
+	else if(type == 2) {
+		l1.SetPtEtaPhiM(ElPt->at(lep1), ElEta->at(lep1), ElPhi->at(lep1), 0.005);
+		l2.SetPtEtaPhiM(ElPt->at(lep2), ElEta->at(lep2), ElPhi->at(lep2), 0.005);
+	}
+	else { cout << "SOMETHING WRONG WITH THE Mll VETO! CHECK THE CODE" << endl; exit(-1);}
+
+	if( (l1+l2).M()  < mass) return false;
+	return true;
+
 }
 
 void Closure::bookClosureTree(){
