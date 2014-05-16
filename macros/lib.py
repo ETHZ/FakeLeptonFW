@@ -18,7 +18,7 @@ def getScaling(outputDir, printall = 0):
 
 def getModule(outputDir, printall = 0):
 
-	list   = ['plots_1d', 'plots_2d', 'zoom_met', 'zoom_jpt', 'fakerates_1d', 'fakerates_2d', 'adhoc', 'compare']
+	list   = ['plots_1d', 'plots_2d', 'zoom_met', 'zoom_jpt', 'fakerates_1d', 'fakerates_2d', 'fakerates_2dct', 'adhoc', 'compare']
 	struct = outputDir.split('/')
 	result = ''
 
@@ -109,13 +109,45 @@ def getColor(name):
 	elif name == 'mu_ttbar6'          : return mycolor.GetColor( 51, 153,  58)
 	elif name == 'el_ttbar6'          : return mycolor.GetColor( 51, 153,  58)
 	elif name == 'mu_qcd0'            : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcd0'            : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'mu_qcd1'            : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcd1'            : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'mu_qcd2'            : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcd2'            : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'mu_qcd3'            : return mycolor.GetColor( 51, 102, 153)
-	elif name == 'el_qcd3'            : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd00'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd01'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd02'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd03'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd10'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd11'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd12'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd13'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd20'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd21'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd22'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd23'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd30'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd31'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd32'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd33'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd40'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd41'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd42'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd43'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd50'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd51'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd52'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd53'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd60'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd61'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd62'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd63'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd70'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd71'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd72'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd73'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd80'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd81'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd82'           : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'el_qcd83'           : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'mu_qcdmuenr'        : return mycolor.GetColor( 51, 102, 153)
 	elif name == 'el_qcdtot50'        : return mycolor.GetColor( 15, 106, 196)
 	elif name == 'el_qcdtot80'        : return mycolor.GetColor( 15, 106, 196)
@@ -134,6 +166,8 @@ def getColor(name):
 	elif name == 'el_qcdbctoe20'      : return mycolor.GetColor( 12,  57, 102)
 	elif name == 'el_qcdbctoe30'      : return mycolor.GetColor( 12,  57, 102)
 	elif name == 'el_qcdbctoe80'      : return mycolor.GetColor( 12,  57, 102)
+	elif name == 'qcd'                : return mycolor.GetColor( 51, 102, 153)
+	elif name == 'mc'                 : return mycolor.GetColor(191,  11,  11)
 	elif name == 'totbg'              : return mycolor.GetColor(191,  11,  11)
 	elif name == 'data'               : return ROOT.kBlack
 	elif name == 'datamcsub'          : return ROOT.kOrange
@@ -207,6 +241,7 @@ def getLegendName(name):
 	elif name == 'el_qcdbctoe20'      : return 'QCD (BCtoE)'
 	elif name == 'el_qcdbctoe30'      : return 'QCD (BCtoE)'
 	elif name == 'el_qcdbctoe80'      : return 'QCD (BCtoE)'
+	elif name == 'qcd'                : return 'QCD'
 	elif name == 'mc'                 : return 'MC'
 	elif name == 'totbg'              : return 'QCD + EW'
 	elif name == 'data'               : return 'Data'

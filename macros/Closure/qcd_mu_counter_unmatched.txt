@@ -1,5 +1,4 @@
-g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2 -I. -pthread -m64 -I/swshare/ROOT/root_v5.34.18_slc5_amd64//include/root   -c -o src/Fakerates.o src/Fakerates.cc
-g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2 -I. -pthread -m64 -I/swshare/ROOT/root_v5.34.18_slc5_amd64//include/root -L/swshare/ROOT/root_v5.34.18_slc5_amd64//lib/root -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic -ldl -o Fakerates exe/Fakerates.C src/FWBaseClass.o src/Fakerates.o
+make: `Fakerates' is up to date.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =======================================================
 =======================================================

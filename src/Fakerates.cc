@@ -774,7 +774,7 @@ int Fakerates::getLeptonOrigin(int mid, int gmid){
 	else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 399                    ) return 3;
 	else if (mother == 6                                                                                     ) return 4;
 	else if (grandmother == 24                                                                               ) return 6;
-	else cout << "MID: " << mother << " GMID: " << grandmother << endl;
+	else return 5; //cout << "MID: " << mother << " GMID: " << grandmother << endl;
 
 	//if      (grandmother == 24                                                                               ) return 6;
 	//else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
@@ -1169,7 +1169,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 			}
 		}
 
-		if(closestInd == j && closestDR < 0.4) isClosest = true;
+		if(closestInd == j && closestDR < minDR) isClosest = true;
 
 	}
 
@@ -1190,7 +1190,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 			}
 		}
 
-		if(closestInd == j && closestDR < 0.4) isClosest = true;
+		if(closestInd == j && closestDR < minDR) isClosest = true;
 
 	}
 
