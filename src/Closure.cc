@@ -303,7 +303,7 @@ bool Closure::isSameSignLLEvent(int &lep1, int &lep2, int &type){
 		type = 0;
 	}
 	else if(ssleps[0].first + ssleps[1].first == 1 ) { // el-mu
-		lep1 = ssleps[0].second; //since muons are filled first, this should always be the muon
+		lep1 = ssleps[0].second; //since muons are filled first, this is always the muon
 		lep2 = ssleps[1].second;
 		type = 1;
 	}
