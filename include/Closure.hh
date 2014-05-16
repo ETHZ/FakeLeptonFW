@@ -124,6 +124,12 @@ public:
 	int   fCT_type;
 
 	float fCT_lumiW;
+
+	float fCT_f1;
+	float fCT_f2;
+	float fCT_p1;
+	float fCT_p2;
+
 	float fCT_npp;
 	float fCT_npf;
 	float fCT_nfp;

@@ -35,14 +35,16 @@ void Closure::init(TString frfilestring){
 	fFRFile = new TFile(fFRFileString, "READ");
 
 	// SET ALL THE HISTOGRAMS CORRECTLY
-	f_h_FR_data_el      = (TH2F*) fFRFile->Get("FR_data_el");
+	// f_h_FR_data_el      = (TH2F*) fFRFile->Get("FR_data_el");
+	// f_h_FR_data_pure_el = (TH2F*) fFRFile->Get("FR_data_pure_el");
+	// f_h_FR_mc_el        = (TH2F*) fFRFile->Get("FR_mc_el");
+	// f_h_FR_ttbar_el     = (TH2F*) fFRFile->Get("FR_ttbar_el");
+
 	f_h_FR_data_mu      = (TH2F*) fFRFile->Get("FR_data_mu");
-	f_h_FR_data_pure_el = (TH2F*) fFRFile->Get("FR_data_pure_el");
 	f_h_FR_data_pure_mu = (TH2F*) fFRFile->Get("FR_data_pure_mu");
-	f_h_FR_mc_el        = (TH2F*) fFRFile->Get("FR_mc_el");
+
 	f_h_FR_mc_mu        = (TH2F*) fFRFile->Get("FR_mc_mu");
-	f_h_FR_ttbar_el     = (TH2F*) fFRFile->Get("FR_ttbar_el");
-	f_h_FR_ttbar_mu     = (TH2F*) fFRFile->Get("FR_ttbar_mu");
+	f_h_FR_ttbar_mu     = (TH2F*) fFRFile->Get("FR_ttbar_all_mu");
 
 
 	fLuminosity = 19500.;
@@ -112,7 +114,7 @@ void Closure::loop(TFile * outFile){
 		if(jentry > (fMaxSize>0?fMaxSize:Ngen)) break;
 		tree_->GetEntry(jentry);
 
-		fEventWeight *= PUWeight;
+		// fEventWeight *= PUWeight;
 		fTot++;
 
 		storePredictions();
@@ -166,6 +168,12 @@ void Closure::storePredictions(){
 		fCT_type  = type;
 
 		fCT_lumiW = fEventWeight;
+
+		fCT_f1    = f1;
+		fCT_f2    = f2;
+		fCT_p1    = p1;
+		fCT_p2    = p2;
+
 		fCT_npp   = npp;
 		fCT_npf   = npf;
 		fCT_nfp   = nfp;
@@ -208,8 +216,8 @@ float Closure::getFRatio(int type, float pt, float eta){
 	if(pt >= f_h_FR_mc_mu->GetXaxis()->GetXmax()) corr = 1; // make sure we get the right bin if pt is too high
 
 	if(type==0){
-		fr = f_h_FR_ttbar_mu->GetBinContent( f_h_FR_ttbar_mu->FindBin(pt, feta) - corr);
-		//fr = f_h_FR_mc_mu->GetBinContent( f_h_FR_mc_mu->FindBin(pt, feta) - corr);
+		//fr = f_h_FR_ttbar_mu->GetBinContent( f_h_FR_ttbar_mu->FindBin(pt, feta) - corr);
+		fr = f_h_FR_mc_mu->GetBinContent( f_h_FR_mc_mu->FindBin(pt, feta) - corr);
 	}
 
 	return fr;
@@ -219,31 +227,56 @@ float Closure::getFRatio(int type, float pt, float eta){
 
 bool Closure::isSameSignLLEvent(int &mu1, int &mu2, int &type){
 
-	std::vector<int> muneg;
-	std::vector<int> mupos;
+	std::vector< std::pair<int, int> > lepneg;
+	std::vector< std::pair<int, int> > leppos;
 
 	for(int i=0; i< MuPt->size(); ++i){
 		if(MuPt->at(i) < 20.)        continue;
-		if(fabs(MuEta->at(i)) > 2.5) continue;
-		//if(!MuIsLoose->at(i))        continue;
-		if(!isLooseMuon(i))        continue;
+		if(fabs(MuEta->at(i)) > 2.4) continue;
+		if(!isLooseMuon(i))          continue;
 		if      (MuCharge->at(i) < 0) 
-			muneg.push_back(i);
+			lepneg.push_back(make_pair(0,i));
 		else if (MuCharge->at(i) > 0) 
-			mupos.push_back(i);
+			leppos.push_back(make_pair(0,i));
+		else 
+			cout << "ERROR: THERE IS A MUON WITH 0 CHARGE OR SOMETHING ELSE IS WRONG" << endl;
+	
+	}
+	for(int i=0; i< ElPt->size(); ++i){
+		if(ElPt->at(i) < 20.)          continue;
+		if(fabs(ElEta->at(i)) > 2.5)   continue;
+		if(!isLooseElectron(i))        continue;
+		if      (ElCharge->at(i) < 0) 
+			lepneg.push_back(make_pair(1,i));
+		else if (ElCharge->at(i) > 0) 
+			leppos.push_back(make_pair(1,i));
 		else 
 			cout << "ERROR: THERE IS A MUON WITH 0 CHARGE OR SOMETHING ELSE IS WRONG" << endl;
 	
 	}
 
-	if(muneg.size() < 2 && mupos.size() < 2) return false;
-	if(muneg.size() > 1){
-		mu1 = muneg[0];
-		mu2 = muneg[1];
+	if(lepneg.size() < 2 && leppos.size() < 2) return false;
+	if(lepneg.size() > 1){
+
+		if(lepneg[0].first + lepneg[1].first == 0 ) { // mu-mu
+			lep1 = lepneg[0];
+			lep2 = lepneg[1];
+			type = 0;
+		}
+		else if(lepneg[0].first + lepneg[1].first == 1 ) { // el-mu
+			lep1 = lepneg[0];
+			lep2 = lepneg[1];
+			type = 1;
+		}
+		else if(lepneg[0].first + lepneg[1].first == 2 ) { // el-el
+			lep1 = lepneg[0];
+			lep2 = lepneg[1];
+			type = 2;
+		}
 	}
-	if(mupos.size() > 1){
-		mu1 = mupos[0];
-		mu2 = mupos[1];
+	if(leppos.size() > 1){
+		lep1 = leppos[0];
+		lep2 = leppos[1];
 	}
 	type = 0;
 	
@@ -260,6 +293,12 @@ void Closure::bookClosureTree(){
 	fClosureTree->Branch("type"  , &fCT_type  , "type/I"   ) ;
 
 	fClosureTree->Branch("lumiW" , &fCT_lumiW , "lumiW/F" ) ;
+
+	fClosureTree->Branch("f1"    , &fCT_f1    , "f1/F"    ) ;
+	fClosureTree->Branch("f2"    , &fCT_f2    , "f2/F"    ) ;
+	fClosureTree->Branch("p1"    , &fCT_p1    , "p1/F"    ) ;
+	fClosureTree->Branch("p2"    , &fCT_p2    , "p2/F"    ) ;
+
 	fClosureTree->Branch("npp"   , &fCT_npp   , "npp/F"   ) ;
 	fClosureTree->Branch("npf"   , &fCT_npf   , "npf/F"   ) ;
 	fClosureTree->Branch("nfp"   , &fCT_nfp   , "nfp/F"   ) ;
@@ -295,6 +334,12 @@ void Closure::resetClosureTree(){
 	fCT_type  = -1;
 
 	fCT_lumiW = -1.;
+
+	fCT_f1   = -99.;
+	fCT_f2   = -99.;
+	fCT_p1   = -99.;
+	fCT_p2   = -99.;
+
 	fCT_npp   = -99.;
 	fCT_npf   = -99.;
 	fCT_nfp   = -99.;
