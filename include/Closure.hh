@@ -78,9 +78,13 @@ public:
 // COUNTERS
 	int fTot;
 	int fSS;
+	int fOS;
 	int fSSmm;
 	int fSSem;
 	int fSSee;
+	int fOSmm;
+	int fOSem;
+	int fOSee;
 
 
 // INPUT FR FILE
@@ -93,6 +97,8 @@ public:
 	TH2F    * f_h_FR_data_pure_mu;
 	TH2F    * f_h_FR_mc_el;
 	TH2F    * f_h_FR_mc_mu;
+	TH2F    * f_h_FR_qcd_el;
+	TH2F    * f_h_FR_qcd_mu;
 	TH2F    * f_h_FR_ttbar_el;
 	TH2F    * f_h_FR_ttbar_mu;
 
