@@ -291,6 +291,26 @@ def PlotFR(dataType, outputDir, datasets, mcsets, histlist, mcsetsplot = [], mcs
 
 
 
+def DoMCSubCERN(hist_new, hist_data_small, hist_data_large, n_prompt_small, n_prompt_large, n_all_small, n_all_large):
+
+	r_p_sl = (n_prompt_small / n_prompt_large) * (n_all_large / n_all_small)
+	
+	for i in range(1, hist_new.GetNbinsX()+1):
+		for j in range(1, hist_new.GetNbinsY()+1):
+
+			f_data_small = hist_data_small.GetBinContent(i,j)
+			f_data_large = hist_data_large.GetBinContent(i,j)
+
+			f_qcd = (f_data_small - r_p_sl * f_data_large) / (1. - r_p_sl)
+			
+			print "adjusting value of bin " + str(i) + "." + str(j) + " from " + str(hist_new.GetBinContent(i,j)) + " to " + str(f_qcd)
+			
+			hist_new.SetBinContent(i, j, f_qcd)
+
+	return hist_new
+
+
+
 
 def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], mcsubtract = [], mcsubtractplot = [], doProjection = False, mcsubtractscales = False):
 	# attention: when calling this function with substraction of certain MC (e.g. electroweak)
@@ -351,9 +371,9 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 
 			index_numerator = i
 
-			data_numerator   = ROOT.THStack()
-			mc_numerator     = ROOT.THStack()
-			mcsub_numerator  = ROOT.THStack()
+			data_numerator            = ROOT.THStack()
+			mc_numerator              = ROOT.THStack()
+			mcsub_numerator           = ROOT.THStack()
 
 			for data in datasets:               data_numerator   .Add(copy.deepcopy(data.hists[index_numerator]))
 			for mc in mcsets:                   mc_numerator     .Add(copy.deepcopy(mc  .hists[index_numerator]))
@@ -376,6 +396,28 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 			for mc in mcsubtractplot:           mcsub_denominator  .Add(copy.deepcopy(mc  .hists[index_denominator]))
 
 
+		# Get Numerator CERN Histogram
+		if hist.GetName()[-19:] == 'h_FTight_CERN_small':
+			data_numerator_CERN_small = ROOT.THStack()
+			for data in datasets:               data_numerator_CERN_small .Add(copy.deepcopy(data.hists[i]))
+
+		# Get Numerator CERN Histogram
+		if hist.GetName()[-19:] == 'h_FTight_CERN_large':
+			data_numerator_CERN_large = ROOT.THStack()
+			for data in datasets:               data_numerator_CERN_large .Add(copy.deepcopy(data.hists[i]))
+
+		# Get Numerator CERN Histogram
+		if hist.GetName()[-19:] == 'h_FLoose_CERN_small':
+			data_denominator_CERN_small = ROOT.THStack()
+			for data in datasets:               data_denominator_CERN_small .Add(copy.deepcopy(data.hists[i]))
+
+		# Get Numerator CERN Histogram
+		if hist.GetName()[-19:] == 'h_FLoose_CERN_small':
+			data_denominator_CERN_large = ROOT.THStack()
+			for data in datasets:               data_denominator_CERN_large .Add(copy.deepcopy(data.hists[i]))
+
+
+
 	FR_data        = copy.deepcopy(data_numerator   .GetStack().Last())
 	FR_mc          = copy.deepcopy(mc_numerator     .GetStack().Last())
 	FR_mcsub       = copy.deepcopy(mcsub_numerator  .GetStack().Last())
@@ -385,6 +427,14 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 	FR_mcsub_copy  = copy.deepcopy(FR_mcsub)
 	
 	for j in range(len(mcsetsplot)): FR_mcplot_copy[j] = copy.deepcopy(FR_mcplot[j])
+
+
+	FR_data_CERN_small = copy.deepcopy(data_numerator_CERN_small.GetStack().Last())
+	FR_data_CERN_large = copy.deepcopy(data_numerator_CERN_large.GetStack().Last())
+
+	FR_data_CERN_small.Divide(FR_data_CERN_small, copy.deepcopy(data_denominator_CERN_small.GetStack().Last()), 1, 1, 'B')
+	FR_data_CERN_large.Divide(FR_data_CERN_large, copy.deepcopy(data_denominator_CERN_large.GetStack().Last()), 1, 1, 'B')
+
 
 	#sum = 0 
 	#for i in range(FR_data.GetNbinsX()+2, (FR_data.GetNbinsX()+2)*(FR_data.GetNbinsY()+1)):
@@ -405,6 +455,10 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 	FR_data_mcsub_l1 = copy.deepcopy(FR_data)
 	FR_data_mcsub_u1 = copy.deepcopy(FR_data)
 	FR_data_mcsub_c2 = copy.deepcopy(FR_data)
+	FR_data_mcsub_c3 = copy.deepcopy(FR_data)
+	FR_data_mcsub_c3.Divide(FR_data_mcsub_c3, copy.deepcopy(data_denominator   .GetStack().Last()), 1, 1, 'B')
+	FR_data_mcsub_c3 = DoMCSubCERN(FR_data_mcsub_c3, FR_data_CERN_small, FR_data_CERN_large, 117683, 32137, 12139, 3750)
+	# you gotta fill in the numbers by hand (i know, not very nice indeed) from the counters fCounter_CERN_small/-large from Fakerates.cc
 
 	data_denominator_mcsub    = copy.deepcopy(data_denominator.GetStack().Last())
 	data_denominator_mcsub_c1 = copy.deepcopy(data_denominator.GetStack().Last())
@@ -513,6 +567,7 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_l1, title_indeces, 'datamcsub_lower1'  )
 		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_u1, title_indeces, 'datamcsub_upper1'  )
 		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c2, title_indeces, 'datamcsub_central2')
+		make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c3, title_indeces, 'datamcsub_central3')
 
 
 

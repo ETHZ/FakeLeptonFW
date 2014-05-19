@@ -66,6 +66,8 @@ void Fakerates::init(bool verbose){
 	fCounter_jet30       = 0;
 	fCounter_met         = 0;
 	fCounter_mt          = 0;
+	fCounter_CERN_small  = 0;
+	fCounter_CERN_large  = 0;
 	fCounter_origin      = 0;
 
 	fCounter_origin_pl1   = 0;
@@ -359,19 +361,21 @@ void Fakerates::loop(TFile* pFile){
 	cout << " mu: nevents passing MT     selection: " << fCutflow_afterMTCut  << endl;
 	cout << " i just looped on " << ntot << " events." << endl;
 
-	cout << " fCounter_all             = " << fCounter_all     << " (" << (float) fCounter_all     / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_trigger         = " << fCounter_trigger << " (" << (float) fCounter_trigger / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_loose           = " << fCounter_loose   << " (" << (float) fCounter_loose   / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_veto            = " << fCounter_veto    << " (" << (float) fCounter_veto    / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_jet (40)        = " << fCounter_jet     << " (" << (float) fCounter_jet     / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_jet (30)        = " << fCounter_jet30   << " (" << (float) fCounter_jet30   / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_met             = " << fCounter_met     << " (" << (float) fCounter_met     / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_mt              = " << fCounter_mt      << " (" << (float) fCounter_mt      / (float) fCounter_all << ") " << endl;
-	cout << " fCounter_origin (ttbar)  = " << fCounter_origin  << " (" << (float) fCounter_origin  / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_all             = " << fCounter_all        << " (" << (float) fCounter_all        / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_trigger         = " << fCounter_trigger    << " (" << (float) fCounter_trigger    / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_loose           = " << fCounter_loose      << " (" << (float) fCounter_loose      / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_veto            = " << fCounter_veto       << " (" << (float) fCounter_veto       / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_jet (40)        = " << fCounter_jet        << " (" << (float) fCounter_jet        / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_jet (30)        = " << fCounter_jet30      << " (" << (float) fCounter_jet30      / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_met             = " << fCounter_met        << " (" << (float) fCounter_met        / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_mt              = " << fCounter_mt         << " (" << (float) fCounter_mt         / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_CERN_small      = " << fCounter_CERN_small << " (" << (float) fCounter_CERN_small / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_CERN_large      = " << fCounter_CERN_large << " (" << (float) fCounter_CERN_large / (float) fCounter_all << ") " << endl;
+	cout << " fCounter_origin (ttbar)  = " << fCounter_origin     << " (" << (float) fCounter_origin     / (float) fCounter_all << ") " << endl;
 
 	if(fClosure) {
 		ofstream ttbarfile;
-		ttbarfile.open("macros/Plots/qcd_mu_counters.txt", ios::app);
+		ttbarfile.open("macros/Closure/qcd_mu_counters.txt", ios::app);
 		ttbarfile << fName << ": " << fCounter_origin_pl1 << ", " << fCounter_origin_pl2 << ", " << fCounter_origin_pl3 << ", " << fCounter_origin_pl4 << ", " << fCounter_origin_pl5 << ", " << fCounter_origin_pl6 << endl; 
 		ttbarfile << fName << ": " << fCounter_origin_nl1 << ", " << fCounter_origin_nl2 << ", " << fCounter_origin_nl3 << ", " << fCounter_origin_nl4 << ", " << fCounter_origin_nl5 << ", " << fCounter_origin_nl6 << endl; 
 		ttbarfile << fName << ": " << fCounter_origin_pt1 << ", " << fCounter_origin_pt2 << ", " << fCounter_origin_pt3 << ", " << fCounter_origin_pt4 << ", " << fCounter_origin_pt5 << ", " << fCounter_origin_pt6 << endl; 
@@ -534,6 +538,45 @@ std::vector<float, std::allocator<float> >* Fakerates::getLepD0() {
 	if(fDataType == 2) return ElD0;
 	else               return MuD0;
 }
+
+
+//____________________________________________________________________________
+std::vector<bool, std::allocator<bool> >* Fakerates::getLepIsPrompt() {
+	/*
+	return IsPrompt of the lepton
+	parameters: none
+	return: ID
+	*/
+
+	if(fDataType == 2) return ElIsPrompt;
+	else               return MuIsPrompt;
+}
+
+
+//____________________________________________________________________________
+void Fakerates::setLepIsPrompt(int index, bool newvalue) {
+	/*
+	set the value of IsPrompt of the lepton
+	parameters: index (index of the lepton), newvalue (new value to be set)
+	return: none
+	*/
+
+	if(fDataType == 2) ElIsPrompt->at(index) = newvalue;
+	else               MuIsPrompt->at(index) = newvalue;
+}
+
+
+//____________________________________________________________________________
+//std::vector<int, std::allocator<int> >* Fakerates::getLepID() {
+//	/*
+//	return ID of the lepton
+//	parameters: none
+//	return: ID
+//	*/
+//
+//	if(fDataType == 2) return ElID;
+//	else               return MuID;
+//}
 
 
 //____________________________________________________________________________
@@ -747,11 +790,11 @@ bool Fakerates::isFRRegionLepEventTTBar(int origin = 0){
 
 
 //____________________________________________________________________________
-int Fakerates::getLeptonOrigin(int mid, int gmid){
+int Fakerates::getLeptonOrigin(int mid, int gmid, int id = 0){
 	/*
 	returns the original quark flavor of the lepton
 	parameters: mid (mother id), gmid (grandmother id)
-	return: (0 is reserved for all), 1 (bottom), 2 (charm), 3 (other, light-flavor), 4 (other, top), 5 (other, unidentified), 6 (W)
+	return: (0 is reserved for all), 1 (bottom), 2 (charm), 3 (other, light-flavor), 4 (other, top), 5 (other, unidentified), 6 (W), 7 (also W but prompt, detected in non-prompt)
 	*/ 
 
 	int mother           = (int) fabs(mid);
@@ -772,7 +815,7 @@ int Fakerates::getLeptonOrigin(int mid, int gmid){
 	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 499                    ) return 2;
 	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 599                    ) return 1;
 	else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 399                    ) return 3;
-	else if (mother == 6                                                                                     ) return 4;
+	else if (mother == 6 || grandmother == 6                                                                 ) return 4;
 	else if (grandmother == 24                                                                               ) return 6;
 	else return 5; //cout << "MID: " << mother << " GMID: " << grandmother << endl;
 
@@ -794,7 +837,7 @@ int Fakerates::getLeptonOrigin(int mid, int gmid){
 
 	return 5;
 }
-	
+
 
 //____________________________________________________________________________
 bool Fakerates::isLooseMuon(int index){
@@ -855,44 +898,40 @@ bool Fakerates::isLooseOpLepton(int index){
 
 
 //____________________________________________________________________________
-bool Fakerates::isLooseMuonTTBar(int index, bool checkforprompt = false){
+bool Fakerates::isLooseMuonTTBar(int index){
 	/* 
 	checks, if the muon in the ttbar sample is loose
-	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
+	parameters: index (index of the particle)
 	return: true (if muon is loose), false (else)
 	*/
 
 	if(!isLooseMuon(index)) return false;
-	if(checkforprompt  && !MuIsPrompt->at(index)) return false;
-	if(!checkforprompt && MuIsPrompt->at(index) ) return false;
 	return true;
 }
 
 
 //____________________________________________________________________________
-bool Fakerates::isLooseElectronTTBar(int index, bool checkforprompt = false){
+bool Fakerates::isLooseElectronTTBar(int index){
 	/* 
 	checks, if the electron in the ttbar sample is loose
-	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
+	parameters: index (index of the particle)
 	return: true (if electron is loose), false (else)
 	*/
 
 	if(!isLooseElectron(index)) return false;
-	if(checkforprompt  && !ElIsPrompt->at(index)) return false;
-	if(!checkforprompt && ElIsPrompt->at(index) ) return false;
 	return true;
 }
 
 //____________________________________________________________________________
-bool Fakerates::isLooseLeptonTTBar(int index, bool checkforprompt = false){
+bool Fakerates::isLooseLeptonTTBar(int index){
 	/* 
 	checks, if the lepton in the ttbar sample is loose
-	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
+	parameters: index (index of the particle)
 	return: true (if lepton is loose), false (else)
 	*/
 
-	if(fDataType == 2) return isLooseElectronTTBar(index, checkforprompt);
-	else return isLooseMuonTTBar(index, checkforprompt);
+	if(fDataType == 2) return isLooseElectronTTBar(index);
+	else return isLooseMuonTTBar(index);
 }
 
 
@@ -943,47 +982,43 @@ bool Fakerates::isTightLepton(int index){
 
 
 //____________________________________________________________________________
-bool Fakerates::isTightMuonTTBar(int index, bool checkforprompt = false){
+bool Fakerates::isTightMuonTTBar(int index){
 	/* 
 	checks, if the muon in the ttbar sample is tight
-	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
+	parameters: index (index of the particle)
 	return: true (if muon is tight), false (else)
 	*/
 
 	if(!isTightMuon(index)) return false;
-	if(checkforprompt  && !MuIsPrompt->at(index)) return false;
-	if(!checkforprompt && MuIsPrompt->at(index) ) return false;
 
 	return true;
 }
 
 
 //____________________________________________________________________________
-bool Fakerates::isTightElectronTTBar(int index, bool checkforprompt = false){
+bool Fakerates::isTightElectronTTBar(int index){
 	/* 
 	checks, if the electron in the ttbar sample is tight
-	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
+	parameters: index (index of the particle)
 	return: true (if electron is tight), false (else)
 	*/
 
 	if(!isTightElectron(index)) return false;
-	if(checkforprompt  && !ElIsPrompt->at(index)) return false;
-	if(!checkforprompt && ElIsPrompt->at(index) ) return false;
 
 	return true;
 }
 
 
 //____________________________________________________________________________
-bool Fakerates::isTightLeptonTTBar(int index, bool checkforprompt = false){
+bool Fakerates::isTightLeptonTTBar(int index){
 	/* 
 	checks, if the lepton in the ttbar sample is tight
-	parameters: index (index of the particle), checkforprompt (true if we want to find prompt leptons)
+	parameters: index (index of the particle)
 	return: true (if lepton is tight), false (else)
 	*/
 
-	if(fDataType == 2) return isTightElectronTTBar(index, checkforprompt);
-	else return isTightMuonTTBar(index, checkforprompt);
+	if(fDataType == 2) return isTightElectronTTBar(index);
+	else return isTightMuonTTBar(index);
 
 }
 
@@ -1742,6 +1777,15 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 		if(passesMETCut(20,1))  h_Loose_MTMET20        ->Fill(getMT(lep)          , eventweight);
 		if(passesMETCut(30,1))  h_Loose_MTMET30        ->Fill(getMT(lep)          , eventweight);
 		if(passesMETCut(20,1))  h_Loose_NVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , eventweight);
+		
+		if(passesMTCut(lep) && passesMETCut(20)){
+			h_FLoose_CERN_small ->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
+			++fCounter_CERN_small;
+		}
+		if(passesMTCut(lep) && passesMETCut(45,1) && passesMETCut(80)){
+			h_FLoose_CERN_large ->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
+			++fCounter_CERN_large;
+		}
 
 		if(passesMTCut(lep) && fFRMETbinseta[0]<=fabs(LepEta->at(lep)) && fabs(LepEta->at(lep))<fFRMETbinseta[fFRMETn_binseta-1]){
 			if(fFRMETbinspt[0]<=LepPt->at(lep) && LepPt->at(lep)<fFRMETbinspt[fFRMETn_binspt-1]){
@@ -1830,6 +1874,9 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 			if(passesMETCut(30,1))  h_Tight_MTMET30    -> Fill(getMT(lep)             , eventweight);
 			if(passesMETCut(20,1))  h_Tight_NVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , eventweight);
 
+			if(passesMTCut(lep) && passesMETCut(20))                        h_FTight_CERN_small ->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
+			if(passesMTCut(lep) && passesMETCut(45,1) && passesMETCut(80))  h_FTight_CERN_large ->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
+
 			if(passesMTCut(lep) && fFRMETbinseta[0]<=fabs(LepEta->at(lep)) && fabs(LepEta->at(lep))<fFRMETbinseta[fFRMETn_binseta-1]){
 				if(fFRMETbinspt[0]<=LepPt->at(lep) && LepPt->at(lep)<fFRMETbinspt[fFRMETn_binspt-1]){
 					int i = h_Tight_FRMETZoomEta ->FindBin(fabs(LepEta->at(lep)));
@@ -1857,9 +1904,9 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
 	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
 	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
+	//std::vector<int, std::allocator<int> >* LepID        = getLepID();
 	std::vector<int, std::allocator<int> >* LepMID       = getLepMID();
 	std::vector<int, std::allocator<int> >* LepGMID      = getLepGMID();
-
 
 	++fCounter_all;
 
@@ -1892,33 +1939,6 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 
 
-	// prompt counters
-
-	for(int j=0; j < LepPt->size(); ++j){
-
-		if(!isLooseLeptonTTBar(j, true)) continue;
-
-		int thisorigin = getLeptonOrigin(LepMID->at(j), LepGMID->at(j));
-
-		if     (thisorigin == 1) ++fCounter_origin_pl1;
-		else if(thisorigin == 2) ++fCounter_origin_pl2;
-		else if(thisorigin == 3) ++fCounter_origin_pl3;
-		else if(thisorigin == 4) ++fCounter_origin_pl4;
-		else if(thisorigin == 5) ++fCounter_origin_pl5;
-		else if(thisorigin == 6) ++fCounter_origin_pl6;
-
-		if(!isTightLeptonTTBar(j, true)) continue;
-
-		if     (thisorigin == 1) ++fCounter_origin_pt1;
-		else if(thisorigin == 2) ++fCounter_origin_pt2;
-		else if(thisorigin == 3) ++fCounter_origin_pt3;
-		else if(thisorigin == 4) ++fCounter_origin_pt4;
-		else if(thisorigin == 5) ++fCounter_origin_pt5;
-		else if(thisorigin == 6) ++fCounter_origin_pt6;
-
-	}
-
-
 
 	// fill Plots for all loose leptons in the event
 
@@ -1931,26 +1951,30 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 		int thisorigin = getLeptonOrigin(LepMID->at(j), LepGMID->at(j));
 
+		if     (thisorigin == 4 || thisorigin == 6) setLepIsPrompt(j, true);
+		else                                        setLepIsPrompt(j, false);
+	
 		if     (thisorigin == 1) ++fCounter_origin_nl1;
 		else if(thisorigin == 2) ++fCounter_origin_nl2;
 		else if(thisorigin == 3) ++fCounter_origin_nl3;
-		else if(thisorigin == 4) ++fCounter_origin_nl4;
+		else if(thisorigin == 4) ++fCounter_origin_pl4;
 		else if(thisorigin == 5) ++fCounter_origin_nl5;
-		else if(thisorigin == 6) ++fCounter_origin_nl6;
+		else if(thisorigin == 6) ++fCounter_origin_pl6;
 
-
+	
+	
 		// lepton origin
-
+	
 		//cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (thisorigin == 0 || (origin != 0 && thisorigin != origin)) << endl;
-
+	
 		if(thisorigin == 0 || (fOrigin != 0 && thisorigin != fOrigin)) continue;
 		++fCounter_origin;
-
-
+	
+	
 		// fill histogram
 	
 		h_Loose_LepIso ->Fill(LepPFIso->at(j), eventweight);
-
+	
 		if( LepPt->at(j) > fFRbinspt.back() ){
 			int fillbin = h_FLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(j)));
 			h_FLoose->AddBinContent(fillbin, eventweight);
@@ -1960,22 +1984,24 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 				h_FLoose->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
 		}
 //cout << Form("%d\t%d\t%d\t%.2f\t%d", Run, Lumi, Event, LepPt->at(j), isTightLeptonTTBar(j)) << endl;
-
-
+	
+	
 		// tight lepton
 		if(!isTightLeptonTTBar(j)) continue;
-
+	
 		if     (thisorigin == 1) ++fCounter_origin_nt1;
 		else if(thisorigin == 2) ++fCounter_origin_nt2;
 		else if(thisorigin == 3) ++fCounter_origin_nt3;
-		else if(thisorigin == 4) ++fCounter_origin_nt4;
+		else if(thisorigin == 4) ++fCounter_origin_pt4;
 		else if(thisorigin == 5) ++fCounter_origin_nt5;
-		else if(thisorigin == 6) ++fCounter_origin_nt6;
+		else if(thisorigin == 6) ++fCounter_origin_pt6;
 
+
+	
 		// fill histograms
-
+	
 		h_Tight_LepIso ->Fill(LepPFIso->at(j), eventweight);
-
+	
 		if( LepPt->at(j) >  fFRbinspt.back()){
 			int fillbin = h_FTight->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(j)));
 			h_FTight->AddBinContent(fillbin, eventweight);
@@ -2008,9 +2034,13 @@ void Fakerates::bookHistos(){
 	nvrtx_bins.push_back(31.);
 	int nvrtx_nbins = nvrtx_bins.size();
 
-	h_FRatio             = new TH2F("h_FRatio"            , "FRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FRatio->Sumw2(); 
-	h_FTight             = new TH2F("h_FTight"            , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight->Sumw2(); 
-	h_FLoose             = new TH2F("h_FLoose"            , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose->Sumw2(); 
+	h_FRatio             = new TH2F("h_FRatio"            , "FRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FRatio           ->Sumw2(); 
+	h_FTight             = new TH2F("h_FTight"            , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight           ->Sumw2(); 
+	h_FLoose             = new TH2F("h_FLoose"            , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose           ->Sumw2(); 
+	h_FTight_CERN_small  = new TH2F("h_FTight_CERN_small" , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_CERN_small->Sumw2(); 
+	h_FLoose_CERN_small  = new TH2F("h_FLoose_CERN_small" , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_CERN_small->Sumw2(); 
+	h_FTight_CERN_large  = new TH2F("h_FTight_CERN_large" , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_CERN_large->Sumw2(); 
+	h_FLoose_CERN_large  = new TH2F("h_FLoose_CERN_large" , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_CERN_large->Sumw2(); 
 
 	h_Loose_FRZoomEta    = new TH1F("h_Loose_FRZoomEta"   , "Loose_FRZoomEta"   , fFRn_binseta-1   , &fFRbinseta[0]   ); // empty, just to use binning
 	h_Loose_FRZoomPt     = new TH1F("h_Loose_FRZoomPt"    , "Loose_FRZoomPt"    , fFRn_binspt-1    , &fFRbinspt[0]    ); // empty, just to use binning
@@ -2271,6 +2301,11 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_FRatio               ->Write(fName + "_" + h_FRatio               ->GetName(), TObject::kWriteDelete);
 	h_FTight               ->Write(fName + "_" + h_FTight               ->GetName(), TObject::kWriteDelete);
 	h_FLoose               ->Write(fName + "_" + h_FLoose               ->GetName(), TObject::kWriteDelete);
+
+	h_FTight_CERN_small    ->Write(fName + "_" + h_FTight_CERN_small    ->GetName(), TObject::kWriteDelete);
+	h_FLoose_CERN_small    ->Write(fName + "_" + h_FLoose_CERN_small    ->GetName(), TObject::kWriteDelete);
+	h_FTight_CERN_large    ->Write(fName + "_" + h_FTight_CERN_large    ->GetName(), TObject::kWriteDelete);
+	h_FLoose_CERN_large    ->Write(fName + "_" + h_FLoose_CERN_large    ->GetName(), TObject::kWriteDelete);
  
 	// loose histograms
 	h_Loose_LepPt          ->Write(fName + "_" + h_Loose_LepPt          ->GetName(), TObject::kWriteDelete);

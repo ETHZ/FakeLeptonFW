@@ -57,5 +57,5 @@ make Fakerates && \
 #./Fakerates -v 2 -s -t 2 -c config/ETH/corrected_jet/PUweight_runD/Ele17J/0.config -i /shome/cheidegg/FakeTrees/QCD-Pt-300to470-TuneZ2star-8TeV-pythia6-v2.root            -n el_qcdtot300v2     -x 1759.5
 #./Fakerates -v 2 -s -t 2 -c config/ETH/corrected_jet/PUweight_runD/Ele17J/0.config -i /shome/cheidegg/FakeTrees/QCD-Pt-300to470-TuneZ2star-8TeV-pythia6-v3.root            -n el_qcdtot300v3     -x 1759.5
 ######################################### ELECTRON TREES
-./Fakerates -v 2    -t 2 -c config/ETH/corrected_jet/PUweight_runD/Ele17J/0.config -i /shome/cheidegg/FakeTrees/synching/eleSynch_data_minitree_new.root                        -n el_datatest     -x 1.0 >& evtlist_synch_data.txt
-./Fakerates -v 2 -s -t 2 -c config/ETH/corrected_jet/PUweight_runD/Ele17J/0.config -i /shome/cheidegg/FakeTrees/synching/eleSynch_mc_minitree_new.root                          -n el_mctest       -x 1.0 >& evtlist_synch_mc.txt
+#./Fakerates -v 2    -t 2 -c config/ETH/corrected_jet/PUweight_runD/Ele17J/0.config -i /shome/cheidegg/FakeTrees/synching/eleSynch_data_minitree_new.root                        -n el_datatest     -x 1.0 >& evtlists/evtlist_synch_data.txt
+./Fakerates -v 2 -s -t 2 -c config/ETH/corrected_jet/PUweight_runD/Ele17J/0.config -i /shome/cheidegg/FakeTrees/synching/eleSynch_mc_minitree_new.root                          -n el_mctest       -x 1.0 >& evtlists/evtlist_synch_mc.txt

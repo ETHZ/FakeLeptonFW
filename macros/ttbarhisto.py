@@ -1,6 +1,6 @@
 
 
-import ROOT, lib
+import ROOT, lib, sys
 
 
 def SetFillStyle(hists, integral, normalize = True):
@@ -59,7 +59,8 @@ ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetPaintTextFormat("4.5f")
 ROOT.TGaxis.SetMaxDigits(3)
 
-
+args = sys.argv
+filename = args[1]
 
 mycolor   = ROOT.TColor()
 label     = ['W', 'B', 'C', 'U/D/S', 'T', 'unm.']
@@ -78,8 +79,6 @@ hnt       = [{} for i in range(len(label))]
 hnf       = [{} for i in range(len(label))]
 ht        = [{} for i in range(len(label))]
 hl        = [{} for i in range(len(label))]
-filename  = 'ttbar_mu_counters'
-
 
 
 

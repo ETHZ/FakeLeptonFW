@@ -1,3 +1,4 @@
+make: `Fakerates' is up to date.
 
 [1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 
                 Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
@@ -10,14 +11,14 @@
 =======================================================
 =======================================================
  verbose level is:   2
- config file is:     config/ETH/corrected_jet/PUweight_runD/Ele17J/0.config
- inputfile is:       /shome/cheidegg/FakeTrees/synching/eleSynch_mc_minitree_new.root
- name is:            el_mctest
+ config file is:     config/ETH/corrected_jet/PUweight_runD/Mu17/0.config
+ inputfile is:       /shome/cheidegg/FakeTrees/TTJets_complete.root
+ name is:            mu_ttbar0
  running on mc
- particles are:      2
- xsec is:            1
+ particles are:      1
+ xsec is:            245
  sample max size is: 0
- closure test:       no
+ closure test:       yes
  lepton origin is:   0
 =======================================================
 =======================================================
@@ -28,8 +29,8 @@ Error in <TFile::TFile>: file qcdBigFile_START53_V20.root does not exist
  Reading Config File ...                               
 =======================================================
 =======================================================
- fOutputDir:       fakeHistos/ETH/corrected_jet/PUweight_runD/Ele17J_qcdtot/
- fLuminosity:      5.5
+ fOutputDir:       fakeHistos/ETH/corrected_jet/PUweight_runD/Mu17/
+ fLuminosity:      8.1
  fJetCorrection:   1
  fJetPtCut:        40
  fLepPtCut:        20
@@ -38,7 +39,7 @@ Error in <TFile::TFile>: file qcdBigFile_START53_V20.root does not exist
  fAwayJetBTagCut:  -1
  fAwayJetDPhiCut:  -1
  fPUweight:        1
- fLepTrigger:      Ele17J
+ fLepTrigger:      Mu17
  fLepTriggerMC:    0
  fCSA14:           0
 =======================================================
@@ -56,24 +57,8 @@ Error in <TTree::SetBranchAddress>: unknown branch -> MuD0BS
 Error in <TTree::SetBranchAddress>: unknown branch -> MuIso03SumPt
 Error in <TTree::SetBranchAddress>: unknown branch -> MuIso03EmPt
 Error in <TTree::SetBranchAddress>: unknown branch -> MuIso03HadPt
- going to loop over 9751 events...
- eventweight is 0.000564045
- mu: nevents passing lepton selection: 6480
- mu: nevents passing jet    selection: 770
- mu: nevents passing MET    selection: 147
- mu: nevents passing MT     selection: 34
- i just looped on 3814 events.
- fCounter_all             = 3814 (1) 
- fCounter_trigger         = 3814 (1) 
- fCounter_loose           = 1296 (0.339801) 
- fCounter_veto            = 1293 (0.339014) 
- fCounter_jet (40)        = 164 (0.0429995) 
- fCounter_jet (30)        = 283 (0.0742003) 
- fCounter_met             = 24 (0.00629261) 
- fCounter_mt              = 6 (0.00157315) 
- fCounter_origin (ttbar)  = 0 (0) 
-Creating directory el_mctest
- done ...                                              
-=======================================================
-=======================================================
-.......................................................
+ going to loop over 2.6683e+07 events...
+ eventweight is 7.43732e-05
+terminate called after throwing an instance of 'std::out_of_range'
+  what():  vector::_M_range_check
+bash/ETH/corrected_jet/PUweight_runD/Mu17/0.sh: line 8:  1129 Aborted                 ./Fakerates -v 2 -s -t 1 -c config/ETH/corrected_jet/PUweight_runD/Mu17/0.config -i /shome/cheidegg/FakeTrees/TTJets_complete.root -n mu_ttbar0 -x 245.0 -g 0

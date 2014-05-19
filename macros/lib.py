@@ -175,6 +175,7 @@ def getColor(name):
 	elif name == 'datamcsub_lower1'   : return mycolor.GetColor(106,  90, 205)
 	elif name == 'datamcsub_upper1'   : return mycolor.GetColor(  0,   0, 128)
 	elif name == 'datamcsub_central2' : return ROOT.kRed
+	elif name == 'datamcsub_central3' : return ROOT.kPink
 	elif name == 'data30'             : return ROOT.kBlack
 	elif name == 'data40'             : return ROOT.kRed
 	elif name == 'data50'             : return ROOT.kBlue
@@ -250,6 +251,7 @@ def getLegendName(name):
 	elif name == 'datamcsub_lower1'   : return 'Data - EW (ETH lower)'
 	elif name == 'datamcsub_upper1'   : return 'Data - EW (ETH upper)'
 	elif name == 'datamcsub_central2' : return 'Data - EW (UCSx)'
+	elif name == 'datamcsub_central3' : return 'Data - EW (CERN)'
 	elif name == 'data30'             : return 'Data (30GeV)'
 	elif name == 'data40'             : return 'Data (40GeV)'
 	elif name == 'data50'             : return 'Data (50GeV)'

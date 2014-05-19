@@ -52,3 +52,18 @@ for i in range(n_sets):
 nf.Close()
 
 
+nf1 = ROOT.TFile('Closure/histos_closuretest.root', 'recreate')
+
+for i in range(n_sets):
+
+	cv.append([])
+	hi.append([])
+
+	cv[i] = [f.Get('c2dFR') for f in fr[i]]
+	hi[i] = [c.FindObject('h_FTight') for c in cv[i]]
+
+	hi[i][3].SetName(nn[i][3])
+	hi[i][3].Write()
+
+nf1.Close()
+

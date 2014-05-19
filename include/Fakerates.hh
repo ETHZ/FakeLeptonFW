@@ -123,6 +123,9 @@ public:
 	std::vector<float, std::allocator<float> >* getLepPFIso();
 	std::vector<float, std::allocator<float> >* getLepD0();
 	std::vector<float, std::allocator<float> >* getOpLepPt();
+	std::vector<bool, std::allocator<bool> >* getLepIsPrompt();
+	void setLepIsPrompt(int, bool);
+	std::vector<int, std::allocator<int> >* getLepID();
 	std::vector<int, std::allocator<int> >* getLepMID();
 	std::vector<int, std::allocator<int> >* getLepGMID();
 
@@ -130,24 +133,24 @@ public:
 	bool isFRRegionLepEventTTBar(int);
 
 	// LEPTON 
-	int  getLeptonOrigin(int, int);
+	int  getLeptonOrigin(int, int, int);
 
 	bool isLooseMuon(int);	
 	bool isLooseElectron(int);
 	bool isLooseLepton(int);
 	bool isLooseOpLepton(int);
 
-	bool isLooseMuonTTBar(int, bool);	
-	bool isLooseElectronTTBar(int, bool);
-	bool isLooseLeptonTTBar(int, bool);
+	bool isLooseMuonTTBar(int);	
+	bool isLooseElectronTTBar(int);
+	bool isLooseLeptonTTBar(int);
 
 	bool isTightMuon(int);
 	bool isTightElectron(int);
 	bool isTightLepton(int);
 
-	bool isTightMuonTTBar(int, bool);
-	bool isTightElectronTTBar(int, bool);
-	bool isTightLeptonTTBar(int, bool);
+	bool isTightMuonTTBar(int);
+	bool isTightElectronTTBar(int);
+	bool isTightLeptonTTBar(int);
 
 	// JETS
 	float getJetPt(int);	
@@ -184,6 +187,10 @@ public:
 	TH2F * h_FRatio;
 	TH2F * h_FTight;
 	TH2F * h_FLoose;
+	TH2F * h_FTight_CERN_small;
+	TH2F * h_FLoose_CERN_small;
+	TH2F * h_FTight_CERN_large;
+	TH2F * h_FLoose_CERN_large;
 
 	TH1F * h_Loose_AwayJetDR;
 	TH1F * h_Loose_AwayJetPt;
@@ -336,6 +343,8 @@ public:
 	int fCounter_jet30;
 	int fCounter_met;
 	int fCounter_mt;
+	int fCounter_CERN_small;
+	int fCounter_CERN_large;
 	int fCounter_origin;
 
 	int fCounter_origin_pl1;
