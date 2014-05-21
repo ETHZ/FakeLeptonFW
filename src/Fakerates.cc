@@ -1977,13 +1977,15 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 		if     (thisorigin == 4 || thisorigin == 6) setLepIsPrompt(j, true);
 		else                                        setLepIsPrompt(j, false);
+
+		bool istight = isTightLeptonTTBar(j);
 	
-		if     (thisorigin == 1) ++fCounter_origin_nl1;
-		else if(thisorigin == 2) ++fCounter_origin_nl2;
-		else if(thisorigin == 3) ++fCounter_origin_nl3;
-		else if(thisorigin == 4) ++fCounter_origin_pl4;
-		else if(thisorigin == 5) ++fCounter_origin_nl5;
-		else if(thisorigin == 6) ++fCounter_origin_pl6;
+		if     (thisorigin == 1 && !istight) ++fCounter_origin_nl1;
+		else if(thisorigin == 2 && !istight) ++fCounter_origin_nl2;
+		else if(thisorigin == 3 && !istight) ++fCounter_origin_nl3;
+		else if(thisorigin == 4 && !istight) ++fCounter_origin_pl4;
+		else if(thisorigin == 5 && !istight) ++fCounter_origin_nl5;
+		else if(thisorigin == 6 && !istight) ++fCounter_origin_pl6;
 
 	
 	
