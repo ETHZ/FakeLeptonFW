@@ -158,6 +158,7 @@ public:
 
 	bool  isGoodJet(int, float, float);
 	bool  isGoodSynchJet(int, float);
+	float getLargestCSV();
 
 	int   getAwayJet(int);
 	float getAwayJetDR(int);
@@ -216,9 +217,11 @@ public:
 	TH1F * h_Loose_MaxJPt;
 	TH1F * h_Loose_MaxJCPt;
 	TH1F * h_Loose_MaxJRPt;
+	TH1F * h_Loose_MaxJCSV;
 	TH1F * h_Loose_AllJCPt;
 	TH1F * h_Loose_AllJRPt;
 	TH1F * h_Loose_AllJEta;
+	TH1F * h_Loose_AllJCSV;
 	TH1F * h_Loose_AllJEtatest1;
 	TH1F * h_Loose_AllJEtatest2;
 	TH1F * h_Loose_AllJEtatest3;
@@ -272,9 +275,11 @@ public:
 	TH1F * h_Tight_MaxJPt;
 	TH1F * h_Tight_MaxJCPt;
 	TH1F * h_Tight_MaxJRPt;
+	TH1F * h_Tight_MaxJCSV;
 	TH1F * h_Tight_AllJCPt;
 	TH1F * h_Tight_AllJRPt;
 	TH1F * h_Tight_AllJEta;
+	TH1F * h_Tight_AllJCSV;
 	TH1F * h_Tight_NBJets;
 	TH1F * h_Tight_NJets;
 	TH1F * h_Tight_NVertices;   

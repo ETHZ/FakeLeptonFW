@@ -865,6 +865,7 @@ bool Fakerates::isLooseElectron(int index){
 
 	if(!ElIsLoose->at(index)) return false;
 	if(ElPFIso->at(index) > 0.6) return false;
+
 	return true;
 }
 
@@ -878,7 +879,7 @@ bool Fakerates::isLooseLepton(int index){
 	*/
 
 	if(fDataType == 2) return isLooseElectron(index);
-	else isLooseMuon(index);
+	else               return isLooseMuon(index);
 
 }
 
@@ -892,7 +893,7 @@ bool Fakerates::isLooseOpLepton(int index){
 	*/
 
 	if(fDataType == 2) return isLooseMuon(index);
-	else isLooseElectron(index);
+	else               return isLooseElectron(index);
 
 }
 
@@ -906,6 +907,7 @@ bool Fakerates::isLooseMuonTTBar(int index){
 	*/
 
 	if(!isLooseMuon(index)) return false;
+
 	return true;
 }
 
@@ -919,6 +921,7 @@ bool Fakerates::isLooseElectronTTBar(int index){
 	*/
 
 	if(!isLooseElectron(index)) return false;
+
 	return true;
 }
 
@@ -931,7 +934,7 @@ bool Fakerates::isLooseLeptonTTBar(int index){
 	*/
 
 	if(fDataType == 2) return isLooseElectronTTBar(index);
-	else return isLooseMuonTTBar(index);
+	else               return isLooseMuonTTBar(index);
 }
 
 
@@ -977,7 +980,7 @@ bool Fakerates::isTightLepton(int index){
 	*/
 
 	if(fDataType == 2) return isTightElectron(index);
-	else return isTightMuon(index);
+	else               return isTightMuon(index);
 }
 
 
@@ -1018,7 +1021,7 @@ bool Fakerates::isTightLeptonTTBar(int index){
 	*/
 
 	if(fDataType == 2) return isTightElectronTTBar(index);
-	else return isTightMuonTTBar(index);
+	else               return isTightMuonTTBar(index);
 
 }
 
@@ -1026,13 +1029,13 @@ bool Fakerates::isTightLeptonTTBar(int index){
 //____________________________________________________________________________
 float Fakerates::getJetPt(int index) {
 	/* 
-	select the right JetPt according to the JetCorrection given
+	select the right JetPt according to the level of correction
 	parameters: index (index of the jet)
 	return: JetPt or JetRawPt of the jet
 	*/
 
 	if(fJetCorrection) return JetPt->at(index);
-	else return JetRawPt->at(index);
+	else               return JetRawPt->at(index);
 }
 
 
@@ -1040,12 +1043,12 @@ float Fakerates::getJetPt(int index) {
 void Fakerates::setMET(float newvalue){
 	/* 
 	set the right MET according to the level of correction
-	parameters: type (type of correction)
+	parameters: newvalue (value to be set)
 	return: MET or MET1
 	*/
 
 	if(fJetCorrection) pfMET1 = newvalue;
-	else pfMET = newvalue;
+	else               pfMET  = newvalue;
 }
 
 
@@ -1053,12 +1056,12 @@ void Fakerates::setMET(float newvalue){
 void Fakerates::setMETPhi(float newvalue){
 	/* 
 	set the right METPhi according to the level of correction
-	parameters: type (type of correction)
-	return: METPhi or MET1Phi
+	parameters: newvalue (value to be set)
+	return: none
 	*/
 
 	if(fJetCorrection) pfMET1Phi = newvalue;
-	else pfMETPhi = newvalue;
+	else               pfMETPhi  = newvalue;
 }
 
 
@@ -1066,12 +1069,12 @@ void Fakerates::setMETPhi(float newvalue){
 float Fakerates::getMET(){
 	/* 
 	select the right MET according to the level of correction
-	parameters: type (type of correction)
+	parameters: none
 	return: MET or MET1
 	*/
 
 	if(fJetCorrection) return pfMET1;
-	else return pfMET;
+	else               return pfMET;
 }
 
 
@@ -1079,12 +1082,12 @@ float Fakerates::getMET(){
 float Fakerates::getMETPhi(){
 	/* 
 	select the right METPhi according to the level of correction
-	parameters: type (type of correction)
+	parameters: none
 	return: METPhi or MET1Phi
 	*/
 
 	if(fJetCorrection) return pfMET1Phi;
-	else return pfMETPhi;
+	else               return pfMETPhi;
 }
 
 
@@ -1112,7 +1115,7 @@ float Fakerates::getMT(int index) {
 bool Fakerates::passesMETCut(float value_met = 20., int sign = 0){
 	/* 
 	checks, if the event passes the MET cut
-	parameters: none
+	parameters: value_met (cut value), sign (0 cut above, 1 cut below)
 	return: true (if event passes the cuts), false (else)
 	*/
 
@@ -1231,6 +1234,23 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	if(isClosest) return false; //no good jet if closest to a loose lepton
 	return true;
+}
+
+
+//____________________________________________________________________________
+float Fakerates::getLargestCSV(){
+	/* 
+	get largest CSV B-Tag in the event
+	parameters: none
+	return: csv
+	*/
+
+	float maxcsv = 0.;
+ 
+	for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet)
+		if(JetCSVBTag->at(thisjet) > maxcsv) maxcsv = JetCSVBTag->at(thisjet);
+
+	return maxcsv;
 }
 
 
@@ -1721,6 +1741,7 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 			h_Loose_D0        ->Fill(LepD0->at(lep)       , eventweight);
 			h_Loose_MaxJCPt   ->Fill(JetPt->at(jet)       , eventweight); // always corrected Jet Pt!
 			h_Loose_MaxJRPt   ->Fill(JetRawPt->at(jet)    , eventweight); // always raw Jet Pt!
+			h_Loose_MaxJCSV   ->Fill(getLargestCSV()      , eventweight); 
 
 			h_Loose_JCPtJEta  ->Fill(fabs(JetEta->at(jet)), JetPt->at(jet), eventweight);
 			h_Loose_JRPtJEta  ->Fill(fabs(JetEta->at(jet)), JetRawPt->at(jet), eventweight);
@@ -1733,6 +1754,7 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 				h_Loose_AllJCPt   ->Fill(JetPt->at(thisjet)       , eventweight);
 				h_Loose_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , eventweight);
 				h_Loose_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), eventweight);
+				h_Loose_AllJCSV   ->Fill(JetCSVBTag->at(thisjet)  , eventweight);
 
 				h_Loose_DJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet)),                       eventweight);
 				h_Loose_FJPtJEta  ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), eventweight);
@@ -1820,6 +1842,7 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 				h_Tight_D0        ->Fill(LepD0->at(lep)        , eventweight);
 				h_Tight_MaxJCPt   ->Fill(JetPt->at(jet)        , eventweight); // always corrected Jet Pt!
 				h_Tight_MaxJRPt   ->Fill(JetRawPt->at(jet)     , eventweight); // always raw Jet Pt!
+				h_Tight_MaxJCSV   ->Fill(getLargestCSV()       , eventweight); 
 
 				h_Tight_JCPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetPt->at(jet)    , eventweight);
 				h_Tight_JRPtJEta  ->Fill(fabs(JetEta->at(jet)) , JetRawPt->at(jet) , eventweight);
@@ -1830,6 +1853,7 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 					h_Tight_AllJCPt   ->Fill(JetPt->at(thisjet)       , eventweight);
 					h_Tight_AllJRPt   ->Fill(JetRawPt->at(thisjet)    , eventweight);
 					h_Tight_AllJEta   ->Fill(fabs(JetEta->at(thisjet)), eventweight);
+					h_Tight_AllJCSV   ->Fill(JetCSVBTag->at(thisjet)  , eventweight);
 
 					h_Tight_DJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))                      , eventweight);
 					h_Tight_FJPtJEta ->Fill(fabs(JetEta->at(thisjet)), (JetPt->at(thisjet)-JetRawPt->at(thisjet))/JetRawPt->at(thisjet), eventweight);
@@ -2081,10 +2105,12 @@ void Fakerates::bookHistos(){
 	h_Loose_MaxJPt        = new TH1F("h_Loose_MaxJPt"       , "Loose_MaxJPt"    , 10      ,  20     , 120    ); h_Loose_MaxJPt    -> Sumw2();
 	h_Loose_MaxJCPt       = new TH1F("h_Loose_MaxJCPt"      , "Loose_MaxJCPt"   , 10      ,  20     , 120    ); h_Loose_MaxJCPt   -> Sumw2();
 	h_Loose_MaxJRPt       = new TH1F("h_Loose_MaxJRPt"      , "Loose_MaxJRPt"   , 10      ,  20     , 120    ); h_Loose_MaxJRPt   -> Sumw2();
+	h_Loose_MaxJCSV       = new TH1F("h_Loose_MaxJCSV"      , "Loose_MaxJCSV"   , 20      ,  0      , 1.0    ); h_Loose_MaxJCSV   -> Sumw2();
 
 	h_Loose_AllJRPt       = new TH1F("h_Loose_AllJRPt"      , "Loose_AllJRPt"   , 15      ,  0      , 150    ); h_Loose_AllJRPt   -> Sumw2();
 	h_Loose_AllJCPt       = new TH1F("h_Loose_AllJCPt"      , "Loose_AllJCPt"   , 15      ,  0      , 150    ); h_Loose_AllJCPt   -> Sumw2();
 	h_Loose_AllJEta       = new TH1F("h_Loose_AllJEta"      , "Loose_AllJEta"   , 12      ,  0      , 2.4    ); h_Loose_AllJEta   -> Sumw2();
+	h_Loose_AllJCSV       = new TH1F("h_Loose_AllJCSV"      , "Loose_AllJCSV"   , 20      ,  0      , 1.0    ); h_Loose_AllJCSV   -> Sumw2();
 
 	//h_Loose_AllJEtatest1  = new TH1F("h_Loose_AllJEtatest1" , "Loose_AllJEtatest1", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest1 -> Sumw2();
 	//h_Loose_AllJEtatest2  = new TH1F("h_Loose_AllJEtatest2" , "Loose_AllJEtatest2", 12    ,  0      , 2.4    ); h_Loose_AllJEtatest2 -> Sumw2();
@@ -2179,10 +2205,12 @@ void Fakerates::bookHistos(){
 	h_Tight_MaxJPt        = new TH1F("h_Tight_MaxJPt"       , "Tight_MaxJPt"    , 10      , 20      , 120    ); h_Tight_MaxJPt     -> Sumw2();
 	h_Tight_MaxJCPt       = new TH1F("h_Tight_MaxJCPt"      , "Tight_MaxJCPt"   , 10      , 20      , 120    ); h_Tight_MaxJCPt    -> Sumw2();
 	h_Tight_MaxJRPt       = new TH1F("h_Tight_MaxJRPt"      , "Tight_MaxJRPt"   , 10      , 20      , 120    ); h_Tight_MaxJRPt    -> Sumw2();
+	h_Tight_MaxJCSV       = new TH1F("h_Tight_MaxJCSV"      , "Tight_MaxJCSV"   , 20      ,  0      , 1.0    ); h_Tight_MaxJCSV   -> Sumw2();
 
 	h_Tight_AllJCPt       = new TH1F("h_Tight_AllJCPt"      , "Tight_AllJCPt"   , 15      , 0       , 150    ); h_Tight_AllJCPt    -> Sumw2();
 	h_Tight_AllJRPt       = new TH1F("h_Tight_AllJRPt"      , "Tight_AllJRPt"   , 15      , 0       , 150    ); h_Tight_AllJRPt    -> Sumw2();
 	h_Tight_AllJEta       = new TH1F("h_Tight_AllJEta"      , "Tight_AllJEta"   , 12      , 0       , 2.4    ); h_Tight_AllJEta    -> Sumw2();
+	h_Tight_AllJCSV       = new TH1F("h_Tight_AllJCSV"      , "Tight_AllJCSV"   , 20      , 0       , 1.0    ); h_Tight_AllJCSV    -> Sumw2();
 
 	h_Tight_NBJets        = new TH1F("h_Tight_NBJets"       , "Tight_NBJets"    , 3       , 0       , 3      ); h_Tight_NBJets     -> Sumw2();
 	h_Tight_NJets         = new TH1F("h_Tight_NJets"        , "Tight_NJets"     , 5       , 1       , 6      ); h_Tight_NJets      -> Sumw2();
@@ -2333,10 +2361,12 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Loose_MaxJPt         ->Write(fName + "_" + h_Loose_MaxJPt         ->GetName(), TObject::kWriteDelete);
 	h_Loose_MaxJCPt        ->Write(fName + "_" + h_Loose_MaxJCPt        ->GetName(), TObject::kWriteDelete);
 	h_Loose_MaxJRPt        ->Write(fName + "_" + h_Loose_MaxJRPt        ->GetName(), TObject::kWriteDelete);
+	h_Loose_MaxJCSV        ->Write(fName + "_" + h_Loose_MaxJCSV        ->GetName(), TObject::kWriteDelete);
 
 	h_Loose_AllJCPt        ->Write(fName + "_" + h_Loose_AllJCPt        ->GetName(), TObject::kWriteDelete);
 	h_Loose_AllJRPt        ->Write(fName + "_" + h_Loose_AllJRPt        ->GetName(), TObject::kWriteDelete);
 	h_Loose_AllJEta        ->Write(fName + "_" + h_Loose_AllJEta        ->GetName(), TObject::kWriteDelete);
+	h_Loose_AllJCSV        ->Write(fName + "_" + h_Loose_AllJCSV        ->GetName(), TObject::kWriteDelete);
 
 	//h_Loose_AllJEtatest1  ->Write(fName + "_" + h_Loose_AllJEtatest1    ->GetName(), TObject::kWriteDelete);
 	//h_Loose_AllJEtatest2  ->Write(fName + "_" + h_Loose_AllJEtatest2    ->GetName(), TObject::kWriteDelete);
@@ -2400,10 +2430,12 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_Tight_MaxJPt         ->Write(fName + "_" + h_Tight_MaxJPt         ->GetName(), TObject::kWriteDelete);
 	h_Tight_MaxJCPt        ->Write(fName + "_" + h_Tight_MaxJCPt        ->GetName(), TObject::kWriteDelete);
 	h_Tight_MaxJRPt        ->Write(fName + "_" + h_Tight_MaxJRPt        ->GetName(), TObject::kWriteDelete);
+	h_Tight_MaxJCSV        ->Write(fName + "_" + h_Tight_MaxJCSV        ->GetName(), TObject::kWriteDelete);
 
 	h_Tight_AllJCPt        ->Write(fName + "_" + h_Tight_AllJCPt        ->GetName(), TObject::kWriteDelete);
 	h_Tight_AllJRPt        ->Write(fName + "_" + h_Tight_AllJRPt        ->GetName(), TObject::kWriteDelete);
 	h_Tight_AllJEta        ->Write(fName + "_" + h_Tight_AllJEta        ->GetName(), TObject::kWriteDelete);
+	h_Tight_AllJCSV        ->Write(fName + "_" + h_Tight_AllJCSV        ->GetName(), TObject::kWriteDelete);
 
 	h_Tight_NBJets         ->Write(fName + "_" + h_Tight_NBJets         ->GetName(), TObject::kWriteDelete);
 	h_Tight_NJets          ->Write(fName + "_" + h_Tight_NJets          ->GetName(), TObject::kWriteDelete);

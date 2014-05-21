@@ -210,17 +210,17 @@ else:
 	dyjets50   = sample('mu_dyjets50'     , inputDir + 'mu_dyjets50_ratios.root')
 	dyjets10   = sample('mu_dyjets10'     , inputDir + 'mu_dyjets10_ratios.root')
 	qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root')
-	ttbar0     = sample('mu_ttbar0'       , inputDir + 'mu_ttbar0_ratios.root'  )
-	ttbar1     = sample('mu_ttbar1'       , inputDir + 'mu_ttbar1_ratios.root'  )
-	ttbar2     = sample('mu_ttbar2'       , inputDir + 'mu_ttbar2_ratios.root'  )
-	ttbar3     = sample('mu_ttbar3'       , inputDir + 'mu_ttbar3_ratios.root'  )
-	ttbar4     = sample('mu_ttbar4'       , inputDir + 'mu_ttbar4_ratios.root'  )
-	ttbar5     = sample('mu_ttbar5'       , inputDir + 'mu_ttbar5_ratios.root'  )
-	ttbar6     = sample('mu_ttbar6'       , inputDir + 'mu_ttbar6_ratios.root'  )
-	qcd0       = sample('mu_qcd0'         , inputDir + 'mu_qcd0_ratios.root'    )
-	qcd1       = sample('mu_qcd1'         , inputDir + 'mu_qcd1_ratios.root'    )
-	qcd2       = sample('mu_qcd2'         , inputDir + 'mu_qcd2_ratios.root'    )
-	qcd3       = sample('mu_qcd3'         , inputDir + 'mu_qcd3_ratios.root'    )
+	#ttbar0     = sample('mu_ttbar0'       , inputDir + 'mu_ttbar0_ratios.root'  )
+	#ttbar1     = sample('mu_ttbar1'       , inputDir + 'mu_ttbar1_ratios.root'  )
+	#ttbar2     = sample('mu_ttbar2'       , inputDir + 'mu_ttbar2_ratios.root'  )
+	#ttbar3     = sample('mu_ttbar3'       , inputDir + 'mu_ttbar3_ratios.root'  )
+	#ttbar4     = sample('mu_ttbar4'       , inputDir + 'mu_ttbar4_ratios.root'  )
+	#ttbar5     = sample('mu_ttbar5'       , inputDir + 'mu_ttbar5_ratios.root'  )
+	#ttbar6     = sample('mu_ttbar6'       , inputDir + 'mu_ttbar6_ratios.root'  )
+	#qcd0       = sample('mu_qcd0'         , inputDir + 'mu_qcd0_ratios.root'    )
+	#qcd1       = sample('mu_qcd1'         , inputDir + 'mu_qcd1_ratios.root'    )
+	#qcd2       = sample('mu_qcd2'         , inputDir + 'mu_qcd2_ratios.root'    )
+	#qcd3       = sample('mu_qcd3'         , inputDir + 'mu_qcd3_ratios.root'    )
 
 	data_samples = []
 	data_samples.append(data)
@@ -235,14 +235,14 @@ else:
 	qcd_samples.append(qcd)
 
 	closure_samples = []
-	closure_samples.append(ttbar0)
-	closure_samples.append(ttbar1)
-	closure_samples.append(ttbar2)
-	closure_samples.append(ttbar3)
-	closure_samples.append(qcd0)
-	closure_samples.append(qcd1)
-	closure_samples.append(qcd2)
-	closure_samples.append(qcd3)
+	#closure_samples.append(ttbar0)
+	#closure_samples.append(ttbar1)
+	#closure_samples.append(ttbar2)
+	#closure_samples.append(ttbar3)
+	#closure_samples.append(qcd0)
+	#closure_samples.append(qcd1)
+	#closure_samples.append(qcd2)
+	#closure_samples.append(qcd3)
 
 	#data1      = sample('mu_data1'        , inputDir + 'mu_data1_ratios.root')
 	#data2      = sample('mu_data2'        , inputDir + 'mu_data2_ratios.root')
@@ -290,7 +290,7 @@ canv = helper.makeCanvas(900, 675)
 
 ## LIST OF HISTOGRAMS TO PLOT
 
-plot1dHists = ['h_Loose_AwayJetDR', 'h_Loose_AwayJetPt', 'h_Loose_ClosJetDR', 'h_Loose_ClosJetPt', 'h_Loose_HT', 'h_Loose_LepEta', 'h_Loose_LepIso', 'h_Loose_LepPt', 'h_Loose_MET', 'h_Loose_METnoMTCut', 'h_Loose_MT', 'h_Loose_MTMET20', 'h_Loose_MTMET30', 'h_Loose_MaxJPt', 'h_Loose_AllJCPt', 'h_Loose_AllJRPt', 'h_Loose_AllJEta', 'h_Loose_AllJEtatest1', 'h_Loose_AllJEtatest2', 'h_Loose_AllJEtatest3', 'h_Loose_NBJets', 'h_Loose_NJets', 'h_Loose_NVertices', 'h_Loose_NVertices1', 'h_Loose_NVerticesMET20', 'h_Loose_D0', 'h_Tight_AwayJetDR', 'h_Tight_AwayJetPt', 'h_Tight_ClosJetDR', 'h_Tight_ClosJetPt', 'h_Tight_HT', 'h_Tight_LepEta', 'h_Tight_LepIso', 'h_Tight_LepPt', 'h_Tight_MET', 'h_Tight_METnoMTCut', 'h_Tight_MT', 'h_Tight_MTMET20', 'h_Tight_MTMET30', 'h_Tight_MaxJPt', 'h_Tight_AllJCPt', 'h_Tight_AllJRPt', 'h_Tight_AllJEta', 'h_Tight_NBJets', 'h_Tight_NJets', 'h_Tight_NVertices', 'h_Tight_NVertices1', 'h_Tight_NVerticesMET20', 'h_Tight_D0']
+plot1dHists = ['h_Loose_AwayJetDR', 'h_Loose_AwayJetPt', 'h_Loose_ClosJetDR', 'h_Loose_ClosJetPt', 'h_Loose_HT', 'h_Loose_LepEta', 'h_Loose_LepIso', 'h_Loose_LepPt', 'h_Loose_MET', 'h_Loose_METnoMTCut', 'h_Loose_MT', 'h_Loose_MTMET20', 'h_Loose_MTMET30', 'h_Loose_MaxJPt', 'h_Loose_MaxJCSV', 'h_Loose_AllJCPt', 'h_Loose_AllJRPt', 'h_Loose_AllJEta', 'h_Loose_AllJCSV', 'h_Loose_AllJEtatest1', 'h_Loose_AllJEtatest2', 'h_Loose_AllJEtatest3', 'h_Loose_NBJets', 'h_Loose_NJets', 'h_Loose_NVertices', 'h_Loose_NVertices1', 'h_Loose_NVerticesMET20', 'h_Loose_D0', 'h_Tight_AwayJetDR', 'h_Tight_AwayJetPt', 'h_Tight_ClosJetDR', 'h_Tight_ClosJetPt', 'h_Tight_HT', 'h_Tight_LepEta', 'h_Tight_LepIso', 'h_Tight_LepPt', 'h_Tight_MET', 'h_Tight_METnoMTCut', 'h_Tight_MT', 'h_Tight_MTMET20', 'h_Tight_MTMET30', 'h_Tight_MaxJPt', 'h_Tight_MaxJCSV', 'h_Tight_AllJCPt', 'h_Tight_AllJRPt', 'h_Tight_AllJEta', 'h_Tight_AllJCSV', 'h_Tight_NBJets', 'h_Tight_NJets', 'h_Tight_NVertices', 'h_Tight_NVertices1', 'h_Tight_NVerticesMET20', 'h_Tight_D0']
 
 plot2dHists = ['h_Loose_DJPtJEta', 'h_Loose_FJPtJEta', 'h_Loose_DJPtJPt', 'h_Loose_FJPtJPt', 'h_Tight_DJPtJEta', 'h_Tight_FJPtJEta', 'h_Tight_DJPtJPt', 'h_Tight_FJPtJPt'] 
 
@@ -426,8 +426,8 @@ if module == 'fakerates_2d' or module == 'all':
 
 # compute and plot FR 2d Map for Closure Test
 
-if module == 'fakerates_2dct' or module == 'all':
-	FR.Plot2dFRMapClosureTest(dataType, outputDir, module, data_samples, mc_samples, closure_samples, [wjets, dyjets50, dyjets10], qcd_samples)
+#if module == 'fakerates_2dct' or module == 'all':
+#	FR.Plot2dFRMapClosureTest(dataType, outputDir, module, data_samples, mc_samples, closure_samples, [wjets, dyjets50, dyjets10], qcd_samples)
 
 
 

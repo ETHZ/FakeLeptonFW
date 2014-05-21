@@ -281,8 +281,6 @@ def PlotFR(dataType, outputDir, datasets, mcsets, histlist, mcsetsplot = [], mcs
 			histstoplot.append([FRs_data[i], 'data'])
 			make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, FRs_data[i], 'FR_' + FRs_data[i].GetName().lstrip('h_Tight_') + '_data-ew_data-eth-qcd', True, 'ETH/QCD')
 
-		if bgestimation:
-			print "here"	
 		
 
 	return True
@@ -290,10 +288,9 @@ def PlotFR(dataType, outputDir, datasets, mcsets, histlist, mcsetsplot = [], mcs
 
 
 
-
 def DoMCSubCERN(hist_new, hist_data_small, hist_data_large, n_prompt_small, n_prompt_large, n_all_small, n_all_large):
 
-	r_p_sl = (n_prompt_small / n_prompt_large) * (n_all_large / n_all_small)
+	r_p_sl = (n_prompt_small / float(n_prompt_large)) * (n_all_large / float(n_all_small))
 	
 	for i in range(1, hist_new.GetNbinsX()+1):
 		for j in range(1, hist_new.GetNbinsY()+1):
@@ -304,6 +301,8 @@ def DoMCSubCERN(hist_new, hist_data_small, hist_data_large, n_prompt_small, n_pr
 			f_qcd = (f_data_small - r_p_sl * f_data_large) / (1. - r_p_sl)
 			
 			print "adjusting value of bin " + str(i) + "." + str(j) + " from " + str(hist_new.GetBinContent(i,j)) + " to " + str(f_qcd)
+			print "f_data_small = " + str(f_data_small) + ", f_data_large = " + str(f_data_large) + ", r = " + str(r_p_sl)
+			print "---"
 			
 			hist_new.SetBinContent(i, j, f_qcd)
 
@@ -456,7 +455,7 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 	FR_data_mcsub_u1 = copy.deepcopy(FR_data)
 	FR_data_mcsub_c2 = copy.deepcopy(FR_data)
 	FR_data_mcsub_c3 = copy.deepcopy(FR_data)
-	FR_data_mcsub_c3.Divide(FR_data_mcsub_c3, copy.deepcopy(data_denominator   .GetStack().Last()), 1, 1, 'B')
+	FR_data_mcsub_c3.Divide(FR_data_mcsub_c3, copy.deepcopy(data_denominator.GetStack().Last()), 1, 1, 'B')
 	FR_data_mcsub_c3 = DoMCSubCERN(FR_data_mcsub_c3, FR_data_CERN_small, FR_data_CERN_large, 117683, 32137, 12139, 3750)
 	# you gotta fill in the numbers by hand (i know, not very nice indeed) from the counters fCounter_CERN_small/-large from Fakerates.cc
 
