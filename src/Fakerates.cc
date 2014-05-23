@@ -846,6 +846,7 @@ bool Fakerates::isLooseMuon(int index){
 	parameters: index (index of the particle)
 	return: true (if muon is loose), false (else)
 	*/
+	if(MuPt->at(index) < 10.) return false;
 	if(!MuIsLoose->at(index)) return false;
 	//if(fabs(MuD0->at(index)) > 0.1) return false;
 	if(fLepD0Cut > 0.0 && fabs(MuD0->at(index)) > fLepD0Cut) return false; // leave this commented for synching!!
@@ -863,6 +864,7 @@ bool Fakerates::isLooseElectron(int index){
 	return: true (if electron is loose), false (else)
 	*/
 
+	if(ElPt->at(index) < 10.) return false;
 	if(!ElIsLoose->at(index)) return false;
 	if(ElPFIso->at(index) > 0.6) return false;
 
@@ -1194,7 +1196,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	// clean w/r/t loose electrons
 	for(int el = 0; el < ElPt->size(); ++el){
-		if(!isLooseElectron(el)) continue;
+		if(!isLooseElectron(el) || ElPt->at(el) < 10.) continue;
 
 		float closestDR  = 99.;
 		int   closestInd =  -1;
@@ -1215,7 +1217,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	// clean w/r/t loose muons
 	for(int mu = 0; mu < MuPt->size(); ++mu){
-		if(!isLooseMuon(mu)) continue;
+		if(!isLooseMuon(mu) || MuPt->at(mu) < 10.) continue;
 
 		float closestDR  = 99.;
 		int   closestInd =  -1;

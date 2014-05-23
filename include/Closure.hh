@@ -78,7 +78,13 @@ public:
 // COUNTERS
 	int fTot;
 	int fSS;
+	int fOS;
 	int fSSmm;
+	int fSSem;
+	int fSSee;
+	int fOSmm;
+	int fOSem;
+	int fOSee;
 
 
 // INPUT FR FILE
@@ -91,6 +97,8 @@ public:
 	TH2F    * f_h_FR_data_pure_mu;
 	TH2F    * f_h_FR_mc_el;
 	TH2F    * f_h_FR_mc_mu;
+	TH2F    * f_h_FR_qcd_el;
+	TH2F    * f_h_FR_qcd_mu;
 	TH2F    * f_h_FR_ttbar_el;
 	TH2F    * f_h_FR_ttbar_mu;
 
@@ -103,6 +111,8 @@ public:
 	void loop(TFile*);
 
 	bool isSameSignLLEvent(int&, int&, int&);
+	bool passMllCut(int, int, int, float);
+	bool isSignalTrigger(int);
 
 // Eventweight
 	float fEventWeight;
@@ -122,6 +132,7 @@ public:
 	int   fCT_ls;
 	int   fCT_event;
 	int   fCT_type;
+	int   fCT_passTrigger;
 
 	float fCT_lumiW;
 
@@ -145,6 +156,7 @@ public:
 	float fCT_iso1;
 	float fCT_iso2;
 	int   fCT_ch1;
+	int   fCT_ch2;
 
 	float fCT_dptrel;
 	float fCT_deltas;

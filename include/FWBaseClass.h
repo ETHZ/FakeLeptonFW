@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Mar  6 14:10:15 2014 by ROOT version 5.34/14
+// Tue May 20 11:13:23 2014 by ROOT version 5.34/18
 // from TTree Analysis/AnalysisTree
-// found on file: qcdBigFile_START53_V20.root
+// found on file: fakeminitree.root
 //////////////////////////////////////////////////////////
 
 #ifndef FWBaseClass_h
@@ -26,27 +26,38 @@ public :
    Int_t           Run;
    Int_t           Lumi;
    Int_t           Event;
-   Int_t           HLT_MU5;
-   Int_t           HLT_MU5_PS;
+   Int_t           HLT_MU17_MU8;
+   Int_t           HLT_MU17_MU8_PS;
+   Int_t           HLT_MU17_TKMU8;
+   Int_t           HLT_MU17_TKMU8_PS;
+   Int_t           HLT_ELE17_ELE8_TIGHT;
+   Int_t           HLT_ELE17_ELE8_TIGHT_PS;
+   Int_t           HLT_MU8_ELE17_TIGHT;
+   Int_t           HLT_MU8_ELE17_TIGHT_PS;
+   Int_t           HLT_MU17_ELE8_TIGHT;
+   Int_t           HLT_MU17_ELE8_TIGHT_PS;
    Int_t           HLT_MU8;
    Int_t           HLT_MU8_PS;
-   Int_t           HLT_MU12;
-   Int_t           HLT_MU12_PS;
    Int_t           HLT_MU17;
    Int_t           HLT_MU17_PS;
+   Int_t           HLT_MU5;
+   Int_t           HLT_MU5_PS;
+   Int_t           HLT_MU12;
+   Int_t           HLT_MU12_PS;
    Int_t           HLT_MU24;
    Int_t           HLT_MU24_PS;
    Int_t           HLT_MU40;
    Int_t           HLT_MU40_PS;
-   Int_t           HLT_ELE8_TIGHT; 
-   Int_t           HLT_ELE8_TIGHT_PS; 
-   Int_t           HLT_ELE8_JET30_TIGHT; 
-   Int_t           HLT_ELE8_JET30_TIGHT_PS; 
-   Int_t           HLT_ELE17_TIGHT; 
-   Int_t           HLT_ELE17_TIGHT_PS; 
-   Int_t           HLT_ELE17_JET30_TIGHT; 
-   Int_t           HLT_ELE17_JET30_TIGHT_PS; 
+   Int_t           HLT_ELE17_TIGHT;
+   Int_t           HLT_ELE17_TIGHT_PS;
+   Int_t           HLT_ELE17_JET30_TIGHT;
+   Int_t           HLT_ELE17_JET30_TIGHT_PS;
+   Int_t           HLT_ELE8_TIGHT;
+   Int_t           HLT_ELE8_TIGHT_PS;
+   Int_t           HLT_ELE8_JET30_TIGHT;
+   Int_t           HLT_ELE8_JET30_TIGHT_PS;
    Int_t           NVrtx;
+   Int_t           NTrue;
    Float_t         PUWeight;
    Float_t         PUWeightUp;
    Float_t         PUWeightDn;
@@ -69,13 +80,11 @@ public :
    std::vector<float>   *MuIso03SumPt;
    std::vector<float>   *MuIso03EmPt;
    std::vector<float>   *MuIso03HadPt;
-
    std::vector<bool>    *MuIsVeto;
    std::vector<bool>    *MuIsLoose;
    std::vector<bool>    *MuIsTight;
-
    std::vector<bool>    *MuIsPrompt;
-   //std::vector<int>     *MuID;
+   std::vector<int>     *MuID;
    std::vector<int>     *MuMID;
    std::vector<int>     *MuGMID;
    std::vector<float>   *ElPt;
@@ -84,12 +93,12 @@ public :
    std::vector<int>     *ElCharge;
    std::vector<float>   *ElPFIso;
    std::vector<float>   *ElD0;
-
+   std::vector<float>   *ElChCo;
    std::vector<bool>    *ElIsVeto;
    std::vector<bool>    *ElIsLoose;
    std::vector<bool>    *ElIsTight;
    std::vector<bool>    *ElIsPrompt;
-   //std::vector<int>     *ElID;
+   std::vector<int>     *ElID;
    std::vector<int>     *ElMID;
    std::vector<int>     *ElGMID;
    Float_t         pfMET;
@@ -109,27 +118,38 @@ public :
    TBranch        *b_Run;   //!
    TBranch        *b_Lumi;   //!
    TBranch        *b_Event;   //!
-   TBranch        *b_HLT_MU5;   //!
-   TBranch        *b_HLT_MU5_PS;   //!
+   TBranch        *b_HLT_MU17_MU8;   //!
+   TBranch        *b_HLT_MU17_MU8_PS;   //!
+   TBranch        *b_HLT_MU17_TKMU8;   //!
+   TBranch        *b_HLT_MU17_TKMU8_PS;   //!
+   TBranch        *b_HLT_ELE17_ELE8_TIGHT;   //!
+   TBranch        *b_HLT_ELE17_ELE8_TIGHT_PS;   //!
+   TBranch        *b_HLT_MU8_ELE17_TIGHT;   //!
+   TBranch        *b_HLT_MU8_ELE17_TIGHT_PS;   //!
+   TBranch        *b_HLT_MU17_ELE8_TIGHT;   //!
+   TBranch        *b_HLT_MU17_ELE8_TIGHT_PS;   //!
    TBranch        *b_HLT_MU8;   //!
    TBranch        *b_HLT_MU8_PS;   //!
-   TBranch        *b_HLT_MU12;   //!
-   TBranch        *b_HLT_MU12_PS;   //!
    TBranch        *b_HLT_MU17;   //!
    TBranch        *b_HLT_MU17_PS;   //!
-   TBranch        *b_HLT_MU24; //!
-   TBranch        *b_HLT_MU24_PS; //!
-   TBranch        *b_HLT_MU40; //!
-   TBranch        *b_HLT_MU40_PS; //!
-   TBranch        *b_HLT_ELE8_TIGHT; //!
-   TBranch        *b_HLT_ELE8_TIGHT_PS; //!
-   TBranch        *b_HLT_ELE8_JET30_TIGHT; //!
-   TBranch        *b_HLT_ELE8_JET30_TIGHT_PS; //!
-   TBranch        *b_HLT_ELE17_TIGHT; //!
-   TBranch        *b_HLT_ELE17_TIGHT_PS; //!
-   TBranch        *b_HLT_ELE17_JET30_TIGHT; //!
-   TBranch        *b_HLT_ELE17_JET30_TIGHT_PS; //!
+   TBranch        *b_HLT_MU5;   //!
+   TBranch        *b_HLT_MU5_PS;   //!
+   TBranch        *b_HLT_MU12;   //!
+   TBranch        *b_HLT_MU12_PS;   //!
+   TBranch        *b_HLT_MU24;   //!
+   TBranch        *b_HLT_MU24_PS;   //!
+   TBranch        *b_HLT_MU40;   //!
+   TBranch        *b_HLT_MU40_PS;   //!
+   TBranch        *b_HLT_ELE17_TIGHT;   //!
+   TBranch        *b_HLT_ELE17_TIGHT_PS;   //!
+   TBranch        *b_HLT_ELE17_JET30_TIGHT;   //!
+   TBranch        *b_HLT_ELE17_JET30_TIGHT_PS;   //!
+   TBranch        *b_HLT_ELE8_TIGHT;   //!
+   TBranch        *b_HLT_ELE8_TIGHT_PS;   //!
+   TBranch        *b_HLT_ELE8_JET30_TIGHT;   //!
+   TBranch        *b_HLT_ELE8_JET30_TIGHT_PS;   //!
    TBranch        *b_NVrtx;   //!
+   TBranch        *b_NTrue;   //!
    TBranch        *b_PUWeight;   //!
    TBranch        *b_PUWeightUp;   //!
    TBranch        *b_PUWeightDn;   //!
@@ -148,15 +168,15 @@ public :
    TBranch        *b_MuDz;   //!
    TBranch        *b_MuNPxHits;   //!
    TBranch        *b_MuNSiLayers;   //!
-   TBranch	*b_MuD0BS;
-   TBranch	*b_MuIso03SumPt;
-   TBranch	*b_MuIso03EmPt;
-   TBranch	*b_MuIso03HadPt;
+   TBranch        *b_MuD0BS;
+   TBranch        *b_MuIso03SumPt;
+   TBranch        *b_MuIso03EmPt;
+   TBranch        *b_MuIso03HadPt;
    TBranch        *b_MuIsVeto;   //!
    TBranch        *b_MuIsLoose;   //!
    TBranch        *b_MuIsTight;   //!
    TBranch        *b_MuIsPrompt;   //!
-   //TBranch        *b_MuID;   //!
+   TBranch        *b_MuID;   //!
    TBranch        *b_MuMID;   //!
    TBranch        *b_MuGMID;   //!
    TBranch        *b_ElPt;   //!
@@ -165,11 +185,12 @@ public :
    TBranch        *b_ElCharge;   //!
    TBranch        *b_ElPFIso;   //!
    TBranch        *b_ElD0;   //!
+   TBranch        *b_ElChCo;   //!
    TBranch        *b_ElIsVeto;   //!
    TBranch        *b_ElIsLoose;   //!
    TBranch        *b_ElIsTight;   //!
    TBranch        *b_ElIsPrompt;   //!
-   //TBranch        *b_ElID;   //!
+   TBranch        *b_ElID;   //!
    TBranch        *b_ElMID;   //!
    TBranch        *b_ElGMID;   //!
    TBranch        *b_pfMET;   //!
@@ -204,9 +225,9 @@ FWBaseClass::FWBaseClass(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("qcdBigFile_START53_V20.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("fakeminitree.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("qcdBigFile_START53_V20.root");
+         f = new TFile("fakeminitree.root");
       }
       f->GetObject("Analysis",tree);
 
@@ -272,7 +293,7 @@ void FWBaseClass::Init(TTree *tree)
    MuIsLoose = 0;
    MuIsTight = 0;
    MuIsPrompt = 0;
-   //MuID = 0;
+   MuID = 0;
    MuMID = 0;
    MuGMID = 0;
    ElPt = 0;
@@ -281,11 +302,12 @@ void FWBaseClass::Init(TTree *tree)
    ElCharge = 0;
    ElPFIso = 0;
    ElD0 = 0;
+   ElChCo = 0;
    ElIsVeto = 0;
    ElIsLoose = 0;
    ElIsTight = 0;
    ElIsPrompt = 0;
-   //ElID = 0;
+   ElID = 0;
    ElMID = 0;
    ElGMID = 0;
    JetPt = 0;
@@ -305,27 +327,38 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("Run", &Run, &b_Run);
    fChain->SetBranchAddress("Lumi", &Lumi, &b_Lumi);
    fChain->SetBranchAddress("Event", &Event, &b_Event);
-   fChain->SetBranchAddress("HLT_MU5", &HLT_MU5, &b_HLT_MU5);
-   fChain->SetBranchAddress("HLT_MU5_PS", &HLT_MU5_PS, &b_HLT_MU5_PS);
+   fChain->SetBranchAddress("HLT_MU17_MU8", &HLT_MU17_MU8, &b_HLT_MU17_MU8);
+   fChain->SetBranchAddress("HLT_MU17_MU8_PS", &HLT_MU17_MU8_PS, &b_HLT_MU17_MU8_PS);
+   fChain->SetBranchAddress("HLT_MU17_TKMU8", &HLT_MU17_TKMU8, &b_HLT_MU17_TKMU8);
+   fChain->SetBranchAddress("HLT_MU17_TKMU8_PS", &HLT_MU17_TKMU8_PS, &b_HLT_MU17_TKMU8_PS);
+   fChain->SetBranchAddress("HLT_ELE17_ELE8_TIGHT", &HLT_ELE17_ELE8_TIGHT, &b_HLT_ELE17_ELE8_TIGHT);
+   fChain->SetBranchAddress("HLT_ELE17_ELE8_TIGHT_PS", &HLT_ELE17_ELE8_TIGHT_PS, &b_HLT_ELE17_ELE8_TIGHT_PS);
+   fChain->SetBranchAddress("HLT_MU8_ELE17_TIGHT", &HLT_MU8_ELE17_TIGHT, &b_HLT_MU8_ELE17_TIGHT);
+   fChain->SetBranchAddress("HLT_MU8_ELE17_TIGHT_PS", &HLT_MU8_ELE17_TIGHT_PS, &b_HLT_MU8_ELE17_TIGHT_PS);
+   fChain->SetBranchAddress("HLT_MU17_ELE8_TIGHT", &HLT_MU17_ELE8_TIGHT, &b_HLT_MU17_ELE8_TIGHT);
+   fChain->SetBranchAddress("HLT_MU17_ELE8_TIGHT_PS", &HLT_MU17_ELE8_TIGHT_PS, &b_HLT_MU17_ELE8_TIGHT_PS);
    fChain->SetBranchAddress("HLT_MU8", &HLT_MU8, &b_HLT_MU8);
    fChain->SetBranchAddress("HLT_MU8_PS", &HLT_MU8_PS, &b_HLT_MU8_PS);
-   fChain->SetBranchAddress("HLT_MU12", &HLT_MU12, &b_HLT_MU12);
-   fChain->SetBranchAddress("HLT_MU12_PS", &HLT_MU12_PS, &b_HLT_MU12_PS);
    fChain->SetBranchAddress("HLT_MU17", &HLT_MU17, &b_HLT_MU17);
    fChain->SetBranchAddress("HLT_MU17_PS", &HLT_MU17_PS, &b_HLT_MU17_PS);
+   fChain->SetBranchAddress("HLT_MU5", &HLT_MU5, &b_HLT_MU5);
+   fChain->SetBranchAddress("HLT_MU5_PS", &HLT_MU5_PS, &b_HLT_MU5_PS);
+   fChain->SetBranchAddress("HLT_MU12", &HLT_MU12, &b_HLT_MU12);
+   fChain->SetBranchAddress("HLT_MU12_PS", &HLT_MU12_PS, &b_HLT_MU12_PS);
    fChain->SetBranchAddress("HLT_MU24", &HLT_MU24, &b_HLT_MU24);
    fChain->SetBranchAddress("HLT_MU24_PS", &HLT_MU24_PS, &b_HLT_MU24_PS);
    fChain->SetBranchAddress("HLT_MU40", &HLT_MU40, &b_HLT_MU40);
    fChain->SetBranchAddress("HLT_MU40_PS", &HLT_MU40_PS, &b_HLT_MU40_PS);
-   fChain->SetBranchAddress("HLT_ELE8_TIGHT", &HLT_ELE8_TIGHT, &b_HLT_ELE8_TIGHT);
-   fChain->SetBranchAddress("HLT_ELE8_TIGHT_PS", &HLT_ELE8_TIGHT_PS, &b_HLT_ELE8_TIGHT_PS);
-   fChain->SetBranchAddress("HLT_ELE8_JET30_TIGHT", &HLT_ELE8_JET30_TIGHT, &b_HLT_ELE8_JET30_TIGHT);
-   fChain->SetBranchAddress("HLT_ELE8_JET30_TIGHT_PS", &HLT_ELE8_JET30_TIGHT_PS, &b_HLT_ELE8_JET30_TIGHT_PS);
    fChain->SetBranchAddress("HLT_ELE17_TIGHT", &HLT_ELE17_TIGHT, &b_HLT_ELE17_TIGHT);
    fChain->SetBranchAddress("HLT_ELE17_TIGHT_PS", &HLT_ELE17_TIGHT_PS, &b_HLT_ELE17_TIGHT_PS);
    fChain->SetBranchAddress("HLT_ELE17_JET30_TIGHT", &HLT_ELE17_JET30_TIGHT, &b_HLT_ELE17_JET30_TIGHT);
    fChain->SetBranchAddress("HLT_ELE17_JET30_TIGHT_PS", &HLT_ELE17_JET30_TIGHT_PS, &b_HLT_ELE17_JET30_TIGHT_PS);
+   fChain->SetBranchAddress("HLT_ELE8_TIGHT", &HLT_ELE8_TIGHT, &b_HLT_ELE8_TIGHT);
+   fChain->SetBranchAddress("HLT_ELE8_TIGHT_PS", &HLT_ELE8_TIGHT_PS, &b_HLT_ELE8_TIGHT_PS);
+   fChain->SetBranchAddress("HLT_ELE8_JET30_TIGHT", &HLT_ELE8_JET30_TIGHT, &b_HLT_ELE8_JET30_TIGHT);
+   fChain->SetBranchAddress("HLT_ELE8_JET30_TIGHT_PS", &HLT_ELE8_JET30_TIGHT_PS, &b_HLT_ELE8_JET30_TIGHT_PS);
    fChain->SetBranchAddress("NVrtx", &NVrtx, &b_NVrtx);
+   fChain->SetBranchAddress("NTrue", &NTrue, &b_NTrue);
    fChain->SetBranchAddress("PUWeight", &PUWeight, &b_PUWeight);
    fChain->SetBranchAddress("PUWeightUp", &PUWeightUp, &b_PUWeightUp);
    fChain->SetBranchAddress("PUWeightDn", &PUWeightDn, &b_PUWeightDn);
@@ -352,7 +385,7 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuIsLoose", &MuIsLoose, &b_MuIsLoose);
    fChain->SetBranchAddress("MuIsTight", &MuIsTight, &b_MuIsTight);
    fChain->SetBranchAddress("MuIsPrompt", &MuIsPrompt, &b_MuIsPrompt);
-   //fChain->SetBranchAddress("MuID", &MuID, &b_MuID);
+   fChain->SetBranchAddress("MuID", &MuID, &b_MuID);
    fChain->SetBranchAddress("MuMID", &MuMID, &b_MuMID);
    fChain->SetBranchAddress("MuGMID", &MuGMID, &b_MuGMID);
    fChain->SetBranchAddress("ElPt", &ElPt, &b_ElPt);
@@ -361,11 +394,12 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("ElCharge", &ElCharge, &b_ElCharge);
    fChain->SetBranchAddress("ElPFIso", &ElPFIso, &b_ElPFIso);
    fChain->SetBranchAddress("ElD0", &ElD0, &b_ElD0);
+   fChain->SetBranchAddress("ElChCo", &ElChCo, &b_ElChCo);
    fChain->SetBranchAddress("ElIsVeto", &ElIsVeto, &b_ElIsVeto);
    fChain->SetBranchAddress("ElIsLoose", &ElIsLoose, &b_ElIsLoose);
    fChain->SetBranchAddress("ElIsTight", &ElIsTight, &b_ElIsTight);
    fChain->SetBranchAddress("ElIsPrompt", &ElIsPrompt, &b_ElIsPrompt);
-   //fChain->SetBranchAddress("ElID", &ElID, &b_ElID);
+   fChain->SetBranchAddress("ElID", &ElID, &b_ElID);
    fChain->SetBranchAddress("ElMID", &ElMID, &b_ElMID);
    fChain->SetBranchAddress("ElGMID", &ElGMID, &b_ElGMID);
    fChain->SetBranchAddress("pfMET", &pfMET, &b_pfMET);
