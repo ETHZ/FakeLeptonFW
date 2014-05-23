@@ -234,8 +234,12 @@ void Closure::storePredictions(){
 		fCT_ht    = Fakerates::getHT();
 		fCT_met   = Fakerates::getMET();
 
- cout << Form("%15d\t%+2d\t%6.2f%1d\t%+2d\t%6.2f\t%1d\t%d\t%d",Event, (muFirst ? MuID->at(lep1) : ElID->at(lep1) ), fCT_pt1, (muFirst ? isTightMuon(lep1) : isTightElectron(lep1) ), (elSecond ? ElID->at(lep2) : MuID->at(lep2) ), fCT_pt2, (elSecond ? isTightElectron(lep2) : isTightMuon(lep2) ), fCT_nj, fCT_nb) << endl;
-
+ //cout << Form("%15d\t%+2d\t%6.2f%1d\t%+2d\t%6.2f\t%1d\t%d\t%d",Event, (muFirst ? MuID->at(lep1) : ElID->at(lep1) ), fCT_pt1, (muFirst ? isTightMuon(lep1) : isTightElectron(lep1) ), (elSecond ? ElID->at(lep2) : MuID->at(lep2) ), fCT_pt2, (elSecond ? isTightElectron(lep2) : isTightMuon(lep2) ), fCT_nj, fCT_nb) << endl;
+		if(Event == 37051) {
+			for(int i = 0; i<JetPt->size(); ++i){
+				if(isGoodJet(i, 40, 0.)) cout << Form("%10d\t%.2f", Event, JetPt->at(i)) << endl;
+			}
+		}
 		fClosureTree->Fill();
 	}
 

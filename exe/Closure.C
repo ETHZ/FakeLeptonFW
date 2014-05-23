@@ -40,9 +40,9 @@ int main(int argc, char* argv[]) {
 			case 'r': frfile     = TString(optarg);  break;
 			case 'o': outputdir  = TString(optarg);  break;
 			case 'c': configfile = TString(optarg);  break;
-			case 'n': name       = TString(optarg);  break;
+			// case 'n': name       = TString(optarg);  break;
 			case 'v': verbose    = atoi(optarg);     break;
-			case 'x': xsec         = atof(optarg);   break; //::atof( ((std::string) optarg).c_str());  break;
+			// case 'x': xsec         = atof(optarg);   break; //::atof( ((std::string) optarg).c_str());  break;
 			case 'm': maxsize      = atoi(optarg);   break;
 			case '?':
 			case 'h': usage(0); break;
@@ -71,12 +71,17 @@ int main(int argc, char* argv[]) {
 	if(verbose > 0) cout << "=======================================================" << endl;
 
 	Closure *clA = new Closure(frfile, configfile);
+
+	std::pair<TString , float> nameXSec = clA->getNameAndXsec(inputfile);
+
+	clA->setName(nameXSec.first);
+	clA->setXS(nameXSec.second);
+	std::cout << "Running on sample " << nameXSec.first << " with a cross section of " << nameXSec.second << " pb." << std::endl;
+
 	clA->setVerbose(verbose);
 	clA->setFRFile(frfile);
-	clA->setXS(xsec);
 	clA->setInputFile(inputfile);
 	clA->setOutputDir(outputdir);
-	clA->setName(name);
 	clA->setMaxSize(maxsize);
 	clA->doStuff();
 
