@@ -112,6 +112,7 @@ public:
 
 	bool isSameSignLLEvent(int&, int&, int&);
 	bool passMllCut(int, int, int, float);
+	bool isSignalTrigger(int);
 
 // Eventweight
 	float fEventWeight;
@@ -131,6 +132,7 @@ public:
 	int   fCT_ls;
 	int   fCT_event;
 	int   fCT_type;
+	int   fCT_passTrigger;
 
 	float fCT_lumiW;
 
@@ -154,6 +156,7 @@ public:
 	float fCT_iso1;
 	float fCT_iso2;
 	int   fCT_ch1;
+	int   fCT_ch2;
 
 	float fCT_dptrel;
 	float fCT_deltas;

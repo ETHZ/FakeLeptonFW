@@ -145,13 +145,19 @@ void Closure::storePredictions(){
 
 	int lep1(-1), lep2(-1), type(-1);
 	if(isSameSignLLEvent(lep1, lep2, type)){
+
+		if(isSignalTrigger(type)) fCT_passTrigger = 1;
+		else fCT_passTrigger = 0;
+
 		if(type < 3) fSS++; 
 		else fOS++; 
 
-		// if(! (type == 0) ) return;
+		bool isOF     = (type == 1 || type == 4);
+		bool muFirst  = (type == 0 || type == 1 || type == 3 || type == 4);
+		bool elSecond = (type == 1 || type == 2 || type == 4 || type == 5);
 
-		f1 = (type == 0 || type == 1 || type == 3 || type == 4) ? getFRatio(0, MuPt->at(lep1), MuEta->at(lep1) ) : getFRatio(1, ElPt->at(lep1), ElEta->at(lep1)) ;
-		f2 = (type == 1 || type == 2 || type == 4 || type == 5) ? getFRatio(1, ElPt->at(lep2), ElEta->at(lep2) ) : getFRatio(0, MuPt->at(lep2), MuEta->at(lep2)) ;
+		f1 = (muFirst ) ? getFRatio(0, MuPt->at(lep1), MuEta->at(lep1) ) : getFRatio(1, ElPt->at(lep1), ElEta->at(lep1)) ;
+		f2 = (elSecond) ? getFRatio(1, ElPt->at(lep2), ElEta->at(lep2) ) : getFRatio(0, MuPt->at(lep2), MuEta->at(lep2)) ;
 		p1 = 1.;
 		p2 = 1.;
 
@@ -211,21 +217,24 @@ void Closure::storePredictions(){
 
 		fCT_tlcat = cat;
 
-		fCT_pt1   = (type == 0 || type == 1 || type == 3 || type == 4) ? MuPt    ->at(lep1) : ElPt    ->at(lep1);
-		fCT_eta1  = (type == 0 || type == 1 || type == 3 || type == 4) ? MuEta   ->at(lep1) : ElEta   ->at(lep1);
-		fCT_phi1  = (type == 0 || type == 1 || type == 3 || type == 4) ? MuPhi   ->at(lep1) : ElPhi   ->at(lep1);
-		fCT_iso1  = (type == 0 || type == 1 || type == 3 || type == 4) ? MuPFIso ->at(lep1) : ElPFIso ->at(lep1);
-		fCT_ch1   = (type == 0 || type == 1 || type == 3 || type == 4) ? MuCharge->at(lep1) : ElCharge->at(lep1);
+		fCT_pt1   = (muFirst ) ? MuPt    ->at(lep1) : ElPt    ->at(lep1);
+		fCT_eta1  = (muFirst ) ? MuEta   ->at(lep1) : ElEta   ->at(lep1);
+		fCT_phi1  = (muFirst ) ? MuPhi   ->at(lep1) : ElPhi   ->at(lep1);
+		fCT_iso1  = (muFirst ) ? MuPFIso ->at(lep1) : ElPFIso ->at(lep1);
+		fCT_ch1   = (muFirst ) ? MuCharge->at(lep1) : ElCharge->at(lep1);
 
-		fCT_pt2   = (type == 1 || type == 2 || type == 4 || type == 5) ? ElPt    ->at(lep2) : MuPt    ->at(lep2);
-		fCT_eta2  = (type == 1 || type == 2 || type == 4 || type == 5) ? ElEta   ->at(lep2) : MuEta   ->at(lep2);
-		fCT_phi2  = (type == 1 || type == 2 || type == 4 || type == 5) ? ElPhi   ->at(lep2) : MuPhi   ->at(lep2);
-		fCT_iso2  = (type == 1 || type == 2 || type == 4 || type == 5) ? ElPFIso ->at(lep2) : MuPFIso ->at(lep2);
+		fCT_pt2   = (elSecond) ? ElPt    ->at(lep2) : MuPt    ->at(lep2);
+		fCT_eta2  = (elSecond) ? ElEta   ->at(lep2) : MuEta   ->at(lep2);
+		fCT_phi2  = (elSecond) ? ElPhi   ->at(lep2) : MuPhi   ->at(lep2);
+		fCT_iso2  = (elSecond) ? ElPFIso ->at(lep2) : MuPFIso ->at(lep2);
+		fCT_ch2   = (elSecond) ? ElCharge->at(lep2) : MuCharge->at(lep2);
 
 		fCT_nj    = Fakerates::getNJets(0);
 		fCT_nb    = Fakerates::getNJets(1);
 		fCT_ht    = Fakerates::getHT();
 		fCT_met   = Fakerates::getMET();
+
+ cout << Form("%15d\t%+2d\t%6.2f%1d\t%+2d\t%6.2f\t%1d\t%d\t%d",Event, (muFirst ? MuID->at(lep1) : ElID->at(lep1) ), fCT_pt1, (muFirst ? isTightMuon(lep1) : isTightElectron(lep1) ), (elSecond ? ElID->at(lep2) : MuID->at(lep2) ), fCT_pt2, (elSecond ? isTightElectron(lep2) : isTightMuon(lep2) ), fCT_nj, fCT_nb) << endl;
 
 		fClosureTree->Fill();
 	}
@@ -269,7 +278,7 @@ bool Closure::isSameSignLLEvent(int &lep1, int &lep2, int &type){
 
 	for(int i=0; i< MuPt->size(); ++i){
 		if(!isLooseMuon(i))          continue;
-		if(MuPt->at(i) < 20.) {
+		if(MuPt->at(i) < 20. && MuPt->at(i) > 10.) {
 			nLooseSoft++;
 			continue;
 		}
@@ -283,7 +292,7 @@ bool Closure::isSameSignLLEvent(int &lep1, int &lep2, int &type){
 	}
 	for(int i=0; i< ElPt->size(); ++i){
 		if(!isLooseElectron(i))        continue;
-		if(ElPt->at(i) < 20.) {
+		if(ElPt->at(i) < 20. && ElPt->at(i) > 10.) {
 			nLooseSoft++;
 			continue;
 		}
@@ -296,15 +305,18 @@ bool Closure::isSameSignLLEvent(int &lep1, int &lep2, int &type){
 	
 	}
 
-	if(lepneg.size() != 2 && leppos.size() != 2 && leppos.size()+lepneg.size() != 2) return false; // require == 2 any sign leptons
+	int nLeps = leppos.size()+lepneg.size();
+
+	//if(lepneg.size() != 2 && leppos.size() != 2 && leppos.size()+lepneg.size() != 2) return false; // require == 2 any sign leptons
+	if(nLeps     != 2) return false; // two leptons of any sign
 	if(nLooseSoft > 0) return false; // veto on any third soft lepton
 
 	std::vector< std::pair<int, int> > ssleps;
 	
 	bool isOS = false;
 
-	if     (lepneg.size() == 2) ssleps = lepneg;
-	else if(leppos.size() == 2) ssleps = leppos;
+	if     (lepneg.size() == 2) ssleps = lepneg; // negative pairs
+	else if(leppos.size() == 2) ssleps = leppos; // positive pairs
 	else if(leppos.size()+lepneg.size() == 2) {
 		isOS = true; // if OS, fill the positive first for SF, otherwise fill muon first
 		if(leppos[0].first == lepneg[0].first){
@@ -369,6 +381,22 @@ bool Closure::passMllCut(int lep1, int lep2, int type, float mass){
 
 }
 
+bool Closure::isSignalTrigger(int type){
+
+	if     (type == 0 || type == 3){
+		if(HLT_MU17_MU8 || HLT_MU17_TKMU8) return true;
+	}
+	else if(type == 1 || type == 4){
+		if(HLT_MU8_ELE17_TIGHT || HLT_MU17_ELE8_TIGHT) return true;
+	}
+	else if(type == 2 || type == 5){
+		if(HLT_ELE17_ELE8_TIGHT) return true;
+	}
+	else { cout << "WRONG TYPE IN THE TRIGGER FUNCTION" << endl; exit(-1);} 
+	return false;
+	
+}
+
 void Closure::bookClosureTree(){
 	fClosureTree = new TTree("closureTree", "closureTree");
 	fClosureTree->Branch("sname" ,  &fCT_sname) ;
@@ -377,6 +405,7 @@ void Closure::bookClosureTree(){
 	fClosureTree->Branch("ls"    , &fCT_ls    , "ls/I"     ) ;
 	fClosureTree->Branch("event" , &fCT_event , "event/I"  ) ;
 	fClosureTree->Branch("type"  , &fCT_type  , "type/I"   ) ;
+	fClosureTree->Branch("passTrigger"  , &fCT_passTrigger  , "passTrigger/I"   ) ;
 
 	fClosureTree->Branch("lumiW" , &fCT_lumiW , "lumiW/F" ) ;
 
@@ -400,6 +429,7 @@ void Closure::bookClosureTree(){
 	fClosureTree->Branch("iso1"  , &fCT_iso1  , "iso1/F"   ) ;
 	fClosureTree->Branch("iso2"  , &fCT_iso2  , "iso2/F"   ) ;
 	fClosureTree->Branch("ch1"   , &fCT_ch1   , "ch1/I"    ) ;
+	fClosureTree->Branch("ch2"   , &fCT_ch2   , "ch2/I"    ) ;
 
 	fClosureTree->Branch("nj"    , &fCT_nj    , "nj/I"     ) ;
 	fClosureTree->Branch("nb"    , &fCT_nb    , "nb/I"     ) ;
@@ -418,6 +448,7 @@ void Closure::resetClosureTree(){
 	fCT_ls    = -1;
 	fCT_event = -1;
 	fCT_type  = -1;
+	fCT_passTrigger  = -1;
 
 	fCT_lumiW = -1.;
 
@@ -441,6 +472,7 @@ void Closure::resetClosureTree(){
 	fCT_iso1  = -1.;
 	fCT_iso2  = -1.;
 	fCT_ch1   = 0;
+	fCT_ch2   = 0;
 
 	fCT_nj    = -1;
 	fCT_nb    = -1;

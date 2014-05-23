@@ -1,9 +1,14 @@
 import ROOT, math, helper
 
 
-#f = ROOT.TFile('../closureTest/ttjets_ttbarTruthFR_closureOutput.root','read')
-#f = ROOT.TFile('../closureTest/ttjets_qcdFR_closureOutput.root','read')
-f = ROOT.TFile('../closureTest/ttjets_closureOutput.root','read')
+f = ROOT.TFile('../closureTest/ttjets_semiLep_closureOutput.root','read')
+#f = ROOT.TFile('../closureTest/ttjets_fullLep_closureOutput.root','read')
+#f = ROOT.TFile('../closureTest/ttjets_massiveb_newEl_closureOutput.root','read')
+#f = ROOT.TFile('../closureTest/ttjets_semilep_elchcons_closureOutput.root','read')
+#f = ROOT.TFile('../closureTest/ttjets_semilep_closureOutput.root','read')
+#f = ROOT.TFile('../closureTest/ttjets_massivebin_trigger_closureOutput.root','read')
+#f = ROOT.TFile('../closureTest/wjets_inc_trigger_closureOutput.root','read')
+#f = ROOT.TFile('../closureTest/ttjets_massiveb_elchcons_closureOutput.root','read')
 
 tree = f.Get('closureTree')
 
@@ -25,9 +30,15 @@ ee = cat('ELECTRON-ELECTRON')
 
 cats = [mm, em, ee] ## this order is very important!!!!
 
+trigger = 1
+
 for evt in tree:
 
+	if trigger and evt.passTrigger == 0: continue
 	weight = evt.lumiW
+	type   = evt.type
+	if type > 2:
+		type -= 3
 
 	if sr == 1:
 		if evt.pt1 < 20 or evt.pt2 < 20: continue
@@ -36,6 +47,7 @@ for evt in tree:
 		if evt.met  < 30.: continue
 
 	if sr == 2:
+		if evt.type > 2: continue
 		if evt.pt1 < 20 or evt.pt2 < 20: continue
 		if evt.nj  <   2: continue
 		if evt.nb  <   1: continue
@@ -50,35 +62,35 @@ for evt in tree:
 	if sr == 0:
 		pass
 
-	cats[evt.type].npp += evt.npp*weight
-	cats[evt.type].npf += evt.npf*weight
-	cats[evt.type].nfp += evt.nfp*weight
-	cats[evt.type].nff += evt.nff*weight
+	cats[type].npp += evt.npp*weight
+	cats[type].npf += evt.npf*weight
+	cats[type].nfp += evt.nfp*weight
+	cats[type].nff += evt.nff*weight
 
-	cats[evt.type].npp2 += evt.npp*evt.npp*weight*weight
-	cats[evt.type].npf2 += evt.npf*evt.npf*weight*weight
-	cats[evt.type].nfp2 += evt.nfp*evt.nfp*weight*weight
-	cats[evt.type].nff2 += evt.nff*evt.nff*weight*weight
+	cats[type].npp2 += evt.npp*evt.npp*weight*weight
+	cats[type].npf2 += evt.npf*evt.npf*weight*weight
+	cats[type].nfp2 += evt.nfp*evt.nfp*weight*weight
+	cats[type].nff2 += evt.nff*evt.nff*weight*weight
 
 	if   evt.tlcat is 0:
-		cats[evt.type].ntt  +=weight
-		cats[evt.type].ntt2 +=weight*weight
-		cats[evt.type].nttc +=1
+		cats[type].ntt  +=weight
+		cats[type].ntt2 +=weight*weight
+		cats[type].nttc +=1
 
 	elif evt.tlcat is 1:
-		cats[evt.type].ntl  +=weight
-		cats[evt.type].ntl2 +=weight*weight
-		cats[evt.type].ntlc +=1
+		cats[type].ntl  +=weight
+		cats[type].ntl2 +=weight*weight
+		cats[type].ntlc +=1
 
 	elif evt.tlcat is 2:
-		cats[evt.type].nlt  +=weight
-		cats[evt.type].nlt2 +=weight*weight
-		cats[evt.type].nltc +=1
+		cats[type].nlt  +=weight
+		cats[type].nlt2 +=weight*weight
+		cats[type].nltc +=1
 
 	elif evt.tlcat is 3:
-		cats[evt.type].nll  +=weight
-		cats[evt.type].nll2 +=weight*weight
-		cats[evt.type].nllc +=1
+		cats[type].nll  +=weight
+		cats[type].nll2 +=weight*weight
+		cats[type].nllc +=1
 
 
 
@@ -112,8 +124,12 @@ for cat in cats:
 	print 'OBSERVED     : %.2f +- %.2f' %(cat.obs  , cat.ntte)
 	print 'SUM OF FAKES : %.2f +- %.2f' %(cat.fakes, cat.npfe+cat.nfpe+cat.nffe)
 
-	res    = helper.divWithErr(cat.fakes, cat.fakese, cat.obs, cat.obse)	
-	relres = helper.divWithErr(cat.fakes - cat.obs, cat.fakese - cat.obse, cat.fakes, cat.fakese)	
+	if cat.obs > 0:
+		res    = helper.divWithErr(cat.fakes, cat.fakese, cat.obs, cat.obse)	
+		relres = helper.divWithErr(cat.fakes - cat.obs, cat.fakese - cat.obse, cat.fakes, cat.fakese)	
+	else:
+		res = [0,0]
+		relres = [0,0]
 	print '\n------------------------------------------'
 	print '%25s %.3f +- %.3f' %('pred./ obs.:', res[0], res[1])
 	print '\n%25s %.3f +- %.3f' %('(pred. - obs.) / pred.:', relres[0], relres[1])
