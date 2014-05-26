@@ -30,6 +30,10 @@ void Closure::init(TString frfilestring){
 	fOutputSubDir = "";
 	Util::SetStyle();
 
+	// the following two lines fix an error. believe it or not
+	TCanvas * dummy = new TCanvas();
+	delete dummy;
+
 	fFRFileString = frfilestring;
 	cout << "INPUT FILE WITH FR VALUES: " << fFRFileString << endl;
 	fFRFile = new TFile(fFRFileString, "READ");
