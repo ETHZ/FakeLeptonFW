@@ -1159,7 +1159,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	// clean w/r/t loose electrons
 	for(int el = 0; el < ElPt->size(); ++el){
-		if(!isLooseElectron(el)) continue;
+		if(!isLooseElectron(el) || ElPt->at(el) < 10.) continue;
 
 		float closestDR  = 99.;
 		int   closestInd =  -1;
@@ -1180,7 +1180,7 @@ bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
 
 	// clean w/r/t loose muons
 	for(int mu = 0; mu < MuPt->size(); ++mu){
-		if(!isLooseMuon(mu)) continue;
+		if(!isLooseMuon(mu) || MuPt->at(mu) < 10.) continue;
 
 		float closestDR  = 99.;
 		int   closestInd =  -1;
