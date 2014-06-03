@@ -46,62 +46,10 @@ inputDir = args[2]
 outputDir = args[3]
 
 if dataType == 'el':
-	data        = sample('el_data'         , inputDir + 'el_data_ratios.root'       )
-	wjets       = sample('el_wjets'        , inputDir + 'el_wjets_ratios.root'      )
-	dyjets50    = sample('el_dyjets50'     , inputDir + 'el_dyjets50_ratios.root'   )
-	dyjets10    = sample('el_dyjets10'     , inputDir + 'el_dyjets10_ratios.root'   )
-	ttbar0      = sample('el_ttbar0'       , inputDir + 'el_ttbar0_ratios.root'     )
-	ttbar1      = sample('el_ttbar1'       , inputDir + 'el_ttbar1_ratios.root'     )
-	ttbar2      = sample('el_ttbar2'       , inputDir + 'el_ttbar2_ratios.root'     )
-	ttbar3      = sample('el_ttbar3'       , inputDir + 'el_ttbar3_ratios.root'     )
-	ttbar4      = sample('el_ttbar4'       , inputDir + 'el_ttbar4_ratios.root'     )
-	ttbar5      = sample('el_ttbar5'       , inputDir + 'el_ttbar5_ratios.root'     )
-	ttbar6      = sample('el_ttbar6'       , inputDir + 'el_ttbar6_ratios.root'     )
-	qcd00       = sample('el_qcd00'        , inputDir + 'el_qcd00_ratios.root'      ) 
-	qcd01       = sample('el_qcd01'        , inputDir + 'el_qcd01_ratios.root'      ) 
-	qcd02       = sample('el_qcd02'        , inputDir + 'el_qcd02_ratios.root'      ) 
-	qcd03       = sample('el_qcd03'        , inputDir + 'el_qcd03_ratios.root'      ) 
-	qcd10       = sample('el_qcd10'        , inputDir + 'el_qcd10_ratios.root'      ) 
-	qcd11       = sample('el_qcd11'        , inputDir + 'el_qcd11_ratios.root'      ) 
-	qcd12       = sample('el_qcd12'        , inputDir + 'el_qcd12_ratios.root'      ) 
-	qcd13       = sample('el_qcd13'        , inputDir + 'el_qcd13_ratios.root'      ) 
-	qcd20       = sample('el_qcd20'        , inputDir + 'el_qcd20_ratios.root'      ) 
-	qcd21       = sample('el_qcd21'        , inputDir + 'el_qcd21_ratios.root'      ) 
-	qcd22       = sample('el_qcd22'        , inputDir + 'el_qcd22_ratios.root'      ) 
-	qcd23       = sample('el_qcd23'        , inputDir + 'el_qcd23_ratios.root'      ) 
-	#qcd30       = sample('el_qcd30'        , inputDir + 'el_qcd30_ratios.root'      ) 
-	#qcd31       = sample('el_qcd31'        , inputDir + 'el_qcd31_ratios.root'      ) 
-	#qcd32       = sample('el_qcd32'        , inputDir + 'el_qcd32_ratios.root'      ) 
-	#qcd33       = sample('el_qcd33'        , inputDir + 'el_qcd33_ratios.root'      ) 
-	#qcd40       = sample('el_qcd40'        , inputDir + 'el_qcd40_ratios.root'      ) 
-	#qcd41       = sample('el_qcd41'        , inputDir + 'el_qcd41_ratios.root'      ) 
-	#qcd42       = sample('el_qcd42'        , inputDir + 'el_qcd42_ratios.root'      ) 
-	#qcd43       = sample('el_qcd43'        , inputDir + 'el_qcd43_ratios.root'      ) 
-	#qcd50       = sample('el_qcd50'        , inputDir + 'el_qcd50_ratios.root'      ) 
-	#qcd51       = sample('el_qcd51'        , inputDir + 'el_qcd51_ratios.root'      ) 
-	#qcd52       = sample('el_qcd52'        , inputDir + 'el_qcd52_ratios.root'      ) 
-	#qcd53       = sample('el_qcd53'        , inputDir + 'el_qcd53_ratios.root'      ) 
-	qcd60       = sample('el_qcd60'        , inputDir + 'el_qcd60_ratios.root'      ) 
-	qcd61       = sample('el_qcd61'        , inputDir + 'el_qcd61_ratios.root'      ) 
-	qcd62       = sample('el_qcd62'        , inputDir + 'el_qcd62_ratios.root'      ) 
-	qcd63       = sample('el_qcd63'        , inputDir + 'el_qcd63_ratios.root'      ) 
-	qcd70       = sample('el_qcd70'        , inputDir + 'el_qcd70_ratios.root'      ) 
-	qcd71       = sample('el_qcd71'        , inputDir + 'el_qcd71_ratios.root'      ) 
-	qcd72       = sample('el_qcd72'        , inputDir + 'el_qcd72_ratios.root'      ) 
-	qcd73       = sample('el_qcd73'        , inputDir + 'el_qcd73_ratios.root'      ) 
-	qcd80       = sample('el_qcd80'        , inputDir + 'el_qcd80_ratios.root'      ) 
-	qcd81       = sample('el_qcd81'        , inputDir + 'el_qcd81_ratios.root'      ) 
-	qcd82       = sample('el_qcd82'        , inputDir + 'el_qcd82_ratios.root'      ) 
-	qcd83       = sample('el_qcd83'        , inputDir + 'el_qcd83_ratios.root'      ) 
-
-	#qcdtot50    = sample('el_qcdtot50'     , inputDir + 'el_qcdtot50_ratios.root'   )
-	#qcdtot80    = sample('el_qcdtot80'     , inputDir + 'el_qcdtot80_ratios.root'   )
-	#qcdtot120   = sample('el_qcdtot120'    , inputDir + 'el_qcdtot120_ratios.root'  )
-	#qcdtot170   = sample('el_qcdtot170'    , inputDir + 'el_qcdtot170_ratios.root'  )
-	#qcdtot170v2 = sample('el_qcdtot170v2'  , inputDir + 'el_qcdtot170v2_ratios.root')
-	#qcdtot300   = sample('el_qcdtot300'    , inputDir + 'el_qcdtot300_ratios.root'  )
-	#qcdtot300v2 = sample('el_qcdtot300v2'  , inputDir + 'el_qcdtot300v2_ratios.root')
-	#qcdtot300v3 = sample('el_qcdtot300v3'  , inputDir + 'el_qcdtot300v3_ratios.root')
+	data        = sample('el_data'         , inputDir + 'el_data_ratios.root'        )
+	wjets       = sample('el_wjets'        , inputDir + 'el_wjets_ratios.root'       )
+	dyjets50    = sample('el_dyjets50'     , inputDir + 'el_dyjets50_ratios.root'    )
+	dyjets10    = sample('el_dyjets10'     , inputDir + 'el_dyjets10_ratios.root'    )
 
 	qcdem20     = sample('el_qcdemenr20'   , inputDir + 'el_qcdemenr20_ratios.root' ) 
 	qcdem30     = sample('el_qcdemenr30'   , inputDir + 'el_qcdemenr30_ratios.root' )
@@ -112,6 +60,23 @@ if dataType == 'el':
 	qcdbc20     = sample('el_qcdbctoe20'   , inputDir + 'el_qcdbctoe20_ratios.root' )
 	qcdbc30     = sample('el_qcdbctoe30'   , inputDir + 'el_qcdbctoe30_ratios.root' )
 	qcdbc80     = sample('el_qcdbctoe80'   , inputDir + 'el_qcdbctoe80_ratios.root' )
+
+	#qcdtot50    = sample('el_qcdtot50'     , inputDir + 'el_qcdtot50_ratios.root'   )
+	#qcdtot80    = sample('el_qcdtot80'     , inputDir + 'el_qcdtot80_ratios.root'   )
+	#qcdtot120   = sample('el_qcdtot120'    , inputDir + 'el_qcdtot120_ratios.root'  )
+	#qcdtot170   = sample('el_qcdtot170'    , inputDir + 'el_qcdtot170_ratios.root'  )
+	#qcdtot170v2 = sample('el_qcdtot170v2'  , inputDir + 'el_qcdtot170v2_ratios.root')
+	#qcdtot300   = sample('el_qcdtot300'    , inputDir + 'el_qcdtot300_ratios.root'  )
+	#qcdtot300v2 = sample('el_qcdtot300v2'  , inputDir + 'el_qcdtot300v2_ratios.root')
+	#qcdtot300v3 = sample('el_qcdtot300v3'  , inputDir + 'el_qcdtot300v3_ratios.root')
+
+	ttbar_g     = sample('el_ttbar_g'      , inputDir + 'el_ttbar_g_ratios.root'     )
+	qcdem20_g   = sample('el_qcdemenr20_g' , inputDir + 'el_qcdemenr20_g_ratios.root') 
+	qcdem30_g   = sample('el_qcdemenr30_g' , inputDir + 'el_qcdemenr30_g_ratios.root')
+	qcdem80_g   = sample('el_qcdemenr80_g' , inputDir + 'el_qcdemenr80_g_ratios.root')
+	qcdbc20_g   = sample('el_qcdbctoe20_g' , inputDir + 'el_qcdbctoe20_g_ratios.root')
+	qcdbc30_g   = sample('el_qcdbctoe30_g' , inputDir + 'el_qcdbctoe30_g_ratios.root')
+	qcdbc80_g   = sample('el_qcdbctoe80_g' , inputDir + 'el_qcdbctoe80_g_ratios.root')
 
 	data_samples = []
 	data_samples.append(data)
@@ -162,65 +127,23 @@ if dataType == 'el':
 	qcd_samples.append(qcdbc80    )
 
 	closure_samples = []
-	closure_samples.append(ttbar0)
-	closure_samples.append(ttbar1)
-	closure_samples.append(ttbar2)
-	closure_samples.append(ttbar3)
-	closure_samples.append(qcd00)
-	closure_samples.append(qcd01)
-	closure_samples.append(qcd02)
-	closure_samples.append(qcd03)
-	closure_samples.append(qcd10)
-	closure_samples.append(qcd11)
-	closure_samples.append(qcd12)
-	closure_samples.append(qcd13)
-	closure_samples.append(qcd20)
-	closure_samples.append(qcd21)
-	closure_samples.append(qcd22)
-	closure_samples.append(qcd23)
-	#closure_samples.append(qcd30)
-	#closure_samples.append(qcd31)
-	#closure_samples.append(qcd32)
-	#closure_samples.append(qcd33)
-	#closure_samples.append(qcd40)
-	#closure_samples.append(qcd41)
-	#closure_samples.append(qcd42)
-	#closure_samples.append(qcd43)
-	#closure_samples.append(qcd50)
-	#closure_samples.append(qcd51)
-	#closure_samples.append(qcd52)
-	#closure_samples.append(qcd53)
-	closure_samples.append(qcd60)
-	closure_samples.append(qcd61)
-	closure_samples.append(qcd62)
-	closure_samples.append(qcd63)
-	closure_samples.append(qcd70)
-	closure_samples.append(qcd71)
-	closure_samples.append(qcd72)
-	closure_samples.append(qcd73)
-	closure_samples.append(qcd80)
-	closure_samples.append(qcd81)
-	closure_samples.append(qcd82)
-	closure_samples.append(qcd83)
-
+	closure_samples.append(ttbar_g  )
+	closure_samples.append(qcdem20_g)
+	closure_samples.append(qcdem30_g)
+	closure_samples.append(qcdem80_g)
+	closure_samples.append(qcdbc20_g)
+	closure_samples.append(qcdbc30_g)
+	closure_samples.append(qcdbc80_g)
 
 else:
-	data       = sample('mu_data'         , inputDir + 'mu_data_ratios.root'    )
-	wjets      = sample('mu_wjets'        , inputDir + 'mu_wjets_ratios.root'   )
-	dyjets50   = sample('mu_dyjets50'     , inputDir + 'mu_dyjets50_ratios.root')
-	dyjets10   = sample('mu_dyjets10'     , inputDir + 'mu_dyjets10_ratios.root')
-	qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root')
-	#ttbar0     = sample('mu_ttbar0'       , inputDir + 'mu_ttbar0_ratios.root'  )
-	#ttbar1     = sample('mu_ttbar1'       , inputDir + 'mu_ttbar1_ratios.root'  )
-	#ttbar2     = sample('mu_ttbar2'       , inputDir + 'mu_ttbar2_ratios.root'  )
-	#ttbar3     = sample('mu_ttbar3'       , inputDir + 'mu_ttbar3_ratios.root'  )
-	#ttbar4     = sample('mu_ttbar4'       , inputDir + 'mu_ttbar4_ratios.root'  )
-	#ttbar5     = sample('mu_ttbar5'       , inputDir + 'mu_ttbar5_ratios.root'  )
-	#ttbar6     = sample('mu_ttbar6'       , inputDir + 'mu_ttbar6_ratios.root'  )
-	#qcd0       = sample('mu_qcd0'         , inputDir + 'mu_qcd0_ratios.root'    )
-	#qcd1       = sample('mu_qcd1'         , inputDir + 'mu_qcd1_ratios.root'    )
-	#qcd2       = sample('mu_qcd2'         , inputDir + 'mu_qcd2_ratios.root'    )
-	#qcd3       = sample('mu_qcd3'         , inputDir + 'mu_qcd3_ratios.root'    )
+	data       = sample('mu_data'         , inputDir + 'mu_data_ratios.root'      )
+	wjets      = sample('mu_wjets'        , inputDir + 'mu_wjets_ratios.root'     )
+	dyjets50   = sample('mu_dyjets50'     , inputDir + 'mu_dyjets50_ratios.root'  )
+	dyjets10   = sample('mu_dyjets10'     , inputDir + 'mu_dyjets10_ratios.root'  )
+	qcd        = sample('mu_qcdmuenr'     , inputDir + 'mu_qcdmuenr_ratios.root'  )
+
+	ttbar_g    = sample('mu_ttbar_g'      , inputDir + 'mu_ttbar_g_ratios.root'   )
+	qcd_g      = sample('mu_qcdmuenr_g'   , inputDir + 'mu_qcdmuenr_g_ratios.root')
 
 	data_samples = []
 	data_samples.append(data)
@@ -235,14 +158,8 @@ else:
 	qcd_samples.append(qcd)
 
 	closure_samples = []
-	#closure_samples.append(ttbar0)
-	#closure_samples.append(ttbar1)
-	#closure_samples.append(ttbar2)
-	#closure_samples.append(ttbar3)
-	#closure_samples.append(qcd0)
-	#closure_samples.append(qcd1)
-	#closure_samples.append(qcd2)
-	#closure_samples.append(qcd3)
+	closure_samples.append(ttbar_g)
+	closure_samples.append(qcd_g)
 
 	#data1      = sample('mu_data1'        , inputDir + 'mu_data1_ratios.root')
 	#data2      = sample('mu_data2'        , inputDir + 'mu_data2_ratios.root')
@@ -290,7 +207,7 @@ canv = helper.makeCanvas(900, 675)
 
 ## LIST OF HISTOGRAMS TO PLOT
 
-plot1dHists = ['h_Loose_AwayJetDR', 'h_Loose_AwayJetPt', 'h_Loose_ClosJetDR', 'h_Loose_ClosJetPt', 'h_Loose_HT', 'h_Loose_LepEta', 'h_Loose_LepIso', 'h_Loose_LepPt', 'h_Loose_MET', 'h_Loose_METnoMTCut', 'h_Loose_MT', 'h_Loose_MTMET20', 'h_Loose_MTMET30', 'h_Loose_MaxJPt', 'h_Loose_MaxJCSV', 'h_Loose_AllJCPt', 'h_Loose_AllJRPt', 'h_Loose_AllJEta', 'h_Loose_AllJCSV', 'h_Loose_AllJEtatest1', 'h_Loose_AllJEtatest2', 'h_Loose_AllJEtatest3', 'h_Loose_NBJets', 'h_Loose_NJets', 'h_Loose_NVertices', 'h_Loose_NVertices1', 'h_Loose_NVerticesMET20', 'h_Loose_D0', 'h_Tight_AwayJetDR', 'h_Tight_AwayJetPt', 'h_Tight_ClosJetDR', 'h_Tight_ClosJetPt', 'h_Tight_HT', 'h_Tight_LepEta', 'h_Tight_LepIso', 'h_Tight_LepPt', 'h_Tight_MET', 'h_Tight_METnoMTCut', 'h_Tight_MT', 'h_Tight_MTMET20', 'h_Tight_MTMET30', 'h_Tight_MaxJPt', 'h_Tight_MaxJCSV', 'h_Tight_AllJCPt', 'h_Tight_AllJRPt', 'h_Tight_AllJEta', 'h_Tight_AllJCSV', 'h_Tight_NBJets', 'h_Tight_NJets', 'h_Tight_NVertices', 'h_Tight_NVertices1', 'h_Tight_NVerticesMET20', 'h_Tight_D0']
+plot1dHists = ['h_Loose_AwayJetDR', 'h_Loose_AwayJetPt', 'h_Loose_ClosJetDR', 'h_Loose_ClosJetPt', 'h_Loose_ClosJetPt_0', 'h_Loose_ClosJetPt_1', 'h_Loose_ClosJetPt_2', 'h_Loose_ClosJetPt_3', 'h_Loose_ClosJetPt_4', 'h_Loose_ClosJetPt_5', 'h_Loose_HT', 'h_Loose_LepEta', 'h_Loose_LepIso', 'h_Loose_LepPt', 'h_Loose_MET', 'h_Loose_METnoMTCut', 'h_Loose_MT', 'h_Loose_MTMET20', 'h_Loose_MTMET30', 'h_Loose_MaxJPt', 'h_Loose_MaxJCSV', 'h_Loose_AllJCPt', 'h_Loose_AllJRPt', 'h_Loose_AllJEta', 'h_Loose_AllJCSV', 'h_Loose_AllJEtatest1', 'h_Loose_AllJEtatest2', 'h_Loose_AllJEtatest3', 'h_Loose_NBJets', 'h_Loose_NJets', 'h_Loose_NVertices', 'h_Loose_NVertices1', 'h_Loose_NVerticesMET20', 'h_Loose_D0', 'h_Tight_AwayJetDR', 'h_Tight_AwayJetPt', 'h_Tight_ClosJetDR', 'h_Tight_ClosJetPt', 'h_Tight_ClosJetPt_0', 'h_Tight_ClosJetPt_1', 'h_Tight_ClosJetPt_2', 'h_Tight_ClosJetPt_3', 'h_Tight_ClosJetPt_4', 'h_Tight_ClosJetPt_5', 'h_Tight_HT', 'h_Tight_LepEta', 'h_Tight_LepIso', 'h_Tight_LepPt', 'h_Tight_MET', 'h_Tight_METnoMTCut', 'h_Tight_MT', 'h_Tight_MTMET20', 'h_Tight_MTMET30', 'h_Tight_MaxJPt', 'h_Tight_MaxJCSV', 'h_Tight_AllJCPt', 'h_Tight_AllJRPt', 'h_Tight_AllJEta', 'h_Tight_AllJCSV', 'h_Tight_NBJets', 'h_Tight_NJets', 'h_Tight_NVertices', 'h_Tight_NVertices1', 'h_Tight_NVerticesMET20', 'h_Tight_D0']
 
 plot2dHists = ['h_Loose_DJPtJEta', 'h_Loose_FJPtJEta', 'h_Loose_DJPtJPt', 'h_Loose_FJPtJPt', 'h_Tight_DJPtJEta', 'h_Tight_FJPtJEta', 'h_Tight_DJPtJPt', 'h_Tight_FJPtJPt'] 
 
@@ -347,7 +264,7 @@ if module == 'plots_1d' or module == 'all':
 	leg.AddEntry(wjets          .hists[0], helper.getLegendName(wjets          .GetName()), 'f' )
 	leg.AddEntry(dyjets10       .hists[0], helper.getLegendName(dyjets10       .GetName()), 'f' )
 	leg.AddEntry(qcd_samples[0] .hists[0], helper.getLegendName(qcd_samples[0] .GetName()), 'f' )
-	#if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
+	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
 	Plot.Plot1d(dataType, outputDir, data_samples, mc_samples, plot1dHists, leg, True)
 
 
@@ -367,7 +284,7 @@ if module == 'zoom_met' or module == 'all':
 	leg.AddEntry(wjets          .hists[0], helper.getLegendName(wjets          .GetName()), 'f' )
 	leg.AddEntry(dyjets10       .hists[0], helper.getLegendName(dyjets10       .GetName()), 'f' )
 	leg.AddEntry(qcd_samples[0] .hists[0], helper.getLegendName(qcd_samples[0] .GetName()), 'f' )
-	#if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
+	if dataType == 'el': leg.AddEntry(qcdbc20.hists[0], helper.getLegendName(qcdbc20.GetName()), 'f')
 	Plot.PlotMETZooms(dataType, outputDir, data_samples, mc_samples, leg)
 
 
@@ -394,15 +311,32 @@ if module == 'compare' or module == 'all':
 	Plot.PlotCompare(dataType, outputDir, [wjets, dyjets50], 'AllJ', leg)
 
 
+
+# Compare ClosJetPt for different origins in TTBar and QCD
+
+if module == 'compare' or module == 'all':
+	leg = helper.makeLegend(0.6, 0.6, 0.85, 0.85)
+	leg.AddEntry(ttbar_g.hists[0], helper.getLegendName(ttbar_g.GetName()), 'l' )
+	leg.AddEntry(qcd_g  .hists[0], helper.getLegendName(qcd_g  .GetName()), 'l' )
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_0', leg, '-2:')
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_2', leg, '-2:')
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_3', leg, '-2:')
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_4', leg, '-2:')
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_5', leg, '-2:')
+
+
+
 # Compare Isolation between QCD and TTBar
 
-#if module == 'compare' or module == 'all':
-#	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.35)
-#	leg.AddEntry(qcd_samples[0].hists[0], helper.getLegendName(qcd_samples[0].GetName()), 'l' )
-#	leg.AddEntry(ttbar2        .hists[0], helper.getLegendName(ttbar2        .GetName()), 'l' )
-#	Plot.PlotCompare(dataType, outputDir, [qcd_samples[0], ttbar0], 'LepIso', leg)
-#	Plot.PlotCompare(dataType, outputDir, [qcd_samples[0], ttbar1], 'LepIso', leg)
-#	Plot.PlotCompare(dataType, outputDir, [qcd_samples[0], ttbar2], 'LepIso', leg)
+if module == 'compare' or module == 'all':
+	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.35)
+	leg.AddEntry(ttbar_g.hists[0], helper.getLegendName(ttbar_g.GetName()), 'l' )
+	leg.AddEntry(qcd_g  .hists[0], helper.getLegendName(qcd_g  .GetName()), 'l' )
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_0', leg, '-2:')
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_2', leg, '-2:')
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_3', leg, '-2:')
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_4', leg, '-2:')
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_5', leg, '-2:')
 
 
 
@@ -426,8 +360,12 @@ if module == 'fakerates_2d' or module == 'all':
 
 # compute and plot FR 2d Map for Closure Test
 
-#if module == 'fakerates_2dct' or module == 'all':
-#	FR.Plot2dFRMapClosureTest(dataType, outputDir, module, data_samples, mc_samples, closure_samples, [wjets, dyjets50, dyjets10], qcd_samples)
+if module == 'fakerates_2dct' or module == 'all':
+	FR.Plot2dFRMapClosureTest(dataType, outputDir, module, data_samples, mc_samples, closure_samples, [wjets, dyjets50, dyjets10], qcd_samples)
+
+
+if module == 'closure' or module == 'all':
+	Plot.PlotProvenance(dataType, outputDir, closure_samples, [3,4,5,6])#, [3,4,5,6])
 
 
 

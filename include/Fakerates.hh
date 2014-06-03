@@ -74,7 +74,6 @@ public:
 	inline virtual void setMaxSize      (int     m) {fMaxSize      = m;};
 	inline virtual void setXS           (float   x) {if (!fIsData) fXSec = x; else fXSec = -1.;};
 	inline virtual void setClosure      (bool    c) {fClosure      = c;};
-	inline virtual void setOrigin       (int     g) {fOrigin       = g;};
 
 	int  fVerbose;
 	bool fIsData;
@@ -84,7 +83,6 @@ public:
 	int fMaxSize;
 	float fXSec;
 	bool fClosure;
-	int fOrigin;
 
 	TString fOutputDir;
 	float fLuminosity;
@@ -108,6 +106,7 @@ public:
 	void smearAllJets();	
 
 	bool fillFHist(float);
+	void fillFHistTTBar(TH2F *&, float, float, float);
 	void fillFRPlots(float);
 	void fillHLTPlots(float);
 	void fillFRPlotsTTBar(float);
@@ -186,13 +185,37 @@ public:
 
 	// ===================================
 	TH2F * h_FRatio;
-	TH2F * h_FTight;
-	TH2F * h_FLoose;
-	TH2F * h_FTight_CERN_small;
-	TH2F * h_FLoose_CERN_small;
-	TH2F * h_FTight_CERN_large;
-	TH2F * h_FLoose_CERN_large;
 
+	TH2F * h_FLoose;
+	TH2F * h_FLoose_CERN_small;
+	TH2F * h_FLoose_CERN_large;
+	TH2F * h_FLoose_0;
+	TH2F * h_FLoose_1;
+	TH2F * h_FLoose_2;
+	TH2F * h_FLoose_3;
+	TH2F * h_FLoose_4;
+	TH2F * h_FLoose_5;
+	TH1F * h_Loose_LepIso_0;
+	TH1F * h_Loose_LepIso_1;
+	TH1F * h_Loose_LepIso_2;
+	TH1F * h_Loose_LepIso_3;
+	TH1F * h_Loose_LepIso_4;
+	TH1F * h_Loose_LepIso_5;
+	TH1F * h_Loose_ClosJetPt_0;
+	TH1F * h_Loose_ClosJetPt_1;
+	TH1F * h_Loose_ClosJetPt_2;
+	TH1F * h_Loose_ClosJetPt_3;
+	TH1F * h_Loose_ClosJetPt_4;
+	TH1F * h_Loose_ClosJetPt_5;
+	TH1F * h_Loose_ClosJetPtLNT_0;
+	TH1F * h_Loose_ClosJetPtLNT_1;
+	TH1F * h_Loose_ClosJetPtLNT_2;
+	TH1F * h_Loose_ClosJetPtLNT_3;
+	TH1F * h_Loose_ClosJetPtLNT_4;
+	TH1F * h_Loose_ClosJetPtLNT_5;
+	TH1F * h_Loose_Provenance;
+	TH1F * h_Loose_ProvenanceLNT;
+	TH1F * h_Loose_ProvenanceAES;
 	TH1F * h_Loose_AwayJetDR;
 	TH1F * h_Loose_AwayJetPt;
  	TH1F * h_Loose_ClosJetDR;
@@ -251,6 +274,29 @@ public:
 	TH1F * h_Loose_FRMETZoomPt;
 	TH1F * h_Loose_METZoom[40];
 
+	TH2F * h_FTight;
+	TH2F * h_FTight_CERN_small;
+	TH2F * h_FTight_CERN_large;
+	TH2F * h_FTight_0;
+	TH2F * h_FTight_1;
+	TH2F * h_FTight_2;
+	TH2F * h_FTight_3;
+	TH2F * h_FTight_4;
+	TH2F * h_FTight_5;
+	TH1F * h_Tight_LepIso_0;
+	TH1F * h_Tight_LepIso_1;
+	TH1F * h_Tight_LepIso_2;
+	TH1F * h_Tight_LepIso_3;
+	TH1F * h_Tight_LepIso_4;
+	TH1F * h_Tight_LepIso_5;
+	TH1F * h_Tight_ClosJetPt_0;
+	TH1F * h_Tight_ClosJetPt_1;
+	TH1F * h_Tight_ClosJetPt_2;
+	TH1F * h_Tight_ClosJetPt_3;
+	TH1F * h_Tight_ClosJetPt_4;
+	TH1F * h_Tight_ClosJetPt_5;
+	TH1F * h_Tight_Provenance;
+	TH1F * h_Tight_ProvenanceAES;
 	TH1F * h_Tight_AwayJetDR;
 	TH1F * h_Tight_AwayJetPt;
 	TH1F * h_Tight_ClosJetDR;

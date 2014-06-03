@@ -347,7 +347,7 @@ void Fakerates::loop(TFile* pFile){
 		//smearAllJets(); // Jet-Energy Smearing, leave commented for snyching
 
 		if(fClosure) {
-		  fillFRPlotsTTBar(eventweight);
+			fillFRPlotsTTBar(eventweight);
 		}
 		else {
 			fillFRPlots(eventweight);
@@ -375,11 +375,11 @@ void Fakerates::loop(TFile* pFile){
 
 	if(fClosure) {
 		ofstream ttbarfile;
-		ttbarfile.open("macros/Closure/qcd_mu_counters.txt", ios::app);
-		ttbarfile << fName << ": " << fCounter_origin_pl1 << ", " << fCounter_origin_pl2 << ", " << fCounter_origin_pl3 << ", " << fCounter_origin_pl4 << ", " << fCounter_origin_pl5 << ", " << fCounter_origin_pl6 << endl; 
-		ttbarfile << fName << ": " << fCounter_origin_nl1 << ", " << fCounter_origin_nl2 << ", " << fCounter_origin_nl3 << ", " << fCounter_origin_nl4 << ", " << fCounter_origin_nl5 << ", " << fCounter_origin_nl6 << endl; 
-		ttbarfile << fName << ": " << fCounter_origin_pt1 << ", " << fCounter_origin_pt2 << ", " << fCounter_origin_pt3 << ", " << fCounter_origin_pt4 << ", " << fCounter_origin_pt5 << ", " << fCounter_origin_pt6 << endl; 
-		ttbarfile << fName << ": " << fCounter_origin_nt1 << ", " << fCounter_origin_nt2 << ", " << fCounter_origin_nt3 << ", " << fCounter_origin_nt4 << ", " << fCounter_origin_nt5 << ", " << fCounter_origin_nt6 << endl; 
+		ttbarfile.open("macros/Closure/dyjets_mu_counters.txt", ios::app);
+		ttbarfile << fName << ": " << fCounter_origin_pl1 << ", " << fCounter_origin_pl2 << ", " << fCounter_origin_pl3 << ", " << fCounter_origin_pl5 << ", " << fCounter_origin_pl6 << endl; 
+		ttbarfile << fName << ": " << fCounter_origin_nl1 << ", " << fCounter_origin_nl2 << ", " << fCounter_origin_nl3 << ", " << fCounter_origin_nl5 << ", " << fCounter_origin_nl6 << endl; 
+		ttbarfile << fName << ": " << fCounter_origin_pt1 << ", " << fCounter_origin_pt2 << ", " << fCounter_origin_pt3 << ", " << fCounter_origin_pt5 << ", " << fCounter_origin_pt6 << endl; 
+		ttbarfile << fName << ": " << fCounter_origin_nt1 << ", " << fCounter_origin_nt2 << ", " << fCounter_origin_nt3 << ", " << fCounter_origin_nt5 << ", " << fCounter_origin_nt6 << endl; 
 		ttbarfile.close();
 	}
 
@@ -733,14 +733,6 @@ bool Fakerates::isFRRegionLepEventTTBar(int origin = 0){
 	*/ 
 	
 
-	//float minDR = 0.4;
-	//float btag = 0.679;
-	//int btag_jets = 0;	
-	//std::vector<float, std::allocator<float> >* LepEta = getLepEta();
-	//std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
-	//std::vector<float, std::allocator<float> >* LepPt = getLepPt();
-
-
 	// Event fails HLT muon trigger (if data) then return false
 	if(fLepTriggerMC || fIsData) {
 		if      (fLepTrigger == "Mu17"   && !HLT_MU17              ) { return false; }
@@ -753,37 +745,6 @@ bool Fakerates::isFRRegionLepEventTTBar(int origin = 0){
 	}
 
 
-	// Muon GEN Origin
-	//origin = 2;
-	//for(int j = 0; j < LepPt->size(); ++j){
-	//	int leporigin = getMuonOrigin(MuMID->at(j), MuGMID->at(j));
-	//	cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (leporigin == 0 || (origin != 0 && leporigin != origin)) << endl;
-	//	//if(leporigin == 0 || (origin != 0 && leporigin != origin)) return false;
-	//}
-
-	// drops out if leporigin = 0
-	// origin == all => leporigin may not be 0
-	// origin != all => leporigin may be origin
-
-	
-
-	// get the number of jets in the event
-
-	//for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
-
-	//	bool nojet = true;
-	//	
-	//	for(int lep = 0; lep < LepPhi->size(); ++lep){
-	//		if(!isLooseLeptonTTBar(lep)) continue;
-	//		if(Util::GetDeltaR(LepEta->at(lep), JetEta->at(thisjet), LepPhi->at(lep), JetPhi->at(thisjet)) < minDR ) nojet = false;
-	//	}
-	//
-	//	if(nojet && JetCSVBTag->at(thisjet) >= btag) ++btag_jets;
-
-	//}
-
-	//if(btag_jets < num_bjets) return false;
-
 
 	return true;
 }
@@ -794,7 +755,7 @@ int Fakerates::getLeptonOrigin(int mid, int gmid, int id = 0){
 	/*
 	returns the original quark flavor of the lepton
 	parameters: mid (mother id), gmid (grandmother id)
-	return: (0 is reserved for all), 1 (bottom), 2 (charm), 3 (other, light-flavor), 4 (other, top), 5 (other, unidentified), 6 (W), 7 (also W but prompt, detected in non-prompt)
+	return: (0 is reserved for all), 1 (W, prompt), 2 (bottom), 3 (charm), 4 (other, light-flavor), 5 (other, unidentified)
 	*/ 
 
 	int mother           = (int) fabs(mid);
@@ -802,38 +763,39 @@ int Fakerates::getLeptonOrigin(int mid, int gmid, int id = 0){
 	int mother_3dig      = mother % 1000;
 	int grandmother_3dig = grandmother % 1000;
 
-	if      (grandmother == 4                                                                                ) return 2;
-	else if (grandmother == 5                                                                                ) return 1;
-	else if (grandmother == 1 || grandmother == 2 || grandmother == 3                                        ) return 3;
-	else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
-	else if (grandmother >= 5000 && grandmother <= 5999                                                      ) return 1;
-	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 499) return 2;
-	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 599) return 1;
-	else if (mother == 24                                                                                    ) return 6;
-	else if (mother >= 4000 && mother <= 4999                                                                ) return 2;
-	else if (mother >= 5000 && mother <= 5999                                                                ) return 1;
-	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 499                    ) return 2;
-	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 599                    ) return 1;
-	else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 399                    ) return 3;
-	else if (mother == 6 || grandmother == 6                                                                 ) return 4;
-	else if (grandmother == 24                                                                               ) return 6;
-	else return 5; //cout << "MID: " << mother << " GMID: " << grandmother << endl;
+	if      (mother == 24 || grandmother == 24                                                               ) return 1;
+	else if (mother == 5 || grandmother == 5                                                                 ) return 2;
+	else if (grandmother >= 5000 && grandmother <= 5999                                                      ) return 2;
+	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 599) return 2;
+	else if (mother >= 5000 && mother <= 5999                                                                ) return 2;
+	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 599                    ) return 2;
+	else if (mother == 4 || grandmother == 4                                                                 ) return 3;
+	else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 3;
+	else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 499) return 3;
+	else if (mother >= 4000 && mother <= 4999                                                                ) return 3;
+	else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 499                    ) return 3;
+	else if (grandmother == 1 || grandmother == 2 || grandmother == 3                                        ) return 4;
+	else if (mother == 1 || mother == 2 || mother == 3                                                       ) return 4;
+	else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 399                    ) return 4;
+	else if (mother == 6 || grandmother == 6                                                                 ) return 1;
+	else return 5;//cout << "MID: " << mother << " GMID: " << grandmother << endl;
 
-	//if      (grandmother == 24                                                                               ) return 6;
+	//if      (grandmother == 4                                                                                ) return 2;
+	//else if (grandmother == 5                                                                                ) return 1;
+	//else if (grandmother == 1 || grandmother == 2 || grandmother == 3                                        ) return 3;
 	//else if (grandmother >= 4000 && grandmother <= 4999                                                      ) return 2;
 	//else if (grandmother >= 5000 && grandmother <= 5999                                                      ) return 1;
-	//else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 450) return 2;
-	//else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 550) return 1;
-	//else if ((grandmother > 999 || grandmother < 10000) && grandmother_3dig >= 100 && grandmother_3dig <= 350) return 3;
-	//else if (grandmother == 6                                                                                ) return 4;
+	//else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 400 && grandmother_3dig <= 499) return 2;
+	//else if ((grandmother < 1000 || grandmother > 9999) && grandmother_3dig >= 500 && grandmother_3dig <= 599) return 1;
 	//else if (mother == 24                                                                                    ) return 6;
 	//else if (mother >= 4000 && mother <= 4999                                                                ) return 2;
 	//else if (mother >= 5000 && mother <= 5999                                                                ) return 1;
-	//else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 450                    ) return 2;
-	//else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 550                    ) return 1;
-	//else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 350                    ) return 3;
-	//else if (mother == 6                                                                                     ) return 4;
-	//else                                                                                                       return 5;
+	//else if ((mother < 1000 || mother > 9999) && mother_3dig >= 400 && mother_3dig <= 499                    ) return 2;
+	//else if ((mother < 1000 || mother > 9999) && mother_3dig >= 500 && mother_3dig <= 599                    ) return 1;
+	//else if ((mother > 999 || mother < 10000) && mother_3dig >= 100 && mother_3dig <= 399                    ) return 3;
+	//else if (mother == 6 || grandmother == 6                                                                 ) return 4;
+	//else if (grandmother == 24                                                                               ) return 6;
+	//else return 5; //cout << "MID: " << mother << " GMID: " << grandmother << endl;
 
 	return 5;
 }
@@ -846,6 +808,8 @@ bool Fakerates::isLooseMuon(int index){
 	parameters: index (index of the particle)
 	return: true (if muon is loose), false (else)
 	*/
+
+	if(MuPt->at(index) < 10.) return false;
 	if(!MuIsLoose->at(index)) return false;
 	//if(fabs(MuD0->at(index)) > 0.1) return false;
 	if(fLepD0Cut > 0.0 && fabs(MuD0->at(index)) > fLepD0Cut) return false; // leave this commented for synching!!
@@ -863,6 +827,7 @@ bool Fakerates::isLooseElectron(int index){
 	return: true (if electron is loose), false (else)
 	*/
 
+	if(ElPt->at(index) < 10.) return false;
 	if(!ElIsLoose->at(index)) return false;
 	if(ElPFIso->at(index) > 0.6) return false;
 
@@ -1310,24 +1275,12 @@ int Fakerates::getClosestJet(int lep = 0){
 	return: jetind (closest jet index)
 	*/
 
-	int nclosjets(0), jetind(0);
-	std::vector<int> closjet_inds;
+	int jetind(0);
 	std::vector<float, std::allocator<float> >* LepEta = getLepEta();
 	std::vector<float, std::allocator<float> >* LepPhi = getLepPhi();
 	
-	for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
-		if(!isGoodJet(thisjet)) continue;
-		if(Util::GetDeltaR(JetEta->at(thisjet), LepEta->at(lep), JetPhi->at(thisjet), LepPhi->at(lep)) > 1.0 ) continue;
-		nclosjets++;
-		closjet_inds.push_back(thisjet);
-	}
-
-	if(closjet_inds.size() == 0) return 0;
-
-	jetind = closjet_inds[0];
-	if(closjet_inds.size() > 1)
-		for(int thisjet=0; thisjet < nclosjets; ++thisjet)
-			if(Util::GetDeltaR(JetEta->at(closjet_inds[thisjet]), LepEta->at(lep), JetPhi->at(closjet_inds[thisjet]), LepPhi->at(lep)) < Util::GetDeltaR(JetEta->at(jetind), LepEta->at(lep), JetPhi->at(jetind), LepPhi->at(lep)) ) jetind = closjet_inds[thisjet];
+	for(int thisjet=0; thisjet < JetPt->size(); ++thisjet)
+		if(Util::GetDeltaR(JetEta->at(thisjet), LepEta->at(lep), JetPhi->at(thisjet), LepPhi->at(lep)) < Util::GetDeltaR(JetEta->at(jetind), LepEta->at(lep), JetPhi->at(jetind), LepPhi->at(lep)) ) jetind = thisjet;
 
 	return jetind;
 
@@ -1410,6 +1363,28 @@ bool Fakerates::fillFHist(float LepPt){
 
 
 //____________________________________________________________________________
+void Fakerates::fillFHistTTBar(TH2F *&Hist, float LepPt, float LepEta, float eventweight){
+	/*
+	checks, if the bins below 40GeV of h_FLoose and h_FTight shall be filled or 
+	not, depending on the choice of trigger used, and then fills the bins of the histogram
+	parameters: Hist (TH2 to be filled), LepPt (pt of the lepton), LepEta (eta of the lepton), eventweight (eventweight)
+	return: true (if entry to be filled), false (else)
+	*/
+
+
+	if( LepPt > fFRbinspt.back() ){
+		int fillbin = Hist ->FindBin(fFRbinspt.back() - 0.5, fabs(LepEta));
+		Hist ->AddBinContent(fillbin, eventweight);
+	}
+	else{
+		//if(fillFHist(LepPt))
+			Hist ->Fill(LepPt, fabs(LepEta), eventweight);
+	}
+
+}
+
+
+//____________________________________________________________________________
 void Fakerates::fillHLTPlots(float fEventweight = 1.0){
 	/* 
 	   Let's use this function to measure purities for the different triggers that 
@@ -1457,18 +1432,18 @@ void Fakerates::fillHLTPlots(float fEventweight = 1.0){
 					
 					for(int j=0; j < MuPt->size(); ++j){
 						if(nloose==0){
-							if(MuPt->at(j) < ptcut)             continue; fillPurities(tr, 2. , fEventweight);
-							if(TMath::Abs(MuEta->at(j) ) > 2.4) continue; 
-							if(MuIsGlobalMuon    ->at(j) == 0 ) continue; fillPurities(tr, 3. , fEventweight);
-							if(MuIsPFMuon        ->at(j) == 0 ) continue; fillPurities(tr, 4. , fEventweight);
-							if(MuNChi2           ->at(j) > 10 ) continue; fillPurities(tr, 5. , fEventweight);
-							if(MuNGlMuHits       ->at(j) < 1  ) continue; fillPurities(tr, 6. , fEventweight);
-							if(MuNMatchedStations->at(j) < 2  ) continue; fillPurities(tr, 7. , fEventweight); 
-							if(MuDz              ->at(j) > 0.2) continue; fillPurities(tr, 8. , fEventweight);
-							if(MuD0              ->at(j) > 0.2) continue; fillPurities(tr, 9. , fEventweight);
-							if(MuNPxHits         ->at(j) < 1  ) continue; fillPurities(tr, 10., fEventweight);
-							if(MuNSiLayers       ->at(j) < 6  ) continue; fillPurities(tr, 11., fEventweight);
-							if(MuPFIso           ->at(j) > 1.0) continue; fillPurities(tr, 12., fEventweight);
+							//if(MuPt              ->at(j) < ptcut) continue; fillPurities(tr, 2. , fEventweight);
+							//if(fabs(MuEta->at(j))        > 2.4  ) continue; 
+							//if(MuIsGlobalMuon    ->at(j) == 0   ) continue; fillPurities(tr, 3. , fEventweight);
+							//if(MuIsPFMuon        ->at(j) == 0   ) continue; fillPurities(tr, 4. , fEventweight);
+							//if(MuNChi2           ->at(j) > 10   ) continue; fillPurities(tr, 5. , fEventweight);
+							//if(MuNGlMuHits       ->at(j) < 1    ) continue; fillPurities(tr, 6. , fEventweight);
+							//if(MuNMatchedStations->at(j) < 2    ) continue; fillPurities(tr, 7. , fEventweight); 
+							//if(MuDz              ->at(j) > 0.2  ) continue; fillPurities(tr, 8. , fEventweight);
+							//if(MuD0              ->at(j) > 0.2  ) continue; fillPurities(tr, 9. , fEventweight);
+							//if(MuNPxHits         ->at(j) < 1    ) continue; fillPurities(tr, 10., fEventweight);
+							//if(MuNSiLayers       ->at(j) < 6    ) continue; fillPurities(tr, 11., fEventweight);
+							//if(MuPFIso           ->at(j) > 1.0  ) continue; fillPurities(tr, 12., fEventweight);
 						}
 						lep = j;
 						nloose++;
@@ -1618,13 +1593,11 @@ void Fakerates::fillHLTPlots(float fEventweight = 1.0){
 					h_Tight_LepPt_trig [iHLTMU5]->Fill(LepPt->at(lep), fEventweight);
 					h_Tight_LepEta_trig[iHLTMU5]->Fill(fabs(LepEta->at(lep)), fEventweight);
 				}
-		
 				if (HLT_MU8) {
 					fill2DWithoutOF(h_FTight_trig[iHLTMU8 ], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 					h_Tight_LepPt_trig [iHLTMU8]->Fill(LepPt->at(lep), fEventweight);
 					h_Tight_LepEta_trig[iHLTMU8]->Fill(fabs(LepEta->at(lep)), fEventweight);
 				}
-
 				if (HLT_MU12) {
 					fill2DWithoutOF(h_FTight_trig[iHLTMU12], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 					h_Tight_LepPt_trig [iHLTMU12]->Fill(LepPt->at(lep), fEventweight);
@@ -1634,8 +1607,7 @@ void Fakerates::fillHLTPlots(float fEventweight = 1.0){
 					fill2DWithoutOF(h_FTight_trig[iHLTMU17], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 					h_Tight_LepPt_trig [iHLTMU17]->Fill(LepPt->at(lep), fEventweight);
 					h_Tight_LepEta_trig[iHLTMU17]->Fill(fabs(LepEta->at(lep)), fEventweight);
-				}
-		
+				}	
 				if (HLT_MU24) {
 					fill2DWithoutOF(h_FTight_trig[iHLTMU24], LepPt->at(lep), fabs(LepEta->at(lep)), fEventweight);
 					h_Tight_LepPt_trig [iHLTMU24]->Fill(LepPt->at(lep), fEventweight);
@@ -1800,11 +1772,11 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 		if(passesMETCut(30,1))  h_Loose_MTMET30        ->Fill(getMT(lep)          , eventweight);
 		if(passesMETCut(20,1))  h_Loose_NVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , eventweight);
 		
-		if(passesMTCut(lep) && passesMETCut(20)){
+		if(passesMETCut(20)){
 			h_FLoose_CERN_small ->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
 			++fCounter_CERN_small;
 		}
-		if(passesMTCut(lep) && passesMETCut(45,1) && passesMETCut(80)){
+		if(passesMETCut(45,1) && passesMETCut(80)){
 			h_FLoose_CERN_large ->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
 			++fCounter_CERN_large;
 		}
@@ -1898,8 +1870,11 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 			if(passesMETCut(30,1))  h_Tight_MTMET30    -> Fill(getMT(lep)             , eventweight);
 			if(passesMETCut(20,1))  h_Tight_NVerticesMET20 ->Fill((NVrtx>40)?40:NVrtx , eventweight);
 
-			if(passesMTCut(lep) && passesMETCut(20))                        h_FTight_CERN_small ->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
-			if(passesMTCut(lep) && passesMETCut(45,1) && passesMETCut(80))  h_FTight_CERN_large ->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
+			if(passesMETCut(20))
+				h_FTight_CERN_small ->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
+		
+			if(passesMETCut(45,1) && passesMETCut(80))
+				h_FTight_CERN_large ->Fill(LepPt->at(lep), fabs(LepEta->at(lep)), eventweight);
 
 			if(passesMTCut(lep) && fFRMETbinseta[0]<=fabs(LepEta->at(lep)) && fabs(LepEta->at(lep))<fFRMETbinseta[fFRMETn_binseta-1]){
 				if(fFRMETbinspt[0]<=LepPt->at(lep) && LepPt->at(lep)<fFRMETbinspt[fFRMETn_binspt-1]){
@@ -1925,6 +1900,7 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 	*/
 
 
+	int lep(-1), jet(-1);
 	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
 	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
 	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
@@ -1935,32 +1911,12 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 	++fCounter_all;
 
 
-	//// Checks for jet
-
-	//if     (strstr(fName, "ttbar0")) njets = 0;
-	//else if(strstr(fName, "ttbar1")) njets = 1;
-	//else if(strstr(fName, "ttbar2")) njets = 2;
-
-	//if(!isFRRegionLepEventTTBar(njets)) return; 
-
 
 	// Checks for Trigger
 
 	if(!isFRRegionLepEventTTBar()) return; 
 
 	++fCounter_trigger;
-
-
-	// Get Desired Particle GEN Origin
-
-	//if     (strstr(fName, "ttbar0")) origin = 0; // all
-	//else if(strstr(fName, "ttbar1")) origin = 1; // b
-	//else if(strstr(fName, "ttbar2")) origin = 2; // c
-	//else if(strstr(fName, "ttbar3")) origin = 3; // other, light-flavor
-	//else if(strstr(fName, "ttbar4")) origin = 4; // other, t
-	//else if(strstr(fName, "ttbar5")) origin = 5; // other, misidentified
-	//else if(strstr(fName, "ttbar6")) origin = 6; // W
-
 
 
 
@@ -1975,66 +1931,120 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 
 		int thisorigin = getLeptonOrigin(LepMID->at(j), LepGMID->at(j));
 
-		if     (thisorigin == 4 || thisorigin == 6) setLepIsPrompt(j, true);
-		else                                        setLepIsPrompt(j, false);
+		if(thisorigin == 1) setLepIsPrompt(j, true);
+		else                setLepIsPrompt(j, false);
+	
+		h_Loose_Provenance ->Fill(0);
+		h_Loose_Provenance ->Fill(thisorigin);
+		
+		fillFHistTTBar(h_FLoose_0, LepPt->at(j), LepEta->at(j), eventweight);
+
+		if     (thisorigin == 1) fillFHistTTBar(h_FLoose_1, LepPt->at(j), LepEta->at(j), eventweight);
+		else if(thisorigin == 2) fillFHistTTBar(h_FLoose_2, LepPt->at(j), LepEta->at(j), eventweight);
+		else if(thisorigin == 3) fillFHistTTBar(h_FLoose_3, LepPt->at(j), LepEta->at(j), eventweight);
+		else if(thisorigin == 4) fillFHistTTBar(h_FLoose_4, LepPt->at(j), LepEta->at(j), eventweight);
+		else if(thisorigin == 5) fillFHistTTBar(h_FLoose_5, LepPt->at(j), LepEta->at(j), eventweight);
+
+		h_Loose_LepIso_0   ->Fill(LepPFIso->at(j), eventweight);
+
+		if     (thisorigin == 1) h_Loose_LepIso_1 ->Fill(LepPFIso->at(j), eventweight);
+		else if(thisorigin == 2) h_Loose_LepIso_2 ->Fill(LepPFIso->at(j), eventweight);
+		else if(thisorigin == 3) h_Loose_LepIso_3 ->Fill(LepPFIso->at(j), eventweight);
+		else if(thisorigin == 4) h_Loose_LepIso_4 ->Fill(LepPFIso->at(j), eventweight);
+		else if(thisorigin == 5) h_Loose_LepIso_5 ->Fill(LepPFIso->at(j), eventweight);
 
 		bool istight = isTightLeptonTTBar(j);
-	
-		if     (thisorigin == 1 && !istight) ++fCounter_origin_nl1;
-		else if(thisorigin == 2 && !istight) ++fCounter_origin_nl2;
-		else if(thisorigin == 3 && !istight) ++fCounter_origin_nl3;
-		else if(thisorigin == 4 && !istight) ++fCounter_origin_pl4;
-		else if(thisorigin == 5 && !istight) ++fCounter_origin_nl5;
-		else if(thisorigin == 6 && !istight) ++fCounter_origin_pl6;
 
+		if(!istight && JetPt->size()>0 && !strstr(fName, "qcd")) {
 	
-	
-		// lepton origin
-	
-		//cout << j << ", MuMID: " << MuMID->at(j) << ", MuGMID: " << MuGMID->at(j) << " => " << getMuonOrigin(MuMID->at(j), MuGMID->at(j)) << " : " << (thisorigin == 0 || (origin != 0 && thisorigin != origin)) << endl;
-	
-		if(thisorigin == 0 || (fOrigin != 0 && thisorigin != fOrigin)) continue;
-		++fCounter_origin;
-	
-	
-		// fill histogram
-	
-		h_Loose_LepIso ->Fill(LepPFIso->at(j), eventweight);
-	
-		if( LepPt->at(j) > fFRbinspt.back() ){
-			int fillbin = h_FLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(j)));
-			h_FLoose->AddBinContent(fillbin, eventweight);
+			h_Loose_ClosJetPt_0   ->Fill(getJetPt(getClosestJet(j)), eventweight);
+
+			if     (thisorigin == 1) h_Loose_ClosJetPt_1 ->Fill(getJetPt(getClosestJet(j)), eventweight);
+			else if(thisorigin == 2) h_Loose_ClosJetPt_2 ->Fill(getJetPt(getClosestJet(j)), eventweight);
+			else if(thisorigin == 3) h_Loose_ClosJetPt_3 ->Fill(getJetPt(getClosestJet(j)), eventweight);
+			else if(thisorigin == 4) h_Loose_ClosJetPt_4 ->Fill(getJetPt(getClosestJet(j)), eventweight);
+			else if(thisorigin == 5) h_Loose_ClosJetPt_5 ->Fill(getJetPt(getClosestJet(j)), eventweight);
+
 		}
-		else{
-			//if(fillFHist(LepPt->at(j)))
-				h_FLoose->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
+
+		if(!istight) {
+			h_Loose_ProvenanceLNT ->Fill(0);
+			h_Loose_ProvenanceLNT ->Fill(thisorigin);
 		}
-//cout << Form("%d\t%d\t%d\t%.2f\t%d", Run, Lumi, Event, LepPt->at(j), isTightLeptonTTBar(j)) << endl;
+
+		//cout << Form("%d\t%d\t%d\t%.2f\t%d", Run, Lumi, Event, LepPt->at(j), isTightLeptonTTBar(j)) << endl;
 	
-	
+
 		// tight lepton
+
 		if(!isTightLeptonTTBar(j)) continue;
 	
-		if     (thisorigin == 1) ++fCounter_origin_nt1;
-		else if(thisorigin == 2) ++fCounter_origin_nt2;
-		else if(thisorigin == 3) ++fCounter_origin_nt3;
-		else if(thisorigin == 4) ++fCounter_origin_pt4;
-		else if(thisorigin == 5) ++fCounter_origin_nt5;
-		else if(thisorigin == 6) ++fCounter_origin_pt6;
+		h_Tight_Provenance ->Fill(0);
+		h_Tight_Provenance ->Fill(thisorigin);
+		
+		fillFHistTTBar(h_FTight_0, LepPt->at(j), LepEta->at(j), eventweight);
+
+		if     (thisorigin == 1) fillFHistTTBar(h_FTight_1, LepPt->at(j), LepEta->at(j), eventweight);
+		else if(thisorigin == 2) fillFHistTTBar(h_FTight_2, LepPt->at(j), LepEta->at(j), eventweight);
+		else if(thisorigin == 3) fillFHistTTBar(h_FTight_3, LepPt->at(j), LepEta->at(j), eventweight);
+		else if(thisorigin == 4) fillFHistTTBar(h_FTight_4, LepPt->at(j), LepEta->at(j), eventweight);
+		else if(thisorigin == 5) fillFHistTTBar(h_FTight_5, LepPt->at(j), LepEta->at(j), eventweight);
+
+		h_Tight_LepIso_0   ->Fill(LepPFIso->at(j), eventweight);
+
+		if     (thisorigin == 1) h_Tight_LepIso_1 ->Fill(LepPFIso->at(j), eventweight);
+		else if(thisorigin == 2) h_Tight_LepIso_2 ->Fill(LepPFIso->at(j), eventweight);
+		else if(thisorigin == 3) h_Tight_LepIso_3 ->Fill(LepPFIso->at(j), eventweight);
+		else if(thisorigin == 4) h_Tight_LepIso_4 ->Fill(LepPFIso->at(j), eventweight);
+		else if(thisorigin == 5) h_Tight_LepIso_5 ->Fill(LepPFIso->at(j), eventweight);
+	
+		if(JetPt->size()>0 && !strstr(fName, "qcd")) {
+	
+			h_Tight_ClosJetPt_0   ->Fill(getJetPt(getClosestJet(j)), eventweight);
+
+			if     (thisorigin == 1) h_Tight_ClosJetPt_1 ->Fill(getJetPt(getClosestJet(j)), eventweight);
+			else if(thisorigin == 2) h_Tight_ClosJetPt_2 ->Fill(getJetPt(getClosestJet(j)), eventweight);
+			else if(thisorigin == 3) h_Tight_ClosJetPt_3 ->Fill(getJetPt(getClosestJet(j)), eventweight);
+			else if(thisorigin == 4) h_Tight_ClosJetPt_4 ->Fill(getJetPt(getClosestJet(j)), eventweight);
+			else if(thisorigin == 5) h_Tight_ClosJetPt_5 ->Fill(getJetPt(getClosestJet(j)), eventweight);
+		}	
+	}
 
 
-	
-		// fill histograms
-	
-		h_Tight_LepIso ->Fill(LepPFIso->at(j), eventweight);
-	
-		if( LepPt->at(j) >  fFRbinspt.back()){
-			int fillbin = h_FTight->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(j)));
-			h_FTight->AddBinContent(fillbin, eventweight);
-		}
-		else{
-			//if(fillFHist(LepPt->at(j)))
-				h_FTight->Fill(LepPt->at(j), fabs(LepEta->at(j)), eventweight);
+	// do the same thing after event selection (AES) for single lepton events
+
+	if(isFRRegionLepEvent(lep, jet, fJetPtCut)){
+		if(passesUpperMETMT(lep)) {
+			int thisorigin = getLeptonOrigin(LepMID->at(lep), LepGMID->at(lep));
+
+			h_Loose_ProvenanceAES ->Fill(0);
+			h_Loose_ProvenanceAES ->Fill(thisorigin);
+
+			if(strstr(fName, "qcd")) {
+				h_Loose_ClosJetPt_0   ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+
+				if     (thisorigin == 1) h_Loose_ClosJetPt_1 ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+				else if(thisorigin == 2) h_Loose_ClosJetPt_2 ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+				else if(thisorigin == 3) h_Loose_ClosJetPt_3 ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+				else if(thisorigin == 4) h_Loose_ClosJetPt_4 ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+				else if(thisorigin == 5) h_Loose_ClosJetPt_5 ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+			}
+
+
+			if(isTightLeptonTTBar(lep)){
+				h_Tight_ProvenanceAES ->Fill(0);
+				h_Tight_ProvenanceAES ->Fill(thisorigin);
+			
+				if(strstr(fName, "qcd")) {
+					h_Tight_ClosJetPt_0   ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+
+					if     (thisorigin == 1) h_Tight_ClosJetPt_1 ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+					else if(thisorigin == 2) h_Tight_ClosJetPt_2 ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+					else if(thisorigin == 3) h_Tight_ClosJetPt_3 ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+					else if(thisorigin == 4) h_Tight_ClosJetPt_4 ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+					else if(thisorigin == 5) h_Tight_ClosJetPt_5 ->Fill(getJetPt(getClosestJet(lep)), eventweight);
+				}
+			}
 		}
 	}
 }
@@ -2061,22 +2071,47 @@ void Fakerates::bookHistos(){
 	int nvrtx_nbins = nvrtx_bins.size();
 
 	h_FRatio             = new TH2F("h_FRatio"            , "FRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FRatio           ->Sumw2(); 
-	h_FTight             = new TH2F("h_FTight"            , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight           ->Sumw2(); 
+
 	h_FLoose             = new TH2F("h_FLoose"            , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose           ->Sumw2(); 
-	h_FTight_CERN_small  = new TH2F("h_FTight_CERN_small" , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_CERN_small->Sumw2(); 
 	h_FLoose_CERN_small  = new TH2F("h_FLoose_CERN_small" , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_CERN_small->Sumw2(); 
-	h_FTight_CERN_large  = new TH2F("h_FTight_CERN_large" , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_CERN_large->Sumw2(); 
 	h_FLoose_CERN_large  = new TH2F("h_FLoose_CERN_large" , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_CERN_large->Sumw2(); 
 
-	h_Loose_FRZoomEta    = new TH1F("h_Loose_FRZoomEta"   , "Loose_FRZoomEta"   , fFRn_binseta-1   , &fFRbinseta[0]   ); // empty, just to use binning
-	h_Loose_FRZoomPt     = new TH1F("h_Loose_FRZoomPt"    , "Loose_FRZoomPt"    , fFRn_binspt-1    , &fFRbinspt[0]    ); // empty, just to use binning
-	h_Tight_FRZoomEta    = new TH1F("h_Tight_FRZoomEta"   , "Tight_FRZoomEta"   , fFRn_binseta-1   , &fFRbinseta[0]   ); // empty, just to use binning
-	h_Tight_FRZoomPt     = new TH1F("h_Tight_FRZoomPt"    , "Tight_FRZoomPt"    , fFRn_binspt-1    , &fFRbinspt[0]    ); // empty, just to use binning
+	h_FLoose_0            = new TH2F("h_FLoose_0"           , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_0  ->Sumw2(); 
+	h_FLoose_1            = new TH2F("h_FLoose_1"           , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_1  ->Sumw2(); 
+	h_FLoose_2            = new TH2F("h_FLoose_2"           , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_2  ->Sumw2(); 
+	h_FLoose_3            = new TH2F("h_FLoose_3"           , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_3  ->Sumw2(); 
+	h_FLoose_4            = new TH2F("h_FLoose_4"           , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_4  ->Sumw2(); 
+	h_FLoose_5            = new TH2F("h_FLoose_5"           , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_5  ->Sumw2(); 
+ 	
+	h_Loose_LepIso_0      = new TH1F("h_Loose_LepIso_0"     , "Loose_LepIso_0"    , 20, 0 , 1.0); h_Loose_LepIso_0     ->Sumw2();
+	h_Loose_LepIso_1      = new TH1F("h_Loose_LepIso_1"     , "Loose_LepIso_1"    , 20, 0 , 1.0); h_Loose_LepIso_1     ->Sumw2();
+	h_Loose_LepIso_2      = new TH1F("h_Loose_LepIso_2"     , "Loose_LepIso_2"    , 20, 0 , 1.0); h_Loose_LepIso_2     ->Sumw2();
+	h_Loose_LepIso_3      = new TH1F("h_Loose_LepIso_3"     , "Loose_LepIso_3"    , 20, 0 , 1.0); h_Loose_LepIso_3     ->Sumw2();
+	h_Loose_LepIso_4      = new TH1F("h_Loose_LepIso_4"     , "Loose_LepIso_4"    , 20, 0 , 1.0); h_Loose_LepIso_4     ->Sumw2();
+	h_Loose_LepIso_5      = new TH1F("h_Loose_LepIso_5"     , "Loose_LepIso_5"    , 20, 0 , 1.0); h_Loose_LepIso_5     ->Sumw2();
+	
+	h_Loose_ClosJetPt_0   = new TH1F("h_Loose_ClosJetPt_0"  , "Loose_ClosJetPt_0" , 10, 20, 120); h_Loose_ClosJetPt_0  ->Sumw2(); 
+	h_Loose_ClosJetPt_1   = new TH1F("h_Loose_ClosJetPt_1"  , "Loose_ClosJetPt_1" , 10, 20, 120); h_Loose_ClosJetPt_1  ->Sumw2(); 
+	h_Loose_ClosJetPt_2   = new TH1F("h_Loose_ClosJetPt_2"  , "Loose_ClosJetPt_2" , 10, 20, 120); h_Loose_ClosJetPt_2  ->Sumw2(); 
+	h_Loose_ClosJetPt_3   = new TH1F("h_Loose_ClosJetPt_3"  , "Loose_ClosJetPt_3" , 10, 20, 120); h_Loose_ClosJetPt_3  ->Sumw2(); 
+	h_Loose_ClosJetPt_4   = new TH1F("h_Loose_ClosJetPt_4"  , "Loose_ClosJetPt_4" , 10, 20, 120); h_Loose_ClosJetPt_4  ->Sumw2(); 
+	h_Loose_ClosJetPt_5   = new TH1F("h_Loose_ClosJetPt_5"  , "Loose_ClosJetPt_5" , 10, 20, 120); h_Loose_ClosJetPt_5  ->Sumw2(); 
 
-	h_Loose_FRMETZoomEta = new TH1F("h_Loose_FRMETZoomEta", "Loose_FRMETZoomEta", fFRMETn_binseta-1, &fFRMETbinseta[0]); // empty, just to use binning
-	h_Loose_FRMETZoomPt  = new TH1F("h_Loose_FRMETZoomPt" , "Loose_FRMETZoomPt" , fFRMETn_binspt-1 , &fFRMETbinspt[0] ); // empty, just to use binning
-	h_Tight_FRMETZoomEta = new TH1F("h_Tight_FRMETZoomEta", "Tight_FRMETZoomEta", fFRMETn_binseta-1, &fFRMETbinseta[0]); // empty, just to use binning
-	h_Tight_FRMETZoomPt  = new TH1F("h_Tight_FRMETZoomPt" , "Tight_FRMETZoomPt" , fFRMETn_binspt-1 , &fFRMETbinspt[0] ); // empty, just to use binning
+	h_Loose_ClosJetPtLNT_0 = new TH1F("h_Loose_ClosJetPtLNT_0"  , "Loose_ClosJetPtLNT_0" , 10, 20, 120); h_Loose_ClosJetPtLNT_0  ->Sumw2(); 
+	h_Loose_ClosJetPtLNT_1 = new TH1F("h_Loose_ClosJetPtLNT_1"  , "Loose_ClosJetPtLNT_1" , 10, 20, 120); h_Loose_ClosJetPtLNT_1  ->Sumw2(); 
+	h_Loose_ClosJetPtLNT_2 = new TH1F("h_Loose_ClosJetPtLNT_2"  , "Loose_ClosJetPtLNT_2" , 10, 20, 120); h_Loose_ClosJetPtLNT_2  ->Sumw2(); 
+	h_Loose_ClosJetPtLNT_3 = new TH1F("h_Loose_ClosJetPtLNT_3"  , "Loose_ClosJetPtLNT_3" , 10, 20, 120); h_Loose_ClosJetPtLNT_3  ->Sumw2(); 
+	h_Loose_ClosJetPtLNT_4 = new TH1F("h_Loose_ClosJetPtLNT_4"  , "Loose_ClosJetPtLNT_4" , 10, 20, 120); h_Loose_ClosJetPtLNT_4  ->Sumw2(); 
+	h_Loose_ClosJetPtLNT_5 = new TH1F("h_Loose_ClosJetPtLNT_5"  , "Loose_ClosJetPtLNT_5" , 10, 20, 120); h_Loose_ClosJetPtLNT_5  ->Sumw2(); 
+
+	h_Loose_Provenance    = new TH1F("h_Loose_Provenance"   , "Loose_Provenance"   , 6 , 0 , 6  );
+	h_Loose_ProvenanceLNT = new TH1F("h_Loose_ProvenanceLNT", "Loose_ProvenanceLNT", 6 , 0 , 6  );
+	h_Loose_ProvenanceAES = new TH1F("h_Loose_ProvenanceAES", "Loose_ProvenanceAES", 6 , 0 , 6  );
+
+	h_Loose_FRZoomEta     = new TH1F("h_Loose_FRZoomEta"    , "Loose_FRZoomEta"   , fFRn_binseta-1   , &fFRbinseta[0]   ); // empty, just to use binning
+	h_Loose_FRZoomPt      = new TH1F("h_Loose_FRZoomPt"     , "Loose_FRZoomPt"    , fFRn_binspt-1    , &fFRbinspt[0]    ); // empty, just to use binning
+	h_Loose_FRMETZoomEta  = new TH1F("h_Loose_FRMETZoomEta" , "Loose_FRMETZoomEta", fFRMETn_binseta-1, &fFRMETbinseta[0]); // empty, just to use binning
+	h_Loose_FRMETZoomPt   = new TH1F("h_Loose_FRMETZoomPt"  , "Loose_FRMETZoomPt" , fFRMETn_binspt-1 , &fFRMETbinspt[0] ); // empty, just to use binning
 
 	float eta_min = 0. , eta_max = 2.4;
 	float pt_min  = 10., pt_max  = 70.;
@@ -2181,6 +2216,39 @@ void Fakerates::bookHistos(){
 			++n;
 		}
 	}
+
+	h_FTight             = new TH2F("h_FTight"            , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight           ->Sumw2(); 
+	h_FTight_CERN_small  = new TH2F("h_FTight_CERN_small" , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_CERN_small->Sumw2(); 
+	h_FTight_CERN_large  = new TH2F("h_FTight_CERN_large" , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_CERN_large->Sumw2(); 
+
+	h_FTight_0           = new TH2F("h_FTight_0"          , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_0  ->Sumw2(); 
+	h_FTight_1           = new TH2F("h_FTight_1"          , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_1  ->Sumw2(); 
+	h_FTight_2           = new TH2F("h_FTight_2"          , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_2  ->Sumw2(); 
+	h_FTight_3           = new TH2F("h_FTight_3"          , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_3  ->Sumw2(); 
+	h_FTight_4           = new TH2F("h_FTight_4"          , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_4  ->Sumw2(); 
+	h_FTight_5           = new TH2F("h_FTight_5"          , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_5  ->Sumw2(); 
+ 	
+	h_Tight_LepIso_0      = new TH1F("h_Tight_LepIso_0"     , "Tight_LepIso_0"    , 20, 0 , 1.0); h_Tight_LepIso_0     ->Sumw2();
+	h_Tight_LepIso_1      = new TH1F("h_Tight_LepIso_1"     , "Tight_LepIso_1"    , 20, 0 , 1.0); h_Tight_LepIso_1     ->Sumw2();
+	h_Tight_LepIso_2      = new TH1F("h_Tight_LepIso_2"     , "Tight_LepIso_2"    , 20, 0 , 1.0); h_Tight_LepIso_2     ->Sumw2();
+	h_Tight_LepIso_3      = new TH1F("h_Tight_LepIso_3"     , "Tight_LepIso_3"    , 20, 0 , 1.0); h_Tight_LepIso_3     ->Sumw2();
+	h_Tight_LepIso_4      = new TH1F("h_Tight_LepIso_4"     , "Tight_LepIso_4"    , 20, 0 , 1.0); h_Tight_LepIso_4     ->Sumw2();
+	h_Tight_LepIso_5      = new TH1F("h_Tight_LepIso_5"     , "Tight_LepIso_5"    , 20, 0 , 1.0); h_Tight_LepIso_5     ->Sumw2();
+	
+	h_Tight_ClosJetPt_0   = new TH1F("h_Tight_ClosJetPt_0"  , "Tight_ClosJetPt_0" , 10, 20, 120); h_Tight_ClosJetPt_0  ->Sumw2(); 
+	h_Tight_ClosJetPt_1   = new TH1F("h_Tight_ClosJetPt_1"  , "Tight_ClosJetPt_1" , 10, 20, 120); h_Tight_ClosJetPt_1  ->Sumw2(); 
+	h_Tight_ClosJetPt_2   = new TH1F("h_Tight_ClosJetPt_2"  , "Tight_ClosJetPt_2" , 10, 20, 120); h_Tight_ClosJetPt_2  ->Sumw2(); 
+	h_Tight_ClosJetPt_3   = new TH1F("h_Tight_ClosJetPt_3"  , "Tight_ClosJetPt_3" , 10, 20, 120); h_Tight_ClosJetPt_3  ->Sumw2(); 
+	h_Tight_ClosJetPt_4   = new TH1F("h_Tight_ClosJetPt_4"  , "Tight_ClosJetPt_4" , 10, 20, 120); h_Tight_ClosJetPt_4  ->Sumw2(); 
+	h_Tight_ClosJetPt_5   = new TH1F("h_Tight_ClosJetPt_5"  , "Tight_ClosJetPt_5" , 10, 20, 120); h_Tight_ClosJetPt_5  ->Sumw2(); 
+
+	h_Tight_Provenance    = new TH1F("h_Tight_Provenance"   , "Tight_Provenance"   , 6 , 0 , 6  );
+	h_Tight_ProvenanceAES = new TH1F("h_Tight_ProvenanceAES", "Tight_ProvenanceAES", 6 , 0 , 6  );
+
+	h_Tight_FRZoomEta     = new TH1F("h_Tight_FRZoomEta"    , "Tight_FRZoomEta"   , fFRn_binseta-1   , &fFRbinseta[0]   ); // empty, just to use binning
+	h_Tight_FRZoomPt      = new TH1F("h_Tight_FRZoomPt"     , "Tight_FRZoomPt"    , fFRn_binspt-1    , &fFRbinspt[0]    ); // empty, just to use binning
+	h_Tight_FRMETZoomEta  = new TH1F("h_Tight_FRMETZoomEta" , "Tight_FRMETZoomEta", fFRMETn_binseta-1, &fFRMETbinseta[0]); // empty, just to use binning
+	h_Tight_FRMETZoomPt   = new TH1F("h_Tight_FRMETZoomPt"  , "Tight_FRMETZoomPt" , fFRMETn_binspt-1 , &fFRMETbinspt[0] ); // empty, just to use binning
 	
 	h_Tight_LepPt         = new TH1F("h_Tight_LepPt"        , "Tight_LepPt"     , pt_bin  , pt_min  , pt_max ); h_Tight_LepPt     -> Sumw2();
 	h_Tight_LepEta        = new TH1F("h_Tight_LepEta"       , "Tight_LepEta"    , eta_bin , eta_min , eta_max); h_Tight_LepEta    -> Sumw2();
@@ -2329,15 +2397,44 @@ void Fakerates::writeHistos(TFile* pFile){
 	sdir->cd();
 
 	h_FRatio               ->Write(fName + "_" + h_FRatio               ->GetName(), TObject::kWriteDelete);
-	h_FTight               ->Write(fName + "_" + h_FTight               ->GetName(), TObject::kWriteDelete);
-	h_FLoose               ->Write(fName + "_" + h_FLoose               ->GetName(), TObject::kWriteDelete);
 
-	h_FTight_CERN_small    ->Write(fName + "_" + h_FTight_CERN_small    ->GetName(), TObject::kWriteDelete);
-	h_FLoose_CERN_small    ->Write(fName + "_" + h_FLoose_CERN_small    ->GetName(), TObject::kWriteDelete);
-	h_FTight_CERN_large    ->Write(fName + "_" + h_FTight_CERN_large    ->GetName(), TObject::kWriteDelete);
-	h_FLoose_CERN_large    ->Write(fName + "_" + h_FLoose_CERN_large    ->GetName(), TObject::kWriteDelete);
- 
 	// loose histograms
+	h_FLoose               ->Write(fName + "_" + h_FLoose               ->GetName(), TObject::kWriteDelete);
+	h_FLoose_CERN_small    ->Write(fName + "_" + h_FLoose_CERN_small    ->GetName(), TObject::kWriteDelete);
+	h_FLoose_CERN_large    ->Write(fName + "_" + h_FLoose_CERN_large    ->GetName(), TObject::kWriteDelete);
+
+	h_FLoose_0             ->Write(fName + "_" + h_FLoose_0             ->GetName(), TObject::kWriteDelete);
+	h_FLoose_1             ->Write(fName + "_" + h_FLoose_1             ->GetName(), TObject::kWriteDelete);
+	h_FLoose_2             ->Write(fName + "_" + h_FLoose_2             ->GetName(), TObject::kWriteDelete);
+	h_FLoose_3             ->Write(fName + "_" + h_FLoose_3             ->GetName(), TObject::kWriteDelete);
+	h_FLoose_4             ->Write(fName + "_" + h_FLoose_4             ->GetName(), TObject::kWriteDelete);
+	h_FLoose_5             ->Write(fName + "_" + h_FLoose_5             ->GetName(), TObject::kWriteDelete);
+
+	h_Loose_LepIso_0       ->Write(fName + "_" + h_Loose_LepIso_0       ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepIso_1       ->Write(fName + "_" + h_Loose_LepIso_1       ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepIso_2       ->Write(fName + "_" + h_Loose_LepIso_2       ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepIso_3       ->Write(fName + "_" + h_Loose_LepIso_3       ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepIso_4       ->Write(fName + "_" + h_Loose_LepIso_4       ->GetName(), TObject::kWriteDelete);
+	h_Loose_LepIso_5       ->Write(fName + "_" + h_Loose_LepIso_5       ->GetName(), TObject::kWriteDelete);
+
+	h_Loose_ClosJetPt_0    ->Write(fName + "_" + h_Loose_ClosJetPt_0    ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPt_1    ->Write(fName + "_" + h_Loose_ClosJetPt_1    ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPt_2    ->Write(fName + "_" + h_Loose_ClosJetPt_2    ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPt_3    ->Write(fName + "_" + h_Loose_ClosJetPt_3    ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPt_4    ->Write(fName + "_" + h_Loose_ClosJetPt_4    ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPt_5    ->Write(fName + "_" + h_Loose_ClosJetPt_5    ->GetName(), TObject::kWriteDelete);
+
+	h_Loose_ClosJetPtLNT_0    ->Write(fName + "_" + h_Loose_ClosJetPtLNT_0    ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPtLNT_1    ->Write(fName + "_" + h_Loose_ClosJetPtLNT_1    ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPtLNT_2    ->Write(fName + "_" + h_Loose_ClosJetPtLNT_2    ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPtLNT_3    ->Write(fName + "_" + h_Loose_ClosJetPtLNT_3    ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPtLNT_4    ->Write(fName + "_" + h_Loose_ClosJetPtLNT_4    ->GetName(), TObject::kWriteDelete);
+	h_Loose_ClosJetPtLNT_5    ->Write(fName + "_" + h_Loose_ClosJetPtLNT_5    ->GetName(), TObject::kWriteDelete);
+
+	h_Loose_Provenance     ->Write(fName + "_" + h_Loose_Provenance     ->GetName(), TObject::kWriteDelete);
+	h_Loose_ProvenanceLNT  ->Write(fName + "_" + h_Loose_ProvenanceLNT  ->GetName(), TObject::kWriteDelete);
+	h_Loose_ProvenanceAES  ->Write(fName + "_" + h_Loose_ProvenanceAES  ->GetName(), TObject::kWriteDelete);
+ 
 	h_Loose_LepPt          ->Write(fName + "_" + h_Loose_LepPt          ->GetName(), TObject::kWriteDelete);
 	h_Loose_LepEta         ->Write(fName + "_" + h_Loose_LepEta         ->GetName(), TObject::kWriteDelete);
 	h_Loose_LepIso         ->Write(fName + "_" + h_Loose_LepIso         ->GetName(), TObject::kWriteDelete);
@@ -2407,6 +2504,34 @@ void Fakerates::writeHistos(TFile* pFile){
 
 
 	// tight histograms
+	h_FTight               ->Write(fName + "_" + h_FTight               ->GetName(), TObject::kWriteDelete);
+	h_FTight_CERN_small    ->Write(fName + "_" + h_FTight_CERN_small    ->GetName(), TObject::kWriteDelete);
+	h_FTight_CERN_large    ->Write(fName + "_" + h_FTight_CERN_large    ->GetName(), TObject::kWriteDelete);
+
+	h_FTight_0             ->Write(fName + "_" + h_FTight_0             ->GetName(), TObject::kWriteDelete);
+	h_FTight_1             ->Write(fName + "_" + h_FTight_1             ->GetName(), TObject::kWriteDelete);
+	h_FTight_2             ->Write(fName + "_" + h_FTight_2             ->GetName(), TObject::kWriteDelete);
+	h_FTight_3             ->Write(fName + "_" + h_FTight_3             ->GetName(), TObject::kWriteDelete);
+	h_FTight_4             ->Write(fName + "_" + h_FTight_4             ->GetName(), TObject::kWriteDelete);
+	h_FTight_5             ->Write(fName + "_" + h_FTight_5             ->GetName(), TObject::kWriteDelete);
+
+	h_Tight_LepIso_0       ->Write(fName + "_" + h_Tight_LepIso_0       ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepIso_1       ->Write(fName + "_" + h_Tight_LepIso_1       ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepIso_2       ->Write(fName + "_" + h_Tight_LepIso_2       ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepIso_3       ->Write(fName + "_" + h_Tight_LepIso_3       ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepIso_4       ->Write(fName + "_" + h_Tight_LepIso_4       ->GetName(), TObject::kWriteDelete);
+	h_Tight_LepIso_5       ->Write(fName + "_" + h_Tight_LepIso_5       ->GetName(), TObject::kWriteDelete);
+
+	h_Tight_ClosJetPt_0    ->Write(fName + "_" + h_Tight_ClosJetPt_0    ->GetName(), TObject::kWriteDelete);
+	h_Tight_ClosJetPt_1    ->Write(fName + "_" + h_Tight_ClosJetPt_1    ->GetName(), TObject::kWriteDelete);
+	h_Tight_ClosJetPt_2    ->Write(fName + "_" + h_Tight_ClosJetPt_2    ->GetName(), TObject::kWriteDelete);
+	h_Tight_ClosJetPt_3    ->Write(fName + "_" + h_Tight_ClosJetPt_3    ->GetName(), TObject::kWriteDelete);
+	h_Tight_ClosJetPt_4    ->Write(fName + "_" + h_Tight_ClosJetPt_4    ->GetName(), TObject::kWriteDelete);
+	h_Tight_ClosJetPt_5    ->Write(fName + "_" + h_Tight_ClosJetPt_5    ->GetName(), TObject::kWriteDelete);
+
+	h_Tight_Provenance     ->Write(fName + "_" + h_Tight_Provenance     ->GetName(), TObject::kWriteDelete);
+	h_Tight_ProvenanceAES  ->Write(fName + "_" + h_Tight_ProvenanceAES  ->GetName(), TObject::kWriteDelete);
+	
 	h_Tight_LepPt          ->Write(fName + "_" + h_Tight_LepPt          ->GetName(), TObject::kWriteDelete);
 	h_Tight_LepEta         ->Write(fName + "_" + h_Tight_LepEta         ->GetName(), TObject::kWriteDelete);
 	h_Tight_LepIso         ->Write(fName + "_" + h_Tight_LepIso         ->GetName(), TObject::kWriteDelete);

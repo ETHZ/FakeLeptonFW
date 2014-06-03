@@ -4,6 +4,9 @@ import ROOT, copy
 import lib as helper
 
 
+
+
+#___________________________________________________________________________________
 def make1dPlot_plot(dataType, pad_plot, hists, title_hist, leg):
 
 	pad_plot.cd()
@@ -27,6 +30,9 @@ def make1dPlot_plot(dataType, pad_plot, hists, title_hist, leg):
 	leg.Draw()
 
 
+
+
+#___________________________________________________________________________________
 def make1dPlot_ratio(dataType, pad_ratio, hists, title_hist):
 
 	pad_ratio.cd()
@@ -39,6 +45,8 @@ def make1dPlot_ratio(dataType, pad_ratio, hists, title_hist):
 
 
 
+
+#___________________________________________________________________________________
 def make1dPlot(dataType, canv, pad_plot, pad_ratio, outputDir, hists, title_hist, file_name, leg):
 
 
@@ -65,6 +73,7 @@ def make1dPlot(dataType, canv, pad_plot, pad_ratio, outputDir, hists, title_hist
 
 
 
+#___________________________________________________________________________________
 def make2dPlot(dataType, canv, pad_plot, outputDir, hist, postpend, file_name):
 
 	postpend = "_" + str(postpend.lower())
@@ -85,6 +94,8 @@ def make2dPlot(dataType, canv, pad_plot, outputDir, hist, postpend, file_name):
 
 
 
+
+#___________________________________________________________________________________
 def Plot1d(dataType, outputDir, datasets, mcsets, histlist, leg, grouping = False):
 	
 	canv = helper.makeCanvas(900, 675, 'c1d')
@@ -154,6 +165,40 @@ def Plot1d(dataType, outputDir, datasets, mcsets, histlist, leg, grouping = Fals
 
 
 
+#___________________________________________________________________________________
+def Plot2d(dataType, outputDir, datasets, mcsets, histlist):
+
+	canv = helper.makeCanvas(900, 675, 'c2d')
+	pad_plot = helper.makePad('tot')
+	pad_plot.cd()
+	pad_plot.SetTicks(1,1)
+
+	for hist in datasets[0].hists:
+		
+		i = datasets[0].hists.index(hist)
+		
+		# Plot Histogram
+		if not hist.GetName() in histlist: continue
+
+		prepend = ''
+		postpend = ''
+		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
+		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
+
+		data = ROOT.THStack()
+		mc   = ROOT.THStack()
+
+		for dataset in datasets: data.Add(dataset.hists[i])
+		for mcset   in mcsets:   mc  .Add(mcset  .hists[i])
+
+		make2dPlot(dataType, canv, pad_plot, outputDir, data.GetStack().Last(), 'data', prepend + helper.getSaveName(hist) + postpend)
+		make2dPlot(dataType, canv, pad_plot, outputDir, mc  .GetStack().Last(), 'MC'  , prepend + helper.getSaveName(hist) + postpend)
+		for mcset in mcsets: make2dPlot(dataType, canv, pad_plot, outputDir, mcset.hists[i], mcset.GetName(), prepend + helper.getSaveName(hist) + postpend)
+
+
+
+
+#___________________________________________________________________________________
 def PlotMETZooms(dataType, outputDir, datasets, mcsets, leg, grouping = False):
 
 	canv = helper.makeCanvas(900, 675, 'c1dM')
@@ -279,6 +324,7 @@ def PlotMETZooms(dataType, outputDir, datasets, mcsets, leg, grouping = False):
 
 
 
+#___________________________________________________________________________________
 def PlotJPtZooms(dataType, outputDir, dataset, mcsets, leg):
 
 	canv = helper.makeCanvas(900, 675, 'c1dZ')
@@ -361,7 +407,9 @@ def PlotJPtZooms(dataType, outputDir, dataset, mcsets, leg):
 
 
 
-def PlotCompare(dataType, outputDir, mcsets, histname, leg):
+
+#___________________________________________________________________________________
+def PlotCompare(dataType, outputDir, mcsets, histname, leg, cutoff = -1):
 
 	canv = helper.makeCanvas(900, 675)
 	pad_plot = helper.makePad('plot')
@@ -405,41 +453,225 @@ def PlotCompare(dataType, outputDir, mcsets, histname, leg):
 		hist_ratio = helper.setRatioStyle(dataType, hist_ratio, hist)
 		line = helper.makeLine(hist_ratio.GetXaxis().GetXmin(), 1.00, hist_ratio.GetXaxis().GetXmax(), 1.00)
 		line.Draw()
-		helper.saveCanvas(canv, pad_plot, outputDir + "compare/", prepend + helper.getSaveName(hist) + postpend)
+		helper.saveCanvas(canv, pad_plot, outputDir + "compare/", prepend + helper.getSaveName(hist, cutoff) + postpend)
 
 
 
 
+#___________________________________________________________________________________
+def setProvenanceBin(hist, bintoselect, bintoset):
+
+	binvalue = hist.GetBinContent(bintoselect)
+	for j in range(1, hist.GetNbinsX()+1): hist.SetBinContent(j, 0)
+	hist.SetBinContent(bintoset, binvalue)
+
+	return hist
 
 
-def Plot2d(dataType, outputDir, datasets, mcsets, histlist):
 
-	canv = helper.makeCanvas(900, 675, 'c2d')
+
+#___________________________________________________________________________________
+def makeProvenancePlots(hist, labels, binstoplot, normalize = True):
+
+	integral = float(hist.Integral())
+	mycolor  = ROOT.TColor()
+	bincolor = []
+
+	bincolor.append(mycolor.GetColor(255, 255, 255))
+	bincolor.append(mycolor.GetColor( 12,  57, 102))
+	bincolor.append(mycolor.GetColor( 15, 106, 196))
+	bincolor.append(mycolor.GetColor( 51, 153,  58))
+	bincolor.append(mycolor.GetColor( 51, 102, 153))
+	bincolor.append(mycolor.GetColor(191,  11,  11))
+	bincolor.append(mycolor.GetColor(255, 204,   0))
+
+	if binstoplot == []: binstoplot = [i for i in range(1,hist.GetNbinsX()+1)]
+
+	h = []
+
+	for i in range(len(binstoplot)):
+		h.append(copy.deepcopy(hist))
+		h[i] = setProvenanceBin(h[i], i+1, i+1)
+		h[i].SetFillColor(bincolor[binstoplot[i]])
+		if normalize and integral>0.: h[i].Scale(1./integral)
+
+	for i in range(len(binstoplot)):
+
+		h[i].SetMaximum(1.4)
+		h[i].SetMinimum(0.0001)
+		h[i].SetTitle('')
+		h[i].SetMarkerSize(2.0)
+		h[i].GetXaxis().SetLabelSize(0.07)
+		h[i].GetXaxis().SetTitleSize(0.06)
+		h[i].GetXaxis().SetTitle('')
+		h[i].GetXaxis().SetLabelFont(62)
+		h[i].GetYaxis().SetLabelSize(0.06)
+		h[i].GetYaxis().SetTitleSize(0.06)
+
+		if normalize and integral>0.: h[i].GetYaxis().SetTitle('1/Integral')
+
+		for j in range(len(binstoplot)):  h[i].GetXaxis().SetBinLabel(j+1, labels[binstoplot[j]-1])
+
+	return h
+
+
+
+
+#___________________________________________________________________________________
+def PlotProvenance(dataType, outputDir, mcsets, binstoplot = []):
+
+	canv = helper.makeCanvas(900, 675, 'c1dZ')
 	pad_plot = helper.makePad('tot')
-	pad_plot.cd()
 	pad_plot.SetTicks(1,1)
+	pad_plot.cd()
+	
+	nbins          = len(binstoplot)
+	index_loose    = 0
+	index_tight    = 0
+	index_lnt      = 0
 
-	for hist in datasets[0].hists:
+	labels             = ['all', 'W', 'B', 'C', 'U/D/S', 'unm.']
+	hist_plot          = []
+	mcgroups_loose     = []
+	mcgroups_loose_lnt = []
+	mcgroups_loose_aes = []
+	mcgroups_tight     = []
+	mcgroups_tight_aes = []
+	mcnames            = []
+
+	for hist in mcsets[0].hists:
+
+		i = mcsets[0].hists.index(hist)
+
+		hist_num[j].Divide(hist_num[j], hist_den[j], 1, 1, 'B')
+		hist_nums  = makeProvenancePlots(hist_num[j], labels, binstoplot, False)
+	
+		hist_nums[0].Draw('hist text')	
+		for k in range(1, len(hist_nums)): hist_nums[k].Draw('hist text same')
+	
+		helper.saveCanvas(canv, pad_plot, outputDir + "closure/", mcnames[j] + '_rate')
+		if not 'Provenance' in hist.GetName(): continue
+	
+		if hist.GetName() == 'h_Loose_Provenance'   : index_loose     = i
+		if hist.GetName() == 'h_Loose_ProvenanceLNT': index_loose_lnt = i
+		if hist.GetName() == 'h_Loose_ProvenanceAES': index_loose_aes = i
+		hist_num[j].Divide(hist_num[j], hist_den[j], 1, 1, 'B')
+		hist_nums  = makeProvenancePlots(hist_num[j], labels, binstoplot, False)
+	
+		hist_nums[0].Draw('hist text')	
+		for k in range(1, len(hist_nums)): hist_nums[k].Draw('hist text same')
+	
+		helper.saveCanvas(canv, pad_plot, outputDir + "closure/", mcnames[j] + '_rate')
+		if hist.GetName() == 'h_Tight_Provenance'   : index_tight     = i
+		if hist.GetName() == 'h_Tight_ProvenanceAES': index_tight_aes = i
+		hist_num[j].Divide(hist_num[j], hist_den[j], 1, 1, 'B')
+		hist_num[j].Divide(hist_num[j], hist_den[j], 1, 1, 'B')
+		hist_nums  = makeProvenancePlots(hist_num[j], labels, binstoplot, False)
+	
+		hist_nums[0].Draw('hist text')	
+		for k in range(1, len(hist_nums)): hist_nums[k].Draw('hist text same')
+	
+		helper.saveCanvas(canv, pad_plot, outputDir + "closure/", mcnames[j] + '_rate')
+		hist_nums  = makeProvenancePlots(hist_num[j], labels, binstoplot, False)
+	
+		hist_nums[0].Draw('hist text')	
+		for k in range(1, len(hist_nums)): hist_nums[k].Draw('hist text same')
+	
+		helper.saveCanvas(canv, pad_plot, outputDir + "closure/", mcnames[j] + '_rate')
+
+
+
+	for mcset in mcsets:
+		label = ''.join([j for j in mcset.GetName() if not j.isdigit()])
+			
+		foundat = -1
+		for j, mcname in enumerate(mcnames): 
+			if label == mcname: foundat = j
+
+		if foundat == -1:
+			mcgroups_loose    .append(ROOT.THStack())
+			mcgroups_loose_lnt.append(ROOT.THStack())
+			mcgroups_loose_aes.append(ROOT.THStack())
+			mcgroups_tight    .append(ROOT.THStack())
+			mcgroups_tight_aes.append(ROOT.THStack())
+			mcgroups_loose    [len(mcgroups_loose)    -1].Add(mcset.hists[index_loose]    )
+			mcgroups_loose_lnt[len(mcgroups_loose_lnt)-1].Add(mcset.hists[index_loose_lnt])
+			mcgroups_loose_aes[len(mcgroups_loose_aes)-1].Add(mcset.hists[index_loose_aes])
+			mcgroups_tight    [len(mcgroups_tight)    -1].Add(mcset.hists[index_tight]    )
+			mcgroups_tight_aes[len(mcgroups_tight_aes)-1].Add(mcset.hists[index_tight_aes])
+			mcnames.append(label)
+		else:
+			mcgroups_loose    [foundat].Add(mcset.hists[index_loose]    )
+			mcgroups_loose_lnt[foundat].Add(mcset.hists[index_loose_lnt])
+			mcgroups_loose_aes[foundat].Add(mcset.hists[index_loose_aes])
+			mcgroups_tight    [foundat].Add(mcset.hists[index_tight]    )
+			mcgroups_tight_aes[foundat].Add(mcset.hists[index_tight_aes])
+
+
+	hist_den     = [{} for j in range(len(mcnames))]
+	hist_den_aes = [{} for j in range(len(mcnames))]
+	hist_num     = [{} for j in range(len(mcnames))]
+	hist_num_aes = [{} for j in range(len(mcnames))]
+
+	for i, plotgroup in enumerate([mcgroups_loose, mcgroups_loose_lnt, mcgroups_loose_aes, mcgroups_tight, mcgroups_tight_aes]):
+
+		hist_plot.append([])
+
+		for j, group in enumerate(plotgroup):
+
+			group.Draw('hist')
+			histogram = group.GetStack().Last()
+
+			if nbins == 0: nbins = histogram.GetNbinsX()
+	
+			if histogram.GetName() == 'h_Loose_Provenance'   : postpend = 'loose'
+			if histogram.GetName() == 'h_Loose_ProvenanceLNT': postpend = 'loose_lnt'
+			if histogram.GetName() == 'h_Loose_ProvenanceAES': postpend = 'loose_aes'
+			if histogram.GetName() == 'h_Tight_Provenance'   : postpend = 'tight'
+			if histogram.GetName() == 'h_Tight_ProvenanceAES': postpend = 'tight_aes'
+	
+			hist_plot[i].append(ROOT.TH1F(histogram.GetName() + '_plot' + str(j), histogram.GetName(), nbins, 0, nbins))
+	
+			n = 1
+			for k in range(1, histogram.GetNbinsX()+1):
+				if binstoplot == [] or k in binstoplot:
+					hist_plot[i][j].SetBinContent(n, histogram.GetBinContent(k))
+					n +=1 
+
+			if hist_plot[i][j].GetName() == 'h_Loose_Provenance_plot' + str(j)   : hist_den[j]     = copy.deepcopy(hist_plot[i][j])
+			if hist_plot[i][j].GetName() == 'h_Loose_ProvenanceAES_plot' + str(j): hist_den_aes[j] = copy.deepcopy(hist_plot[i][j])
+			if hist_plot[i][j].GetName() == 'h_Tight_Provenance_plot' + str(j)   : hist_num[j]     = copy.deepcopy(hist_plot[i][j])
+			if hist_plot[i][j].GetName() == 'h_Tight_ProvenanceAES_plot' + str(j): hist_num_aes[j] = copy.deepcopy(hist_plot[i][j])
+	
+			hist_plots = makeProvenancePlots(hist_plot[i][j], labels, binstoplot)
+	
+			hist_plots[0].Draw('hist text')
+			for k in range(1,len(hist_plots)): hist_plots[k].Draw('hist text same')
+	
+			helper.saveCanvas(canv, pad_plot, outputDir + "closure/", mcnames[j] + '_' + postpend)
+
+
+
+	for j in range(len(mcnames)):
+
+		hist_num[j].Divide(hist_num[j], hist_den[j], 1, 1, 'B')
+		hist_nums  = makeProvenancePlots(hist_num[j], labels, binstoplot, False)
+		hist_nums[0].Draw('hist text')	
+		for k in range(1, len(hist_nums)): hist_nums[k].Draw('hist text same')
+		helper.saveCanvas(canv, pad_plot, outputDir + "closure/", mcnames[j] + '_rate')
 		
-		i = datasets[0].hists.index(hist)
+		hist_num_aes[j].Divide(hist_num_aes[j], hist_den_aes[j], 1, 1, 'B')
+		hist_nums  = makeProvenancePlots(hist_num_aes[j], labels, binstoplot, False)	
+		hist_nums[0].Draw('hist text')	
+		for k in range(1, len(hist_nums)): hist_nums[k].Draw('hist text same')
+		helper.saveCanvas(canv, pad_plot, outputDir + "closure/", mcnames[j] + '_rate_aes')
+
+	
+
 		
-		# Plot Histogram
-		if not hist.GetName() in histlist: continue
+		
 
-		prepend = ''
-		postpend = ''
-		if '_Loose_' in hist.GetName(): prepend = 'Loose_'
-		if '_Tight_' in hist.GetName(): prepend = 'Tight_'
 
-		data = ROOT.THStack()
-		mc   = ROOT.THStack()
-
-		for dataset in datasets: data.Add(dataset.hists[i])
-		for mcset   in mcsets:   mc  .Add(mcset  .hists[i])
-
-		make2dPlot(dataType, canv, pad_plot, outputDir, data.GetStack().Last(), 'data', prepend + helper.getSaveName(hist) + postpend)
-		make2dPlot(dataType, canv, pad_plot, outputDir, mc  .GetStack().Last(), 'MC'  , prepend + helper.getSaveName(hist) + postpend)
-		for mcset in mcsets: make2dPlot(dataType, canv, pad_plot, outputDir, mcset.hists[i], mcset.GetName(), prepend + helper.getSaveName(hist) + postpend)
 
 
 
