@@ -1,4 +1,4 @@
-import ROOT, math, helper
+import ROOT, math, helper, sys
 
 
 #f = ROOT.TFile('../closureTest/ttjets_semiLep_closureOutput.root','read')
@@ -11,6 +11,8 @@ import ROOT, math, helper
 #f = ROOT.TFile('../closureTest/ttjets_massiveb_elchcons_closureOutput.root','read')
 
 ttjets = helper.sample('ttjets','../closureTest/ttjets_semiLep_closureOutput.root')
+testsa = helper.sample('test'  ,'../closureTest/ttjets_semiLep_closureOutput.root')
+
 
 
 sr = 2
@@ -20,12 +22,20 @@ sr = 2
 ## ee = helper.cat('ELECTRON-ELECTRON')
 
 ##cats = [mm, em, ee] ## this order is very important!!!!
-samples = [ttjets]
+samples = [ttjets, testsa]
 
 trigger = 1
+maxev = 10E9
+i=0
+
+totals = helper.sample('total','')
+
 
 for sample in samples:
 	for evt in sample.tree:
+		i += 1
+		if i > maxev:
+			continue
 	
 		if trigger and evt.passTrigger == 0: continue
 		weight = evt.lumiW
@@ -86,52 +96,53 @@ for sample in samples:
 			sample.cats[type].nllc +=1
 
 
-for sample in samples:
-	for cat in sample.cats:
-		sample.cat.fakes = sample.cat.npf+sample.cat.nfp+sample.cat.nff
-		sample.cat.obs   = sample.cat.ntt
-		sample.cat.ntte , sample.cat.ntle , sample.cat.nlte , sample.cat.nlle  = math.sqrt(sample.cat.ntt2), math.sqrt(sample.cat.ntl2), math.sqrt(sample.cat.nlt2), math.sqrt(sample.cat.nll2)
-		sample.cat.nttce, sample.cat.ntlce, sample.cat.nltce, sample.cat.nllce = math.sqrt(sample.cat.nttc), math.sqrt(sample.cat.ntlc), math.sqrt(sample.cat.nltc), math.sqrt(sample.cat.nllc)
-		sample.cat.nppe , sample.cat.npfe , sample.cat.nfpe , sample.cat.nffe  = math.sqrt(sample.cat.npp2), math.sqrt(sample.cat.npf2), math.sqrt(sample.cat.nfp2), math.sqrt(sample.cat.nff2)
-		sample.cat.fakese = sample.cat.npfe+sample.cat.nfpe+sample.cat.nffe
-		sample.cat.obse  = sample.cat.ntte
-	
-	print '\n\n\n'
-	print '=============================================================================================================='
-	print '                                          CATEGORY:', cat.name
-	print '=============================================================================================================='
-	print '%10s%9s | %10s%9s | %10s%9s | %10s%9s || %10s%9s' %('NTT','', 'NTL','', 'NLT','', 'NLL','', 'SUM','')
-	print '--------------------------------------------------------------------------------------------------------------'
-	print '%10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f || %10.2f +- %5.2f' %(
-	      cat.ntt, cat.ntte, cat.ntl, cat.ntle, cat.nlt, cat.nlte, cat.nll, cat.nlle, cat.ntt+cat.ntl+cat.nlt+cat.nll, cat.ntte+cat.ntle+cat.nlte+cat.nlle)
-
-	print '--------------------------------------------------------------------------------------------------------------'
-	print '--------------------------------------------------------------------------------------------------------------'
-
-	print '%10s%9s | %10s%9s | %10s%9s | %10s%9s || %10s%9s' %('NPP','', 'NPF','', 'NFP','', 'NFF','', 'SUM','')
-	print '--------------------------------------------------------------------------------------------------------------'
-	print '%10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f || %10.2f +- %5.2f' %(
-	      cat.npp, cat.nppe, cat.npf, cat.npfe, cat.nfp, cat.nfpe, cat.nff, cat.nffe, cat.npp+cat.npf+cat.nfp+cat.nff, cat.nppe+cat.npfe+cat.nfpe+cat.nffe)
-
-	print '--------------------------------------------------------------------------------------------------------------'
-	print 'OBSERVED     : %.2f +- %.2f' %(cat.obs  , cat.ntte)
-	print 'SUM OF FAKES : %.2f +- %.2f' %(cat.fakes, cat.npfe+cat.nfpe+cat.nffe)
-
-	if cat.obs > 0:
-		res    = helper.divWithErr(cat.fakes, cat.fakese, cat.obs, cat.obse)	
-		relres = helper.divWithErr(cat.fakes - cat.obs, cat.fakese - cat.obse, cat.fakes, cat.fakese)	
-	else:
-		res = [0,0]
-		relres = [0,0]
-	print '\n------------------------------------------'
-	print '%25s %.3f +- %.3f' %('pred./ obs.:', res[0], res[1])
-	print '\n%25s %.3f +- %.3f' %('(pred. - obs.) / pred.:', relres[0], relres[1])
-	print '------------------------------------------'
-	
-	print '\n \nPURE COUNTS:'
-	print '%10s%9s | %10s%9s | %10s%9s | %10s%9s || %10s%9s' %('NTT','', 'NTL','', 'NLT','', 'NLL','', 'SUM','')
-	print '--------------------------------------------------------------------------------------------------------------'
-	print '%10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f || %10.2f +- %5.2f' %(
-	      cat.nttc, cat.nttce, cat.ntlc, cat.ntlce, cat.nltc, cat.nltce, cat.nllc, cat.nllce, cat.nttc+cat.ntlc+cat.nltc+cat.nllc, cat.nttce+cat.ntlce+cat.nltce+cat.nllce)
-
-f.Close()
+## for sample in samples:
+## 	for cat in sample.cats:
+## 		cat.fakes = cat.npf+cat.nfp+cat.nff
+## 		cat.obs   = cat.ntt
+## 		cat.ntte , cat.ntle , cat.nlte , cat.nlle  = math.sqrt(cat.ntt2), math.sqrt(cat.ntl2), math.sqrt(cat.nlt2), math.sqrt(cat.nll2)
+## 		cat.nttce, cat.ntlce, cat.nltce, cat.nllce = math.sqrt(cat.nttc), math.sqrt(cat.ntlc), math.sqrt(cat.nltc), math.sqrt(cat.nllc)
+## 		cat.nppe , cat.npfe , cat.nfpe , cat.nffe  = math.sqrt(cat.npp2), math.sqrt(cat.npf2), math.sqrt(cat.nfp2), math.sqrt(cat.nff2)
+## 		cat.fakese = cat.npfe+cat.nfpe+cat.nffe
+## 		cat.obse  = cat.ntte
+## 	
+## 		if samples.index(sample) == 0:
+## 			print '\n\n\n'
+## 			print '=============================================================================================================='
+## 			print '                                          CATEGORY:', cat.name
+## 			print '=============================================================================================================='
+## 			print '%10s | %10s%9s | %10s%9s | %10s%9s | %10s%9s || %10s%9s' %('SAMPLE', 'NTT','', 'NTL','', 'NLT','', 'NLL','', 'SUM','')
+## 			print '--------------------------------------------------------------------------------------------------------------'
+## 		print '%10s | %10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f || %10.2f +- %5.2f' %(
+## 		      sample.name, cat.ntt, cat.ntte, cat.ntl, cat.ntle, cat.nlt, cat.nlte, cat.nll, cat.nlle, cat.ntt+cat.ntl+cat.nlt+cat.nll, cat.ntte+cat.ntle+cat.nlte+cat.nlle)
+## ##
+## ##		print '--------------------------------------------------------------------------------------------------------------'
+## ##		print '--------------------------------------------------------------------------------------------------------------'
+## ##
+## ##		print '%10s%9s | %10s%9s | %10s%9s | %10s%9s || %10s%9s' %('NPP','', 'NPF','', 'NFP','', 'NFF','', 'SUM','')
+## ##		print '--------------------------------------------------------------------------------------------------------------'
+## ##		print '%10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f || %10.2f +- %5.2f' %(
+## ##		      cat.npp, cat.nppe, cat.npf, cat.npfe, cat.nfp, cat.nfpe, cat.nff, cat.nffe, cat.npp+cat.npf+cat.nfp+cat.nff, cat.nppe+cat.npfe+cat.nfpe+cat.nffe)
+## ##
+## ##		print '--------------------------------------------------------------------------------------------------------------'
+## ##		print 'OBSERVED     : %.2f +- %.2f' %(cat.obs  , cat.ntte)
+## ##		print 'SUM OF FAKES : %.2f +- %.2f' %(cat.fakes, cat.npfe+cat.nfpe+cat.nffe)
+## ##
+## ##		if cat.obs > 0:
+## ##			res    = helper.divWithErr(cat.fakes, cat.fakese, cat.obs, cat.obse)	
+## ##			relres = helper.divWithErr(cat.fakes - cat.obs, cat.fakese - cat.obse, cat.fakes, cat.fakese)	
+## ##		else:
+## ##			res = [0,0]
+## ##			relres = [0,0]
+## ##		print '\n------------------------------------------'
+## ##		print '%25s %.3f +- %.3f' %('pred./ obs.:', res[0], res[1])
+## ##		print '\n%25s %.3f +- %.3f' %('(pred. - obs.) / pred.:', relres[0], relres[1])
+## ##		print '------------------------------------------'
+## ##		
+## ##		print '\n \nPURE COUNTS:'
+## ##		print '%10s%9s | %10s%9s | %10s%9s | %10s%9s || %10s%9s' %('NTT','', 'NTL','', 'NLT','', 'NLL','', 'SUM','')
+## ##		print '--------------------------------------------------------------------------------------------------------------'
+## ##		print '%10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f | %10.2f +- %5.2f || %10.2f +- %5.2f' %(
+## ##		      cat.nttc, cat.nttce, cat.ntlc, cat.ntlce, cat.nltc, cat.nltce, cat.nllc, cat.nllce, cat.nttc+cat.ntlc+cat.nltc+cat.nllc, cat.nttce+cat.ntlce+cat.nltce+cat.nllce)
+## 
+## 	sample.file.Close()
