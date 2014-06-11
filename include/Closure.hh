@@ -168,6 +168,11 @@ public:
 	float fCT_ht;
 	float fCT_met;
 
+	int   fCT_lID1;
+	int   fCT_lID2;
+	int   fCT_lProv1;
+	int   fCT_lProv2;
+
 
 private:
 	

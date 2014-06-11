@@ -238,6 +238,12 @@ void Closure::storePredictions(){
 		fCT_ht    = Fakerates::getHT();
 		fCT_met   = Fakerates::getMET();
 
+		fCT_lID1   = (muFirst ) ? MuID->at(lep1) : ElID->at(lep1);
+		fCT_lID2   = (elSecond) ? ElID->at(lep2) : MuID->at(lep2);
+		
+		fCT_lProv1 = (muFirst ) ? Fakerates::getLeptonOrigin(MuMID->at(lep1), MuGMID->at(lep1), 0) : Fakerates::getLeptonOrigin(ElMID->at(lep1), ElGMID->at(lep1), 0);
+		fCT_lProv2 = (elSecond) ? Fakerates::getLeptonOrigin(ElMID->at(lep2), ElGMID->at(lep2), 0) : Fakerates::getLeptonOrigin(MuMID->at(lep2), MuGMID->at(lep2), 0);
+
  //cout << Form("%15d\t%+2d\t%6.2f%1d\t%+2d\t%6.2f\t%1d\t%d\t%d",Event, (muFirst ? MuID->at(lep1) : ElID->at(lep1) ), fCT_pt1, (muFirst ? isTightMuon(lep1) : isTightElectron(lep1) ), (elSecond ? ElID->at(lep2) : MuID->at(lep2) ), fCT_pt2, (elSecond ? isTightElectron(lep2) : isTightMuon(lep2) ), fCT_nj, fCT_nb) << endl;
 		if(Event == 37051) {
 			for(int i = 0; i<JetPt->size(); ++i){
@@ -444,6 +450,11 @@ void Closure::bookClosureTree(){
 	fClosureTree->Branch("ht"    , &fCT_ht    , "ht/F"     ) ;
 	fClosureTree->Branch("met"   , &fCT_met   , "met/F"    ) ;
 
+	fClosureTree->Branch("lID1"   , &fCT_lID1   , "lID1/I"    ) ;
+	fClosureTree->Branch("lID2"   , &fCT_lID2   , "lID2/I"    ) ;
+	fClosureTree->Branch("lProv1" , &fCT_lProv1 , "lProv1/I"  ) ;
+	fClosureTree->Branch("lProv2" , &fCT_lProv2 , "lProv2/I"  ) ;
+
 }
 void Closure::writeClosureTree(TFile *pFile){
 	pFile->cd();
@@ -486,5 +497,10 @@ void Closure::resetClosureTree(){
 	fCT_nb    = -1;
 	fCT_ht    = -1.;
 	fCT_met   = -1.;
+
+	fCT_lID1   = 0;
+	fCT_lID2   = 0;
+	fCT_lProv1 = -1;
+	fCT_lProv2 = -1;
 
 }
