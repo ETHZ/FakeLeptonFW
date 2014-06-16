@@ -274,3 +274,11 @@ mu_qcdmuenr_g: 0, 0, 0, 0, 0
 mu_qcdmuenr_g: 0, 0, 0, 0, 0
 mu_qcdmuenr_g: 0, 0, 0, 0, 0
 mu_qcdmuenr_g: 0, 0, 0, 0, 0
+mu_ttbar_g: 0, 0, 0, 0, 0
+mu_ttbar_g: 0, 0, 0, 0, 0
+mu_ttbar_g: 0, 0, 0, 0, 0
+mu_ttbar_g: 0, 0, 0, 0, 0
+mu_ttbar_g: 0, 0, 0, 0, 0
+mu_ttbar_g: 0, 0, 0, 0, 0
+mu_ttbar_g: 0, 0, 0, 0, 0
+mu_ttbar_g: 0, 0, 0, 0, 0

@@ -71,10 +71,10 @@ public :
    std::vector<int>     *MuIsGlobalMuon;
    std::vector<int>     *MuIsPFMuon;
    std::vector<float>   *MuNChi2;
-   std::vector<int>     *MuNGlMuHits;
+   //std::vector<int>     *MuNGlMuHits;
    std::vector<int>     *MuNMatchedStations;
    std::vector<float>   *MuDz;
-   std::vector<int>     *MuNPxHits;
+   //std::vector<int>     *MuNPxHits;
    std::vector<int>     *MuNSiLayers;
    std::vector<float>   *MuD0BS;
    std::vector<float>   *MuIso03SumPt;
@@ -163,10 +163,10 @@ public :
    TBranch        *b_MuIsGlobalMuon;   //!
    TBranch        *b_MuIsPFMuon;   //!
    TBranch        *b_MuNChi2;   //!
-   TBranch        *b_MuNGlMuHits;   //!
+   //TBranch        *b_MuNGlMuHits;   //!
    TBranch        *b_MuNMatchedStations;   //!
    TBranch        *b_MuDz;   //!
-   TBranch        *b_MuNPxHits;   //!
+   //TBranch        *b_MuNPxHits;   //!
    TBranch        *b_MuNSiLayers;   //!
    TBranch        *b_MuD0BS;
    TBranch        *b_MuIso03SumPt;
@@ -284,10 +284,10 @@ void FWBaseClass::Init(TTree *tree)
    MuIsGlobalMuon = 0;
    MuIsPFMuon = 0;
    MuNChi2 = 0;
-   MuNGlMuHits = 0;
+   //MuNGlMuHits = 0;
    MuNMatchedStations = 0;
    MuDz = 0;
-   MuNPxHits = 0;
+   //MuNPxHits = 0;
    MuNSiLayers = 0;
    MuIsVeto = 0;
    MuIsLoose = 0;
@@ -372,10 +372,10 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuIsGlobalMuon", &MuIsGlobalMuon, &b_MuIsGlobalMuon);
    fChain->SetBranchAddress("MuIsPFMuon", &MuIsPFMuon, &b_MuIsPFMuon);
    fChain->SetBranchAddress("MuNChi2", &MuNChi2, &b_MuNChi2);
-   fChain->SetBranchAddress("MuNGlMuHits", &MuNGlMuHits, &b_MuNGlMuHits);
+   //fChain->SetBranchAddress("MuNGlMuHits", &MuNGlMuHits, &b_MuNGlMuHits);
    fChain->SetBranchAddress("MuNMatchedStations", &MuNMatchedStations, &b_MuNMatchedStations);
    fChain->SetBranchAddress("MuDz", &MuDz, &b_MuDz);
-   fChain->SetBranchAddress("MuNPxHits", &MuNPxHits, &b_MuNPxHits);
+   //fChain->SetBranchAddress("MuNPxHits", &MuNPxHits, &b_MuNPxHits);
    fChain->SetBranchAddress("MuNSiLayers", &MuNSiLayers, &b_MuNSiLayers);
    fChain->SetBranchAddress("MuD0BS", &MuD0BS , &b_MuD0BS);
    fChain->SetBranchAddress("MuIso03SumPt", &MuIso03SumPt , &b_MuIso03SumPt);
