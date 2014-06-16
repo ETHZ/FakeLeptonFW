@@ -1,7 +1,0 @@
-el_ttbar0: 1310829
-el_ttbar1: 1147208
-el_ttbar2: 142021
-el_ttbar3: 9468
-el_ttbar4: 27
-el_ttbar5: 11455
-el_ttbar6: 650
