@@ -31,24 +31,14 @@ class cat:
 		self.npp2 = self.npp2 + other.npp2 ; self.npf2 = self.npf2 + other.npf2 ; self.nfp2 = self.nfp2 + other.nfp2 ; self.nff2 = self.nff2 + other.nff2
 		return self
 
-class sample:
-	def __init__(self, name, file):
+class region:
+	def __init__(self, name):
 		self.name = name
-		self.file = ROOT.TFile(file)
-		#self.tree = ROOT.TFile(file).Get('closureTree')
-		self.tree = self.file.Get('closureTree')
 		self.mm = cat('MUON-MUON')
 		self.em = cat('MUON-ELECTRON')
 		self.ee = cat('ELECTRON-ELECTRON')
 		self.cats = [self.mm, self.em, self.ee]
-		self.number = 0
-		self.color = lib.getColor(name)
-		self.loaded = False
 		self.histos = {}
-		if name in ['doublemu', 'doubleel']:
-			self.isdata = True
-		else:
-			self.isdata = False
 	def __iadd__(self, other):
 		self.mm = self.mm + other.mm
 		self.em = self.em + other.em
@@ -59,6 +49,93 @@ class sample:
 		self.em = self.em + other.em
 		self.ee = self.ee + other.ee
 		return self
+
+class sample:
+	def __init__(self, name, file):
+		self.name = name
+		self.file = ROOT.TFile(file)
+		#self.tree = ROOT.TFile(file).Get('closureTree')
+		self.tree = self.file.Get('closureTree')
+		#self.mm = cat('MUON-MUON')
+		#self.em = cat('MUON-ELECTRON')
+		#self.ee = cat('ELECTRON-ELECTRON')
+		#self.cats = [self.mm, self.em, self.ee]
+		#self.histos = {}
+		self.regions = []
+		self.color = lib.getColor(name)
+		self.loaded = False
+		if name in ['doublemu', 'doubleel']:
+			self.isdata = True
+		else:
+			self.isdata = False
+	def __iadd__(self, other):
+		for region in self.regions:
+			 region = region + other.regions[self.region.index(region)]
+		#self.em = self.em + other.em
+		#self.ee = self.ee + other.ee
+		return self
+	def __add__(self, other):
+		for region in self.regions:
+			 region = region + other.regions[self.region.index(region)]
+		#self.mm = self.mm + other.mm
+		#self.em = self.em + other.em
+		#self.ee = self.ee + other.ee
+		return self
+
+def passRegion(sr, evt):
+	passes = True
+	if sr  in ['a', 'A']:
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.nj   <   2: passes = False
+		if evt.nb  !=   0: passes = False
+		if evt.met  < 30.: passes = False
+	
+	elif sr in ['b', 'B']:
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.type > 2: passes = False
+		if evt.nj  <   2: passes = False
+		if evt.nb  <   1: passes = False
+		if evt.met < 30.: passes = False
+	
+	elif sr == 3:
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.nj  <   2: passes = False
+		if evt.nb  <   2: passes = False
+		if evt.met < 30.: passes = False
+	
+	elif sr == 'wjets':
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.type not in [0,1,2] : passes = False
+		if evt.nj  >   0: passes = False
+		if evt.nb !=   0: passes = False
+		if evt.met < 30.: passes = False
+	
+	elif sr == 'ttjets':
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.type not in [0,1,2] : passes = False
+		if evt.nj <   3: passes = False
+		if evt.nb !=  1: passes = False
+		#if evt.met < 30.: passes = False
+
+	elif sr == 'ttjets_ht200met100':
+		if evt.type not in [0,1,2] : passes = False
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.nj <   3: passes = False
+		if evt.nb !=  1: passes = False
+		if evt.ht  <  200: passes = False
+		if evt.met <  100: passes = False
+	
+	elif sr == 'ttjets_ht200':
+		if evt.type not in [0,1,2] : passes = False
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.nj <   3: passes = False
+		if evt.nb !=  1: passes = False
+		if evt.ht  <  200: passes = False
+
+	else:
+		print 'this signal region doesn\'t exist:', sr
+		passes = False
+	return passes
 
 def canvasWithRatio(stack, histo, legend):
 	c1 = ROOT.TCanvas('canvas', 'canvas', 675, 675)
