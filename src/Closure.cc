@@ -208,6 +208,7 @@ void Closure::storePredictions(){
 		fCT_type  = type;
 
 		fCT_lumiW = fEventWeight;
+		fCT_puW   = PUWeight;
 
 		fCT_f1    = f1;
 		fCT_f2    = f2;
@@ -224,19 +225,35 @@ void Closure::storePredictions(){
 		fCT_pt1   = (muFirst ) ? MuPt    ->at(lep1) : ElPt    ->at(lep1);
 		fCT_eta1  = (muFirst ) ? MuEta   ->at(lep1) : ElEta   ->at(lep1);
 		fCT_phi1  = (muFirst ) ? MuPhi   ->at(lep1) : ElPhi   ->at(lep1);
-		fCT_iso1  = (muFirst ) ? MuPFIso ->at(lep1) : ElPFIso ->at(lep1);
+		fCT_mt1   = (muFirst ) ? getMT(lep1, 0)     : getMT(lep1, 1);
 		fCT_ch1   = (muFirst ) ? MuCharge->at(lep1) : ElCharge->at(lep1);
+		fCT_iso1  = (muFirst ) ? MuPFIso ->at(lep1) : ElPFIso ->at(lep1);
+		fCT_neiso1  = (muFirst ) ? MuNeIso ->at(lep1) : ElNeIso ->at(lep1);
+		fCT_phiso1  = (muFirst ) ? MuPhIso ->at(lep1) : ElPhIso ->at(lep1);
+		fCT_chiso1  = (muFirst ) ? MuChIso ->at(lep1) : ElChIso ->at(lep1);
+		fCT_pucor1  = (muFirst ) ? MuSumPU ->at(lep1) : Rho;
 
 		fCT_pt2   = (elSecond) ? ElPt    ->at(lep2) : MuPt    ->at(lep2);
 		fCT_eta2  = (elSecond) ? ElEta   ->at(lep2) : MuEta   ->at(lep2);
 		fCT_phi2  = (elSecond) ? ElPhi   ->at(lep2) : MuPhi   ->at(lep2);
-		fCT_iso2  = (elSecond) ? ElPFIso ->at(lep2) : MuPFIso ->at(lep2);
+		fCT_mt2   = (elSecond) ? getMT(lep2, 1)     : getMT(lep2, 0);
 		fCT_ch2   = (elSecond) ? ElCharge->at(lep2) : MuCharge->at(lep2);
+		fCT_iso2  = (elSecond) ? ElPFIso ->at(lep2) : MuPFIso ->at(lep2);
+		fCT_neiso2  = (elSecond ) ? ElNeIso ->at(lep2) : MuNeIso ->at(lep2);
+		fCT_phiso2  = (elSecond ) ? ElPhIso ->at(lep2) : MuPhIso ->at(lep2);
+		fCT_chiso2  = (elSecond ) ? ElChIso ->at(lep2) : MuChIso ->at(lep2);
+		fCT_pucor2  = (elSecond ) ? Rho                : MuSumPU ->at(lep1);
 
 		fCT_nj    = Fakerates::getNJets(0);
 		fCT_nb    = Fakerates::getNJets(1);
 		fCT_ht    = Fakerates::getHT();
 		fCT_met   = Fakerates::getMET();
+
+		fCT_lID1   = (muFirst ) ? MuID->at(lep1) : ElID->at(lep1);
+		fCT_lID2   = (elSecond) ? ElID->at(lep2) : MuID->at(lep2);
+		
+		fCT_lProv1 = (muFirst ) ? Fakerates::getLeptonOrigin(MuMID->at(lep1), MuGMID->at(lep1), 0) : Fakerates::getLeptonOrigin(ElMID->at(lep1), ElGMID->at(lep1), 0);
+		fCT_lProv2 = (elSecond) ? Fakerates::getLeptonOrigin(ElMID->at(lep2), ElGMID->at(lep2), 0) : Fakerates::getLeptonOrigin(MuMID->at(lep2), MuGMID->at(lep2), 0);
 
  //cout << Form("%15d\t%+2d\t%6.2f%1d\t%+2d\t%6.2f\t%1d\t%d\t%d",Event, (muFirst ? MuID->at(lep1) : ElID->at(lep1) ), fCT_pt1, (muFirst ? isTightMuon(lep1) : isTightElectron(lep1) ), (elSecond ? ElID->at(lep2) : MuID->at(lep2) ), fCT_pt2, (elSecond ? isTightElectron(lep2) : isTightMuon(lep2) ), fCT_nj, fCT_nb) << endl;
 		if(Event == 37051) {
@@ -416,6 +433,7 @@ void Closure::bookClosureTree(){
 	fClosureTree->Branch("passTrigger"  , &fCT_passTrigger  , "passTrigger/I"   ) ;
 
 	fClosureTree->Branch("lumiW" , &fCT_lumiW , "lumiW/F" ) ;
+	fClosureTree->Branch("puW"   , &fCT_puW   , "puW/F" ) ;
 
 	fClosureTree->Branch("f1"    , &fCT_f1    , "f1/F"    ) ;
 	fClosureTree->Branch("f2"    , &fCT_f2    , "f2/F"    ) ;
@@ -434,15 +452,30 @@ void Closure::bookClosureTree(){
 	fClosureTree->Branch("eta2"  , &fCT_eta2  , "eta2/F"   ) ;
 	fClosureTree->Branch("phi1"  , &fCT_phi1  , "phi1/F"   ) ;
 	fClosureTree->Branch("phi2"  , &fCT_phi2  , "phi2/F"   ) ;
-	fClosureTree->Branch("iso1"  , &fCT_iso1  , "iso1/F"   ) ;
-	fClosureTree->Branch("iso2"  , &fCT_iso2  , "iso2/F"   ) ;
+	fClosureTree->Branch("mt1"  , &fCT_mt1  , "mt1/F"   ) ;
+	fClosureTree->Branch("mt2"  , &fCT_mt2  , "mt2/F"   ) ;
 	fClosureTree->Branch("ch1"   , &fCT_ch1   , "ch1/I"    ) ;
 	fClosureTree->Branch("ch2"   , &fCT_ch2   , "ch2/I"    ) ;
+	fClosureTree->Branch("iso1"  , &fCT_iso1  , "iso1/F"   ) ;
+	fClosureTree->Branch("iso2"  , &fCT_iso2  , "iso2/F"   ) ;
+	fClosureTree->Branch("neiso1"  , &fCT_neiso1  , "neiso1/F"   ) ;
+	fClosureTree->Branch("neiso2"  , &fCT_neiso2  , "neiso2/F"   ) ;
+	fClosureTree->Branch("phiso1"  , &fCT_phiso1  , "phiso1/F"   ) ;
+	fClosureTree->Branch("phiso2"  , &fCT_phiso2  , "phiso2/F"   ) ;
+	fClosureTree->Branch("chiso1"  , &fCT_chiso1  , "chiso1/F"   ) ;
+	fClosureTree->Branch("chiso2"  , &fCT_chiso2  , "chiso2/F"   ) ;
+	fClosureTree->Branch("pucor1"  , &fCT_pucor1  , "pucor1/F"   ) ;
+	fClosureTree->Branch("pucor2"  , &fCT_pucor2  , "pucor2/F"   ) ;
 
 	fClosureTree->Branch("nj"    , &fCT_nj    , "nj/I"     ) ;
 	fClosureTree->Branch("nb"    , &fCT_nb    , "nb/I"     ) ;
 	fClosureTree->Branch("ht"    , &fCT_ht    , "ht/F"     ) ;
 	fClosureTree->Branch("met"   , &fCT_met   , "met/F"    ) ;
+
+	fClosureTree->Branch("lID1"   , &fCT_lID1   , "lID1/I"    ) ;
+	fClosureTree->Branch("lID2"   , &fCT_lID2   , "lID2/I"    ) ;
+	fClosureTree->Branch("lProv1" , &fCT_lProv1 , "lProv1/I"  ) ;
+	fClosureTree->Branch("lProv2" , &fCT_lProv2 , "lProv2/I"  ) ;
 
 }
 void Closure::writeClosureTree(TFile *pFile){
@@ -459,6 +492,7 @@ void Closure::resetClosureTree(){
 	fCT_passTrigger  = -1;
 
 	fCT_lumiW = -1.;
+	fCT_puW   = -1.;
 
 	fCT_f1   = -99.;
 	fCT_f2   = -99.;
@@ -478,7 +512,17 @@ void Closure::resetClosureTree(){
 	fCT_phi1  = -99.;
 	fCT_phi2  = -99.;
 	fCT_iso1  = -1.;
+	fCT_neiso1  = -1.;
+	fCT_phiso1  = -1.;
+	fCT_chiso1  = -1.;
+	fCT_pucor1  = -1.;
 	fCT_iso2  = -1.;
+	fCT_neiso2  = -1.;
+	fCT_phiso2  = -1.;
+	fCT_chiso2  = -1.;
+	fCT_pucor2  = -1.;
+	fCT_mt1  = -1.;
+	fCT_mt2  = -1.;
 	fCT_ch1   = 0;
 	fCT_ch2   = 0;
 
@@ -486,5 +530,10 @@ void Closure::resetClosureTree(){
 	fCT_nb    = -1;
 	fCT_ht    = -1.;
 	fCT_met   = -1.;
+
+	fCT_lID1   = 0;
+	fCT_lID2   = 0;
+	fCT_lProv1 = -1;
+	fCT_lProv2 = -1;
 
 }

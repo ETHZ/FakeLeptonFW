@@ -33,7 +33,7 @@ OBJSD      = $(patsubst %.C,%.o,$(SRCSD:.cc=.o))
 
 
 # Rules ====================================
-all: Fakerates dps Closure
+all: Fakerates dps Closure depend
 
 Fakerates: exe/Fakerates.C $(OBJSA)
 	$(CXX) $(INCLUDES) $(LIBS) -ldl -o $@ $^
@@ -46,8 +46,6 @@ Closure: exe/Closure.C $(OBJSC)
 
 dps: exe/dps.C $(OBJSD)
 	$(CXX) $(INCLUDES) $(LIBS) -ldl -o $@ $^
-
-depend: .depend
 
 ## old .depend: $(SRCSA) $(SRCSB) $(SRCSC)
 ## old 	rm -f ./.depend

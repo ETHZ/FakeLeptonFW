@@ -558,16 +558,16 @@ void Fakerates::setLepIsPrompt(int index, bool newvalue) {
 
 
 //____________________________________________________________________________
-//std::vector<int, std::allocator<int> >* Fakerates::getLepID() {
-//	/*
-//	return ID of the lepton
-//	parameters: none
-//	return: ID
-//	*/
-//
-//	if(fDataType == 2) return ElID;
-//	else               return MuID;
-//}
+std::vector<int, std::allocator<int> >* Fakerates::getLepID() {
+	/*
+	return ID of the lepton
+	parameters: none
+	return: ID
+	*/
+
+	if(fDataType == 2) return ElID;
+	else               return MuID;
+}
 
 
 //____________________________________________________________________________
@@ -1170,6 +1170,22 @@ float Fakerates::getMT(int index) {
 
 }
 
+float Fakerates::getMT(int ind, int type){
+	TLorentzVector lep;
+	if(type == 0)
+		lep.SetPtEtaPhiM(MuPt->at(ind), MuEta->at(ind), MuPhi->at(ind), 0.105);	
+	else if(type == 1)
+		lep.SetPtEtaPhiM(ElPt->at(ind), ElEta->at(ind), ElPhi->at(ind), 0.005);	
+	else {
+		cout << "calling the getMT function incorrectly!!" << endl; exit(-1); }
+
+	float ETlept = sqrt(lep.M2() + lep.Perp2());
+	TLorentzVector met;
+	met.SetPtEtaPhiM(getMET(), 0., getMETPhi(), 0.);
+
+	float mt = sqrt( 2*(met.Pt()*ETlept - lep.Px()*met.Px() - lep.Py()*met.Py() ));
+	return mt;
+}
 
 //____________________________________________________________________________
 bool Fakerates::passesMETCut(float value_met = 20., int sign = 0){

@@ -1,4 +1,4 @@
-import ROOT, math
+import ROOT, math, lib, copy
 
 
 def divWithErr(a, ae, b, be):
@@ -31,17 +31,14 @@ class cat:
 		self.npp2 = self.npp2 + other.npp2 ; self.npf2 = self.npf2 + other.npf2 ; self.nfp2 = self.nfp2 + other.nfp2 ; self.nff2 = self.nff2 + other.nff2
 		return self
 
-class sample:
-	def __init__(self, name, file):
+class region:
+	def __init__(self, name):
 		self.name = name
-		self.file = ROOT.TFile(file)
-		#self.tree = ROOT.TFile(file).Get('closureTree')
-		self.tree = self.file.Get('closureTree')
 		self.mm = cat('MUON-MUON')
 		self.em = cat('MUON-ELECTRON')
 		self.ee = cat('ELECTRON-ELECTRON')
 		self.cats = [self.mm, self.em, self.ee]
-		self.number = 0
+		self.histos = {}
 	def __iadd__(self, other):
 		self.mm = self.mm + other.mm
 		self.em = self.em + other.em
@@ -52,3 +49,157 @@ class sample:
 		self.em = self.em + other.em
 		self.ee = self.ee + other.ee
 		return self
+
+class sample:
+	def __init__(self, name, file):
+		self.name = name
+		self.file = ROOT.TFile(file)
+		#self.tree = ROOT.TFile(file).Get('closureTree')
+		self.tree = self.file.Get('closureTree')
+		#self.mm = cat('MUON-MUON')
+		#self.em = cat('MUON-ELECTRON')
+		#self.ee = cat('ELECTRON-ELECTRON')
+		#self.cats = [self.mm, self.em, self.ee]
+		#self.histos = {}
+		self.regions = []
+		self.color = lib.getColor(name)
+		self.loaded = False
+		if name in ['doublemu', 'doubleel']:
+			self.isdata = True
+		else:
+			self.isdata = False
+	def __iadd__(self, other):
+		for region in self.regions:
+			 region = region + other.regions[self.region.index(region)]
+		#self.em = self.em + other.em
+		#self.ee = self.ee + other.ee
+		return self
+	def __add__(self, other):
+		for region in self.regions:
+			 region = region + other.regions[self.region.index(region)]
+		#self.mm = self.mm + other.mm
+		#self.em = self.em + other.em
+		#self.ee = self.ee + other.ee
+		return self
+
+def passRegion(sr, evt):
+	passes = True
+	if sr  in ['a', 'A']:
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.nj   <   2: passes = False
+		if evt.nb  !=   0: passes = False
+		if evt.met  < 30.: passes = False
+	
+	elif sr in ['b', 'B']:
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.type > 2: passes = False
+		if evt.nj  <   2: passes = False
+		if evt.nb  <   1: passes = False
+		if evt.met < 30.: passes = False
+	
+	elif sr == 3:
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.nj  <   2: passes = False
+		if evt.nb  <   2: passes = False
+		if evt.met < 30.: passes = False
+	
+	elif sr == 'wjets':
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.type not in [0,1,2] : passes = False
+		if evt.nj  >   0: passes = False
+		if evt.nb !=   0: passes = False
+		if evt.met < 30.: passes = False
+	
+	elif sr == 'ttjets':
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.type not in [0,1,2] : passes = False
+		if evt.nj <   3: passes = False
+		if evt.nb !=  1: passes = False
+		#if evt.met < 30.: passes = False
+
+	elif sr == 'ttjets_ht200met100':
+		if evt.type not in [0,1,2] : passes = False
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.nj <   3: passes = False
+		if evt.nb !=  1: passes = False
+		if evt.ht  <  200: passes = False
+		if evt.met <  100: passes = False
+	
+	elif sr == 'ttjets_ht200':
+		if evt.type not in [0,1,2] : passes = False
+		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
+		if evt.nj <   3: passes = False
+		if evt.nb !=  1: passes = False
+		if evt.ht  <  200: passes = False
+
+	else:
+		print 'this signal region doesn\'t exist:', sr
+		passes = False
+	return passes
+
+def canvasWithRatio(stack, histo, legend):
+	c1 = ROOT.TCanvas('canvas', 'canvas', 675, 675)
+	pad_plot  = lib.makePad('plot')
+	pad_ratio = lib.makePad('ratio')
+	pad_plot.SetTicks(1,1)
+	pad_ratio.SetTicks(1,1)
+
+	stackcp = copy.deepcopy(stack)
+	stackhisto = copy.deepcopy(stackcp.GetStack().Last())
+	hlist = stackcp.GetHists()
+	newstack = ROOT.THStack('st', 'st')
+	for i in hlist:
+		i.Scale(1./stackhisto.Integral())
+		newstack.Add(copy.deepcopy(i))
+	
+	pad_plot.cd()
+	stackcp.Draw('hist')
+
+	histoerr = copy.deepcopy(stackhisto)
+	histoerr.SetFillColor(ROOT.kGray+3)
+	histoerr.SetLineColor(ROOT.kGray+3)
+	histoerr.SetFillStyle(3004)
+	histoerr.Draw('same e2')
+
+	#newstack.Draw('hist')
+	histo.SetMarkerStyle(20)
+	histo.SetMarkerSize(0.9)
+	histo.SetMarkerColor(ROOT.kBlack)
+	histo.SetLineColor(ROOT.kBlack)
+	histonorm = copy.deepcopy(histo)
+	#histonorm.Scale(1./histonorm.Integral())
+	histonorm.Draw('same pe')
+
+	stackmax = stackcp.GetMaximum()
+	histomax = histo.GetMaximum()
+	stackcp.SetMaximum(1.15* max(stackmax, histomax) )
+
+	legend.Draw('same')
+	
+	pad_ratio.cd()
+	#stackhisto.Scale(1./stackhisto.Integral())
+	histocp = copy.deepcopy(histo)
+	histocp.SetStats(0)
+	#histocp.Scale(1./histocp.Integral())
+	histocp.Divide(stackhisto)
+	histocp.GetYaxis().SetRangeUser(0.00, 1.60)
+	histocp.Draw('pe')
+	histocp.GetYaxis().SetNdivisions(505)
+	histocp.GetYaxis().SetLabelSize(0.08)
+	histocp.GetXaxis().SetLabelSize(0.12)
+	histocp.GetXaxis().SetTitle(histocp.GetName().split('_')[0])
+	histocp.GetXaxis().SetTitleOffset(1.15)
+	histocp.GetXaxis().SetTitleSize(0.15)
+	histocp.SetTitle('')
+
+	fl = ROOT.TF1("fl","[0]*x+[1]",0.,1.)
+	histocp.Fit(fl)
+	fl.Draw('same')
+
+	line = lib.makeLine(0., 1., 1., 1.)
+	line.Draw('same')
+	pad_ratio.Draw()
+	c1.Update()
+	return c1, stackhisto, histocp, stackcp, newstack, histonorm, line, histoerr
+
+

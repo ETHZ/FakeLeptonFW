@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue May 20 11:13:23 2014 by ROOT version 5.34/18
+// Thu Jun 19 13:55:15 2014 by ROOT version 5.34/18
 // from TTree Analysis/AnalysisTree
-// found on file: fakeminitree.root
+// found on file: /shome/mdunser/fakeTrees/2leps/TTWJets-V03-09-00.root
 //////////////////////////////////////////////////////////
 
 #ifndef FWBaseClass_h
@@ -58,6 +58,7 @@ public :
    Int_t           HLT_ELE8_JET30_TIGHT_PS;
    Int_t           NVrtx;
    Int_t           NTrue;
+   Float_t         Rho;
    Float_t         PUWeight;
    Float_t         PUWeightUp;
    Float_t         PUWeightDn;
@@ -66,8 +67,14 @@ public :
    std::vector<float>   *MuEta;
    std::vector<float>   *MuPhi;
    std::vector<int>     *MuCharge;
-   std::vector<float>   *MuPFIso;
    std::vector<float>   *MuD0;
+<<<<<<< HEAD
+   std::vector<float>   *MuPFIso;
+   std::vector<float>   *MuNeIso;
+   std::vector<float>   *MuPhIso;
+   std::vector<float>   *MuChIso;
+   std::vector<float>   *MuSumPU;
+=======
    std::vector<int>     *MuIsGlobalMuon;
    std::vector<int>     *MuIsPFMuon;
    std::vector<float>   *MuNChi2;
@@ -77,9 +84,8 @@ public :
    //std::vector<int>     *MuNPxHits;
    std::vector<int>     *MuNSiLayers;
    std::vector<float>   *MuD0BS;
+>>>>>>> 092c0682812957411c3b9b073bfd648c7597accd
    std::vector<float>   *MuIso03SumPt;
-   std::vector<float>   *MuIso03EmPt;
-   std::vector<float>   *MuIso03HadPt;
    std::vector<bool>    *MuIsVeto;
    std::vector<bool>    *MuIsLoose;
    std::vector<bool>    *MuIsTight;
@@ -87,13 +93,19 @@ public :
    std::vector<int>     *MuID;
    std::vector<int>     *MuMID;
    std::vector<int>     *MuGMID;
+   std::vector<int>     *MuMatchID;
+   std::vector<int>     *MuMatchMID;
+   std::vector<int>     *MuMatchGMID;
    std::vector<float>   *ElPt;
    std::vector<float>   *ElEta;
    std::vector<float>   *ElPhi;
    std::vector<int>     *ElCharge;
-   std::vector<float>   *ElPFIso;
    std::vector<float>   *ElD0;
-   std::vector<float>   *ElChCo;
+   std::vector<int>     *ElChCo;
+   std::vector<float>   *ElPFIso;
+   std::vector<float>   *ElNeIso;
+   std::vector<float>   *ElPhIso;
+   std::vector<float>   *ElChIso;
    std::vector<bool>    *ElIsVeto;
    std::vector<bool>    *ElIsLoose;
    std::vector<bool>    *ElIsTight;
@@ -101,6 +113,9 @@ public :
    std::vector<int>     *ElID;
    std::vector<int>     *ElMID;
    std::vector<int>     *ElGMID;
+   std::vector<int>     *ElMatchID;
+   std::vector<int>     *ElMatchMID;
+   std::vector<int>     *ElMatchGMID;
    Float_t         pfMET;
    Float_t         pfMETPhi;
    Float_t         pfMET1;
@@ -150,6 +165,7 @@ public :
    TBranch        *b_HLT_ELE8_JET30_TIGHT_PS;   //!
    TBranch        *b_NVrtx;   //!
    TBranch        *b_NTrue;   //!
+   TBranch        *b_Rho;   //!
    TBranch        *b_PUWeight;   //!
    TBranch        *b_PUWeightUp;   //!
    TBranch        *b_PUWeightDn;   //!
@@ -158,8 +174,15 @@ public :
    TBranch        *b_MuEta;   //!
    TBranch        *b_MuPhi;   //!
    TBranch        *b_MuCharge;   //!
-   TBranch        *b_MuPFIso;   //!
    TBranch        *b_MuD0;   //!
+<<<<<<< HEAD
+   TBranch        *b_MuPFIso;   //!
+   TBranch        *b_MuNeIso;   //!
+   TBranch        *b_MuPhIso;   //!
+   TBranch        *b_MuChIso;   //!
+   TBranch        *b_MuSumPU;   //!
+   TBranch        *b_MuIso03SumPt;   //!
+=======
    TBranch        *b_MuIsGlobalMuon;   //!
    TBranch        *b_MuIsPFMuon;   //!
    TBranch        *b_MuNChi2;   //!
@@ -172,6 +195,7 @@ public :
    TBranch        *b_MuIso03SumPt;
    TBranch        *b_MuIso03EmPt;
    TBranch        *b_MuIso03HadPt;
+>>>>>>> 092c0682812957411c3b9b073bfd648c7597accd
    TBranch        *b_MuIsVeto;   //!
    TBranch        *b_MuIsLoose;   //!
    TBranch        *b_MuIsTight;   //!
@@ -179,13 +203,19 @@ public :
    TBranch        *b_MuID;   //!
    TBranch        *b_MuMID;   //!
    TBranch        *b_MuGMID;   //!
+   TBranch        *b_MuMatchID;   //!
+   TBranch        *b_MuMatchMID;   //!
+   TBranch        *b_MuMatchGMID;   //!
    TBranch        *b_ElPt;   //!
    TBranch        *b_ElEta;   //!
    TBranch        *b_ElPhi;   //!
    TBranch        *b_ElCharge;   //!
-   TBranch        *b_ElPFIso;   //!
    TBranch        *b_ElD0;   //!
    TBranch        *b_ElChCo;   //!
+   TBranch        *b_ElPFIso;   //!
+   TBranch        *b_ElNeIso;   //!
+   TBranch        *b_ElPhIso;   //!
+   TBranch        *b_ElChIso;   //!
    TBranch        *b_ElIsVeto;   //!
    TBranch        *b_ElIsLoose;   //!
    TBranch        *b_ElIsTight;   //!
@@ -193,6 +223,9 @@ public :
    TBranch        *b_ElID;   //!
    TBranch        *b_ElMID;   //!
    TBranch        *b_ElGMID;   //!
+   TBranch        *b_ElMatchID;   //!
+   TBranch        *b_ElMatchMID;   //!
+   TBranch        *b_ElMatchGMID;   //!
    TBranch        *b_pfMET;   //!
    TBranch        *b_pfMETPhi;   //!
    TBranch        *b_pfMET1;   //!
@@ -225,9 +258,9 @@ FWBaseClass::FWBaseClass(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("fakeminitree.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/shome/mdunser/fakeTrees/2leps/TTWJets-V03-09-00.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("fakeminitree.root");
+         f = new TFile("/shome/mdunser/fakeTrees/2leps/TTWJets-V03-09-00.root");
       }
       f->GetObject("Analysis",tree);
 
@@ -275,10 +308,15 @@ void FWBaseClass::Init(TTree *tree)
    MuEta = 0;
    MuPhi = 0;
    MuCharge = 0;
-   MuPFIso = 0;
    MuD0 = 0;
-   MuD0BS = 0;
+   MuPFIso = 0;
+   MuNeIso = 0;
+   MuPhIso = 0;
+   MuChIso = 0;
+   MuSumPU = 0;
    MuIso03SumPt = 0;
+<<<<<<< HEAD
+=======
    MuIso03EmPt = 0;
    MuIso03HadPt = 0;
    MuIsGlobalMuon = 0;
@@ -289,6 +327,7 @@ void FWBaseClass::Init(TTree *tree)
    MuDz = 0;
    //MuNPxHits = 0;
    MuNSiLayers = 0;
+>>>>>>> 092c0682812957411c3b9b073bfd648c7597accd
    MuIsVeto = 0;
    MuIsLoose = 0;
    MuIsTight = 0;
@@ -296,13 +335,19 @@ void FWBaseClass::Init(TTree *tree)
    MuID = 0;
    MuMID = 0;
    MuGMID = 0;
+   MuMatchID = 0;
+   MuMatchMID = 0;
+   MuMatchGMID = 0;
    ElPt = 0;
    ElEta = 0;
    ElPhi = 0;
    ElCharge = 0;
-   ElPFIso = 0;
    ElD0 = 0;
    ElChCo = 0;
+   ElPFIso = 0;
+   ElNeIso = 0;
+   ElPhIso = 0;
+   ElChIso = 0;
    ElIsVeto = 0;
    ElIsLoose = 0;
    ElIsTight = 0;
@@ -310,6 +355,9 @@ void FWBaseClass::Init(TTree *tree)
    ElID = 0;
    ElMID = 0;
    ElGMID = 0;
+   ElMatchID = 0;
+   ElMatchMID = 0;
+   ElMatchGMID = 0;
    JetPt = 0;
    JetRawPt = 0;
    JetEta = 0;
@@ -359,6 +407,7 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_ELE8_JET30_TIGHT_PS", &HLT_ELE8_JET30_TIGHT_PS, &b_HLT_ELE8_JET30_TIGHT_PS);
    fChain->SetBranchAddress("NVrtx", &NVrtx, &b_NVrtx);
    fChain->SetBranchAddress("NTrue", &NTrue, &b_NTrue);
+   fChain->SetBranchAddress("Rho", &Rho, &b_Rho);
    fChain->SetBranchAddress("PUWeight", &PUWeight, &b_PUWeight);
    fChain->SetBranchAddress("PUWeightUp", &PUWeightUp, &b_PUWeightUp);
    fChain->SetBranchAddress("PUWeightDn", &PUWeightDn, &b_PUWeightDn);
@@ -367,8 +416,15 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuEta", &MuEta, &b_MuEta);
    fChain->SetBranchAddress("MuPhi", &MuPhi, &b_MuPhi);
    fChain->SetBranchAddress("MuCharge", &MuCharge, &b_MuCharge);
-   fChain->SetBranchAddress("MuPFIso", &MuPFIso, &b_MuPFIso);
    fChain->SetBranchAddress("MuD0", &MuD0, &b_MuD0);
+<<<<<<< HEAD
+   fChain->SetBranchAddress("MuPFIso", &MuPFIso, &b_MuPFIso);
+   fChain->SetBranchAddress("MuNeIso", &MuNeIso, &b_MuNeIso);
+   fChain->SetBranchAddress("MuPhIso", &MuPhIso, &b_MuPhIso);
+   fChain->SetBranchAddress("MuChIso", &MuChIso, &b_MuChIso);
+   fChain->SetBranchAddress("MuSumPU", &MuSumPU, &b_MuSumPU);
+   fChain->SetBranchAddress("MuIso03SumPt", &MuIso03SumPt, &b_MuIso03SumPt);
+=======
    fChain->SetBranchAddress("MuIsGlobalMuon", &MuIsGlobalMuon, &b_MuIsGlobalMuon);
    fChain->SetBranchAddress("MuIsPFMuon", &MuIsPFMuon, &b_MuIsPFMuon);
    fChain->SetBranchAddress("MuNChi2", &MuNChi2, &b_MuNChi2);
@@ -381,6 +437,7 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuIso03SumPt", &MuIso03SumPt , &b_MuIso03SumPt);
    fChain->SetBranchAddress("MuIso03EmPt", &MuIso03EmPt , &b_MuIso03EmPt);
    fChain->SetBranchAddress("MuIso03HadPt", &MuIso03HadPt , &b_MuIso03HadPt);
+>>>>>>> 092c0682812957411c3b9b073bfd648c7597accd
    fChain->SetBranchAddress("MuIsVeto", &MuIsVeto, &b_MuIsVeto);
    fChain->SetBranchAddress("MuIsLoose", &MuIsLoose, &b_MuIsLoose);
    fChain->SetBranchAddress("MuIsTight", &MuIsTight, &b_MuIsTight);
@@ -388,13 +445,19 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuID", &MuID, &b_MuID);
    fChain->SetBranchAddress("MuMID", &MuMID, &b_MuMID);
    fChain->SetBranchAddress("MuGMID", &MuGMID, &b_MuGMID);
+   fChain->SetBranchAddress("MuMatchID", &MuMatchID, &b_MuMatchID);
+   fChain->SetBranchAddress("MuMatchMID", &MuMatchMID, &b_MuMatchMID);
+   fChain->SetBranchAddress("MuMatchGMID", &MuMatchGMID, &b_MuMatchGMID);
    fChain->SetBranchAddress("ElPt", &ElPt, &b_ElPt);
    fChain->SetBranchAddress("ElEta", &ElEta, &b_ElEta);
    fChain->SetBranchAddress("ElPhi", &ElPhi, &b_ElPhi);
    fChain->SetBranchAddress("ElCharge", &ElCharge, &b_ElCharge);
-   fChain->SetBranchAddress("ElPFIso", &ElPFIso, &b_ElPFIso);
    fChain->SetBranchAddress("ElD0", &ElD0, &b_ElD0);
    fChain->SetBranchAddress("ElChCo", &ElChCo, &b_ElChCo);
+   fChain->SetBranchAddress("ElPFIso", &ElPFIso, &b_ElPFIso);
+   fChain->SetBranchAddress("ElNeIso", &ElNeIso, &b_ElNeIso);
+   fChain->SetBranchAddress("ElPhIso", &ElPhIso, &b_ElPhIso);
+   fChain->SetBranchAddress("ElChIso", &ElChIso, &b_ElChIso);
    fChain->SetBranchAddress("ElIsVeto", &ElIsVeto, &b_ElIsVeto);
    fChain->SetBranchAddress("ElIsLoose", &ElIsLoose, &b_ElIsLoose);
    fChain->SetBranchAddress("ElIsTight", &ElIsTight, &b_ElIsTight);
@@ -402,6 +465,9 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("ElID", &ElID, &b_ElID);
    fChain->SetBranchAddress("ElMID", &ElMID, &b_ElMID);
    fChain->SetBranchAddress("ElGMID", &ElGMID, &b_ElGMID);
+   fChain->SetBranchAddress("ElMatchID", &ElMatchID, &b_ElMatchID);
+   fChain->SetBranchAddress("ElMatchMID", &ElMatchMID, &b_ElMatchMID);
+   fChain->SetBranchAddress("ElMatchGMID", &ElMatchGMID, &b_ElMatchGMID);
    fChain->SetBranchAddress("pfMET", &pfMET, &b_pfMET);
    fChain->SetBranchAddress("pfMETPhi", &pfMETPhi, &b_pfMETPhi);
    fChain->SetBranchAddress("pfMET1", &pfMET1, &b_pfMET1);

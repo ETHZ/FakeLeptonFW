@@ -156,6 +156,7 @@ public:
 	// JETS
 	float getJetPt(int);	
 	float getMT(int);
+	float getMT(int, int);
 
 	bool  isGoodJet(int, float, float);
 	bool  isGoodSynchJet(int, float);
@@ -463,17 +464,19 @@ public:
 	};
 	std::pair<TString , float> getNameAndXsec(TString file){
 	// DATA SAMPLES
-		if(file.Contains("DoubleMu"))
-			return std::make_pair("doublemu", 1.);
-		else if(file.Contains("DoubleElectron"))
-			return std::make_pair("doubleelectron", 1.);
+		if(file.Contains("DoubleMu")){
+			setData(true);
+			return std::make_pair("doublemu", 1.); }
+		else if(file.Contains("DoubleElectron")){
+			setData(true);
+			return std::make_pair("doubleel", 1.); }
 	// TTbar samples
 		else if(file.Contains("TTJets") && file.Contains("MassiveB") )
-			return std::make_pair("ttjets", 245.8);
+			return std::make_pair("ttjets_inc", 245.8);
 		else if(file.Contains("TTJets") && file.Contains("SemiLept") )
-			return std::make_pair("ttjets", 102.5);
+			return std::make_pair("ttjets_semi", 102.5);
 		else if(file.Contains("TTJets") && file.Contains("FullLept") )
-			return std::make_pair("ttjets", 24.6);
+			return std::make_pair("ttjets_full", 24.6);
 	// WJets samples
 		else if(file.Contains("WJetsToLNu"))
 			return std::make_pair("wjets", 37509.);
@@ -482,7 +485,7 @@ public:
 		else if(file.Contains("W2Jets"))
 			return std::make_pair("w2jets", 2152.);
 		else if(file.Contains("W3Jets"))
-			return std::make_pair("w1jets", 638.4);
+			return std::make_pair("w3jets", 638.4);
 		else if(file.Contains("W4Jets"))
 			return std::make_pair("w4jets", 263.2);
 	// DYJets samples
@@ -515,7 +518,9 @@ public:
 			return std::make_pair("qcdemenr", 1191000.0*0.0109);
 	// RARES
 		else if(file.Contains("TTWJets"))
-			return std::make_pair("ttwjets", 232.);
+			return std::make_pair("ttwjets", 0.232);
+		else if(file.Contains("TTZJets"))
+			return std::make_pair("ttzjets", 0.206);
 		else{
 			std::cout << "COULD NOT IDENTIFY SAMPLE FROM FILENAME. EXITING!" << std::endl; exit(-1);
 		}
