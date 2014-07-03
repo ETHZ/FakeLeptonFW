@@ -85,7 +85,7 @@ def make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, hists, title_hi
 
 
 #___________________________________________________________________________________
-def make2dFRPlot(dataType, canv, outputDir, dataset, hist, title_indeces, name='', exportinroot = False, folder = 'fakerates_2d/'):
+def make2dFRPlot(dataType, canv, outputDir, dataset, hist, title_indeces, name='', exportinroot = False, folder = 'fakerates_2d/', isprompt = False):
 	#
 	# produces all 2d fake rate maps
 	#
@@ -99,6 +99,7 @@ def make2dFRPlot(dataType, canv, outputDir, dataset, hist, title_indeces, name='
 	# name..............name of the output file
 	# exportinroot......True if we want to export the canvas in a root file
 	# folder............one may change the last outputfolder to something else than fakerates_2d
+	# isprompt..........temporary solution to plot prompt ratio
 
 	# define pad
 
@@ -124,11 +125,14 @@ def make2dFRPlot(dataType, canv, outputDir, dataset, hist, title_indeces, name='
 
 	if dataType == 'el': hist.SetMaximum(0.6)
 	else               : hist.SetMaximum(0.4)
-	hist.SetTitle("FR 2d Map (" + helper.getLegendName(name) + ")")
+	if isprompt == True: prepend = 'PR'
+	else               : prepend = 'FR' 
+
+	hist.SetTitle(prepend + " 2d Map (" + helper.getLegendName(name) + ")")
 
 	# save plot
 
-	helper.saveCanvas(canv, pad_plot, outputDir + folder, "FR_2dmap_" + name.lower().replace(" ", "_"), False, exportinroot)
+	helper.saveCanvas(canv, pad_plot, outputDir + folder, prepend + "_2dmap_" + name.lower().replace(" ", "_"), False, exportinroot)
 	pad_plot.Close()
 
 
@@ -993,6 +997,14 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 			for mc in mcsets:         mc_numerator   .Add(copy.deepcopy(mc  .hists[index_numerator]))
 			for mc in mcsubtractplot: mcsub_numerator.Add(copy.deepcopy(mc  .hists[index_numerator]))
 
+
+		# get numerator histograms
+
+		if hist.GetName()[-8:] == 'h_PTight':
+			for mc in mcsets:         mc_numerator_p .Add(copy.deepcopy(mc  .hists[i]))
+
+
+
 		# get denominator histograms
 		
 		if hist.GetName()[-8:] == 'h_FLoose':
@@ -1006,6 +1018,13 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 			for data in datasets:     data_denominator .Add(copy.deepcopy(data.hists[index_denominator]))
 			for mc in mcsets:         mc_denominator   .Add(copy.deepcopy(mc  .hists[index_denominator]))
 			for mc in mcsubtractplot: mcsub_denominator.Add(copy.deepcopy(mc  .hists[index_denominator]))
+
+
+		# get denominator histograms
+		
+		if hist.GetName()[-8:] == 'h_PLoose':
+			for mc in mcsets:        mc_denominator_p  .Add(copy.deepcopy(mc  .hists[i]))
+
 
 
 	# we stack the closure test histograms (i.e. with provenance info) seperately
@@ -1044,6 +1063,7 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 
 	FR_data          = copy.deepcopy(data_numerator .GetStack().Last())
 	FR_mc            = copy.deepcopy(mc_numerator   .GetStack().Last())
+	PR_mc            = copy.deepcopy(mc_numerator_p .GetStack().Last())
 	FR_mcsub         = copy.deepcopy(mcsub_numerator.GetStack().Last())
 	FR_data_mcsub_c1 = copy.deepcopy(FR_data)
 
@@ -1072,6 +1092,7 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 	
 	FR_data         .Divide(FR_data         , copy.deepcopy(data_denominator .GetStack().Last()), 1, 1, 'B')
 	FR_mc           .Divide(FR_mc           , copy.deepcopy(mc_denominator   .GetStack().Last()), 1, 1, 'B')
+	PR_mc           .Divide(PR_mc           , copy.deepcopy(mc_denominator_p .GetStack().Last()), 1, 1, 'B')
 	FR_mcsub        .Divide(FR_mcsub        , copy.deepcopy(mcsub_denominator.GetStack().Last()), 1, 1, 'B')
 	FR_data_mcsub_c1.Divide(FR_data_mcsub_c1, data_denominator_mcsub_c1                         , 1, 1, '' )
 
@@ -1084,6 +1105,7 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data         , title_indeces, 'data'              , True, 'fakerates_2dct/')
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mc           , title_indeces, 'mc'                , True, 'fakerates_2dct/')
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], PR_mc           , title_indeces, 'mc'´               , True, 'fakerates_2dct/', True)
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcsub        , title_indeces, 'qcd'               , True, 'fakerates_2dct/')
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c1, title_indeces, 'datamcsub_central1', True, 'fakerates_2dct/')
 

@@ -68,13 +68,11 @@ public :
    std::vector<float>   *MuPhi;
    std::vector<int>     *MuCharge;
    std::vector<float>   *MuD0;
-<<<<<<< HEAD
    std::vector<float>   *MuPFIso;
    std::vector<float>   *MuNeIso;
    std::vector<float>   *MuPhIso;
    std::vector<float>   *MuChIso;
    std::vector<float>   *MuSumPU;
-=======
    std::vector<int>     *MuIsGlobalMuon;
    std::vector<int>     *MuIsPFMuon;
    std::vector<float>   *MuNChi2;
@@ -84,8 +82,9 @@ public :
    //std::vector<int>     *MuNPxHits;
    std::vector<int>     *MuNSiLayers;
    std::vector<float>   *MuD0BS;
->>>>>>> 092c0682812957411c3b9b073bfd648c7597accd
    std::vector<float>   *MuIso03SumPt;
+   std::vector<float>   *MuIso03EmPt;
+   std::vector<float>   *MuIso03HadPt;
    std::vector<bool>    *MuIsVeto;
    std::vector<bool>    *MuIsLoose;
    std::vector<bool>    *MuIsTight;
@@ -175,14 +174,11 @@ public :
    TBranch        *b_MuPhi;   //!
    TBranch        *b_MuCharge;   //!
    TBranch        *b_MuD0;   //!
-<<<<<<< HEAD
    TBranch        *b_MuPFIso;   //!
    TBranch        *b_MuNeIso;   //!
    TBranch        *b_MuPhIso;   //!
    TBranch        *b_MuChIso;   //!
    TBranch        *b_MuSumPU;   //!
-   TBranch        *b_MuIso03SumPt;   //!
-=======
    TBranch        *b_MuIsGlobalMuon;   //!
    TBranch        *b_MuIsPFMuon;   //!
    TBranch        *b_MuNChi2;   //!
@@ -195,7 +191,6 @@ public :
    TBranch        *b_MuIso03SumPt;
    TBranch        *b_MuIso03EmPt;
    TBranch        *b_MuIso03HadPt;
->>>>>>> 092c0682812957411c3b9b073bfd648c7597accd
    TBranch        *b_MuIsVeto;   //!
    TBranch        *b_MuIsLoose;   //!
    TBranch        *b_MuIsTight;   //!
@@ -315,8 +310,6 @@ void FWBaseClass::Init(TTree *tree)
    MuChIso = 0;
    MuSumPU = 0;
    MuIso03SumPt = 0;
-<<<<<<< HEAD
-=======
    MuIso03EmPt = 0;
    MuIso03HadPt = 0;
    MuIsGlobalMuon = 0;
@@ -327,7 +320,6 @@ void FWBaseClass::Init(TTree *tree)
    MuDz = 0;
    //MuNPxHits = 0;
    MuNSiLayers = 0;
->>>>>>> 092c0682812957411c3b9b073bfd648c7597accd
    MuIsVeto = 0;
    MuIsLoose = 0;
    MuIsTight = 0;
@@ -417,14 +409,12 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuPhi", &MuPhi, &b_MuPhi);
    fChain->SetBranchAddress("MuCharge", &MuCharge, &b_MuCharge);
    fChain->SetBranchAddress("MuD0", &MuD0, &b_MuD0);
-<<<<<<< HEAD
    fChain->SetBranchAddress("MuPFIso", &MuPFIso, &b_MuPFIso);
    fChain->SetBranchAddress("MuNeIso", &MuNeIso, &b_MuNeIso);
    fChain->SetBranchAddress("MuPhIso", &MuPhIso, &b_MuPhIso);
    fChain->SetBranchAddress("MuChIso", &MuChIso, &b_MuChIso);
    fChain->SetBranchAddress("MuSumPU", &MuSumPU, &b_MuSumPU);
    fChain->SetBranchAddress("MuIso03SumPt", &MuIso03SumPt, &b_MuIso03SumPt);
-=======
    fChain->SetBranchAddress("MuIsGlobalMuon", &MuIsGlobalMuon, &b_MuIsGlobalMuon);
    fChain->SetBranchAddress("MuIsPFMuon", &MuIsPFMuon, &b_MuIsPFMuon);
    fChain->SetBranchAddress("MuNChi2", &MuNChi2, &b_MuNChi2);
@@ -437,7 +427,6 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuIso03SumPt", &MuIso03SumPt , &b_MuIso03SumPt);
    fChain->SetBranchAddress("MuIso03EmPt", &MuIso03EmPt , &b_MuIso03EmPt);
    fChain->SetBranchAddress("MuIso03HadPt", &MuIso03HadPt , &b_MuIso03HadPt);
->>>>>>> 092c0682812957411c3b9b073bfd648c7597accd
    fChain->SetBranchAddress("MuIsVeto", &MuIsVeto, &b_MuIsVeto);
    fChain->SetBranchAddress("MuIsLoose", &MuIsLoose, &b_MuIsLoose);
    fChain->SetBranchAddress("MuIsTight", &MuIsTight, &b_MuIsTight);

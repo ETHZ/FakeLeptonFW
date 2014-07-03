@@ -683,7 +683,7 @@ bool Fakerates::isPRRegionLepEvent(int &lep1, int &lep2, int &type1, int &type2,
 
 
 	// require mll in specific region
-	if(!passesMllCut(lep1, lep2, type, 80.) || !passesMllCut(lep1, lep2, type, 100., 1)) return false;
+	if(!passesMllCut(looselep_inds[0], looselep_inds[1], type, 80.) || !passesMllCut(looselep_inds[0], looselep_inds[1], type, 100., 1)) return false;
 
 
 	// Jet Pt is not reasonable then return false
