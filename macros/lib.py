@@ -276,6 +276,7 @@ def getLegendName(name):
 	elif name == 'qcd_g_5'            : return 'QCD (unm.)'
 	elif name == 'qcd'                : return 'QCD'
 	elif name == 'mc'                 : return 'MC'
+	elif name == 'mcprompt'           : return 'MC (prompt)'
 	elif name == 'totbg'              : return 'QCD + EW'
 	elif name == 'data'               : return 'Data'
 	elif name == 'data_num'               : return 'Data'

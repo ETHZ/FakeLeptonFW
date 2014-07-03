@@ -74,6 +74,8 @@ public :
    std::vector<float>   *MuChIso;
    std::vector<float>   *MuSumPU;
    std::vector<float>   *MuIso03SumPt;
+   std::vector<float>   *MuIso03EmPt;
+   std::vector<float>   *MuIso03HadPt;
    std::vector<bool>    *MuIsVeto;
    std::vector<bool>    *MuIsLoose;
    std::vector<bool>    *MuIsTight;
@@ -168,7 +170,6 @@ public :
    TBranch        *b_MuPhIso;   //!
    TBranch        *b_MuChIso;   //!
    TBranch        *b_MuSumPU;   //!
-   TBranch        *b_MuIso03SumPt;   //!
    TBranch        *b_MuIsVeto;   //!
    TBranch        *b_MuIsLoose;   //!
    TBranch        *b_MuIsTight;   //!
