@@ -43,6 +43,8 @@ class sample:
 		self.cats = [self.mm, self.em, self.ee]
 		self.number = 0
 		self.color = lib.getColor(name)
+		self.loaded = False
+		self.histos = {}
 		if name in ['doublemu', 'doubleel']:
 			self.isdata = True
 		else:
@@ -59,7 +61,7 @@ class sample:
 		return self
 
 def canvasWithRatio(stack, histo, legend):
-	c1 = ROOT.TCanvas('canvas', 'canvas', 900, 675)
+	c1 = ROOT.TCanvas('canvas', 'canvas', 675, 675)
 	pad_plot  = lib.makePad('plot')
 	pad_ratio = lib.makePad('ratio')
 	pad_plot.SetTicks(1,1)
@@ -75,6 +77,13 @@ def canvasWithRatio(stack, histo, legend):
 	
 	pad_plot.cd()
 	stackcp.Draw('hist')
+
+	histoerr = copy.deepcopy(stackhisto)
+	histoerr.SetFillColor(ROOT.kGray+3)
+	histoerr.SetLineColor(ROOT.kGray+3)
+	histoerr.SetFillStyle(3004)
+	histoerr.Draw('same e2')
+
 	#newstack.Draw('hist')
 	histo.SetMarkerStyle(20)
 	histo.SetMarkerSize(0.9)
@@ -83,6 +92,7 @@ def canvasWithRatio(stack, histo, legend):
 	histonorm = copy.deepcopy(histo)
 	#histonorm.Scale(1./histonorm.Integral())
 	histonorm.Draw('same pe')
+
 	stackmax = stackcp.GetMaximum()
 	histomax = histo.GetMaximum()
 	stackcp.SetMaximum(1.15* max(stackmax, histomax) )
@@ -113,6 +123,6 @@ def canvasWithRatio(stack, histo, legend):
 	line.Draw('same')
 	pad_ratio.Draw()
 	c1.Update()
-	return c1, stackhisto, histocp, stackcp, newstack, histonorm, line
+	return c1, stackhisto, histocp, stackcp, newstack, histonorm, line, histoerr
 
 

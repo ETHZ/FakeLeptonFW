@@ -147,6 +147,16 @@ def getColor(name):
 	elif name == 'dataJCPt'           : return ROOT.kRed
 	elif name == 'dataJRPt'           : return ROOT.kBlue
 
+	elif name == 'wjets'              : return mycolor.GetColor(102,   0,   0)
+	elif name == 'doublemu'           : return ROOT.kBlack
+	elif name == 'doubleel'           : return ROOT.kBlack
+	elif name == 'ttjets_sl'          : return mycolor.GetColor( 51, 153,  58)
+	elif name == 'ttjets_fl'          : return mycolor.GetColor(102, 153,  58)
+	elif name == 'ttwjets'            : return mycolor.GetColor(102, 102, 102)
+	elif name == 'ttzjets'            : return mycolor.GetColor(102, 102, 102)
+	elif name == 'rares'              : return mycolor.GetColor(102, 102, 102)
+	elif name == 'dyjets'             : return mycolor.GetColor(255, 204,   0)
+
 def getSampleColor(self):
 	return getColor(self.name)
 

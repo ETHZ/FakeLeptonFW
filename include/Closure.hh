@@ -135,6 +135,7 @@ public:
 	int   fCT_passTrigger;
 
 	float fCT_lumiW;
+	float fCT_puW;
 
 	float fCT_f1;
 	float fCT_f2;
@@ -155,6 +156,16 @@ public:
 	float fCT_phi2;
 	float fCT_iso1;
 	float fCT_iso2;
+	float fCT_neiso1;
+	float fCT_neiso2;
+	float fCT_phiso1;
+	float fCT_phiso2;
+	float fCT_chiso1;
+	float fCT_chiso2;
+	float fCT_pucor1;
+	float fCT_pucor2;
+	float fCT_mt1;
+	float fCT_mt2;
 	int   fCT_ch1;
 	int   fCT_ch2;
 
