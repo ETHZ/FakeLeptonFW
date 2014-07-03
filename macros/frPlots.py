@@ -13,6 +13,15 @@ ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetPaintTextFormat("4.3f")
 ROOT.TGaxis.SetMaxDigits(3)
 
+args = sys.argv
+dataType = args[1]
+inputDir = args[2]
+outputDir = args[3]
+
+
+
+# DEFINE SAMPLE CLASS
+
 class sample:
 	def __init__(self, name, infile):
 		self.name   = name
@@ -40,10 +49,8 @@ class sample:
 		for h in self.hists: h.Scale(newscale)
 	
 
-args = sys.argv
-dataType = args[1]
-inputDir = args[2]
-outputDir = args[3]
+# LOAD SAMPLES
+# note, every sample needs a color and legend name defined in lib.py
 
 if dataType == 'el':
 	data        = sample('el_data'         , inputDir + 'el_data_ratios.root'        )
@@ -199,11 +206,6 @@ if module == '':
 canv = helper.makeCanvas(900, 675)
 
 
-# Rescaling for complete PU_complete
-#for mc in mc_samples:i
-#	mc.Rescale(24.85/8.1)
-
-
 
 ## LIST OF HISTOGRAMS TO PLOT
 
@@ -322,7 +324,7 @@ if module == 'compare' or module == 'all':
 	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_2', leg, '-2:')
 	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_3', leg, '-2:')
 	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_4', leg, '-2:')
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_5', leg, '-2:')
+	#Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_5', leg, '-2:')
 
 
 
@@ -337,6 +339,7 @@ if module == 'compare' or module == 'all':
 	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_3', leg, '-2:')
 	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_4', leg, '-2:')
 	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_5', leg, '-2:')
+	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd]  , 'h_Loose_LepIso', leg, -1, True)
 
 
 
@@ -365,7 +368,7 @@ if module == 'fakerates_2dct' or module == 'all':
 
 
 if module == 'closure' or module == 'all':
-	Plot.PlotProvenance(dataType, outputDir, closure_samples, [3,4,5,6])#, [3,4,5,6])
+	Plot.PlotProvenance(dataType, outputDir, closure_samples, [3,4,5,6])
 
 
 

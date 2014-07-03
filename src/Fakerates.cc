@@ -640,20 +640,11 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 
 	if(count) ++fCounter_trigger;
 
-	//cout << "check 1" << endl;
-	
-	//if(count && Run == 203912 && Lumi == 229 && Event == 281860639) {
-	//	cout << "this event is still here after trigger!" << endl;
-	//	for(int j=0; j < LepPt->size(); ++j)
-	//		cout << "j: " << isLooseLepton(j) << ": " << ElIsLoose->at(j) << ": " << ElPFIso->at(j) << ": " << LepPt->at(j) << endl;
-	//}
-
 
 	// muon Pt is not reasonable then return false
 	if(LepPt->size() < 1) return false;
 
 
-	//cout << "check 2" << endl;
 	// count numbers of loose and veto muons in the event
 	for(int j=0; j < LepPt->size(); ++j){
 		if(isLooseLepton(j) && LepPt->at(j) > fLepPtCut){
@@ -670,13 +661,13 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 				++nveto_add;
 	}
 
-	//cout << "check 3" << endl;
+
 	// require exactly one loose muon and no additional veto muons
 	if(nloose    != 1) return false;
 
 	if(count) ++fCounter_loose;
 	
-	//cout << "check 4" << endl;
+	
 	fCutflow_afterLepSel++;
 	if(nveto_add != 0) return false;
 
@@ -686,11 +677,10 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 	//if(count) cout << Form("%d\t%d\t%d\t%.2f\t%.2f\t%d\t%.2f\t%.2f\t%.2f\t%.2f", Run, Lumi, Event, LepPt->at(lep), getJetPt(getAwayJet(lep)), isTightLepton(lep), 0.0, -99.0, getMET(), getMT(lep)) << endl;
 
 
-	//cout << "check 5" << endl;
 	// Jet Pt is not reasonable then return false
 	if(JetRawPt->size() < 1) return false;
 
-	//cout << "check 6" << endl;
+
 	// count the number of away jets
 	for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
 		if(!isGoodJet(thisjet, jetcut, fAwayJetBTagCut)) continue;
@@ -699,6 +689,7 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 		awayjet_inds.push_back(thisjet);
 	}
 
+
 	// no away jet found then return false 
 	if(awayjet_inds.size() < 1) return false;
 	fCutflow_afterJetSel++;
@@ -706,21 +697,20 @@ bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count 
 	if(count) ++fCounter_jet;
 	if(jetcut==30.) ++fCounter_jet30;
 
-	//cout << "check 7" << endl;
+
 	// set jet index on the hardest jet
 	jet = awayjet_inds[0];
 	if(awayjet_inds.size() > 1)
 		for(int thisjet=0; thisjet < nawayjets; ++thisjet)
 			if(getJetPt(awayjet_inds[thisjet]) > getJetPt(jet) ) jet = awayjet_inds[thisjet];
 
-	// upper cuts on MT and MET
-	//if(!passesUpperMETMT(0, looselep_inds[0]) ) return false;
 
 	// phi cut
 	if(fAwayJetDPhiCut > 0. && Util::DeltaPhi(JetPhi->at(jet), LepPhi->at(lep)) < fAwayJetDPhiCut) return false;
 
-	//cout << "check 8" << endl;
+
     return true;
+
 }
 
 
@@ -1961,6 +1951,7 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 		else if(thisorigin == 4) fillFHistTTBar(h_FLoose_4, LepPt->at(j), LepEta->at(j), eventweight);
 		else if(thisorigin == 5) fillFHistTTBar(h_FLoose_5, LepPt->at(j), LepEta->at(j), eventweight);
 
+		if     (thisorigin != 1) h_Loose_LepIso   ->Fill(LepPFIso->at(j), eventweight);
 		h_Loose_LepIso_0   ->Fill(LepPFIso->at(j), eventweight);
 
 		if     (thisorigin == 1) h_Loose_LepIso_1 ->Fill(LepPFIso->at(j), eventweight);
@@ -2006,6 +1997,7 @@ void Fakerates::fillFRPlotsTTBar(float eventweight = 1.0){
 		else if(thisorigin == 4) fillFHistTTBar(h_FTight_4, LepPt->at(j), LepEta->at(j), eventweight);
 		else if(thisorigin == 5) fillFHistTTBar(h_FTight_5, LepPt->at(j), LepEta->at(j), eventweight);
 
+		if     (thisorigin != 1) h_Tight_LepIso   ->Fill(LepPFIso->at(j), eventweight);
 		h_Tight_LepIso_0   ->Fill(LepPFIso->at(j), eventweight);
 
 		if     (thisorigin == 1) h_Tight_LepIso_1 ->Fill(LepPFIso->at(j), eventweight);
