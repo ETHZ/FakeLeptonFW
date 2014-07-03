@@ -373,15 +373,6 @@ void Fakerates::loop(TFile* pFile){
 	cout << " fCounter_CERN_large      = " << fCounter_CERN_large << " (" << (float) fCounter_CERN_large / (float) fCounter_all << ") " << endl;
 	cout << " fCounter_origin (ttbar)  = " << fCounter_origin     << " (" << (float) fCounter_origin     / (float) fCounter_all << ") " << endl;
 
-	if(fClosure) {
-		ofstream ttbarfile;
-		ttbarfile.open("macros/Closure/dyjets_mu_counters.txt", ios::app);
-		ttbarfile << fName << ": " << fCounter_origin_pl1 << ", " << fCounter_origin_pl2 << ", " << fCounter_origin_pl3 << ", " << fCounter_origin_pl5 << ", " << fCounter_origin_pl6 << endl; 
-		ttbarfile << fName << ": " << fCounter_origin_nl1 << ", " << fCounter_origin_nl2 << ", " << fCounter_origin_nl3 << ", " << fCounter_origin_nl5 << ", " << fCounter_origin_nl6 << endl; 
-		ttbarfile << fName << ": " << fCounter_origin_pt1 << ", " << fCounter_origin_pt2 << ", " << fCounter_origin_pt3 << ", " << fCounter_origin_pt5 << ", " << fCounter_origin_pt6 << endl; 
-		ttbarfile << fName << ": " << fCounter_origin_nt1 << ", " << fCounter_origin_nt2 << ", " << fCounter_origin_nt3 << ", " << fCounter_origin_nt5 << ", " << fCounter_origin_nt6 << endl; 
-		ttbarfile.close();
-	}
 
 	delete file_, tree_;
 
@@ -602,6 +593,119 @@ std::vector<int, std::allocator<int> >* Fakerates::getLepGMID() {
 
 	if(fDataType == 2) return ElGMID;
 	else               return MuGMID;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::isPRRegionLepEvent(int &lep1, int &lep2, int &type1, int &type2, float jetcut){
+	/*
+	checks, whether the event contains exactly two os leptons and at least two away-jets in the calibration region
+	parameters: &lep1 (address of harder lepton index), &lep2 (address of softer lepton index), &type1 (address of the harder lepton type), &type2 (address of the softer lepton type), jetcut (cut on jet pt)
+	return: true (if muon is in measurement region), false (else)
+	*/ 
+
+	std::vector<int> looselep_type;
+	std::vector<int> looselep_inds;
+	std::vector<int> looselep_chrg;
+	std::vector<float> looselep_pt;
+	std::vector<float> looselep_eta;
+	std::vector<float> looselep_phi;
+	std::vector<int> awayjet_inds;
+	int nloose(0);
+	int sumtype(0);
+	int type(0);
+	int nawayjets(0);
+
+
+	// Event fails HLT muon trigger (if data) then return false
+	if(fLepTriggerMC || fIsData) {
+		if      (fLepTrigger == "Mu17_Mu8"  && (!HLT_MU17_MU8 || !HLT_MU17_TKMU8)) return false;
+	}
+
+
+	// muon Pt is not reasonable then return false
+	if(MuPt->size() < 1 && ElPt->size() < 1) return false;
+
+
+	// count numbers of loose and veto muons in the event
+	for(int j=0; j < MuPt->size(); ++j){
+		if(isLooseMuon(j)) {
+			nloose++;
+			looselep_type.push_back(0);
+			looselep_inds.push_back(j);		
+			looselep_chrg.push_back(MuCharge->at(j));
+			looselep_pt  .push_back(MuPt    ->at(j));
+			looselep_eta .push_back(MuEta   ->at(j));
+			looselep_phi .push_back(MuPhi   ->at(j));
+		}
+	}
+	for(int j=0; j < ElPt->size(); ++j){
+		if(isLooseElectron(j)) {
+			nloose++;
+			looselep_type.push_back(1);
+			looselep_inds.push_back(j);		
+			looselep_chrg.push_back(ElCharge->at(j));
+			looselep_pt  .push_back(ElPt    ->at(j));
+			looselep_eta .push_back(ElEta   ->at(j));
+			looselep_phi .push_back(ElPhi   ->at(j));
+		}
+	}
+
+
+	// require exactly two loose muons and no additional veto muons
+	if(nloose != 2) return false;
+
+
+	// require two opposite loose muons
+	if(looselep_chrg[0] == looselep_chrg[1]) return false;
+
+
+	// set jet indices
+	if(looselep_pt[1] > looselep_pt[0]) {
+		lep1  = looselep_inds[1];
+		lep2  = looselep_inds[0];
+		type1 = looselep_type[1];
+		type2 = looselep_type[0];
+	}
+	else {
+		lep1  = looselep_inds[0];
+		lep2  = looselep_inds[1];
+		type1 = looselep_type[0];
+		type2 = looselep_type[1];
+	}
+
+
+	// assign a type to the pair (note, we require only OS)
+	sumtype = looselep_type[0] + looselep_type[1];
+	if     (sumtype == 0) type = 3; // mu-mu
+	else if(sumtype == 1) type = 4; // el-mu
+	else if(sumtype == 2) type = 5; // el-el
+
+
+	// require mll in specific region
+	if(!passesMllCut(lep1, lep2, type, 80.) || !passesMllCut(lep1, lep2, type, 100., 1)) return false;
+
+
+	// Jet Pt is not reasonable then return false
+	if(JetRawPt->size() < 1) return false;
+
+
+	// count the number of away jets
+	for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
+		if(!isGoodJet(thisjet, jetcut, fAwayJetBTagCut)) continue;
+		if(Util::GetDeltaR(JetEta->at(thisjet), looselep_eta[0], JetPhi->at(thisjet), looselep_phi[0]) < 1.0 ) continue;
+		if(Util::GetDeltaR(JetEta->at(thisjet), looselep_eta[1], JetPhi->at(thisjet), looselep_phi[1]) < 1.0 ) continue;
+		nawayjets++;
+		awayjet_inds.push_back(thisjet);
+	}
+
+
+	// no two away jets found then return false 
+	if(awayjet_inds.size() < 2) return false;
+
+
+    return true;
+
 }
 
 
@@ -1063,6 +1167,7 @@ float Fakerates::getMT(int index) {
 	pt   = LepPt->at(index);
 
 	return TMath::Sqrt( 2 * getMET() * pt * (1. - TMath::Cos(dphi)) );
+
 }
 
 
@@ -1120,6 +1225,37 @@ bool Fakerates::passesUpperMETMT(int index, bool count = false){
 	//cout << "check 11" << endl;
 	
 	return true;
+}
+
+
+//____________________________________________________________________________
+bool Fakerates::passesMllCut(int lep1, int lep2, int type, float mass, int sign = 0){
+	/* 
+	checks if the invariant mass of the two leptons passes a given cut
+	parameters: lep1 (index of lepton 1), lep2 (index of lepton 2), type (pdg type of lepton pair), mass (cut-mass), sign (0 for mll < cut, 1 for mll > cut)
+	return: true (if passes), false (else)
+	*/
+
+    TLorentzVector l1, l2;
+    if     (type == 0 || type == 3) {
+        l1.SetPtEtaPhiM(MuPt->at(lep1), MuEta->at(lep1), MuPhi->at(lep1), 0.105);
+        l2.SetPtEtaPhiM(MuPt->at(lep2), MuEta->at(lep2), MuPhi->at(lep2), 0.105);
+    }
+    else if(type == 1 || type == 4) {
+        l1.SetPtEtaPhiM(MuPt->at(lep1), MuEta->at(lep1), MuPhi->at(lep1), 0.105);
+        l2.SetPtEtaPhiM(ElPt->at(lep2), ElEta->at(lep2), ElPhi->at(lep2), 0.005);
+    }
+    else if(type == 2 || type == 5) {
+        l1.SetPtEtaPhiM(ElPt->at(lep1), ElEta->at(lep1), ElPhi->at(lep1), 0.005);
+        l2.SetPtEtaPhiM(ElPt->at(lep2), ElEta->at(lep2), ElPhi->at(lep2), 0.005);
+    }
+    else { cout << "SOMETHING WRONG WITH THE Mll VETO! CHECK THE CODE" << endl; exit(-1);}
+
+    if(sign == 0 && (l1 + l2).M() < mass) return false;
+	if(sign == 1 && (l1 + l2).M() > mass) return false;
+
+    return true;
+
 }
 
 
@@ -1626,11 +1762,14 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 
 
 	int lep(-1), jet(-1);
+	int lep1(-1), lep2(-1), type1(0), type2(0);
 	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
 	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
 	std::vector<float, std::allocator<float> >* LepPhi   = getLepPhi();
 	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
 	std::vector<float, std::allocator<float> >* LepD0    = getLepD0();
+	std::vector<float, std::allocator<float> >* UsePt;
+	std::vector<float, std::allocator<float> >* UseEta;
 
 
 	if(isFRRegionLepEvent(lep, jet, 30.)) {
@@ -1676,6 +1815,37 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 			}
 		}
 	}
+
+
+
+	// prompt leptons, first loose, then tight
+	if(isPRRegionLepEvent(lep1, lep2, type1, type2, fJetPtCut)){
+
+		if(type1 == fDataType) {
+
+			if( LepPt->at(lep1) >  fFRbinspt.back() ){
+				int fillbin = h_PLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep1)));
+				h_PLoose->AddBinContent(fillbin, eventweight);
+			}
+			else{
+				if(fillFHist(LepPt->at(lep1)))
+					h_PLoose->Fill(LepPt->at(lep1), fabs(LepEta->at(lep1)), eventweight);
+			}
+
+			if(isTightLepton(lep1)) {
+
+				if( LepPt->at(lep1) >  fFRbinspt.back() ){
+					int fillbin = h_PTight->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep1)));
+					h_PTight->AddBinContent(fillbin, eventweight);
+				}
+				else{
+					if(fillFHist(LepPt->at(lep1)))
+						h_PTight->Fill(LepPt->at(lep1), fabs(LepEta->at(lep1)), eventweight);
+				}
+			}
+		}
+	}
+
 
 
 	// leptons, first loose, then tight
@@ -2064,6 +2234,7 @@ void Fakerates::bookHistos(){
 
 	h_FRatio             = new TH2F("h_FRatio"            , "FRatio", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FRatio           ->Sumw2(); 
 
+	h_PLoose             = new TH2F("h_PLoose"            , "PLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_PLoose           ->Sumw2(); 
 	h_FLoose             = new TH2F("h_FLoose"            , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose           ->Sumw2(); 
 	h_FLoose_CERN_small  = new TH2F("h_FLoose_CERN_small" , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_CERN_small->Sumw2(); 
 	h_FLoose_CERN_large  = new TH2F("h_FLoose_CERN_large" , "FLoose", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FLoose_CERN_large->Sumw2(); 
@@ -2209,6 +2380,7 @@ void Fakerates::bookHistos(){
 		}
 	}
 
+	h_PTight             = new TH2F("h_PTight"            , "PTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_PTight           ->Sumw2(); 
 	h_FTight             = new TH2F("h_FTight"            , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight           ->Sumw2(); 
 	h_FTight_CERN_small  = new TH2F("h_FTight_CERN_small" , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_CERN_small->Sumw2(); 
 	h_FTight_CERN_large  = new TH2F("h_FTight_CERN_large" , "FTight", fFRn_binspt-1, &fFRbinspt[0], fFRn_binseta-1, &fFRbinseta[0]); h_FTight_CERN_large->Sumw2(); 
@@ -2391,6 +2563,7 @@ void Fakerates::writeHistos(TFile* pFile){
 	h_FRatio               ->Write(fName + "_" + h_FRatio               ->GetName(), TObject::kWriteDelete);
 
 	// loose histograms
+	h_PLoose               ->Write(fName + "_" + h_PLoose               ->GetName(), TObject::kWriteDelete);
 	h_FLoose               ->Write(fName + "_" + h_FLoose               ->GetName(), TObject::kWriteDelete);
 	h_FLoose_CERN_small    ->Write(fName + "_" + h_FLoose_CERN_small    ->GetName(), TObject::kWriteDelete);
 	h_FLoose_CERN_large    ->Write(fName + "_" + h_FLoose_CERN_large    ->GetName(), TObject::kWriteDelete);
@@ -2496,6 +2669,7 @@ void Fakerates::writeHistos(TFile* pFile){
 
 
 	// tight histograms
+	h_PTight               ->Write(fName + "_" + h_PTight               ->GetName(), TObject::kWriteDelete);
 	h_FTight               ->Write(fName + "_" + h_FTight               ->GetName(), TObject::kWriteDelete);
 	h_FTight_CERN_small    ->Write(fName + "_" + h_FTight_CERN_small    ->GetName(), TObject::kWriteDelete);
 	h_FTight_CERN_large    ->Write(fName + "_" + h_FTight_CERN_large    ->GetName(), TObject::kWriteDelete);

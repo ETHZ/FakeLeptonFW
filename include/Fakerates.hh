@@ -115,6 +115,7 @@ public:
 	bool passesUpperMETMT(int, bool);
 	bool passesMETCut(float, int);
 	bool passesMTCut(int);
+	bool passesMllCut(int, int, int, float, int);
 	
 	std::vector<float, std::allocator<float> >* getLepPt();
 	std::vector<float, std::allocator<float> >* getLepEta();
@@ -128,6 +129,7 @@ public:
 	std::vector<int, std::allocator<int> >* getLepMID();
 	std::vector<int, std::allocator<int> >* getLepGMID();
 
+	bool isPRRegionLepEvent(int&, int&, int&, int&, float);
 	bool isFRRegionLepEvent(int&, int&, float, bool);
 	bool isFRRegionLepEventTTBar(int);
 
@@ -186,6 +188,7 @@ public:
 	// ===================================
 	TH2F * h_FRatio;
 
+	TH2F * h_PLoose;
 	TH2F * h_FLoose;
 	TH2F * h_FLoose_CERN_small;
 	TH2F * h_FLoose_CERN_large;
@@ -274,6 +277,7 @@ public:
 	TH1F * h_Loose_FRMETZoomPt;
 	TH1F * h_Loose_METZoom[40];
 
+	TH2F * h_PTight;
 	TH2F * h_FTight;
 	TH2F * h_FTight_CERN_small;
 	TH2F * h_FTight_CERN_large;
