@@ -170,6 +170,7 @@ public :
    TBranch        *b_MuPhIso;   //!
    TBranch        *b_MuChIso;   //!
    TBranch        *b_MuSumPU;   //!
+   TBranch        *b_MuIso03SumPt;   //!
    TBranch        *b_MuIsVeto;   //!
    TBranch        *b_MuIsLoose;   //!
    TBranch        *b_MuIsTight;   //!
