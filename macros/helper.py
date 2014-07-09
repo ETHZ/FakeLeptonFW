@@ -106,9 +106,10 @@ def passRegion(sr, evt):
 	elif sr == 'wjets':
 		if evt.pt1 < 20 or evt.pt2 < 20: passes = False
 		if evt.type not in [0,1,2] : passes = False
-		if evt.nj  >   0: passes = False
+		if evt.nj  <   0: passes = False
 		if evt.nb !=   0: passes = False
 		if evt.met < 30.: passes = False
+		#if evt.met < 30.: passes = False
 	
 	elif sr == 'ttjets':
 		if evt.pt1 < 20 or evt.pt2 < 20: passes = False

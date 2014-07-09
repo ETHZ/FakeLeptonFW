@@ -91,19 +91,24 @@ public:
 	TString   fFRFileString;
 	TFile   * fFRFile;
 // INPUT FR HISTOGRAMS
-	TH2F    * f_h_FR_data_el;
-	TH2F    * f_h_FR_data_mu;
-	TH2F    * f_h_FR_data_pure_el;
-	TH2F    * f_h_FR_data_pure_mu;
-	TH2F    * f_h_FR_mc_el;
-	TH2F    * f_h_FR_mc_mu;
-	TH2F    * f_h_FR_qcd_el;
-	TH2F    * f_h_FR_qcd_mu;
-	TH2F    * f_h_FR_ttbar_el;
-	TH2F    * f_h_FR_ttbar_mu;
+	TH2F * f_h_FR_data_el;
+	TH2F * f_h_FR_data_mu;
+	TH2F * f_h_FR_data_pure_el;
+	TH2F * f_h_FR_data_pure_mu;
+	TH2F * f_h_FR_mc_el;
+	TH2F * f_h_FR_mc_mu;
+	TH2F * f_h_FR_qcd_el;
+	TH2F * f_h_FR_qcd_mu;
+	TH2F * f_h_FR_ttbar_el;
+	TH2F * f_h_FR_ttbar_mu;
+
+// INPUT PR HISTOGRAMS
+	TH2F * f_h_PR_dy_el;
+	TH2F * f_h_PR_dy_mu;
 
 	FakeRatios * fFR;
 	float getFRatio(int, float, float);
+	float getPRatio(int, float, float);
 	void  storePredictions();
 	
 // FUNCTIONS
@@ -116,6 +121,11 @@ public:
 
 // Eventweight
 	float fEventWeight;
+
+// OUTPUT PR HISTOGRAMS
+	TH2F * h_muPt_partonPt_2D;
+	TH2F * h_closestJetPt_partonPt_2D;
+	TH1F * h_mu_closestJet_dr;
 
 // OUTPUT TREE
 

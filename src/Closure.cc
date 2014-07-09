@@ -51,6 +51,8 @@ void Closure::init(TString frfilestring){
 	f_h_FR_ttbar_mu     = (TH2F*) fFRFile->Get("FR_ttbar_all_mu");
 	f_h_FR_qcd_mu       = (TH2F*) fFRFile->Get("FR_qcd_mu");
 
+	f_h_PR_dy_el        = (TH2F*) fFRFile->Get("PR_mc_el");
+	f_h_PR_dy_mu        = (TH2F*) fFRFile->Get("PR_mc_mu");
 
 	fLuminosity = 19500.;
 
@@ -128,6 +130,8 @@ void Closure::loop(TFile * outFile){
 
 		storePredictions();
 
+		fillGenPlots();
+
 	}
 
 	cout << Form("fTot: %8d \t fSS: %8d \t fSSmm: %8d \t fSSem: %8d \t fSSee: %8d ", fTot, fSS, fSSmm, fSSem, fSSee) <<endl;
@@ -162,8 +166,10 @@ void Closure::storePredictions(){
 
 		f1 = (muFirst ) ? getFRatio(0, MuPt->at(lep1), MuEta->at(lep1) ) : getFRatio(1, ElPt->at(lep1), ElEta->at(lep1)) ;
 		f2 = (elSecond) ? getFRatio(1, ElPt->at(lep2), ElEta->at(lep2) ) : getFRatio(0, MuPt->at(lep2), MuEta->at(lep2)) ;
-		p1 = 1.;
-		p2 = 1.;
+		p1 = (muFirst ) ? getPRatio(0, MuPt->at(lep1), MuEta->at(lep1) ) : getPRatio(1, ElPt->at(lep1), ElEta->at(lep1)) ;
+		p2 = (elSecond) ? getPRatio(1, ElPt->at(lep2), ElEta->at(lep2) ) : getPRatio(0, MuPt->at(lep2), MuEta->at(lep2)) ;
+		//p1 = 1.;
+		//p2 = 1.;
 
 		if     (type == 0 || type == 3){ // MU-MU
 			if(type == 0) fSSmm++;
@@ -267,6 +273,50 @@ void Closure::storePredictions(){
 
 }
 
+void fillGenPlots(){
+	fDataType = 1; // this should be muons
+
+
+	h_muPt_partonPt_MR         = new TH2F("muPt_partonPt_MR"        , "muPt_partonPt_MR"        , 30, 0., 150., 30, 0., 150.);
+	h_closestJetPt_partonPt_MR = new TH2F("closestJetPt_partonPt_MR", "closestJetPt_partonPt_MR", 30, 0., 150., 30, 0., 150.);
+	h_mu_closestJet_dr_MR      = new TH1F("mu_closestJet_dr_MR"     , "mu_closestJet_dr_MR"     , 50, 0., 2.0);
+
+	int lep(-1), jet(-1);
+	if(isFRRegionLepEvent(lep, jet, 40.) ){
+		if( abs(MuPartonID->at(lep) > 10) ) continue; //require leptons from quarks
+		int closestJet = getClosestJet(lep);
+		h_muPt_partonPt_MR         -> Fill(MuPt->at(lep), MuPartonPt->at(lep));
+		h_closestJetPt_partonPt_MR -> Fill(JetPt->at(closestJet), MuPartonPt->at(lep));
+		h_mu_closestJet_dr_MR      -> Fill(getClosestJetDR(lep));
+	}
+
+}
+
+float Closure::getPRatio(int type, float pt, float eta){
+
+	float feta = fabs(eta); //just to make sure
+	if(feta >= 2.5) {
+		cout << "NOT GOING TO WORK WITH ETA >= 2.5" << endl; 
+		exit(-1);
+	}
+
+	float pr(-1.);
+
+	// make sure we get the right bin if pt is too high -----
+	int corr = 0;
+	if(pt >= f_h_PR_dy_mu->GetXaxis()->GetXmax()) corr = 1;
+	// ------------------------------------------------------
+
+	if(type==0){
+		pr = f_h_PR_dy_mu->GetBinContent( f_h_PR_dy_mu->FindBin(pt, feta) - corr);
+	}
+	if(type==1){
+		pr = f_h_PR_dy_el->GetBinContent( f_h_PR_dy_el->FindBin(pt, feta) - corr);
+	}
+
+	return pr;
+
+}
 float Closure::getFRatio(int type, float pt, float eta){
 
 	float feta = fabs(eta); //just to make sure

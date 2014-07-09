@@ -683,7 +683,7 @@ bool Fakerates::isPRRegionLepEvent(int &lep1, int &lep2, int &type1, int &type2,
 
 
 	// require mll in specific region
-	if(!passesMllCut(looselep_inds[0], looselep_inds[1], type, 80.) || !passesMllCut(looselep_inds[0], looselep_inds[1], type, 100., 1)) return false;
+	if(!passesMllCut(looselep_inds[0], looselep_inds[1], type, 80., 0) || !passesMllCut(looselep_inds[0], looselep_inds[1], type, 100., 1)) return false;
 
 
 	// Jet Pt is not reasonable then return false
@@ -907,7 +907,7 @@ bool Fakerates::isLooseMuon(int index){
 	if(!MuIsLoose->at(index)) return false;
 	//if(fabs(MuD0->at(index)) > 0.1) return false;
 	if(fLepD0Cut > 0.0 && fabs(MuD0->at(index)) > fLepD0Cut) return false; // leave this commented for synching!!
-	if(fCSA14 && MuIso03SumPt->at(0)/MuPt->at(0) > 0.4)      return false;
+	// if(fCSA14 && MuIso03SumPt->at(0)/MuPt->at(0) > 0.4)      return false;
 	
 	return true;
 }
@@ -1558,125 +1558,125 @@ void Fakerates::fillHLTPlots(float fEventweight = 1.0){
 			// muon Pt is not reasonable then return false
 			if(MuPt->size() > 0)  {
 		
-				if(!fCSA14 || MuIso03SumPt->at(0)/MuPt->at(0) < 0.4) { // FOR 2015 SCENARIO
-						
-					fillPurities(tr,1., fEventweight);
-					h_Purity_LepPt[tr] -> Fill(MuPt->at(0), fEventweight); 
-					
-					// count numbers of loose and veto muons in the event 
-					float ptcut = -1;
-					if (tr == iHLTMU5 ) ptcut =  5.;
-					if (tr == iHLTMU8 ) ptcut =  8.;
-					if (tr == iHLTMU12) ptcut = 12.;
-					if (tr == iHLTMU17) ptcut = 17.;
-					if (tr == iHLTMU24) ptcut = 24.;
-					if (tr == iHLTMU40) ptcut = 40.;
-					
-					for(int j=0; j < MuPt->size(); ++j){
-						if(nloose==0){
-							//if(MuPt              ->at(j) < ptcut) continue; fillPurities(tr, 2. , fEventweight);
-							//if(fabs(MuEta->at(j))        > 2.4  ) continue; 
-							//if(MuIsGlobalMuon    ->at(j) == 0   ) continue; fillPurities(tr, 3. , fEventweight);
-							//if(MuIsPFMuon        ->at(j) == 0   ) continue; fillPurities(tr, 4. , fEventweight);
-							//if(MuNChi2           ->at(j) > 10   ) continue; fillPurities(tr, 5. , fEventweight);
-							//if(MuNGlMuHits       ->at(j) < 1    ) continue; fillPurities(tr, 6. , fEventweight);
-							//if(MuNMatchedStations->at(j) < 2    ) continue; fillPurities(tr, 7. , fEventweight); 
-							//if(MuDz              ->at(j) > 0.2  ) continue; fillPurities(tr, 8. , fEventweight);
-							//if(MuD0              ->at(j) > 0.2  ) continue; fillPurities(tr, 9. , fEventweight);
-							//if(MuNPxHits         ->at(j) < 1    ) continue; fillPurities(tr, 10., fEventweight);
-							//if(MuNSiLayers       ->at(j) < 6    ) continue; fillPurities(tr, 11., fEventweight);
-							//if(MuPFIso           ->at(j) > 1.0  ) continue; fillPurities(tr, 12., fEventweight);
-						}
-						lep = j;
-						nloose++;
-						looselep_inds.push_back(j);		 
+				// marc if(!fCSA14 || MuIso03SumPt->at(0)/MuPt->at(0) < 0.4) { // FOR 2015 SCENARIO
+				// marc 		
+				// marc 	fillPurities(tr,1., fEventweight);
+				// marc 	h_Purity_LepPt[tr] -> Fill(MuPt->at(0), fEventweight); 
+				// marc 	
+				// marc 	// count numbers of loose and veto muons in the event 
+				// marc 	float ptcut = -1;
+				// marc 	if (tr == iHLTMU5 ) ptcut =  5.;
+				// marc 	if (tr == iHLTMU8 ) ptcut =  8.;
+				// marc 	if (tr == iHLTMU12) ptcut = 12.;
+				// marc 	if (tr == iHLTMU17) ptcut = 17.;
+				// marc 	if (tr == iHLTMU24) ptcut = 24.;
+				// marc 	if (tr == iHLTMU40) ptcut = 40.;
+				// marc 	
+				// marc 	for(int j=0; j < MuPt->size(); ++j){
+				// marc 		if(nloose==0){
+				// marc 			//if(MuPt              ->at(j) < ptcut) continue; fillPurities(tr, 2. , fEventweight);
+				// marc 			//if(fabs(MuEta->at(j))        > 2.4  ) continue; 
+				// marc 			//if(MuIsGlobalMuon    ->at(j) == 0   ) continue; fillPurities(tr, 3. , fEventweight);
+				// marc 			//if(MuIsPFMuon        ->at(j) == 0   ) continue; fillPurities(tr, 4. , fEventweight);
+				// marc 			//if(MuNChi2           ->at(j) > 10   ) continue; fillPurities(tr, 5. , fEventweight);
+				// marc 			//if(MuNGlMuHits       ->at(j) < 1    ) continue; fillPurities(tr, 6. , fEventweight);
+				// marc 			//if(MuNMatchedStations->at(j) < 2    ) continue; fillPurities(tr, 7. , fEventweight); 
+				// marc 			//if(MuDz              ->at(j) > 0.2  ) continue; fillPurities(tr, 8. , fEventweight);
+				// marc 			//if(MuD0              ->at(j) > 0.2  ) continue; fillPurities(tr, 9. , fEventweight);
+				// marc 			//if(MuNPxHits         ->at(j) < 1    ) continue; fillPurities(tr, 10., fEventweight);
+				// marc 			//if(MuNSiLayers       ->at(j) < 6    ) continue; fillPurities(tr, 11., fEventweight);
+				// marc 			//if(MuPFIso           ->at(j) > 1.0  ) continue; fillPurities(tr, 12., fEventweight);
+				// marc 		}
+				// marc 		lep = j;
+				// marc 		nloose++;
+				// marc 		looselep_inds.push_back(j);		 
 			
-						//   if(!isLooseLepton(j)) continue;
-						if(isLooseLepton(j) && MuPt->at(j) < fLepPtCut) nveto_add++;
-						
-					}
-				  
+				// marc 		//   if(!isLooseLepton(j)) continue;
+				// marc 		if(isLooseLepton(j) && MuPt->at(j) < fLepPtCut) nveto_add++;
+				// marc 		
+				// marc 	}
+				// marc   
 			
-					// require exactly one loose muon and no additional veto muons
-					if(nloose == 1 && nveto_add == 0) {
+				// marc 	// require exactly one loose muon and no additional veto muons
+				// marc 	if(nloose == 1 && nveto_add == 0) {
 			
-						fillPurities(tr,13., fEventweight);
-				    
-						// Jet Pt is not reasonable then return false
-						if(JetRawPt->size() > 0) {
+				// marc 		fillPurities(tr,13., fEventweight);
+				// marc     
+				// marc 		// Jet Pt is not reasonable then return false
+				// marc 		if(JetRawPt->size() > 0) {
 			
-							fillPurities(tr,14., fEventweight);
-							h_Purity_JetRawPt[tr] -> Fill(JetRawPt->at(0), fEventweight);
+				// marc 			fillPurities(tr,14., fEventweight);
+				// marc 			h_Purity_JetRawPt[tr] -> Fill(JetRawPt->at(0), fEventweight);
 		      
-							// count the number of away jets
-							for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
-								if(!isGoodJet(thisjet, 20., fAwayJetBTagCut)) continue;
-								ngoodjets20++;
-								if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(lep), JetPhi->at(thisjet), MuPhi->at(lep)) > 1.0 ) nawayjets20++;
-								
-								if(!isGoodJet(thisjet, 30., fAwayJetBTagCut)) continue;
-								ngoodjets30++;
-								if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(lep), JetPhi->at(thisjet), MuPhi->at(lep)) > 1.0 ) nawayjets30++;
-								
-								if(!isGoodJet(thisjet, fJetPtCut, fAwayJetBTagCut)) continue;
-								ngoodjets40++;
-								if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(lep), JetPhi->at(thisjet), MuPhi->at(lep)) > 1.0 ) nawayjets40++;
-							}
+				// marc 			// count the number of away jets
+				// marc 			for(int thisjet=0; thisjet < JetRawPt->size(); ++thisjet){
+				// marc 				if(!isGoodJet(thisjet, 20., fAwayJetBTagCut)) continue;
+				// marc 				ngoodjets20++;
+				// marc 				if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(lep), JetPhi->at(thisjet), MuPhi->at(lep)) > 1.0 ) nawayjets20++;
+				// marc 				
+				// marc 				if(!isGoodJet(thisjet, 30., fAwayJetBTagCut)) continue;
+				// marc 				ngoodjets30++;
+				// marc 				if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(lep), JetPhi->at(thisjet), MuPhi->at(lep)) > 1.0 ) nawayjets30++;
+				// marc 				
+				// marc 				if(!isGoodJet(thisjet, fJetPtCut, fAwayJetBTagCut)) continue;
+				// marc 				ngoodjets40++;
+				// marc 				if(Util::GetDeltaR(JetEta->at(thisjet), MuEta->at(lep), JetPhi->at(thisjet), MuPhi->at(lep)) > 1.0 ) nawayjets40++;
+				// marc 			}
 		      
-							if(ngoodjets20 > 0) {
+				// marc 			if(ngoodjets20 > 0) {
 	
-								fillPurities(tr,15., fEventweight);
-								h_Purity_JetPt   [tr] -> Fill(JetPt->at(0), fEventweight);
-								h_Purity_DRLepJet[tr] -> Fill(Util::GetDeltaR(JetEta->at(0), MuEta->at(lep), JetPhi->at(0), MuPhi->at(lep)), fEventweight);
+				// marc 				fillPurities(tr,15., fEventweight);
+				// marc 				h_Purity_JetPt   [tr] -> Fill(JetPt->at(0), fEventweight);
+				// marc 				h_Purity_DRLepJet[tr] -> Fill(Util::GetDeltaR(JetEta->at(0), MuEta->at(lep), JetPhi->at(0), MuPhi->at(lep)), fEventweight);
 	
-								if(nawayjets20 > 0) {
+				// marc 				if(nawayjets20 > 0) {
 
-									fillPurities(tr,16., fEventweight);
+				// marc 					fillPurities(tr,16., fEventweight);
 
-		  							h_Purity_MET     [tr] -> Fill(getMET(),   fEventweight);
-		  							h_Purity_MT      [tr] -> Fill(getMT(lep), fEventweight);
+		  		// marc 					h_Purity_MET     [tr] -> Fill(getMET(),   fEventweight);
+		  		// marc 					h_Purity_MT      [tr] -> Fill(getMT(lep), fEventweight);
 		  
-									if(passesMETCut()){
+				// marc 					if(passesMETCut()){
 
-										fillPurities(tr,17., fEventweight);
-		    							if(passesMTCut(lep)) fillPurities(tr, 18., fEventweight);
-										
-									}
-								}
-							}
+				// marc 						fillPurities(tr,17., fEventweight);
+		    	// marc 						if(passesMTCut(lep)) fillPurities(tr, 18., fEventweight);
+				// marc 						
+				// marc 					}
+				// marc 				}
+				// marc 			}
 
-							if(ngoodjets30 > 0) {
+				// marc 			if(ngoodjets30 > 0) {
 
-								fillPurities(tr,19., fEventweight);
-								if(nawayjets30 > 0) {
+				// marc 				fillPurities(tr,19., fEventweight);
+				// marc 				if(nawayjets30 > 0) {
 
-									fillPurities(tr,20., fEventweight); 
-									if(passesMETCut()){
+				// marc 					fillPurities(tr,20., fEventweight); 
+				// marc 					if(passesMETCut()){
 
-										fillPurities(tr,21., fEventweight);
-										if(passesMTCut(lep)) fillPurities(tr,22., fEventweight);
+				// marc 						fillPurities(tr,21., fEventweight);
+				// marc 						if(passesMTCut(lep)) fillPurities(tr,22., fEventweight);
 		    
-									}
-								}
-							}
+				// marc 					}
+				// marc 				}
+				// marc 			}
 
-							if(ngoodjets40 > 0) {
+				// marc 			if(ngoodjets40 > 0) {
 
-								fillPurities(tr,23., fEventweight);
-								if(nawayjets40 > 0) {
+				// marc 				fillPurities(tr,23., fEventweight);
+				// marc 				if(nawayjets40 > 0) {
 
-									fillPurities(tr,24., fEventweight);
-									if(passesMETCut()){
+				// marc 					fillPurities(tr,24., fEventweight);
+				// marc 					if(passesMETCut()){
 
-										fillPurities(tr,25., fEventweight);
-										if(passesMTCut(lep)) fillPurities(tr,26., fEventweight);
-										
-									}
-								}
-							}
-						}
-					}
-				}
+				// marc 						fillPurities(tr,25., fEventweight);
+				// marc 						if(passesMTCut(lep)) fillPurities(tr,26., fEventweight);
+				// marc 						
+				// marc 					}
+				// marc 				}
+				// marc 			}
+				// marc 		}
+				// marc 	}
+				// marc }
 			}
 		}
 	}

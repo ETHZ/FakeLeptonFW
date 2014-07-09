@@ -73,9 +73,6 @@ public :
    std::vector<float>   *MuPhIso;
    std::vector<float>   *MuChIso;
    std::vector<float>   *MuSumPU;
-   std::vector<float>   *MuIso03SumPt;
-   std::vector<float>   *MuIso03EmPt;
-   std::vector<float>   *MuIso03HadPt;
    std::vector<bool>    *MuIsVeto;
    std::vector<bool>    *MuIsLoose;
    std::vector<bool>    *MuIsTight;
@@ -288,7 +285,6 @@ void FWBaseClass::Init(TTree *tree)
    MuPhIso = 0;
    MuChIso = 0;
    MuSumPU = 0;
-   MuIso03SumPt = 0;
    MuIsVeto = 0;
    MuIsLoose = 0;
    MuIsTight = 0;
@@ -383,7 +379,6 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuPhIso", &MuPhIso, &b_MuPhIso);
    fChain->SetBranchAddress("MuChIso", &MuChIso, &b_MuChIso);
    fChain->SetBranchAddress("MuSumPU", &MuSumPU, &b_MuSumPU);
-   fChain->SetBranchAddress("MuIso03SumPt", &MuIso03SumPt, &b_MuIso03SumPt);
    fChain->SetBranchAddress("MuIsVeto", &MuIsVeto, &b_MuIsVeto);
    fChain->SetBranchAddress("MuIsLoose", &MuIsLoose, &b_MuIsLoose);
    fChain->SetBranchAddress("MuIsTight", &MuIsTight, &b_MuIsTight);
