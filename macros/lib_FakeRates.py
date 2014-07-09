@@ -59,8 +59,9 @@ def make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, hists, title_hi
 
 	# define legend, fill and draw it
 
-	if dataType == 'el': leg1 = helper.makeLegend(0.62, 0.08, 0.87, 0.33)
-	else               : leg1 = helper.makeLegend(0.22, 0.6, 0.47, 0.85)
+	leg1 = helper.makeLegend(0.22, 0.4, 0.47, 0.65)
+	#if dataType == 'el': leg1 = helper.makeLegend(0.62, 0.08, 0.87, 0.33)
+	#else               : leg1 = helper.makeLegend(0.22, 0.6, 0.47, 0.85)
 
 	leg1.AddEntry(hists[0][0], helper.getLegendName(hists[0][1]), 'pe')
 	for i in range(1,len(hists)):
@@ -532,6 +533,16 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 			for j, mc in enumerate(mcsetsplot): FR_mcplot[j]     =    copy.deepcopy(mc  .hists[index_numerator])
 			for mc in mcsubtractplot:           mcsub_numerator  .Add(copy.deepcopy(mc  .hists[index_numerator]))
 
+
+		# get denominator histograms
+		
+		if hist.GetName()[-8:] == 'h_PTight':
+			mc_numerator_p   = ROOT.THStack()
+			for mc in mcsets:        
+				if 'dyjets50' in mc.GetName():
+					mc_numerator_p  .Add(copy.deepcopy(mc  .hists[i]))
+
+
 		# get denominator histograms
 
 		if hist.GetName()[-8:] == 'h_FLoose':
@@ -546,6 +557,15 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 			for mc in mcsets:                   mc_denominator     .Add(copy.deepcopy(mc  .hists[index_denominator]))
 			for j, mc in enumerate(mcsetsplot): mcplot_denominator[j] = copy.deepcopy(mc  .hists[index_denominator])
 			for mc in mcsubtractplot:           mcsub_denominator  .Add(copy.deepcopy(mc  .hists[index_denominator]))
+
+
+		# get denominator histograms
+		
+		if hist.GetName()[-8:] == 'h_PLoose':
+			mc_denominator_p   = ROOT.THStack()
+			for mc in mcsets:        
+				if 'dyjets50' in mc.GetName():
+					mc_denominator_p  .Add(copy.deepcopy(mc  .hists[i]))
 
 
 		# Get Numerator CERN Histogram
@@ -573,12 +593,14 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 
 	FR_data        = copy.deepcopy(data_numerator   .GetStack().Last())
 	FR_mc          = copy.deepcopy(mc_numerator     .GetStack().Last())
+	PR_mc          = copy.deepcopy(mc_numerator_p   .GetStack().Last())
 	FR_mcsub       = copy.deepcopy(mcsub_numerator  .GetStack().Last())
 
 	# we copy the numerators for the projections
 
 	FR_data_copy   = copy.deepcopy(FR_data)
 	FR_mc_copy     = copy.deepcopy(FR_mc)
+	PR_mc_copy     = copy.deepcopy(PR_mc)
 	FR_mcsub_copy  = copy.deepcopy(FR_mcsub)
 	
 	for j in range(len(mcsetsplot)): FR_mcplot_copy[j] = copy.deepcopy(FR_mcplot[j])
@@ -678,6 +700,7 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 	
 	FR_data   .Divide(FR_data   , copy.deepcopy(data_denominator   .GetStack().Last()), 1, 1, 'B')
 	FR_mc     .Divide(FR_mc     , copy.deepcopy(mc_denominator     .GetStack().Last()), 1, 1, 'B')
+	PR_mc     .Divide(PR_mc     , copy.deepcopy(mc_denominator_p   .GetStack().Last()), 1, 1, 'B')
 	FR_mcsub  .Divide(FR_mcsub  , copy.deepcopy(mcsub_denominator  .GetStack().Last()), 1, 1, 'B')
 
 	for j in range(len(mcsetsplot)): FR_mcplot[j].Divide(FR_mcplot[j], copy.deepcopy(mcplot_denominator[j]), 1, 1, 'B')
@@ -689,6 +712,8 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data  , title_indeces, 'data')
 	# total mc
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mc    , title_indeces, 'mc'  )
+	# total mc (prompt ratio)
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], PR_mc    , title_indeces, 'mc'  , False, 'fakerates_2d/', True)
 	# mcsubtractplot (i.e. qcd)
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcsub , title_indeces, mcsubtractplot[0].GetName())
 
@@ -745,12 +770,14 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 
 		FR_data_px    = copy.deepcopy(FR_data_copy  .ProjectionX())	
 		FR_mc_px      = copy.deepcopy(FR_mc_copy    .ProjectionX())
+		PR_mc_px      = copy.deepcopy(PR_mc_copy    .ProjectionX())
 		FR_mcsub_px   = copy.deepcopy(FR_mcsub_copy .ProjectionX())
 
 		# normal fake rates
 
 		FR_data_px   .Divide(FR_data_px   , copy.deepcopy(data_denominator   .GetStack().Last().ProjectionX()), 1, 1, 'B')
 		FR_mc_px     .Divide(FR_mc_px     , copy.deepcopy(mc_denominator     .GetStack().Last().ProjectionX()), 1, 1, 'B')
+		PR_mc_px     .Divide(PR_mc_px     , copy.deepcopy(mc_denominator_p   .GetStack().Last().ProjectionX()), 1, 1, 'B')
 		FR_mcsub_px  .Divide(FR_mcsub_px  , copy.deepcopy(mcsub_denominator  .GetStack().Last().ProjectionX()), 1, 1, 'B')
 
 		for j in range(len(mcsetsplot)):
@@ -779,12 +806,14 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 
 		FR_data_py    = copy.deepcopy(FR_data_copy  .ProjectionY())	
 		FR_mc_py      = copy.deepcopy(FR_mc_copy    .ProjectionY())
+		PR_mc_py      = copy.deepcopy(PR_mc_copy    .ProjectionY())
 		FR_mcsub_py   = copy.deepcopy(FR_mcsub_copy .ProjectionY())
 
 		# normal fake rates
 
 		FR_data_py   .Divide(FR_data_py   , copy.deepcopy(data_denominator   .GetStack().Last().ProjectionY()), 1, 1, 'B')
 		FR_mc_py     .Divide(FR_mc_py     , copy.deepcopy(mc_denominator     .GetStack().Last().ProjectionY()), 1, 1, 'B')
+		PR_mc_py     .Divide(PR_mc_py     , copy.deepcopy(mc_denominator_p   .GetStack().Last().ProjectionY()), 1, 1, 'B')
 		FR_mcsub_py  .Divide(FR_mcsub_py  , copy.deepcopy(mcsub_denominator  .GetStack().Last().ProjectionY()), 1, 1, 'B')
 
 		for j in range(len(mcsetsplot)):
@@ -805,6 +834,11 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 		histstoplot.append([FR_data_px, 'data'])
 		histstoplot.append([FR_mc_px, 'totbg'])
 		make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[0]], 'FR_proj_Pt_data')
+
+		histstoplot = []
+		histstoplot.append([FR_data_px, 'data'])
+		histstoplot.append([PR_mc_px, 'totbg'])
+		make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[0]], 'PR_proj_Pt_dyjets50')
 
 		# data vs. every mc sample
 
@@ -858,6 +892,11 @@ def Plot2dFRMap(dataType, outputDir, module, datasets, mcsets, mcsetsplot = [], 
 		histstoplot.append([FR_data_py, 'data'])
 		histstoplot.append([FR_mc_py, 'totbg'])
 		make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[1]], 'FR_proj_Eta_data')
+
+		histstoplot = []
+		histstoplot.append([FR_data_py, 'data'])
+		histstoplot.append([PR_mc_py, 'totbg'])
+		make1dFRPlot(dataType, canv, pad_plot, pad_ratio, outputDir, histstoplot, datasets[0].hists[title_indeces[1]], 'PR_proj_Eta_dyjets50')
 
 		# data vs. every single mc
 
@@ -1001,7 +1040,10 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 		# get numerator histograms
 
 		if hist.GetName()[-8:] == 'h_PTight':
-			for mc in mcsets:         mc_numerator_p .Add(copy.deepcopy(mc  .hists[i]))
+			mc_numerator_p   = ROOT.THStack()
+			for mc in mcsets:         
+				if 'dyjets50' in mc.GetName():
+					mc_numerator_p .Add(copy.deepcopy(mc  .hists[i]))
 
 
 
@@ -1023,7 +1065,10 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 		# get denominator histograms
 		
 		if hist.GetName()[-8:] == 'h_PLoose':
-			for mc in mcsets:        mc_denominator_p  .Add(copy.deepcopy(mc  .hists[i]))
+			mc_denominator_p   = ROOT.THStack()
+			for mc in mcsets:        
+				if 'dyjets50' in mc.GetName():
+					mc_denominator_p  .Add(copy.deepcopy(mc  .hists[i]))
 
 
 
@@ -1105,7 +1150,7 @@ def Plot2dFRMapClosureTest(dataType, outputDir, module, datasets, mcsets, mcsets
 
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data         , title_indeces, 'data'              , True, 'fakerates_2dct/')
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mc           , title_indeces, 'mc'                , True, 'fakerates_2dct/')
-	make2dFRPlot(dataType, canv, outputDir, datasets[0], PR_mc           , title_indeces, 'mc'´               , True, 'fakerates_2dct/', True)
+	make2dFRPlot(dataType, canv, outputDir, datasets[0], PR_mc           , title_indeces, 'mc'                , True, 'fakerates_2dct/', True)
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_mcsub        , title_indeces, 'qcd'               , True, 'fakerates_2dct/')
 	make2dFRPlot(dataType, canv, outputDir, datasets[0], FR_data_mcsub_c1, title_indeces, 'datamcsub_central1', True, 'fakerates_2dct/')
 

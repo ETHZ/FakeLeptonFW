@@ -142,6 +142,8 @@ if dataType == 'el':
 	closure_samples.append(qcdbc30_g)
 	closure_samples.append(qcdbc80_g)
 
+	qcd_g = qcdem20_g
+
 else:
 	data       = sample('mu_data'         , inputDir + 'mu_data_ratios.root'      )
 	wjets      = sample('mu_wjets'        , inputDir + 'mu_wjets_ratios.root'     )
@@ -306,40 +308,40 @@ if module == 'zoom_met' or module == 'all':
 
 # Compare AllJet quantities between WJets and DYjets
 
-if module == 'compare' or module == 'all':
-	leg = helper.makeLegend(0.6, 0.6, 0.85, 0.85)
-	leg.AddEntry(wjets   .hists[0], helper.getLegendName(wjets   .GetName()), 'l' )
-	leg.AddEntry(dyjets50.hists[0], helper.getLegendName(dyjets50.GetName()), 'l' )
-	Plot.PlotCompare(dataType, outputDir, [wjets, dyjets50], 'AllJ', leg)
+#if module == 'compare' or module == 'all':
+#	leg = helper.makeLegend(0.6, 0.6, 0.85, 0.85)
+#	leg.AddEntry(wjets   .hists[0], helper.getLegendName(wjets   .GetName()), 'l' )
+#	leg.AddEntry(dyjets50.hists[0], helper.getLegendName(dyjets50.GetName()), 'l' )
+#	Plot.PlotCompare(dataType, outputDir, [wjets, dyjets50], 'AllJ', leg)
 
 
 
 # Compare ClosJetPt for different origins in TTBar and QCD
 
-if module == 'compare' or module == 'all':
-	leg = helper.makeLegend(0.6, 0.6, 0.85, 0.85)
-	leg.AddEntry(ttbar_g.hists[0], helper.getLegendName(ttbar_g.GetName()), 'l' )
-	leg.AddEntry(qcd_g  .hists[0], helper.getLegendName(qcd_g  .GetName()), 'l' )
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_0', leg, '-2:')
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_2', leg, '-2:')
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_3', leg, '-2:')
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_4', leg, '-2:')
-	#Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_5', leg, '-2:')
+#if module == 'compare' or module == 'all':
+#	leg = helper.makeLegend(0.6, 0.6, 0.85, 0.85)
+#	leg.AddEntry(ttbar_g.hists[0], helper.getLegendName(ttbar_g.GetName()), 'l' )
+#	leg.AddEntry(qcd_g  .hists[0], helper.getLegendName(qcd_g  .GetName()), 'l' )
+#	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_0', leg, '-2:')
+#	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_2', leg, '-2:')
+#	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_3', leg, '-2:')
+#	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_4', leg, '-2:')
+#	#Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'ClosJetPt_5', leg, '-2:')
 
 
 
 # Compare Isolation between QCD and TTBar
 
-if module == 'compare' or module == 'all':
-	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.35)
-	leg.AddEntry(ttbar_g.hists[0], helper.getLegendName(ttbar_g.GetName()), 'l' )
-	leg.AddEntry(qcd_g  .hists[0], helper.getLegendName(qcd_g  .GetName()), 'l' )
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_0', leg, '-2:')
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_2', leg, '-2:')
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_3', leg, '-2:')
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_4', leg, '-2:')
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_5', leg, '-2:')
-	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd]  , 'h_Loose_LepIso', leg, -1, True)
+#if module == 'compare' or module == 'all':
+#	leg = helper.makeLegend(0.6, 0.1, 0.85, 0.35)
+#	leg.AddEntry(ttbar_g.hists[0], helper.getLegendName(ttbar_g.GetName()), 'l' )
+#	leg.AddEntry(qcd_g  .hists[0], helper.getLegendName(qcd_g  .GetName()), 'l' )
+#	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_0', leg, '-2:')
+#	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_2', leg, '-2:')
+#	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_3', leg, '-2:')
+#	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_4', leg, '-2:')
+#	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd_g], 'LepIso_5', leg, '-2:')
+#	Plot.PlotCompare(dataType, outputDir, [ttbar_g, qcd]  , 'h_Loose_LepIso', leg, -1, True)
 
 
 

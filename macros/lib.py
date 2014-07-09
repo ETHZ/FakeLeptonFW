@@ -444,8 +444,9 @@ def setFRPlotStyle(dataType, hist, color, title = '', title_hist = ''):
 	hist.SetFillColor(color)
 	hist.SetMinimum(0.0001)
 
-	if dataType == 'el': hist.SetMaximum(0.5)
-	else               : hist.SetMaximum(0.4)
+	hist.SetMaximum(1.0)
+	#if dataType == 'el': hist.SetMaximum(0.5)
+	#else               : hist.SetMaximum(0.4)
 
 	if not title_hist=='': hist.GetXaxis().SetTitle(getXTitle(dataType, title_hist))
 	hist.GetYaxis().SetTitle("FR")

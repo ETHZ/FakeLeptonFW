@@ -660,6 +660,16 @@ bool Fakerates::isPRRegionLepEvent(int &lep1, int &lep2, int &type1, int &type2,
 	if(looselep_chrg[0] == looselep_chrg[1]) return false;
 
 
+	// require same flavor
+	if(looselep_type[0] != looselep_type[1]) return false;
+
+
+	//cout << "here: " << nloose << endl;
+	//cout << "size: " << MuPt->size() << "-" << ElPt->size() << endl;
+	//cout << "list: " << looselep_inds[0] << "-" << looselep_inds[1] << endl;
+	//cout << "type: " << looselep_type[0] << "-" << looselep_type[1] << endl;
+	//cout << "here: " << looselep_pt.size() << ": " << looselep_pt[0] << "-" << looselep_pt[1] << endl;
+
 	// set jet indices
 	if(looselep_pt[1] > looselep_pt[0]) {
 		lep1  = looselep_inds[1];
@@ -1778,14 +1788,11 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 
 
 	int lep(-1), jet(-1);
-	int lep1(-1), lep2(-1), type1(0), type2(0);
 	std::vector<float, std::allocator<float> >* LepPt    = getLepPt();
 	std::vector<float, std::allocator<float> >* LepEta   = getLepEta();
 	std::vector<float, std::allocator<float> >* LepPhi   = getLepPhi();
 	std::vector<float, std::allocator<float> >* LepPFIso = getLepPFIso();
 	std::vector<float, std::allocator<float> >* LepD0    = getLepD0();
-	std::vector<float, std::allocator<float> >* UsePt;
-	std::vector<float, std::allocator<float> >* UseEta;
 
 
 	if(isFRRegionLepEvent(lep, jet, 30.)) {
@@ -1833,30 +1840,32 @@ void Fakerates::fillFRPlots(float eventweight = 1.0){
 	}
 
 
+	int lep1(-1), lep2(-1), type1(-1), type2(-1);
+
 
 	// prompt leptons, first loose, then tight
 	if(isPRRegionLepEvent(lep1, lep2, type1, type2, fJetPtCut)){
 
-		if(type1 == fDataType) {
+		if(type2 + 1 == fDataType) {
 
-			if( LepPt->at(lep1) >  fFRbinspt.back() ){
-				int fillbin = h_PLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep1)));
+			if( LepPt->at(lep2) >  fFRbinspt.back() ){
+				int fillbin = h_PLoose->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep2)));
 				h_PLoose->AddBinContent(fillbin, eventweight);
 			}
 			else{
-				if(fillFHist(LepPt->at(lep1)))
-					h_PLoose->Fill(LepPt->at(lep1), fabs(LepEta->at(lep1)), eventweight);
+				if(fillFHist(LepPt->at(lep2)))
+					h_PLoose->Fill(LepPt->at(lep2), fabs(LepEta->at(lep2)), eventweight);
 			}
 
-			if(isTightLepton(lep1)) {
+			if(isTightLepton(lep2)) {
 
-				if( LepPt->at(lep1) >  fFRbinspt.back() ){
-					int fillbin = h_PTight->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep1)));
+				if( LepPt->at(lep2) >  fFRbinspt.back() ){
+					int fillbin = h_PTight->FindBin(fFRbinspt.back()-0.5, fabs(LepEta->at(lep2)));
 					h_PTight->AddBinContent(fillbin, eventweight);
 				}
 				else{
-					if(fillFHist(LepPt->at(lep1)))
-						h_PTight->Fill(LepPt->at(lep1), fabs(LepEta->at(lep1)), eventweight);
+					if(fillFHist(LepPt->at(lep2)))
+						h_PTight->Fill(LepPt->at(lep2), fabs(LepEta->at(lep2)), eventweight);
 				}
 			}
 		}

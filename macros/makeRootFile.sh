@@ -1,2 +1,2 @@
 #! /bin/bash/
-python makeRootFile.py mu ETH/corrected_jet/PUweight_runD/Mu17MC/ el ETH/corrected_jet/PUweight_runD/Ele17JMC/
+python makeRootFile.py mu ETH_corrected_jet_PUweight_runD_Mu17MC/ el ETH_corrected_jet_PUweight_runD_Ele17JMC/

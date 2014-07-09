@@ -15,8 +15,8 @@ for i in range(n_sets):
 	URL[i] = args[i*2+2]
 	names[i] = URL[i].split('/')[-2]
 
-	fn[i] = ['FR_2dmap_data.root', 'FR_2dmap_mc.root', 'PR_2dmap_mc.root', 'FR_2dmap_datamcsub_central1.root', 'FR_2dmap_qcd.root', 'FR_2dmap_' + str(run[i]) + '_ttbar0.root', 'FR_2dmap_' + str(run[i]) + '_ttbar1.root', 'FR_2dmap_' + str(run[i]) + '_ttbar2.root', 'FR_2dmap_' + str(run[i]) + '_ttbar3.root', 'FR_2dmap_' + str(run[i]) + '_qcd0.root', 'FR_2dmap_' + str(run[i]) + '_qcd1.root', 'FR_2dmap_' + str(run[i]) + '_qcd2.root', 'FR_2dmap_' + str(run[i]) + '_qcd3.root']
-	nn[i] = ['FR_data_pure_' + str(run[i]), 'FR_mc_' + str(run[i]), 'PR_mc_' + str(run[i]), 'FR_data_' + str(run[i]), 'FR_qcd_' + str(run[i]), 'FR_ttbar_all_' + str(run[i]), 'FR_ttbar_b_' + str(run[i]), 'FR_ttbar_c_' + str(run[i]), 'FR_ttbar_light_' + str(run[i]), 'FR_qcd_all_' + str(run[i]), 'FR_qcd_b_' + str(run[i]), 'FR_qcd_c_' + str(run[i]), 'FR_qcd_light_' + str(run[i])]
+	fn[i] = ['FR_2dmap_data.root', 'FR_2dmap_mc.root', 'PR_2dmap_mc.root', 'FR_2dmap_datamcsub_central1.root', 'FR_2dmap_qcd.root']#, 'FR_2dmap_ttbar_g_0.root', 'FR_2dmap_ttbar_g_1.root', 'FR_2dmap_ttbar_g_2.root', 'FR_2dmap_ttbar_g_3.root', 'FR_2dmap_qcd_g_0.root', 'FR_2dmap_qcd_g_1.root', 'FR_2dmap_qcd_g_2.root', 'FR_2dmap_qcd_g_3.root']
+	nn[i] = ['FR_data_pure_' + str(run[i]), 'FR_mc_' + str(run[i]), 'PR_mc_' + str(run[i]), 'FR_data_' + str(run[i]), 'FR_qcd_' + str(run[i])]#, 'FR_ttbar_all_' + str(run[i]), 'FR_ttbar_b_' + str(run[i]), 'FR_ttbar_c_' + str(run[i]), 'FR_ttbar_light_' + str(run[i]), 'FR_qcd_all_' + str(run[i]), 'FR_qcd_b_' + str(run[i]), 'FR_qcd_c_' + str(run[i]), 'FR_qcd_light_' + str(run[i])]
 
 
 fl = []
@@ -43,7 +43,9 @@ for i in range(n_sets):
 	hi.append([])
 
 	cv[i] = [f.Get('c2dFR') for f in fr[i]]
+
 	hi[i] = [c.FindObject('h_FTight') for c in cv[i]]
+	hi[i][2] = cv[i][2].FindObject('h_PTight')
 
 	for j, hist in enumerate(hi[i]):
 		hist.SetName(nn[i][j])
@@ -61,9 +63,11 @@ for i in range(n_sets):
 
 	cv[i] = [f.Get('c2dFR') for f in fr[i]]
 	hi[i] = [c.FindObject('h_FTight') for c in cv[i]]
+	hi[i][2] = cv[i][2].FindObject('h_PTight')
 
-	hi[i][3].SetName(nn[i][3])
-	hi[i][3].Write()
+	for j, hist in enumerate(hi[i]):
+		hist.SetName(nn[i][j])
+		hist.Write()
 
 nf1.Close()
 
