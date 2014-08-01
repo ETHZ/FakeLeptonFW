@@ -22,7 +22,7 @@ includes = $(wildcard include/*.h)
 ## SRCSB      = src/FWBaseClass.C src/Estimation.cc
 ## OBJSB      = $(patsubst %.C,%.o,$(SRCSB:.cc=.o))
 ## 
-SRCSC      = src/FWBaseClass.C src/Fakerates.cc src/FakeRatios.cc src/Closure.cc
+SRCSC      = src/FWBaseClass.C src/Fakerates.cc src/FakeRatios.cc src/BTagSF.cc src/Closure.cc
 OBJSC      = $(patsubst %.C,%.o,$(SRCSC:.cc=.o))
 
 SRCSD      = src/FWBaseClass.C src/dps.cc

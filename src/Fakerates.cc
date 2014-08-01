@@ -720,7 +720,7 @@ bool Fakerates::isPRRegionLepEvent(int &lep1, int &lep2, int &type1, int &type2,
 
 
 //____________________________________________________________________________
-bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count = false){
+bool Fakerates::isFRRegionLepEvent(int &lep, int &jet, float jetcut, bool count){
 	/*
 	checks, whether the event contains exactly one lepton and at least one away-jet in the calibration region
 	parameters: &lep (address of lepton index), &jet (address of away-jet index), jetcut
@@ -1286,7 +1286,7 @@ bool Fakerates::passesMllCut(int lep1, int lep2, int type, float mass, int sign 
 
 
 //____________________________________________________________________________
-bool Fakerates::isGoodJet(int j, float pt = 0., float btag = 0.){
+bool Fakerates::isGoodJet(int j, float pt = 0., float btag){
 	/*
 	checks, if the given jet passes certain cuts defining it as a "good" jet
 	parameters: j (jet index), pt (cut on pt), btag (btag cut)

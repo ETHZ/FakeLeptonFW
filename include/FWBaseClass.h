@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Jun 19 13:55:15 2014 by ROOT version 5.34/18
+// Wed Jul 30 11:14:48 2014 by ROOT version 5.34/18
 // from TTree Analysis/AnalysisTree
-// found on file: /shome/mdunser/fakeTrees/2leps/TTWJets-V03-09-00.root
+// found on file: W1JetsToLNu-V03-09-01.root
 //////////////////////////////////////////////////////////
 
 #ifndef FWBaseClass_h
@@ -83,6 +83,9 @@ public :
    std::vector<int>     *MuMatchID;
    std::vector<int>     *MuMatchMID;
    std::vector<int>     *MuMatchGMID;
+   std::vector<float>   *MuPartonPt;
+   std::vector<int>     *MuPartonID;
+   std::vector<float>   *MuPartonDR;
    std::vector<float>   *ElPt;
    std::vector<float>   *ElEta;
    std::vector<float>   *ElPhi;
@@ -103,6 +106,9 @@ public :
    std::vector<int>     *ElMatchID;
    std::vector<int>     *ElMatchMID;
    std::vector<int>     *ElMatchGMID;
+   std::vector<float>   *ElPartonPt;
+   std::vector<int>     *ElPartonID;
+   std::vector<float>   *ElPartonDR;
    Float_t         pfMET;
    Float_t         pfMETPhi;
    Float_t         pfMET1;
@@ -113,8 +119,10 @@ public :
    std::vector<float>   *JetPhi;
    std::vector<float>   *JetEnergy;
    std::vector<float>   *JetCSVBTag;
+   std::vector<float>   *JetJECUnc;
    std::vector<int>     *JetPartonFlav;
    std::vector<float>   *JetBetaStar;
+   std::vector<float>   *JetPartonPt;
 
    // List of branches
    TBranch        *b_Run;   //!
@@ -167,7 +175,6 @@ public :
    TBranch        *b_MuPhIso;   //!
    TBranch        *b_MuChIso;   //!
    TBranch        *b_MuSumPU;   //!
-   TBranch        *b_MuIso03SumPt;   //!
    TBranch        *b_MuIsVeto;   //!
    TBranch        *b_MuIsLoose;   //!
    TBranch        *b_MuIsTight;   //!
@@ -178,6 +185,9 @@ public :
    TBranch        *b_MuMatchID;   //!
    TBranch        *b_MuMatchMID;   //!
    TBranch        *b_MuMatchGMID;   //!
+   TBranch        *b_MuPartonPt;   //!
+   TBranch        *b_MuPartonID;   //!
+   TBranch        *b_MuPartonDR;   //!
    TBranch        *b_ElPt;   //!
    TBranch        *b_ElEta;   //!
    TBranch        *b_ElPhi;   //!
@@ -198,6 +208,9 @@ public :
    TBranch        *b_ElMatchID;   //!
    TBranch        *b_ElMatchMID;   //!
    TBranch        *b_ElMatchGMID;   //!
+   TBranch        *b_ElPartonPt;   //!
+   TBranch        *b_ElPartonID;   //!
+   TBranch        *b_ElPartonDR;   //!
    TBranch        *b_pfMET;   //!
    TBranch        *b_pfMETPhi;   //!
    TBranch        *b_pfMET1;   //!
@@ -208,8 +221,10 @@ public :
    TBranch        *b_JetPhi;   //!
    TBranch        *b_JetEnergy;   //!
    TBranch        *b_JetCSVBTag;   //!
+   TBranch        *b_JetJECUnc;   //!
    TBranch        *b_JetPartonFlav;   //!
    TBranch        *b_JetBetaStar;   //!
+   TBranch        *b_JetPartonPt;   //!
 
    FWBaseClass(TTree *tree=0);
    virtual ~FWBaseClass();
@@ -230,9 +245,9 @@ FWBaseClass::FWBaseClass(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/shome/mdunser/fakeTrees/2leps/TTWJets-V03-09-00.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("W1JetsToLNu-V03-09-01.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/shome/mdunser/fakeTrees/2leps/TTWJets-V03-09-00.root");
+         f = new TFile("W1JetsToLNu-V03-09-01.root");
       }
       f->GetObject("Analysis",tree);
 
@@ -296,6 +311,9 @@ void FWBaseClass::Init(TTree *tree)
    MuMatchID = 0;
    MuMatchMID = 0;
    MuMatchGMID = 0;
+   MuPartonPt = 0;
+   MuPartonID = 0;
+   MuPartonDR = 0;
    ElPt = 0;
    ElEta = 0;
    ElPhi = 0;
@@ -316,14 +334,19 @@ void FWBaseClass::Init(TTree *tree)
    ElMatchID = 0;
    ElMatchMID = 0;
    ElMatchGMID = 0;
+   ElPartonPt = 0;
+   ElPartonID = 0;
+   ElPartonDR = 0;
    JetPt = 0;
    JetRawPt = 0;
    JetEta = 0;
    JetPhi = 0;
    JetEnergy = 0;
    JetCSVBTag = 0;
+   JetJECUnc = 0;
    JetPartonFlav = 0;
    JetBetaStar = 0;
+   JetPartonPt = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -390,6 +413,9 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("MuMatchID", &MuMatchID, &b_MuMatchID);
    fChain->SetBranchAddress("MuMatchMID", &MuMatchMID, &b_MuMatchMID);
    fChain->SetBranchAddress("MuMatchGMID", &MuMatchGMID, &b_MuMatchGMID);
+   fChain->SetBranchAddress("MuPartonPt", &MuPartonPt, &b_MuPartonPt);
+   fChain->SetBranchAddress("MuPartonID", &MuPartonID, &b_MuPartonID);
+   fChain->SetBranchAddress("MuPartonDR", &MuPartonDR, &b_MuPartonDR);
    fChain->SetBranchAddress("ElPt", &ElPt, &b_ElPt);
    fChain->SetBranchAddress("ElEta", &ElEta, &b_ElEta);
    fChain->SetBranchAddress("ElPhi", &ElPhi, &b_ElPhi);
@@ -410,6 +436,9 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("ElMatchID", &ElMatchID, &b_ElMatchID);
    fChain->SetBranchAddress("ElMatchMID", &ElMatchMID, &b_ElMatchMID);
    fChain->SetBranchAddress("ElMatchGMID", &ElMatchGMID, &b_ElMatchGMID);
+   fChain->SetBranchAddress("ElPartonPt", &ElPartonPt, &b_ElPartonPt);
+   fChain->SetBranchAddress("ElPartonID", &ElPartonID, &b_ElPartonID);
+   fChain->SetBranchAddress("ElPartonDR", &ElPartonDR, &b_ElPartonDR);
    fChain->SetBranchAddress("pfMET", &pfMET, &b_pfMET);
    fChain->SetBranchAddress("pfMETPhi", &pfMETPhi, &b_pfMETPhi);
    fChain->SetBranchAddress("pfMET1", &pfMET1, &b_pfMET1);
@@ -420,8 +449,10 @@ void FWBaseClass::Init(TTree *tree)
    fChain->SetBranchAddress("JetPhi", &JetPhi, &b_JetPhi);
    fChain->SetBranchAddress("JetEnergy", &JetEnergy, &b_JetEnergy);
    fChain->SetBranchAddress("JetCSVBTag", &JetCSVBTag, &b_JetCSVBTag);
+   fChain->SetBranchAddress("JetJECUnc", &JetJECUnc, &b_JetJECUnc);
    fChain->SetBranchAddress("JetPartonFlav", &JetPartonFlav, &b_JetPartonFlav);
    fChain->SetBranchAddress("JetBetaStar", &JetBetaStar, &b_JetBetaStar);
+   fChain->SetBranchAddress("JetPartonPt", &JetPartonPt, &b_JetPartonPt);
    Notify();
 }
 

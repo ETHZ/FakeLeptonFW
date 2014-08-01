@@ -188,12 +188,15 @@ def getColor(name):
 	elif name == 'wjets'              : return mycolor.GetColor(102,   0,   0)
 	elif name == 'doublemu'           : return ROOT.kBlack
 	elif name == 'doubleel'           : return ROOT.kBlack
+	elif name == 'ttjets_ha'          : return mycolor.GetColor( 51, 153, 102)
 	elif name == 'ttjets_sl'          : return mycolor.GetColor( 51, 153,  58)
 	elif name == 'ttjets_fl'          : return mycolor.GetColor(102, 153,  58)
+	elif name == 'singletop'          : return mycolor.GetColor(102, 153, 102)
 	elif name == 'ttwjets'            : return mycolor.GetColor(102, 102, 102)
 	elif name == 'ttzjets'            : return mycolor.GetColor(102, 102, 102)
 	elif name == 'rares'              : return mycolor.GetColor(102, 102, 102)
 	elif name == 'dyjets'             : return mycolor.GetColor(255, 204,   0)
+	elif name == 'qcdmuenr'           : return mycolor.GetColor( 58,  58, 102)
 
 #___________________________________________________________________________________
 def getSampleColor(self):

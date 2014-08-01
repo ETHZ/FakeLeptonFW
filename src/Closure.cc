@@ -38,6 +38,9 @@ void Closure::init(TString frfilestring){
 	cout << "INPUT FILE WITH FR VALUES: " << fFRFileString << endl;
 	fFRFile = new TFile(fFRFileString, "READ");
 
+	fBTagSF = new BTagSF();
+	fBTagRandom = new TRandom3(42);
+
 	// SET ALL THE HISTOGRAMS CORRECTLY
 	f_h_FR_data_el      = (TH2F*) fFRFile->Get("FR_data_el");
 	f_h_FR_data_pure_el = (TH2F*) fFRFile->Get("FR_data_pure_el");
@@ -120,6 +123,8 @@ void Closure::loop(TFile * outFile){
 	fSSem=0; fOSem=0; 
 	fSSee=0; fOSee=0;
 
+	bookHistos();
+
 	// loop on events in the tree
 	for (Long64_t jentry=0; jentry<tot_events;jentry++) {
 		if(jentry > (fMaxSize>0?fMaxSize:Ngen)) break;
@@ -138,6 +143,7 @@ void Closure::loop(TFile * outFile){
 	cout << Form("      %8s \t fOS: %8d \t fOSmm: %8d \t fOSem: %8d \t fOSee: %8d ", ""  , fOS, fOSmm, fOSem, fOSee) <<endl;
 
 	writeClosureTree(outFile);
+	writeHistos(outFile);
 	outFile->Close();
 
 	delete file_, tree_;
@@ -170,6 +176,29 @@ void Closure::storePredictions(){
 		p2 = (elSecond) ? getPRatio(1, ElPt->at(lep2), ElEta->at(lep2) ) : getPRatio(0, MuPt->at(lep2), MuEta->at(lep2)) ;
 		//p1 = 1.;
 		//p2 = 1.;
+
+		if(muFirst && type < 3){
+			if( abs(MuPartonID->at(lep1)) < 10) { //require leptons from quarks
+				h_muPt_partonPt_SS         -> Fill(MuPt->at(lep1), MuPartonPt->at(lep1));
+				if(JetPt->size() > 0) {
+					int closestJet = getClosestJet(lep1);
+					h_leptonPt_closestJetPt_SS -> Fill(MuPt->at(lep1), JetPt->at(closestJet)      );
+					h_closestJetPt_partonPt_SS -> Fill(JetPt->at(closestJet), MuPartonPt->at(lep1));
+					h_mu_closestJet_dr_SS      -> Fill(getClosestJetDR(lep1));
+				}
+			}
+		}
+		if(!elSecond && type < 3){
+			if( abs(MuPartonID->at(lep2)) < 10) { //require leptons from quarks
+				h_muPt_partonPt_SS         -> Fill(MuPt->at(lep2), MuPartonPt->at(lep2));
+				if(JetPt->size() > 0) {
+					int closestJet = getClosestJet(lep2);
+					h_leptonPt_closestJetPt_SS -> Fill(MuPt->at(lep2), JetPt->at(closestJet)      );
+					h_closestJetPt_partonPt_SS -> Fill(JetPt->at(closestJet), MuPartonPt->at(lep2));
+					h_mu_closestJet_dr_SS      -> Fill(getClosestJetDR(lep2));
+				}
+			}
+		}
 
 		if     (type == 0 || type == 3){ // MU-MU
 			if(type == 0) fSSmm++;
@@ -228,32 +257,29 @@ void Closure::storePredictions(){
 
 		fCT_tlcat = cat;
 
-		fCT_pt1   = (muFirst ) ? MuPt    ->at(lep1) : ElPt    ->at(lep1);
-		fCT_eta1  = (muFirst ) ? MuEta   ->at(lep1) : ElEta   ->at(lep1);
-		fCT_phi1  = (muFirst ) ? MuPhi   ->at(lep1) : ElPhi   ->at(lep1);
-		fCT_mt1   = (muFirst ) ? getMT(lep1, 0)     : getMT(lep1, 1);
-		fCT_ch1   = (muFirst ) ? MuCharge->at(lep1) : ElCharge->at(lep1);
-		fCT_iso1  = (muFirst ) ? MuPFIso ->at(lep1) : ElPFIso ->at(lep1);
+		fCT_pt1     = (muFirst ) ? MuPt    ->at(lep1) : ElPt    ->at(lep1);
+		fCT_eta1    = (muFirst ) ? MuEta   ->at(lep1) : ElEta   ->at(lep1);
+		fCT_phi1    = (muFirst ) ? MuPhi   ->at(lep1) : ElPhi   ->at(lep1);
+		fCT_mt1     = (muFirst ) ? getMT(lep1, 0)     : getMT(lep1, 1);
+		fCT_ch1     = (muFirst ) ? MuCharge->at(lep1) : ElCharge->at(lep1);
+		fCT_iso1    = (muFirst ) ? MuPFIso ->at(lep1) : ElPFIso ->at(lep1);
+		fCT_ip1     = (muFirst ) ? MuD0    ->at(lep1) : ElD0    ->at(lep1);
 		fCT_neiso1  = (muFirst ) ? MuNeIso ->at(lep1) : ElNeIso ->at(lep1);
 		fCT_phiso1  = (muFirst ) ? MuPhIso ->at(lep1) : ElPhIso ->at(lep1);
 		fCT_chiso1  = (muFirst ) ? MuChIso ->at(lep1) : ElChIso ->at(lep1);
 		fCT_pucor1  = (muFirst ) ? MuSumPU ->at(lep1) : Rho;
 
-		fCT_pt2   = (elSecond) ? ElPt    ->at(lep2) : MuPt    ->at(lep2);
-		fCT_eta2  = (elSecond) ? ElEta   ->at(lep2) : MuEta   ->at(lep2);
-		fCT_phi2  = (elSecond) ? ElPhi   ->at(lep2) : MuPhi   ->at(lep2);
-		fCT_mt2   = (elSecond) ? getMT(lep2, 1)     : getMT(lep2, 0);
-		fCT_ch2   = (elSecond) ? ElCharge->at(lep2) : MuCharge->at(lep2);
-		fCT_iso2  = (elSecond) ? ElPFIso ->at(lep2) : MuPFIso ->at(lep2);
+		fCT_pt2     = (elSecond) ? ElPt    ->at(lep2)  : MuPt    ->at(lep2);
+		fCT_eta2    = (elSecond) ? ElEta   ->at(lep2)  : MuEta   ->at(lep2);
+		fCT_phi2    = (elSecond) ? ElPhi   ->at(lep2)  : MuPhi   ->at(lep2);
+		fCT_mt2     = (elSecond) ? getMT(lep2, 1)      : getMT(lep2, 0);
+		fCT_ch2     = (elSecond) ? ElCharge->at(lep2)  : MuCharge->at(lep2);
+		fCT_iso2    = (elSecond) ? ElPFIso ->at(lep2)  : MuPFIso ->at(lep2);
+		fCT_ip2     = (elSecond) ? ElD0    ->at(lep2)  : MuD0    ->at(lep2);
 		fCT_neiso2  = (elSecond ) ? ElNeIso ->at(lep2) : MuNeIso ->at(lep2);
 		fCT_phiso2  = (elSecond ) ? ElPhIso ->at(lep2) : MuPhIso ->at(lep2);
 		fCT_chiso2  = (elSecond ) ? ElChIso ->at(lep2) : MuChIso ->at(lep2);
 		fCT_pucor2  = (elSecond ) ? Rho                : MuSumPU ->at(lep1);
-
-		fCT_nj    = Fakerates::getNJets(0);
-		fCT_nb    = Fakerates::getNJets(1);
-		fCT_ht    = Fakerates::getHT();
-		fCT_met   = Fakerates::getMET();
 
 		fCT_lID1   = (muFirst ) ? MuID->at(lep1) : ElID->at(lep1);
 		fCT_lID2   = (elSecond) ? ElID->at(lep2) : MuID->at(lep2);
@@ -261,33 +287,87 @@ void Closure::storePredictions(){
 		fCT_lProv1 = (muFirst ) ? Fakerates::getLeptonOrigin(MuMID->at(lep1), MuGMID->at(lep1), 0) : Fakerates::getLeptonOrigin(ElMID->at(lep1), ElGMID->at(lep1), 0);
 		fCT_lProv2 = (elSecond) ? Fakerates::getLeptonOrigin(ElMID->at(lep2), ElGMID->at(lep2), 0) : Fakerates::getLeptonOrigin(MuMID->at(lep2), MuGMID->at(lep2), 0);
 
- //cout << Form("%15d\t%+2d\t%6.2f%1d\t%+2d\t%6.2f\t%1d\t%d\t%d",Event, (muFirst ? MuID->at(lep1) : ElID->at(lep1) ), fCT_pt1, (muFirst ? isTightMuon(lep1) : isTightElectron(lep1) ), (elSecond ? ElID->at(lep2) : MuID->at(lep2) ), fCT_pt2, (elSecond ? isTightElectron(lep2) : isTightMuon(lep2) ), fCT_nj, fCT_nb) << endl;
-		if(Event == 37051) {
-			for(int i = 0; i<JetPt->size(); ++i){
-				if(isGoodJet(i, 40, 0.)) cout << Form("%10d\t%.2f", Event, JetPt->at(i)) << endl;
-			}
-		}
+		// things that change with systematics go here
+
+		scaleBTags(0);
+		saveJetsAndMET();
+
+		// nominal
+		fCT_nj    = Fakerates::getNJets(0);
+		fCT_nb    = Fakerates::getNJets(1);
+		fCT_ht    = Fakerates::getHT();
+		fCT_met   = Fakerates::getMET();
+
+		// jes up
+		JESJER(1);
+		fCT_nj_jesup    = Fakerates::getNJets(0);
+		fCT_nb_jesup    = Fakerates::getNJets(1);
+		fCT_ht_jesup    = Fakerates::getHT();
+		fCT_met_jesup   = Fakerates::getMET();
+
+		// jes down
+		resetJetsAndMET();
+		JESJER(2);
+		fCT_nj_jesdn    = Fakerates::getNJets(0);
+		fCT_nb_jesdn    = Fakerates::getNJets(1);
+		fCT_ht_jesdn    = Fakerates::getHT();
+		fCT_met_jesdn   = Fakerates::getMET();
+
+		// jer
+		resetJetsAndMET();
+		JESJER(3);
+		fCT_nj_jer    = Fakerates::getNJets(0);
+		fCT_nb_jer    = Fakerates::getNJets(1);
+		fCT_ht_jer    = Fakerates::getHT();
+		fCT_met_jer   = Fakerates::getMET();
+
+		// b-up
+		resetJetsAndMET();
+		scaleBTags(1);
+		fCT_nj_bup    = Fakerates::getNJets(0);
+		fCT_nb_bup    = Fakerates::getNJets(1);
+		fCT_ht_bup    = Fakerates::getHT();
+		fCT_met_bup   = Fakerates::getMET();
+
+		// b-dn
+		resetJetsAndMET();
+		scaleBTags(2);
+		fCT_nj_bdn    = Fakerates::getNJets(0);
+		fCT_nb_bdn    = Fakerates::getNJets(1);
+		fCT_ht_bdn    = Fakerates::getHT();
+		fCT_met_bdn   = Fakerates::getMET();
+
 		fClosureTree->Fill();
 	}
 
 
 }
 
-void fillGenPlots(){
+void Closure::fillGenPlots(){
 	fDataType = 1; // this should be muons
-
-
-	h_muPt_partonPt_MR         = new TH2F("muPt_partonPt_MR"        , "muPt_partonPt_MR"        , 30, 0., 150., 30, 0., 150.);
-	h_closestJetPt_partonPt_MR = new TH2F("closestJetPt_partonPt_MR", "closestJetPt_partonPt_MR", 30, 0., 150., 30, 0., 150.);
-	h_mu_closestJet_dr_MR      = new TH1F("mu_closestJet_dr_MR"     , "mu_closestJet_dr_MR"     , 50, 0., 2.0);
 
 	int lep(-1), jet(-1);
 	if(isFRRegionLepEvent(lep, jet, 40.) ){
-		if( abs(MuPartonID->at(lep) > 10) ) continue; //require leptons from quarks
-		int closestJet = getClosestJet(lep);
-		h_muPt_partonPt_MR         -> Fill(MuPt->at(lep), MuPartonPt->at(lep));
-		h_closestJetPt_partonPt_MR -> Fill(JetPt->at(closestJet), MuPartonPt->at(lep));
-		h_mu_closestJet_dr_MR      -> Fill(getClosestJetDR(lep));
+		if( abs(MuPartonID->at(lep)) < 10) { //require leptons from quarks
+			int closestJet = getClosestJet(lep);
+			h_muPt_partonPt_MR         -> Fill(MuPt->at(lep), MuPartonPt->at(lep));
+			h_leptonPt_closestJetPt_MR -> Fill(MuPt->at(lep), JetPt->at(closestJet)      );
+			h_closestJetPt_partonPt_MR -> Fill(JetPt->at(closestJet), MuPartonPt->at(lep));
+			h_mu_closestJet_dr_MR      -> Fill(getClosestJetDR(lep));
+		}
+	}
+	if(MuPt->size() > 0){
+		for(int ind=0; ind < MuPt->size(); ++ind){
+			if(!MuIsLoose->at(ind)) continue;
+			if(abs(MuPartonID->at(ind)) > 10) continue;
+			h_muPt_partonPt_ALL -> Fill(MuPt->at(ind), MuPartonPt->at(ind));
+			if(JetPt->size() > 0) {
+				int closestJet = getClosestJet(ind);
+				h_leptonPt_closestJetPt_ALL -> Fill(MuPt->at(ind), JetPt->at(closestJet)      );
+				h_closestJetPt_partonPt_ALL -> Fill(JetPt->at(closestJet), MuPartonPt->at(ind));
+				h_mu_closestJet_dr_ALL      -> Fill(getClosestJetDR(ind));
+			}
+		}
 	}
 
 }
@@ -508,6 +588,8 @@ void Closure::bookClosureTree(){
 	fClosureTree->Branch("ch2"   , &fCT_ch2   , "ch2/I"    ) ;
 	fClosureTree->Branch("iso1"  , &fCT_iso1  , "iso1/F"   ) ;
 	fClosureTree->Branch("iso2"  , &fCT_iso2  , "iso2/F"   ) ;
+	fClosureTree->Branch("ip1"  , &fCT_ip1  , "ip1/F"   ) ;
+	fClosureTree->Branch("ip2"  , &fCT_ip2  , "ip2/F"   ) ;
 	fClosureTree->Branch("neiso1"  , &fCT_neiso1  , "neiso1/F"   ) ;
 	fClosureTree->Branch("neiso2"  , &fCT_neiso2  , "neiso2/F"   ) ;
 	fClosureTree->Branch("phiso1"  , &fCT_phiso1  , "phiso1/F"   ) ;
@@ -521,6 +603,32 @@ void Closure::bookClosureTree(){
 	fClosureTree->Branch("nb"    , &fCT_nb    , "nb/I"     ) ;
 	fClosureTree->Branch("ht"    , &fCT_ht    , "ht/F"     ) ;
 	fClosureTree->Branch("met"   , &fCT_met   , "met/F"    ) ;
+
+	fClosureTree->Branch("nj_jesup"    , &fCT_nj_jesup    , "nj_jesup/I"     ) ;
+	fClosureTree->Branch("nb_jesup"    , &fCT_nb_jesup    , "nb_jesup/I"     ) ;
+	fClosureTree->Branch("ht_jesup"    , &fCT_ht_jesup    , "ht_jesup/F"     ) ;
+	fClosureTree->Branch("met_jesup"   , &fCT_met_jesup   , "met_jesup/F"    ) ;
+
+	fClosureTree->Branch("nj_jesdn"    , &fCT_nj_jesdn    , "nj_jesdn/I"     ) ;
+	fClosureTree->Branch("nb_jesdn"    , &fCT_nb_jesdn    , "nb_jesdn/I"     ) ;
+	fClosureTree->Branch("ht_jesdn"    , &fCT_ht_jesdn    , "ht_jesdn/F"     ) ;
+	fClosureTree->Branch("met_jesdn"   , &fCT_met_jesdn   , "met_jesdn/F"    ) ;
+
+	fClosureTree->Branch("nj_jer"    , &fCT_nj_jer    , "nj_jer/I"     ) ;
+	fClosureTree->Branch("nb_jer"    , &fCT_nb_jer    , "nb_jer/I"     ) ;
+	fClosureTree->Branch("ht_jer"    , &fCT_ht_jer    , "ht_jer/F"     ) ;
+	fClosureTree->Branch("met_jer"   , &fCT_met_jer   , "met_jer/F"    ) ;
+
+	fClosureTree->Branch("nj_bup"    , &fCT_nj_bup    , "nj_bup/I"     ) ;
+	fClosureTree->Branch("nb_bup"    , &fCT_nb_bup    , "nb_bup/I"     ) ;
+	fClosureTree->Branch("ht_bup"    , &fCT_ht_bup    , "ht_bup/F"     ) ;
+	fClosureTree->Branch("met_bup"   , &fCT_met_bup   , "met_bup/F"    ) ;
+
+	fClosureTree->Branch("nj_bdn"    , &fCT_nj_bdn    , "nj_bdn/I"     ) ;
+	fClosureTree->Branch("nb_bdn"    , &fCT_nb_bdn    , "nb_bdn/I"     ) ;
+	fClosureTree->Branch("ht_bdn"    , &fCT_ht_bdn    , "ht_bdn/F"     ) ;
+	fClosureTree->Branch("met_bdn"   , &fCT_met_bdn   , "met_bdn/F"    ) ;
+
 
 	fClosureTree->Branch("lID1"   , &fCT_lID1   , "lID1/I"    ) ;
 	fClosureTree->Branch("lID2"   , &fCT_lID2   , "lID2/I"    ) ;
@@ -562,11 +670,13 @@ void Closure::resetClosureTree(){
 	fCT_phi1  = -99.;
 	fCT_phi2  = -99.;
 	fCT_iso1  = -1.;
+	fCT_ip1  = -1.;
 	fCT_neiso1  = -1.;
 	fCT_phiso1  = -1.;
 	fCT_chiso1  = -1.;
 	fCT_pucor1  = -1.;
 	fCT_iso2  = -1.;
+	fCT_ip2  = -1.;
 	fCT_neiso2  = -1.;
 	fCT_phiso2  = -1.;
 	fCT_chiso2  = -1.;
@@ -581,9 +691,152 @@ void Closure::resetClosureTree(){
 	fCT_ht    = -1.;
 	fCT_met   = -1.;
 
+	fCT_nj_jesup    = -1;
+	fCT_nb_jesup    = -1;
+	fCT_ht_jesup    = -1.;
+	fCT_met_jesup   = -1.;
+
+	fCT_nj_jesdn    = -1;
+	fCT_nb_jesdn    = -1;
+	fCT_ht_jesdn    = -1.;
+	fCT_met_jesdn   = -1.;
+
+	fCT_nj_jer    = -1;
+	fCT_nb_jer    = -1;
+	fCT_ht_jer    = -1.;
+	fCT_met_jer   = -1.;
+
+	fCT_nj_bup    = -1;
+	fCT_nb_bup    = -1;
+	fCT_ht_bup    = -1.;
+	fCT_met_bup   = -1.;
+
+	fCT_nj_bdn    = -1;
+	fCT_nb_bdn    = -1;
+	fCT_ht_bdn    = -1.;
+	fCT_met_bdn   = -1.;
+
 	fCT_lID1   = 0;
 	fCT_lID2   = 0;
 	fCT_lProv1 = -1;
 	fCT_lProv2 = -1;
 
+}
+
+void Closure::bookHistos(){
+	h_muPt_partonPt_MR          = new TH2F("muPt_partonPt_MR"         , "muPt_partonPt_MR"         , 150, 0., 150., 150, 0., 150.); h_muPt_partonPt_MR          -> Sumw2();
+	h_closestJetPt_partonPt_MR  = new TH2F("closestJetPt_partonPt_MR" , "closestJetPt_partonPt_MR" , 150, 0., 150., 150, 0., 150.); h_closestJetPt_partonPt_MR  -> Sumw2();
+	h_leptonPt_closestJetPt_MR  = new TH2F("leptonPt_closestJetPt_MR" , "leptonPt_closestJetPt_MR" , 150, 0., 150., 150, 0., 150.); h_leptonPt_closestJetPt_MR  -> Sumw2();
+	h_mu_closestJet_dr_MR       = new TH1F("mu_closestJet_dr_MR"      , "mu_closestJet_dr_MR"      ,  20, 0., 1.0);                 h_mu_closestJet_dr_MR       -> Sumw2();
+
+	h_muPt_partonPt_ALL         = new TH2F("muPt_partonPt_ALL"        , "muPt_partonPt_ALL"        , 150, 0., 150., 150, 0., 150.); h_muPt_partonPt_ALL         -> Sumw2();
+	h_closestJetPt_partonPt_ALL = new TH2F("closestJetPt_partonPt_ALL", "closestJetPt_partonPt_ALL", 150, 0., 150., 150, 0., 150.); h_closestJetPt_partonPt_ALL -> Sumw2();
+	h_leptonPt_closestJetPt_ALL = new TH2F("leptonPt_closestJetPt_ALL", "leptonPt_closestJetPt_ALL", 150, 0., 150., 150, 0., 150.); h_leptonPt_closestJetPt_ALL -> Sumw2();
+	h_mu_closestJet_dr_ALL      = new TH1F("mu_closestJet_dr_ALL"     , "mu_closestJet_dr_ALL"     ,  20, 0., 1.0);                 h_mu_closestJet_dr_ALL      -> Sumw2();
+
+	h_muPt_partonPt_SS          = new TH2F("muPt_partonPt_SS"         , "muPt_partonPt_SS"         , 150, 0., 150., 150, 0., 150.); h_muPt_partonPt_SS          -> Sumw2();
+	h_closestJetPt_partonPt_SS  = new TH2F("closestJetPt_partonPt_SS" , "closestJetPt_partonPt_SS" , 150, 0., 150., 150, 0., 150.); h_closestJetPt_partonPt_SS  -> Sumw2();
+	h_leptonPt_closestJetPt_SS  = new TH2F("leptonPt_closestJetPt_SS" , "leptonPt_closestJetPt_SS" , 150, 0., 150., 150, 0., 150.); h_leptonPt_closestJetPt_SS  -> Sumw2();
+	h_mu_closestJet_dr_SS       = new TH1F("mu_closestJet_dr_SS"      , "mu_closestJet_dr_SS"      ,  20, 0., 1.0);                 h_mu_closestJet_dr_SS       -> Sumw2();
+}
+
+void Closure::writeHistos(TFile * pFile){
+	pFile->cd();
+	h_muPt_partonPt_MR          -> Write();
+	h_closestJetPt_partonPt_MR  -> Write();
+	h_leptonPt_closestJetPt_MR  -> Write();
+	h_mu_closestJet_dr_MR       -> Write();
+
+	h_muPt_partonPt_ALL         -> Write();
+	h_closestJetPt_partonPt_ALL -> Write();
+	h_leptonPt_closestJetPt_ALL -> Write();
+	h_mu_closestJet_dr_ALL      -> Write();
+
+	h_muPt_partonPt_SS          -> Write();
+	h_closestJetPt_partonPt_SS  -> Write();
+	h_leptonPt_closestJetPt_SS  -> Write();
+	h_mu_closestJet_dr_SS       -> Write();
+}
+
+// SYSTEMATICS FUNCTIONS
+void Closure::saveJetsAndMET(){
+	fJets.clear(); // clear the jet vector first
+	for(int i=0; i<JetPt->size(); ++i){
+		TLorentzVector jet;
+		jet.SetPtEtaPhiE(JetPt->at(i), JetEta->at(i), JetPhi->at(i), JetEnergy->at(i));
+		fJets.push_back(make_pair(jet, JetCSVBTag->at(i)) );
+	}
+
+	fMET.SetPtEtaPhiM(getMET(), 0., getMETPhi(), 0.);
+}
+
+void Closure::resetJetsAndMET(){
+	for(int i=0; i<JetPt->size(); ++i){
+		JetPt->at(i)      = fJets[i].first.Pt();
+		JetEta->at(i)     = fJets[i].first.Eta();
+		JetPhi->at(i)     = fJets[i].first.Phi();
+		JetEnergy->at(i)  = fJets[i].first.E();
+		JetCSVBTag->at(i) = fJets[i].second;
+	}
+
+	Fakerates::setMET(fMET.Pt());
+	Fakerates::setMETPhi(fMET.Phi());
+}
+
+void Closure::scaleBTags( int flag, TString model){
+	// for now supports only CSVM b-tagger. can be extended if need be
+	if(fIsData) return; // do nothing for data!
+	bool isFastsim = false;
+	if (model != "") isFastsim= true;
+	for(size_t i = 0; i < JetPt->size(); ++i){
+		if(isGoodJet(i, fJetPtCut) == false) continue;
+		bool is_tagged_med = JetCSVBTag->at(i) > 0.679;
+		float random(-1.);
+		fRandom->SetSeed(  (int) (Event * JetPt->at(i) / JetEta->at(i) ) ); // set the random seed to the same value for every min/max iteration
+		if (flag == 0)	random = fRandom ->Uniform(0,1); // get random number from uniform distribution
+		else			random = fRandom ->Uniform(0,1); // get random number from uniform distribution
+		string meanminmax = "mean";
+		if(flag == 1) meanminmax = "max";
+		if(flag == 2) meanminmax = "min";
+
+		bool newTag = fBTagSF->modifyBTagsWithSF(is_tagged_med, JetPt->at(i), JetEta->at(i), JetPartonFlav->at(i), meanminmax, random, isFastsim, model);
+		if(!newTag) JetCSVBTag->at(i) = 0.1; // not tagged
+		if( newTag) JetCSVBTag->at(i) = 1.0; // tagged
+	}
+}
+
+
+void Closure::JESJER(int flag){
+	// Modify the jet pt for systematics studies
+	// Either shifted or smeared
+	// propagate to the MET!!
+	if(fIsData)   return;      // do nothing for data!
+	if(flag == 0) return;      // 0 makes no sense
+
+	//std::vector<int> cleanJets = cleanedJetIndices(15.);
+	TLorentzVector oldjets, newjets, tmp;                           // 4-vec of old jets, newjets and a tmp-vector
+	
+	for( int ijet = 0; ijet < JetPt->size(); ++ijet) {
+		tmp.SetPtEtaPhiE(JetPt->at(ijet), JetEta->at(ijet), JetPhi->at(ijet), JetEnergy->at(ijet)); // set temp to the jet
+		oldjets += tmp;                                                         // add jet to the old jets vector
+		if(flag == 1) JetPt->at(ijet) *= (1 + JetJECUnc->at(ijet));             // vary up for flag 1
+		if(flag == 2) JetPt->at(ijet) *= (1 - JetJECUnc->at(ijet));             // vary down for flag 2;
+		if(flag == 3){                                                          // smear for flag 3
+			float sigmaMC  = Fakerates::getSigmaMC(JetPt->at(ijet), JetEta->at(ijet))/JetPt->at(ijet);      // get the resolution
+			// float jerScale = getJERScale(*it);                                  // get JER scale factors
+			// float factor = fRandom->Gaus(1., sqrt(jerScale*jerScale -1.)*sigmaMC );
+			float factor = fRandom->Gaus(1., sigmaMC );
+			JetPt->at(ijet) = JetPt->at(ijet) * factor;
+		}
+		tmp.SetPtEtaPhiE(JetPt->at(ijet), JetEta->at(ijet), JetPhi->at(ijet), JetEnergy->at(ijet)); // set tmp to the scaled/smeared jet
+		newjets += tmp;                                                            // add scaled/smeared jet to the new jets
+	}
+	propagateMET(newjets, oldjets);   // propagate this change to the MET
+}
+
+void Closure::propagateMET(TLorentzVector nVec, TLorentzVector oVec){
+	TLorentzVector met;
+	met.SetPtEtaPhiM(getMET(), 0., getMETPhi(), 0.);
+	// set the pfMET to the old MET minus original vector plus new vector
+	Fakerates::setMET( (met+oVec-nVec).Pt() );
 }

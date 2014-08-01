@@ -36,6 +36,9 @@
 #include "Utilities.hh"
 
 #include "include/Fakerates.hh"
+#include "include/BTagSF.hh"
+
+
 
 // class Closure: public FWBaseClass{
 class Closure: public Fakerates{
@@ -119,13 +122,57 @@ public:
 	bool passMllCut(int, int, int, float);
 	bool isSignalTrigger(int);
 
+	void fillGenPlots();
+	void bookHistos();
+	void writeHistos(TFile *);
+
+	void scaleBTags(int, TString = "");
+	void JESJER(int);
+	void propagateMET(TLorentzVector, TLorentzVector);
+	void saveJetsAndMET();
+	void resetJetsAndMET();
+	
+	std::vector< std::pair<TLorentzVector, float> > fJets;
+	TLorentzVector fMET;
+	BTagSF * fBTagSF;
+	TRandom3 * fBTagRandom;
+
+// // CLASS
+// 	class variable {
+// 	  public:
+// 		//variable();
+// 		TString name;
+// 	
+// 		float nominal;
+// 		float jesup;
+// 		float jesdn;
+// 	
+// 		void clean(){
+// 			name    = "";
+// 			nominal = -1.;
+// 			jesup   = -1.;
+// 			jesdn   = -1.;
+// 		};
+// 	};
+
 // Eventweight
 	float fEventWeight;
 
-// OUTPUT PR HISTOGRAMS
-	TH2F * h_muPt_partonPt_2D;
-	TH2F * h_closestJetPt_partonPt_2D;
-	TH1F * h_mu_closestJet_dr;
+// OUTPUT HISTOGRAMS
+	TH2F * h_muPt_partonPt_MR;
+	TH2F * h_leptonPt_closestJetPt_MR;
+	TH2F * h_closestJetPt_partonPt_MR;
+	TH1F * h_mu_closestJet_dr_MR;
+
+	TH2F * h_muPt_partonPt_ALL;
+	TH2F * h_leptonPt_closestJetPt_ALL;
+	TH2F * h_closestJetPt_partonPt_ALL;
+	TH1F * h_mu_closestJet_dr_ALL;
+
+	TH2F * h_muPt_partonPt_SS;
+	TH2F * h_leptonPt_closestJetPt_SS;
+	TH2F * h_closestJetPt_partonPt_SS;
+	TH1F * h_mu_closestJet_dr_SS;
 
 // OUTPUT TREE
 
@@ -166,6 +213,8 @@ public:
 	float fCT_phi2;
 	float fCT_iso1;
 	float fCT_iso2;
+	float fCT_ip1;
+	float fCT_ip2;
 	float fCT_neiso1;
 	float fCT_neiso2;
 	float fCT_phiso1;
@@ -179,15 +228,36 @@ public:
 	int   fCT_ch1;
 	int   fCT_ch2;
 
-	float fCT_dptrel;
-	float fCT_deltas;
-	float fCT_lproj;
-	float fCT_drl;
-
 	int   fCT_nj;
 	int   fCT_nb;
 	float fCT_ht;
 	float fCT_met;
+
+	int   fCT_nj_jesup;
+	int   fCT_nb_jesup;
+	float fCT_ht_jesup;
+	float fCT_met_jesup;
+
+	int   fCT_nj_jesdn;
+	int   fCT_nb_jesdn;
+	float fCT_ht_jesdn;
+	float fCT_met_jesdn;
+
+	int   fCT_nj_jer;
+	int   fCT_nb_jer;
+	float fCT_ht_jer;
+	float fCT_met_jer;
+
+	int   fCT_nj_bup;
+	int   fCT_nb_bup;
+	float fCT_ht_bup;
+	float fCT_met_bup;
+
+	int   fCT_nj_bdn;
+	int   fCT_nb_bdn;
+	float fCT_ht_bdn;
+	float fCT_met_bdn;
+
 
 	int   fCT_lID1;
 	int   fCT_lID2;

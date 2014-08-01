@@ -130,7 +130,7 @@ public:
 	std::vector<int, std::allocator<int> >* getLepGMID();
 
 	bool isPRRegionLepEvent(int&, int&, int&, int&, float);
-	bool isFRRegionLepEvent(int&, int&, float, bool);
+	bool isFRRegionLepEvent(int&, int&, float, bool = false);
 	bool isFRRegionLepEventTTBar(int);
 
 	// LEPTON 
@@ -158,7 +158,7 @@ public:
 	float getMT(int);
 	float getMT(int, int);
 
-	bool  isGoodJet(int, float, float);
+	bool  isGoodJet(int, float, float = 0);
 	bool  isGoodSynchJet(int, float);
 	float getLargestCSV();
 
@@ -477,6 +477,21 @@ public:
 			return std::make_pair("ttjets_semi", 102.5);
 		else if(file.Contains("TTJets") && file.Contains("FullLept") )
 			return std::make_pair("ttjets_full", 24.6);
+		else if(file.Contains("TTJets") && file.Contains("Hadronic") )
+			return std::make_pair("ttjets_hadronic", 104.3);
+	// single Top
+		else if(file.Contains("T-") && file.Contains("t-channel") )
+			return std::make_pair("t-t-channel", 47.0);
+		else if(file.Contains("T-") && file.Contains("s-channel") )
+			return std::make_pair("t-s-channel", 2.82);
+		else if(file.Contains("T-") && file.Contains("tW-channel") )
+			return std::make_pair("t-tW-channel", 10.7);
+		else if(file.Contains("Tbar-") && file.Contains("t-channel") )
+			return std::make_pair("tbar-t-channel", 25.0);
+		else if(file.Contains("Tbar-") && file.Contains("s-channel") )
+			return std::make_pair("tbar-s-channel", 1.57);
+		else if(file.Contains("Tbar-") && file.Contains("tW-channel") )
+			return std::make_pair("tbar-tW-channel", 10.7);
 	// WJets samples
 		else if(file.Contains("WJetsToLNu"))
 			return std::make_pair("wjets", 37509.);
@@ -502,6 +517,8 @@ public:
 			return std::make_pair("qcdmuenr", 6.609E7*0.0122);
 		else if(file.Contains("QCD") && file.Contains("50to80_MuEnrichedPt5"))
 			return std::make_pair("qcdmuenr", 8082000.0*0.0218);
+		else if(file.Contains("QCD") && file.Contains("Pt-20-MuEnrichedPt-15"))
+			return std::make_pair("qcdmuenr", 3.64E8*3.7E-4);
 	// EMEnriched
 		else if(file.Contains("QCD") && file.Contains("Pt_20_30_EMEnriched"))
 			return std::make_pair("qcdemenr", 2.886E8*0.0101);
